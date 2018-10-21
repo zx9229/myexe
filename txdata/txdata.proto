@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package txdata;
+
+import public "google/protobuf/timestamp.proto";
+
+enum MsgType {
+    Zero1                =  0;
+    ID_ConnectedData     =  1;
+    ID_DisconnectedData  =  2;
+    ID_PushData          =  3;
+    ID_ExecuteCommandReq = 31;
+    ID_ExecuteCommandRsp = 32;
+    ID_ReportDataReq     = 33;
+    ID_ReportDataRsp     = 34;
+}
+
+message ConnectionInfo {
+    enum AppType {
+        Zero2  = 0;
+        SERVER = 1; //服务端
+        AGENT  = 2; //代理端
+    }
+    enum LinkType {
+        Zero3   = 0;
+        CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
+        ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
+    }
+    string          UniqueID = 1;//唯一ID
+    string          BelongID = 2;//属于哪个ID
+    string          Version  = 3;//版本号
+    AppType         ExeType  = 4;
+    LinkType        LinkDir  = 5;//连接方向
+    int32           ExePid   = 6;//进程ID
+    string          ExePath  = 7;//程序路径
+}
+
+message ConnectedData {
+    ConnectionInfo  Info    = 1;
+    repeated string Pathway = 2;
+}
+
+message DisconnectedData {
+    ConnectionInfo  Info    = 1;
+}
+
+message ExecuteCommandReq {
+    int64           RequestID = 1;
+    repeated string Pathway   = 2;
+    string          Command   = 3;
+}
+
+message ExecuteCommandRsp {
+    int64           RequestID = 1;
+    string          UniqueID  = 2;//这个参数可以没有,我用它检查了数据,安心
+    string          Result    = 3;//结果.
+    int32           ErrNo     = 4;
+    string          ErrMsg    = 5;
+}
+
+message ReportDataReq {
+    int64                     RequestID  = 1;
+    string                    UniqueID   = 2;
+    int64                     SeqNo      = 3;
+    string                    Topic      = 4;//Data的主题.
+    string                    Data       = 5;
+    google.protobuf.Timestamp ReportTime = 6;
+}
+
+message ReportDataRsp {
+    int64           RequestID = 1;
+    repeated string Pathway   = 2;
+    int64           SeqNo     = 3;//这个参数可以没有,我用它检查了数据,安心
+    int32           ErrNo     = 4;//为0,表示SERVER处理成功,AGENT可以删除自己的缓存了.
+    string          ErrMsg    = 5;//(ErrNo==0 && len(ErrMsg)==0)表示SERVER最完美地处理了数据.
+}
+
+message PushData {//不缓存,不保证(一定发送到服务器).
+    string                    UniqueID   = 1;
+    string                    Topic      = 2;//Data的主题.
+    string                    Data       = 3;
+    google.protobuf.Timestamp ReportTime = 4;
+}

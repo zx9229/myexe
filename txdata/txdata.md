@@ -1,0 +1,1 @@
+protoc  --proto_path=./  txdata.proto  --go_out=plugins=grpc:./
