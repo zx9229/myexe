@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"my_code/_jiankong/wsnet"
 	"net/url"
 	"time"
+
+	"github.com/zx9229/myexe/wsnet"
 )
 
 func main() {

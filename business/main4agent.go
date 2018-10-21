@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"my_code/jiankong/txdata"
-	"my_code/jiankong/wsnet"
 	"net/http"
 	"time"
 
 	"github.com/golang/glog"
+	"github.com/zx9229/myexe/txdata"
+	"github.com/zx9229/myexe/wsnet"
 )
 
 var globalA *businessAgent

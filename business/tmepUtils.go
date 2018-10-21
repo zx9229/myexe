@@ -13,14 +13,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"my_code/jiankong/txdata"
-	"my_code/jiankong/wsnet"
 	"sync"
 	"time"
 	"unsafe"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
+	"github.com/zx9229/myexe/txdata"
+	"github.com/zx9229/myexe/wsnet"
 )
 
 type safeWsSocketMap struct {

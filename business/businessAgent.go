@@ -3,8 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"my_code/jiankong/txdata"
-	"my_code/jiankong/wsnet"
 	"os"
 	"path/filepath"
 	"time"
@@ -16,6 +14,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/zx9229/myexe/txdata"
+	"github.com/zx9229/myexe/wsnet"
 	"github.com/zx9229/zxgo/zxxorm"
 )
 

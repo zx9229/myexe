@@ -1,10 +1,10 @@
 package main
 
 import (
-	"my_code/jiankong/txdata"
 	"sync"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/zx9229/myexe/txdata"
 )
 
 type nodeReqRsp struct {

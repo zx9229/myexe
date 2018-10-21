@@ -1,8 +1,9 @@
 package main
 
 import (
-	"my_code/_jiankong/wsnet"
 	"net/url"
+
+	"github.com/zx9229/myexe/wsnet"
 )
 
 func main() {

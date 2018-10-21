@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"my_code/jiankong/txdata"
-	"my_code/jiankong/wsnet"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +10,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/zx9229/myexe/txdata"
+	"github.com/zx9229/myexe/wsnet"
 )
 
 type businessServer struct {

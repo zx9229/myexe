@@ -1,13 +1,11 @@
 package main
 
 import (
-	"my_code/_jiankong/wsnet"
-
-	simplehttpserver "github.com/zx9229/zxgo_push/SimpleHttpServer"
+	"github.com/zx9229/myexe/wsnet"
 )
 
 func main() {
-	shs := simplehttpserver.New_SimpleHttpServer("localhost:8080")
+	shs := wsnet.New_SimpleHttpServer("localhost:8080")
 	wss := wsnet.NewWsServer()
 	shs.GetHttpServeMux().HandleFunc("/echo", wss.WsHandler)
 	wss.CbConnected = wsnet.Example_CbConnected
