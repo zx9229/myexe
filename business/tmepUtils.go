@@ -7,7 +7,30 @@ https://godoc.org/go.uber.org/zap
 https://studygolang.com/articles/14220
 在Github中stars数最多的Go日志库集合
 https://studygolang.com/articles/11995
+
+关于orm,
+有Golang的ORM框架推荐么？或者相互比较的文章?
+https://www.zhihu.com/question/55072439
+在Github中stars数最多的Go数据库框架库集合
+https://my.oschina.net/u/168737/blog/1531834
+golang orm对比
+https://segmentfault.com/a/1190000015606291
+最终，我选择在gorm和xorm里面进行挑选。
+因为因为gorm不用gorm.Model的话，update时会在控制台打印警告信息，我还不知道怎么关掉它，另外xorm有gorm.Model的功能，所以我选择xorm。
+
+XORM - 官方博客
+http://blog.xorm.io/
+使用手册 - xorm: 简单而强大的 Go 语言ORM框架
+http://xorm.io/docs/
+
+sqlite 不允许非主键的自增属性
+https://www.sqlite.org/autoinc.html
+Because AUTOINCREMENT keyword changes the behavior of the ROWID selection algorithm, AUTOINCREMENT is not allowed on WITHOUT ROWID tables or on any table column other than INTEGER PRIMARY KEY. Any attempt to use AUTOINCREMENT on a WITHOUT ROWID table or on a column other than the INTEGER PRIMARY KEY column results in an error.
+
+sqlite中 是不是可以设置非主键的自动增长列-CSDN论坛
+https://bbs.csdn.net/topics/390603321
 */
+
 package main
 
 import (
