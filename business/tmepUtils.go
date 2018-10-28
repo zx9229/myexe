@@ -36,6 +36,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/smtp"
+	"strings"
 	"sync"
 	"time"
 	"unsafe"
@@ -202,6 +204,31 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 	}
 
 	return
+}
+
+func sendMail(username, password, smtpAddr, to, subject, contentType, content string) error {
+	/*
+		username := "sender@163.com"
+		password := "senderPassword"
+		smtpAddr := "smtp.163.com:25"
+		to := "receiver1@163.com;receiver2@126.com;receiver3@hotmail.com"
+		subject := "测试邮件"
+		bodyType := "plain"
+		content := "这是一封测试邮件，用于测试自动发送。"
+		它只负责发送信息到服务器,至于,收件人是否正确,是否被退信,之类的详细提示,需要登录邮箱查看.
+	*/
+	if contentType != "html" {
+		contentType = "plain"
+	}
+	currAuth := smtp.PlainAuth("", username, password, strings.Split(smtpAddr, ":")[0])
+	var mailMsg string
+	mailMsg += fmt.Sprintf("From: %s\r\n", username)
+	mailMsg += fmt.Sprintf("To: %s\r\n", to)
+	mailMsg += fmt.Sprintf("Subject: %s\r\n", subject)
+	mailMsg += fmt.Sprintf("Content-Type: text/%s; charset=UTF-8\r\n", contentType)
+	mailMsg += fmt.Sprintf("\r\n")
+	mailMsg += content
+	return smtp.SendMail(smtpAddr, currAuth, username, strings.Split(to, ";"), []byte(mailMsg))
 }
 
 //ReportDataAgent 上报的数据(存储到Agent)
