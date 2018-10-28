@@ -61,10 +61,10 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, new(ReportDataServer)); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	if err = thls.xEngine.CreateTables(&KeyValue{}, &ReportDataAgent{}, &ReportDataServer{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, new(ReportDataServer)); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(&KeyValue{}, &ReportDataServer{}); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -181,11 +181,10 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.
 	}
 }
 
-func (thls *businessServer) handle_MsgType_ID_ReportDataReq(msgData *txdata.ReportDataReq, msgConn *wsnet.WsSocket) {
+func (thls *businessServer) handle_MsgType_ID_ReportDataReq_inner(msgData *txdata.ReportDataReq) (rspData *txdata.ReportDataRsp) {
 	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
 		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
 	}
-	var rspData *txdata.ReportDataRsp
 	for range "1" {
 		//以(UniqueID+SeqNo)唯一定位一条数据.
 		rds := &ReportDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
@@ -214,6 +213,11 @@ func (thls *businessServer) handle_MsgType_ID_ReportDataReq(msgData *txdata.Repo
 		}
 		rspData = ReportDataReq2ReportDataRsp4Err(msgData, 0, "")
 	}
+	return
+}
+
+func (thls *businessServer) handle_MsgType_ID_ReportDataReq(msgData *txdata.ReportDataReq, msgConn *wsnet.WsSocket) {
+	rspData := thls.handle_MsgType_ID_ReportDataReq_inner(msgData)
 	glog.Infoln("ReportData:", msgData)
 	//
 	if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
@@ -314,4 +318,49 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 		thls.cacheReqRsp.deleteElement(reqInOut.RequestID)
 	}
 	return
+}
+
+func (thls *businessServer) reportData(reqInOut *txdata.ReportDataReq, d time.Duration) (rspOut *txdata.ReportDataRsp) {
+	if true { //修复请求结构体的相关字段.
+		reqInOut.RequestID = 0
+		reqInOut.UniqueID = thls.ownInfo.UniqueID
+		reqInOut.SeqNo = 0
+		//reqInOut.Topic
+		//reqInOut.Data
+		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
+	}
+	ReportDataReq2ReportDataAgent := func(reqIn *txdata.ReportDataReq) *ReportDataAgent {
+		rda := &ReportDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, Topic: reqIn.Topic, Data: reqIn.Data, ReportTime: time.Time{}}
+		rda.ReportTime, _ = ptypes.Timestamp(reqIn.ReportTime)
+		return rda
+	}
+	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
+		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+	}
+	for range "1" {
+		rda := ReportDataReq2ReportDataAgent(reqInOut)
+		var err error
+		var affected int64
+		if affected, err = thls.xEngine.InsertOne(rda); err != nil {
+			rspOut = ReportDataReq2ReportDataRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
+			break
+		}
+		if affected != 1 {
+			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
+		}
+		reqInOut.SeqNo = rda.SeqNo //利用xorm的特性.
+		//
+		rspOut = thls.handle_MsgType_ID_ReportDataReq_inner(reqInOut)
+		if (rspOut.RequestID != reqInOut.RequestID) || (rspOut.SeqNo != reqInOut.SeqNo) {
+			glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
+		}
+	}
+	return
+}
+
+func (thls *businessServer) pushData(reqInOut *txdata.PushData) error {
+	reqInOut.UniqueID = thls.ownInfo.UniqueID
+	reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
+	thls.handle_MsgType_ID_PushData(reqInOut, nil)
+	return nil
 }
