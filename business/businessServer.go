@@ -61,10 +61,10 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &ReportDataAgent{}, &ReportDataServer{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonAtosDataAgent{}, &CommonAtosDataServer{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &ReportDataServer{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonAtosDataAgent{}, &CommonAtosDataServer{}); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -118,6 +118,10 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 		thls.handle_MsgType_ID_ReportDataReq(txMsgData.(*txdata.ReportDataReq), msgConn)
 	case txdata.MsgType_ID_ReportDataRsp:
 		thls.handle_MsgType_ID_ReportDataRsp(txMsgData.(*txdata.ReportDataRsp), msgConn)
+	case txdata.MsgType_ID_CommonAtosReq:
+		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
+	case txdata.MsgType_ID_CommonAtosRsp:
+		thls.handle_MsgType_ID_CommonAtosRsp(txMsgData.(*txdata.CommonAtosRsp), msgConn)
 	default:
 		glog.Errorf("unknown txdata.MsgType, msgConn=%p, txMsgType=%v", msgConn, txMsgType)
 	}
@@ -363,4 +367,66 @@ func (thls *businessServer) pushData(reqInOut *txdata.PushData) error {
 	reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
 	thls.handle_MsgType_ID_PushData(reqInOut, nil)
 	return nil
+}
+
+////////////////////////////////////////////////////////////////////////
+func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
+	CommonAtosReq2CommonAtosRsp4Err := func(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
+		return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+	}
+	glog.Infoln("CommonAtosReq", msgData)
+	return CommonAtosReq2CommonAtosRsp4Err(msgData, 0, "")
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
+	CommonAtosReq2CommonAtosRsp4Err := func(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
+		return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+	}
+	for range "1" {
+		//以(UniqueID+SeqNo)唯一定位一条数据.
+		cads := &CommonAtosDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
+		if has, err := thls.xEngine.Get(cads); err != nil {
+			glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
+			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, -83, fmt.Sprintf("query from db with err=%v", err))
+			break
+		} else if has {
+			//已经存在这一条数据了,就(ErrNo=0)然后AGENT会从缓存中移除这一条数据.
+			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, 0, "already existed")
+			break
+		}
+		if true {
+			//cads.SeqNo
+			//cads.UniqueID
+			cads.DataType = msgData.DataType
+			cads.Data = msgData.Data
+			cads.ReportTime, _ = ptypes.Timestamp(msgData.ReportTime)
+		}
+		if affected, err := thls.xEngine.InsertOne(cads); err != nil {
+			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
+			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, -83, fmt.Sprintf("insert to db with err=%v", err))
+			break
+		} else if affected != 1 {
+			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads) //我就是想知道,成功的话,除了1,还有其他值吗.
+		}
+		rspData = thls.handle_MsgType_ID_CommonAtosReq_process(msgData)
+	}
+	return
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
+	rspData := thls.handle_MsgType_ID_CommonAtosReq_inner(msgData)
+	//
+	if needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
+		if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
+			rspData.Pathway = connInfoEx.Pathway
+			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
+		} else {
+			glog.Infof("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+		}
+	}
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.CommonAtosRsp, msgConn *wsnet.WsSocket) {
+	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
+	return
 }

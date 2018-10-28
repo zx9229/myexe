@@ -23,7 +23,7 @@ import (
 大写字母S的10进制是83，所以Server端暂定端口号10083
 {
     "ConfType": "SERVER",
-    "UniqueID": "a1",
+    "UniqueID": "s1",
     "ServerURL": { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" },
     "DataSourceName": "database_s1.db",
     "LocationName": "Asia/Shanghai"

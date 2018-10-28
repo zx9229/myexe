@@ -15,6 +15,10 @@ import (
 //-log_dir     启用(golang/glog)
 //-logtostderr 启用(golang/glog)
 func main() {
+	if true {
+		flag.Set("stderrthreshold", "WARNING")
+		flag.Set("logtostderr", "true")
+	}
 	var (
 		argHelp   bool
 		argJSON   string

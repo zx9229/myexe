@@ -192,6 +192,10 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 		msgData = new(txdata.ReportDataReq)
 	case txdata.MsgType_ID_ReportDataRsp:
 		msgData = new(txdata.ReportDataRsp)
+	case txdata.MsgType_ID_CommonAtosReq:
+		msgData = new(txdata.CommonAtosReq)
+	case txdata.MsgType_ID_CommonAtosRsp:
+		msgData = new(txdata.CommonAtosRsp)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType=%v", msgType)
@@ -260,4 +264,36 @@ type ReportDataServer struct {
 type KeyValue struct {
 	Key   string `xorm:"notnull pk"`
 	Value string `xorm:"notnull"`
+}
+
+//CommonAtosDataAgent omit
+type CommonAtosDataAgent struct {
+	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
+	UniqueID    string    //
+	DataType    string    //
+	Data        []byte    //
+	ReportTime  time.Time //报告时间
+	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	FatalErrNo  int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	FatalErrMsg string    //错误的具体原因.
+}
+
+//CommonAtosDataServer omit
+type CommonAtosDataServer struct {
+	SeqNo      int64     `xorm:"pk notnull"`
+	UniqueID   string    `xorm:"pk notnull"`
+	DataType   string    //
+	Data       []byte    //
+	ReportTime time.Time //报告时间
+	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+}
+
+func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
+	//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
+	return (requestID != 0)
+}
+
+func dbRelated_CommonAtos_SeqNo(seqNo int64) bool {
+	//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
+	return (seqNo != 0)
 }
