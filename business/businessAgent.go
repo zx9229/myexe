@@ -655,16 +655,15 @@ func (thls *businessAgent) handle_MsgType_ID_CommonAtosReq(msgData *txdata.Commo
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	if 0 < msgData.RequestID { //RequestID不为0,说明有人在等着呢,此时需要回应它,
-		if err := thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, msgData); err != nil {
-			if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
-				rspData := CommonAtosReq2CommonAtosRsp4Err(msgData, -1, err.Error())
-				rspData.Pathway = connInfoEx.Pathway
-				connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
-			} else {
-				//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
-				glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
-			}
+
+	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
+		if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
+			rspData := CommonAtosReq2CommonAtosRsp4Err(msgData, -1, err.Error())
+			rspData.Pathway = connInfoEx.Pathway
+			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
+		} else {
+			//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
+			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	}
 }
