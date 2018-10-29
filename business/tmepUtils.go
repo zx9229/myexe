@@ -37,6 +37,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/smtp"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -44,6 +45,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
 )
@@ -301,4 +303,20 @@ type CommRspData struct {
 
 func CommonAtosReq2CommonAtosRsp4Err(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
 	return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+}
+
+func Message2CommonAtosReq(src proto.Message, reportTime time.Time, uniqueID string, isEndeavour bool) *txdata.CommonAtosReq {
+	dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: uniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
+	var err error
+	if dst.Data, err = proto.Marshal(src); err != nil {
+		glog.Fatalln(err, src)
+	}
+	if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
+		glog.Fatalln(err, reportTime)
+	}
+	return dst
+}
+
+func CommonAtosReqRsp2CommRspData(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
+	return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }

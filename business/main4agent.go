@@ -39,6 +39,29 @@ func handleReportData(w http.ResponseWriter, r *http.Request) {
 	handleCommonFun(w, r, curObj, obj2msg)
 }
 
+func handleSendMail(w http.ResponseWriter, r *http.Request) {
+	curObj := new(struct {
+		txdata.SendMailItem
+		Cache   bool
+		Timeout int
+	})
+	obj2msg := func(obj interface{}) (req *txdata.CommonAtosReq, sec int) {
+		theObj := obj.(*struct {
+			txdata.SendMailItem
+			Cache   bool
+			Timeout int
+		})
+		var err error
+		req = &txdata.CommonAtosReq{Endeavour: theObj.Cache, DataType: reflect.TypeOf(curObj.SendMailItem).String()}
+		if req.Data, err = proto.Marshal(&theObj.SendMailItem); err != nil {
+			glog.Fatalln(err, obj)
+		}
+		sec = theObj.Timeout
+		return
+	}
+	handleCommonFun(w, r, curObj, obj2msg)
+}
+
 func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonAtosReq, int)) {
 	var err error
 	var byteSlice []byte
@@ -86,6 +109,7 @@ func runAgent(cfg *configAgent) {
 	cs.CbReceive = globalA.onMessage
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4a", cacheAgent4a)
 	cs.Run()
 }

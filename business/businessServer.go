@@ -20,6 +20,7 @@ type businessServer struct {
 	cacheAgent  *safeConnInfoMap
 	cacheReqRsp *safeNodeReqRspCache
 	ownInfo     txdata.ConnectionInfo
+	mailCfg     config4mail
 	xEngine     *xorm.Engine
 }
 
@@ -40,6 +41,8 @@ func newBusinessServer(cfg *configServer) *businessServer {
 	curData.ownInfo.LinkDir = txdata.ConnectionInfo_Zero3
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
+	//
+	curData.mailCfg = cfg.MailCfg
 	//
 	curData.initEngine(cfg.DataSourceName, cfg.LocationName)
 	//
@@ -216,6 +219,12 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txd
 			glog.Fatalln(msgData)
 		}
 		errNo, errMsg = thls.handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(msgData, curData)
+	case "txdata.SendMailItem":
+		curData := &txdata.SendMailItem{}
+		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
+			glog.Fatalln(msgData)
+		}
+		errNo, errMsg = thls.handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(msgData, curData)
 	default:
 		errNo = -1
 		errMsg = "unknown data type"
@@ -225,6 +234,19 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txd
 
 func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(commReq *txdata.CommonAtosReq, item *txdata.ReportDataItem) (errNo int32, errMsg string) {
 	glog.Infoln(commReq.DataType, item)
+	return
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(commReq *txdata.CommonAtosReq, item *txdata.SendMailItem) (errNo int32, errMsg string) {
+	if len(item.Username) == 0 {
+		item.Username = thls.mailCfg.Username
+		item.Password = thls.mailCfg.Password
+		item.SmtpAddr = thls.mailCfg.SMTPAddr
+	}
+	if err := sendMail(item.Username, item.Password, item.SmtpAddr, item.To, item.Subject, item.ContentType, item.Content); err != nil {
+		errNo = -1
+		errMsg = err.Error()
+	}
 	return
 }
 

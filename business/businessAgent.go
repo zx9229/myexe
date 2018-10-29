@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"time"
 	"unsafe"
 
@@ -569,21 +568,13 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 }
 
 func (thls *businessAgent) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	toCommonAtosReq := func(src *txdata.ReportDataItem, reportTime time.Time) *txdata.CommonAtosReq {
-		dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: thls.ownInfo.UniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
-		var err error
-		if dst.Data, err = proto.Marshal(src); err != nil {
-			glog.Fatalln(err, src)
-		}
-		if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
-			glog.Fatalln(err, reportTime)
-		}
-		return dst
-	}
-	toCommRspData := func(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
-		return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
-	}
-	reqInOut := toCommonAtosReq(dataIn, time.Now())
+	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
-	return toCommRspData(reqInOut, rspOut)
+	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+}
+
+func (thls *businessAgent) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
+	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	rspOut := thls.commonAtos(reqInOut, d)
+	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
 }

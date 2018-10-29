@@ -26,7 +26,12 @@ import (
     "UniqueID": "s1",
     "ServerURL": { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" },
     "DataSourceName": "database_s1.db",
-    "LocationName": "Asia/Shanghai"
+	"LocationName": "Asia/Shanghai",
+	"MailCfg": {
+        "Username": "用户名@163.com",
+        "Password": "用户名的密码",
+        "SMTPAddr": "smtp.163.com:25"
+    }
 }
 */
 
@@ -77,6 +82,12 @@ func (thls *configAgent) isValid() error {
 	return err
 }
 
+type config4mail struct {
+	Username string //邮箱的用户名
+	Password string //邮箱的密码
+	SMTPAddr string //邮箱的SMTP地址
+}
+
 type configServer struct {
 	configBase
 	UniqueID       string
@@ -84,6 +95,7 @@ type configServer struct {
 	ClientURL      []url.URL
 	DataSourceName string //数据源的名字.
 	LocationName   string //数据源的时区的名字.
+	MailCfg        config4mail
 }
 
 //isValid 仅做基本检查(类似URL是否合法这种详细的检查,不做).
