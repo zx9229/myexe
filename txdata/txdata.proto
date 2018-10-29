@@ -79,3 +79,13 @@ message ReportDataItem {
     string Topic = 1;//Data的主题.
     string Data  = 2;
 }
+
+message SendMailItem {//发送邮件的项
+    string Username    = 1;
+    string Password    = 2;
+    string SmtpAddr    = 3;
+    string To          = 4;
+    string Subject     = 5;
+    string ContentType = 6;
+    string Content     = 7;
+}
