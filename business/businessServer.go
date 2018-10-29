@@ -75,7 +75,7 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 
 func (thls *businessServer) onConnected(msgConn *wsnet.WsSocket, isAccepted bool) {
 	glog.Warningf("[   onConnected] msgConn=%p, isAccepted=%v, LocalAddr=%v, RemoteAddr=%v", msgConn, isAccepted, msgConn.LocalAddr(), msgConn.RemoteAddr())
-	if !thls.cacheSock.insertData(msgConn, isAccepted) {
+	if thls.cacheSock.insertData(msgConn, isAccepted) == false {
 		glog.Fatalf("already exists, msgConn=%v", msgConn)
 	}
 	if !isAccepted {
@@ -85,18 +85,20 @@ func (thls *businessServer) onConnected(msgConn *wsnet.WsSocket, isAccepted bool
 }
 
 func (thls *businessServer) onDisconnected(msgConn *wsnet.WsSocket, err error) {
-	glog.Warningf("[onDisconnected] msgConn=%p, err=%v", msgConn, err)
-	if dataSlice := thls.cacheAgent.deleteDataByConn(msgConn); dataSlice != nil {
-		//儿子和我断开连接,我要清理掉儿子和孙子的缓存.
+	checkSunWhenDisconnected := func(dataSlice []*connInfoEx) {
 		sonNum := 0
 		for _, node := range dataSlice {
 			if len(node.Pathway) == 1 { //步长为1的是儿子.
 				sonNum++
 			}
 		}
-		if 1 < sonNum {
-			glog.Fatalf("one msgConn to multi connInfoEx, msgConn=%p", msgConn)
+		if sonNum != 1 {
+			glog.Fatalf("one msgConn with sonNum=%v", sonNum)
 		}
+	}
+	glog.Warningf("[onDisconnected] msgConn=%p, err=%v", msgConn, err)
+	if dataSlice := thls.cacheAgent.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
+		checkSunWhenDisconnected(dataSlice)
 	}
 	thls.deleteConnectionFromAll(msgConn, false)
 }
@@ -177,13 +179,15 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq(msgData *txdata.Comm
 	}
 }
 
+var fatalErrNo int32 = -83
+
 func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
 	for range "1" {
 		//以(UniqueID+SeqNo)唯一定位一条数据.
 		cads := &CommonAtosDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
 		if has, err := thls.xEngine.Get(cads); err != nil {
 			glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
-			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, -83, fmt.Sprintf("query from db with err=%v", err))
+			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("query from db with err=%v", err))
 			break
 		} else if has {
 			//已经存在这一条数据了,就(ErrNo=0)然后AGENT会从缓存中移除这一条数据.
@@ -199,7 +203,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdat
 		}
 		if affected, err := thls.xEngine.InsertOne(cads); err != nil {
 			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
-			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, -83, fmt.Sprintf("insert to db with err=%v", err))
+			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("insert to db with err=%v", err))
 			break
 		} else if affected != 1 {
 			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads) //我就是想知道,成功的话,除了1,还有其他值吗.

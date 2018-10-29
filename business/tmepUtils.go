@@ -289,8 +289,18 @@ func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
 	return (requestID != 0)
 }
 
+func reqrspRelated_RequestID(requestID int64) bool {
+	//req&rsp相关(//从safeNodeReqRspCache出来的RequestID都是正数)
+	return (0 < requestID)
+}
+
+func backgroundRelated_RequestID(requestID int64) bool {
+	//背景执行相关的请求ID. //从background出来的RequestID都是负数
+	return (requestID < 0)
+}
+
 func dbRelated_CommonAtos_SeqNo(seqNo int64) bool {
-	//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
+	//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)//(SeqNo非0,表示插入了数据库)
 	return (seqNo != 0)
 }
 
