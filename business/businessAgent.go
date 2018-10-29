@@ -282,6 +282,76 @@ func (thls *businessAgent) handle_MsgType_ID_DisconnectedData(msgData *txdata.Di
 	thls.sendDataToParent(txdata.MsgType_ID_DisconnectedData, msgData)
 }
 
+func (thls *businessAgent) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
+	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
+		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+
+	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
+		if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
+			rspData := CommonAtosReq2CommonAtosRsp4Err(msgData, -1, err.Error())
+			rspData.Pathway = connInfoEx.Pathway
+			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
+		} else {
+			//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
+			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+		}
+	}
+}
+
+func (thls *businessAgent) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.CommonAtosRsp, msgConn *wsnet.WsSocket) {
+	if thls.parentData.conn != msgConn {
+		glog.Errorf("the data must come from my father, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+	var pathwayLen int
+	if pathwayLen = len(msgData.Pathway); pathwayLen == 0 {
+		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+	if thls.ownInfo.UniqueID != msgData.Pathway[pathwayLen-1] {
+		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+	msgData.Pathway = msgData.Pathway[:pathwayLen-1]
+	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
+		nextUID := msgData.Pathway[pathwayLen-1]
+		if nextConnInfoEx, isExist := thls.cacheAgent.queryData(nextUID); isExist {
+			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, msgData))
+		} else {
+			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+		}
+	} else {
+		if 0 < msgData.RequestID { //从safeNodeReqRspCache出来的RequestID都是正数
+			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
+				node.rspType = txdata.MsgType_ID_CommonAtosRsp
+				node.rspData = msgData
+				node.condVar.notifyAll()
+			} else {
+				glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
+			}
+		}
+		if dbRelated_CommonAtos_SeqNo(msgData.SeqNo) { //SeqNo非0,表示插入了数据库.
+			if msgData.ErrNo == 0 { //ErrNo为0,表示SERVER处理成功,AGENT可以删除自己的缓存了.
+				if affected, err := thls.xEngine.Delete(&CommonAtosDataAgent{SeqNo: msgData.SeqNo}); err != nil {
+					glog.Fatalf("Engine.Delete with affected=%v, err=%v", affected, err)
+				}
+				//可能AGENT短时间内发送了两个相同的请求,此时,第一个响应已经删除了数据,第二个响应会执行成功,同时删除零行(猜测//TODO:).
+				//所以,可能存在(err == nil && affected == 0)的情况.
+			}
+			if msgData.ErrNo == -83 { //为(-83)表示SERVER无法处理这个数据,此时AGENT不应当再上报它了,因为上报了也处理不了.
+				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataAgent{FatalErrNo: msgData.ErrNo, FatalErrMsg: msgData.ErrMsg}); err != nil {
+					glog.Fatalf("Engine.Update with err=%v", err)
+				}
+			}
+		}
+		if msgData.RequestID < 0 { //从background出来的RequestID都是负数
+			thls.workChan <- msgData.SeqNo
+		}
+	}
+}
+
 func (thls *businessAgent) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
 	if thls.parentData.conn != msgConn {
 		glog.Errorf("the data must be from the father, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -432,26 +502,6 @@ func (thls *businessAgent) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt
 	thls.cacheAgent.deleteDataByConn(conn)
 }
 
-func (thls *businessAgent) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	toCommonAtosReq := func(src *txdata.ReportDataItem, reportTime time.Time) *txdata.CommonAtosReq {
-		dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: thls.ownInfo.UniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
-		var err error
-		if dst.Data, err = proto.Marshal(src); err != nil {
-			glog.Fatalln(err, src)
-		}
-		if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
-			glog.Fatalln(err, reportTime)
-		}
-		return dst
-	}
-	toCommRspData := func(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
-		return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
-	}
-	reqInOut := toCommonAtosReq(dataIn, time.Now())
-	rspOut := thls.commonAtos(reqInOut, d)
-	return toCommRspData(reqInOut, rspOut)
-}
-
 func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Duration) (rspOut *txdata.CommonAtosRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
@@ -518,72 +568,22 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 	return
 }
 
-func (thls *businessAgent) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
-		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-
-	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
-		if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
-			rspData := CommonAtosReq2CommonAtosRsp4Err(msgData, -1, err.Error())
-			rspData.Pathway = connInfoEx.Pathway
-			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
-		} else {
-			//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
-			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+func (thls *businessAgent) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
+	toCommonAtosReq := func(src *txdata.ReportDataItem, reportTime time.Time) *txdata.CommonAtosReq {
+		dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: thls.ownInfo.UniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
+		var err error
+		if dst.Data, err = proto.Marshal(src); err != nil {
+			glog.Fatalln(err, src)
 		}
-	}
-}
-
-func (thls *businessAgent) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.CommonAtosRsp, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn != msgConn {
-		glog.Errorf("the data must come from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	var pathwayLen int
-	if pathwayLen = len(msgData.Pathway); pathwayLen == 0 {
-		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if thls.ownInfo.UniqueID != msgData.Pathway[pathwayLen-1] {
-		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	msgData.Pathway = msgData.Pathway[:pathwayLen-1]
-	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
-		nextUID := msgData.Pathway[pathwayLen-1]
-		if nextConnInfoEx, isExist := thls.cacheAgent.queryData(nextUID); isExist {
-			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, msgData))
-		} else {
-			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+		if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
+			glog.Fatalln(err, reportTime)
 		}
-	} else {
-		if 0 < msgData.RequestID { //从safeNodeReqRspCache出来的RequestID都是正数
-			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-				node.rspType = txdata.MsgType_ID_CommonAtosRsp
-				node.rspData = msgData
-				node.condVar.notifyAll()
-			} else {
-				glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
-			}
-		}
-		if dbRelated_CommonAtos_SeqNo(msgData.SeqNo) { //SeqNo非0,表示插入了数据库.
-			if msgData.ErrNo == 0 { //ErrNo为0,表示SERVER处理成功,AGENT可以删除自己的缓存了.
-				if affected, err := thls.xEngine.Delete(&CommonAtosDataAgent{SeqNo: msgData.SeqNo}); err != nil {
-					glog.Fatalf("Engine.Delete with affected=%v, err=%v", affected, err)
-				}
-				//可能AGENT短时间内发送了两个相同的请求,此时,第一个响应已经删除了数据,第二个响应会执行成功,同时删除零行(猜测//TODO:).
-				//所以,可能存在(err == nil && affected == 0)的情况.
-			}
-			if msgData.ErrNo == -83 { //为(-83)表示SERVER无法处理这个数据,此时AGENT不应当再上报它了,因为上报了也处理不了.
-				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataAgent{FatalErrNo: msgData.ErrNo, FatalErrMsg: msgData.ErrMsg}); err != nil {
-					glog.Fatalf("Engine.Update with err=%v", err)
-				}
-			}
-		}
-		if msgData.RequestID < 0 { //从background出来的RequestID都是负数
-			thls.workChan <- msgData.SeqNo
-		}
+		return dst
 	}
+	toCommRspData := func(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
+		return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
+	}
+	reqInOut := toCommonAtosReq(dataIn, time.Now())
+	rspOut := thls.commonAtos(reqInOut, d)
+	return toCommRspData(reqInOut, rspOut)
 }
