@@ -241,7 +241,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(
 	if len(item.Username) == 0 {
 		item.Username = thls.mailCfg.Username
 		item.Password = thls.mailCfg.Password
-		item.SmtpAddr = thls.mailCfg.SMTPAddr
+		item.SmtpAddr = thls.mailCfg.SmtpAddr
 	}
 	if err := sendMail(item.Username, item.Password, item.SmtpAddr, item.To, item.Subject, item.ContentType, item.Content); err != nil {
 		errNo = -1

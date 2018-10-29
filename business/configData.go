@@ -85,7 +85,7 @@ func (thls *configAgent) isValid() error {
 type config4mail struct {
 	Username string //邮箱的用户名
 	Password string //邮箱的密码
-	SMTPAddr string //邮箱的SMTP地址
+	SmtpAddr string //邮箱的SMTP地址
 }
 
 type configServer struct {
