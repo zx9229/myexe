@@ -9,6 +9,7 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
@@ -108,16 +109,10 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_PushData:
-		thls.handle_MsgType_ID_PushData(txMsgData.(*txdata.PushData), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandReq:
 		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
 		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
-	case txdata.MsgType_ID_ReportDataReq:
-		thls.handle_MsgType_ID_ReportDataReq(txMsgData.(*txdata.ReportDataReq), msgConn)
-	case txdata.MsgType_ID_ReportDataRsp:
-		thls.handle_MsgType_ID_ReportDataRsp(txMsgData.(*txdata.ReportDataRsp), msgConn)
 	case txdata.MsgType_ID_CommonAtosReq:
 		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
 	case txdata.MsgType_ID_CommonAtosRsp:
@@ -166,10 +161,6 @@ func (thls *businessServer) handle_MsgType_ID_DisconnectedData(msgData *txdata.D
 	}
 }
 
-func (thls *businessServer) handle_MsgType_ID_PushData(msgData *txdata.PushData, msgConn *wsnet.WsSocket) {
-	glog.Warningln("PushData:", msgData) //TODO:待添加真正的执行代码.
-}
-
 func (thls *businessServer) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
 	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 	return
@@ -183,58 +174,6 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.
 	} else {
 		glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
 	}
-}
-
-func (thls *businessServer) handle_MsgType_ID_ReportDataReq_inner(msgData *txdata.ReportDataReq) (rspData *txdata.ReportDataRsp) {
-	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
-		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
-	for range "1" {
-		//以(UniqueID+SeqNo)唯一定位一条数据.
-		rds := &ReportDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
-		if has, err := thls.xEngine.Get(rds); err != nil {
-			glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, rds)
-			rspData = ReportDataReq2ReportDataRsp4Err(msgData, -83, fmt.Sprintf("query from db with err=%v", err))
-			break
-		} else if has {
-			//已经存在这一条数据了,就(ErrNo=0)然后AGENT会从缓存中移除这一条数据.
-			rspData = ReportDataReq2ReportDataRsp4Err(msgData, 0, "already existed")
-			break
-		}
-		if true {
-			//rds.SeqNo
-			//rds.UniqueID
-			rds.Topic = msgData.Topic
-			rds.Data = msgData.Data
-			rds.ReportTime, _ = ptypes.Timestamp(msgData.ReportTime)
-		}
-		if affected, err := thls.xEngine.InsertOne(rds); err != nil {
-			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, rds=%v", affected, err, rds)
-			rspData = ReportDataReq2ReportDataRsp4Err(msgData, -83, fmt.Sprintf("insert to db with err=%v", err))
-			break
-		} else if affected != 1 {
-			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, rds=%v", affected, err, rds) //我就是想知道,成功的话,除了1,还有其他值吗.
-		}
-		rspData = ReportDataReq2ReportDataRsp4Err(msgData, 0, "")
-	}
-	return
-}
-
-func (thls *businessServer) handle_MsgType_ID_ReportDataReq(msgData *txdata.ReportDataReq, msgConn *wsnet.WsSocket) {
-	rspData := thls.handle_MsgType_ID_ReportDataReq_inner(msgData)
-	glog.Infoln("ReportData:", msgData)
-	//
-	if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
-		rspData.Pathway = connInfoEx.Pathway
-		connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_ReportDataRsp, rspData))
-	} else {
-		glog.Infof("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
-	}
-}
-
-func (thls *businessServer) handle_MsgType_ID_ReportDataRsp(msgData *txdata.ReportDataRsp, msgConn *wsnet.WsSocket) {
-	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-	return
 }
 
 func (thls *businessServer) doDeal4agent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
@@ -324,58 +263,29 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 	return
 }
 
-func (thls *businessServer) reportData(reqInOut *txdata.ReportDataReq, d time.Duration) (rspOut *txdata.ReportDataRsp) {
-	if true { //修复请求结构体的相关字段.
-		reqInOut.RequestID = 0
-		reqInOut.UniqueID = thls.ownInfo.UniqueID
-		reqInOut.SeqNo = 0
-		//reqInOut.Topic
-		//reqInOut.Data
-		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
-	}
-	ReportDataReq2ReportDataAgent := func(reqIn *txdata.ReportDataReq) *ReportDataAgent {
-		rda := &ReportDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, Topic: reqIn.Topic, Data: reqIn.Data, ReportTime: time.Time{}}
-		rda.ReportTime, _ = ptypes.Timestamp(reqIn.ReportTime)
-		return rda
-	}
-	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
-		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
-	for range "1" {
-		rda := ReportDataReq2ReportDataAgent(reqInOut)
-		var err error
-		var affected int64
-		if affected, err = thls.xEngine.InsertOne(rda); err != nil {
-			rspOut = ReportDataReq2ReportDataRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
-			break
-		}
-		if affected != 1 {
-			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
-		}
-		reqInOut.SeqNo = rda.SeqNo //利用xorm的特性.
-		//
-		rspOut = thls.handle_MsgType_ID_ReportDataReq_inner(reqInOut)
-		if (rspOut.RequestID != reqInOut.RequestID) || (rspOut.SeqNo != reqInOut.SeqNo) {
-			glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
-		}
-	}
+func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(commReq *txdata.CommonAtosReq, item *txdata.ReportDataItem) (errNo int32, errMsg string) {
+	glog.Infoln(commReq.DataType, item)
 	return
 }
 
-func (thls *businessServer) pushData(reqInOut *txdata.PushData) error {
-	reqInOut.UniqueID = thls.ownInfo.UniqueID
-	reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
-	thls.handle_MsgType_ID_PushData(reqInOut, nil)
-	return nil
-}
-
-////////////////////////////////////////////////////////////////////////
 func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
 	CommonAtosReq2CommonAtosRsp4Err := func(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
 		return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
 	}
-	glog.Infoln("CommonAtosReq", msgData)
-	return CommonAtosReq2CommonAtosRsp4Err(msgData, 0, "")
+	var errNo int32
+	var errMsg string
+	switch msgData.DataType {
+	case "txdata.ReportDataItem":
+		curData := &txdata.ReportDataItem{}
+		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
+			glog.Fatalln(msgData)
+		}
+		errNo, errMsg = thls.handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(msgData, curData)
+	default:
+		errNo = -1
+		errMsg = "unknown data type"
+	}
+	return CommonAtosReq2CommonAtosRsp4Err(msgData, errNo, errMsg)
 }
 
 func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {

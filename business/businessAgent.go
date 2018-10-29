@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"time"
 	"unsafe"
 
@@ -206,16 +207,10 @@ func (thls *businessAgent) onMessage(msgConn *wsnet.WsSocket, msgData []byte, ms
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_PushData:
-		thls.handle_MsgType_ID_PushData(txMsgData.(*txdata.PushData), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandReq:
 		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
 		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
-	case txdata.MsgType_ID_ReportDataReq:
-		thls.handle_MsgType_ID_ReportDataReq(txMsgData.(*txdata.ReportDataReq), msgConn)
-	case txdata.MsgType_ID_ReportDataRsp:
-		thls.handle_MsgType_ID_ReportDataRsp(txMsgData.(*txdata.ReportDataRsp), msgConn)
 	case txdata.MsgType_ID_CommonAtosReq:
 		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
 	case txdata.MsgType_ID_CommonAtosRsp:
@@ -287,14 +282,6 @@ func (thls *businessAgent) handle_MsgType_ID_DisconnectedData(msgData *txdata.Di
 	thls.sendDataToParent(txdata.MsgType_ID_DisconnectedData, msgData)
 }
 
-func (thls *businessAgent) handle_MsgType_ID_PushData(msgData *txdata.PushData, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
-		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	thls.sendDataToParent(txdata.MsgType_ID_PushData, msgData)
-}
-
 func (thls *businessAgent) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
 	if thls.parentData.conn != msgConn {
 		glog.Errorf("the data must be from the father, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -331,75 +318,6 @@ func (thls *businessAgent) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.E
 		return
 	}
 	thls.sendDataToParent(txdata.MsgType_ID_ExecuteCommandRsp, msgData)
-}
-
-func (thls *businessAgent) handle_MsgType_ID_ReportDataReq(msgData *txdata.ReportDataReq, msgConn *wsnet.WsSocket) {
-	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
-		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
-	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
-		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if err := thls.sendDataToParent(txdata.MsgType_ID_ReportDataReq, msgData); err != nil {
-		if connInfoEx, isExist := thls.cacheAgent.queryData(msgData.UniqueID); isExist {
-			rspData := ReportDataReq2ReportDataRsp4Err(msgData, -1, err.Error())
-			rspData.Pathway = connInfoEx.Pathway
-			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_ReportDataRsp, rspData))
-		} else {
-			//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
-			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
-		}
-	}
-}
-
-func (thls *businessAgent) handle_MsgType_ID_ReportDataRsp(msgData *txdata.ReportDataRsp, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn != msgConn {
-		glog.Errorf("the data must be from the father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if len(msgData.Pathway) == 0 {
-		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if thls.ownInfo.UniqueID != msgData.Pathway[len(msgData.Pathway)-1] {
-		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	msgData.Pathway = msgData.Pathway[:len(msgData.Pathway)-1]
-	if length := len(msgData.Pathway); length != 0 {
-		nextUID := msgData.Pathway[length-1]
-		if nextConnInfoEx, isExist := thls.cacheAgent.queryData(nextUID); isExist {
-			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_ReportDataRsp, msgData))
-		} else {
-			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
-		}
-	} else {
-		if 0 < msgData.RequestID { //从safeNodeReqRspCache出来的RequestID都是正数
-			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-				node.rspType = txdata.MsgType_ID_ReportDataRsp
-				node.rspData = msgData
-				node.condVar.notifyAll()
-			} else {
-				glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
-			}
-		}
-		if msgData.ErrNo == 0 { //为0,表示SERVER处理成功,AGENT可以删除自己的缓存了.
-			if affected, err := thls.xEngine.Delete(&ReportDataAgent{SeqNo: msgData.SeqNo}); err != nil {
-				glog.Fatalf("Engine.Delete with affected=%v, err=%v", affected, err)
-			}
-			//可能AGENT短时间内发送了两个相同的请求,此时,第一个响应已经删除了数据,第二个响应会执行成功,同时删除零行(猜测//TODO:).
-			//所以,可能存在(err == nil && affected == 0)的情况.
-		}
-		if msgData.ErrNo == -83 { //为(-83)表示SERVER无法处理这个数据,此时AGENT不应当再上报它了,因为上报了也处理不了.
-			if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&ReportDataAgent{FatalErrNo: msgData.ErrNo, FatalErrMsg: msgData.ErrMsg}); err != nil {
-				glog.Fatalf("Engine.Update with err=%v", err)
-			}
-		}
-		if msgData.RequestID < 0 { //从background出来的RequestID都是负数
-			thls.workChan <- msgData.SeqNo
-		}
-	}
 }
 
 func (thls *businessAgent) sendDataToParent(msgType txdata.MsgType, msgData proto.Message) error {
@@ -514,68 +432,24 @@ func (thls *businessAgent) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt
 	thls.cacheAgent.deleteDataByConn(conn)
 }
 
-func (thls *businessAgent) reportData(reqInOut *txdata.ReportDataReq, d time.Duration) (rspOut *txdata.ReportDataRsp) {
-	if true { //修复请求结构体的相关字段.
-		reqInOut.RequestID = 0
-		reqInOut.UniqueID = thls.ownInfo.UniqueID
-		reqInOut.SeqNo = 0
-		//reqInOut.Topic
-		//reqInOut.Data
-		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
-	}
-	ReportDataReq2ReportDataAgent := func(reqIn *txdata.ReportDataReq) *ReportDataAgent {
-		rda := &ReportDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, Topic: reqIn.Topic, Data: reqIn.Data, ReportTime: time.Time{}}
-		rda.ReportTime, _ = ptypes.Timestamp(reqIn.ReportTime)
-		return rda
-	}
-	ReportDataReq2ReportDataRsp4Err := func(reqIn *txdata.ReportDataReq, errNo int32, errMsg string) *txdata.ReportDataRsp {
-		return &txdata.ReportDataRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
-	for range "1" {
-		rda := ReportDataReq2ReportDataAgent(reqInOut)
+func (thls *businessAgent) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
+	toCommonAtosReq := func(src *txdata.ReportDataItem, reportTime time.Time) *txdata.CommonAtosReq {
+		dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: thls.ownInfo.UniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
 		var err error
-		var affected int64
-		if affected, err = thls.xEngine.InsertOne(rda); err != nil {
-			rspOut = ReportDataReq2ReportDataRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
-			break
+		if dst.Data, err = proto.Marshal(src); err != nil {
+			glog.Fatalln(err, src)
 		}
-		if affected != 1 {
-			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
+		if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
+			glog.Fatalln(err, reportTime)
 		}
-		reqInOut.SeqNo = rda.SeqNo //利用xorm的特性.
-		//
-		node := thls.cacheReqRsp.generateElement()
-		if true {
-			reqInOut.RequestID = node.requestID
-			//
-			node.reqType = txdata.MsgType_ID_ReportDataReq
-			node.reqData = reqInOut
-		}
-		//
-		if err = thls.sendDataToParent(node.reqType, node.reqData); err != nil {
-			rspOut = ReportDataReq2ReportDataRsp4Err(reqInOut, -1, err.Error())
-			break
-		}
-		//
-		if isTimeout := node.condVar.waitFor(d); isTimeout {
-			rspOut = ReportDataReq2ReportDataRsp4Err(reqInOut, -1, "timeout")
-			break
-		}
-		rspOut = node.rspData.(*txdata.ReportDataRsp)
-		if (rspOut.RequestID != reqInOut.RequestID) || (rspOut.SeqNo != reqInOut.SeqNo) {
-			glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
-		}
+		return dst
 	}
-	if reqInOut.RequestID != 0 { //为0的话,还没有使用缓存呢,所以无需清理.
-		thls.cacheReqRsp.deleteElement(reqInOut.RequestID)
+	toCommRspData := func(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
+		return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 	}
-	return
-}
-
-func (thls *businessAgent) pushData(reqInOut *txdata.PushData) error {
-	reqInOut.UniqueID = thls.ownInfo.UniqueID
-	reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
-	return thls.sendDataToParent(txdata.MsgType_ID_PushData, reqInOut)
+	reqInOut := toCommonAtosReq(dataIn, time.Now())
+	rspOut := thls.commonAtos(reqInOut, d)
+	return toCommRspData(reqInOut, rspOut)
 }
 
 func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Duration) (rspOut *txdata.CommonAtosRsp) {

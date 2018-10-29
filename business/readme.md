@@ -1,6 +1,6 @@
 ```
 curl -d "{ \"UID\":\"a1\" , \"Cmd\":\"help\" , \"Timeout\":5 }"    http://127.0.0.1:10083/executeCommand
-curl -d "{ \"Endeavour\":true , \"DataType\":\"type1\" , \"Data\":\"data1\" , \"Timeout\":5 }"    http://127.0.0.1:10065/commonAtos
+curl -d "{ \"Cache\":true , \"Timeout\":5 , \"Topic\":\"test\" , \"Data\":\"testData\" }"    http://127.0.0.1:10065/reportData
 ```
 我想写一个程序，这个程序只有一个exe，再无依赖，所以使用sqlite，启用MySQL等。  
 这个程序不会丢失数据，所以需要缓存和REQ+RSP模式。  

@@ -29,6 +29,7 @@ import (
     "LocationName": "Asia/Shanghai"
 }
 */
+
 type configBase struct {
 	ConfType string //可选值为(AGENT/SERVER)
 }

@@ -178,8 +178,6 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 	b4[1] = src[1]
 
 	switch msgType {
-	case txdata.MsgType_ID_PushData:
-		msgData = new(txdata.PushData)
 	case txdata.MsgType_ID_ConnectedData:
 		msgData = new(txdata.ConnectedData)
 	case txdata.MsgType_ID_DisconnectedData:
@@ -188,10 +186,6 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 		msgData = new(txdata.ExecuteCommandReq)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
 		msgData = new(txdata.ExecuteCommandRsp)
-	case txdata.MsgType_ID_ReportDataReq:
-		msgData = new(txdata.ReportDataReq)
-	case txdata.MsgType_ID_ReportDataRsp:
-		msgData = new(txdata.ReportDataRsp)
 	case txdata.MsgType_ID_CommonAtosReq:
 		msgData = new(txdata.CommonAtosReq)
 	case txdata.MsgType_ID_CommonAtosRsp:
@@ -296,4 +290,11 @@ func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
 func dbRelated_CommonAtos_SeqNo(seqNo int64) bool {
 	//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
 	return (seqNo != 0)
+}
+
+type CommRspData struct {
+	UniqueID string
+	SeqNo    int64
+	ErrNo    int32
+	ErrMsg   string
 }
