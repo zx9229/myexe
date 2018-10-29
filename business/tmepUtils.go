@@ -298,3 +298,7 @@ type CommRspData struct {
 	ErrNo    int32
 	ErrMsg   string
 }
+
+func CommonAtosReq2CommonAtosRsp4Err(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
+	return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+}

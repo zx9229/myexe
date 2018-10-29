@@ -91,13 +91,13 @@ func (thls *businessAgent) checkCachedDatabase() {
 	//程序启动时,需要检查,缓存数据库里的数据和配置是否冲突,有冲突的话,则拒绝启动.
 	var err error
 	//(CommonAtosDataAgent.UniqueID)必须等于(txdata.ConnectionInfo.UniqueID)
-	var cada CommonAtosDataAgent
+	var rowData CommonAtosDataAgent
 	var affected1, affected2 int64
-	if affected1, err = thls.xEngine.Count(&cada); err != nil {
+	if affected1, err = thls.xEngine.Count(&rowData); err != nil {
 		glog.Fatalln(err)
 	}
-	cada.UniqueID = thls.ownInfo.UniqueID
-	if affected2, err = thls.xEngine.Count(&cada); err != nil {
+	rowData.UniqueID = thls.ownInfo.UniqueID
+	if affected2, err = thls.xEngine.Count(&rowData); err != nil {
 		glog.Fatalln(err)
 	}
 	if affected1 != affected2 {
@@ -131,9 +131,9 @@ func (thls *businessAgent) backgroundWork() {
 		if has, err = thls.xEngine.Where(builder.Eq{fnFatalErrNo: 0}.And(builder.Lt{fnReportTime: data4qry.ReportTime})).Get(&result); err != nil {
 			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
 		} else if has {
-			glog.Infof("will report data with SeqNo=%v", result.SeqNo)
 			err = thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, CommonAtosDataAgent2CommonAtosReq(&result))
 			//如果没有东西要发送(has == false),也是等待30秒,然后再查询一下数据库.
+			glog.Infof("background report data with SeqNo=%v and err=%v", result.SeqNo, err)
 		}
 		for looping := true; looping; {
 			select {
@@ -148,7 +148,7 @@ func (thls *businessAgent) backgroundWork() {
 					continue
 				}
 				if val != result.SeqNo {
-					glog.Fatalf("val=%v, result.SeqNo=%v", val, result.SeqNo)
+					glog.Warningf("val=%v, result.SeqNo=%v", val, result.SeqNo)
 				}
 				looping = false //上报给SERVER并且收到正确的回复了,就跳出循环.
 			default:
@@ -207,14 +207,14 @@ func (thls *businessAgent) onMessage(msgConn *wsnet.WsSocket, msgData []byte, ms
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandReq:
-		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandRsp:
-		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
 	case txdata.MsgType_ID_CommonAtosReq:
 		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
 	case txdata.MsgType_ID_CommonAtosRsp:
 		thls.handle_MsgType_ID_CommonAtosRsp(txMsgData.(*txdata.CommonAtosRsp), msgConn)
+	case txdata.MsgType_ID_ExecuteCommandReq:
+		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
+	case txdata.MsgType_ID_ExecuteCommandRsp:
+		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
 	default:
 		glog.Errorf("unknown txdata.MsgType, msgConn=%p, txMsgType=%v", msgConn, txMsgType)
 	}
@@ -467,9 +467,6 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 		cada.ReportTime, _ = ptypes.Timestamp(reqIn.ReportTime)
 		return cada
 	}
-	CommonAtosReq2CommonAtosRsp4Err := func(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
-		return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
 	for range "1" {
 		var err error
 		if reqInOut.Endeavour { //根据SeqNo可知它是否缓存
@@ -489,7 +486,7 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 			if err = thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, reqInOut); err != nil {
 				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, err.Error())
 			} else {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, 0, "send success.")
+				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, 0, "send success and no wait.")
 			}
 		} else { //根据RequestID可知它是否在等待.
 			node := thls.cacheReqRsp.generateElement()
@@ -522,9 +519,6 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 }
 
 func (thls *businessAgent) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
-	CommonAtosReq2CommonAtosRsp4Err := func(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
-		return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
-	}
 	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
