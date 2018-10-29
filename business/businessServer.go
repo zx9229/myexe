@@ -360,3 +360,55 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 	}
 	return
 }
+
+func (thls *businessServer) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Duration) (rspOut *txdata.CommonAtosRsp) {
+	if true { //修复请求结构体的相关字段.
+		reqInOut.RequestID = 0
+		reqInOut.UniqueID = thls.ownInfo.UniqueID
+		reqInOut.SeqNo = 0
+		//reqInOut.Endeavour
+		//reqInOut.DataType
+		//reqInOut.Data
+		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
+	}
+	for range "1" {
+		var err error
+		var affected int64
+		if reqInOut.Endeavour { //要缓存到数据库.
+			rowData := CommonAtosReq2CommonAtosDataAgent(reqInOut)
+			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
+				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
+				break
+			}
+			if affected != 1 {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
+			}
+			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
+		}
+		rspOut = thls.handle_MsgType_ID_CommonAtosReq_inner(reqInOut)
+		if reqInOut.Endeavour {
+			if rspOut.ErrNo == 0 {
+				if affected, err = thls.xEngine.Delete(&CommonAtosDataAgent{SeqNo: reqInOut.SeqNo}); (err != nil) || (affected != 1) {
+					glog.Fatalf("Engine.Delete with affected=%v, err=%v", affected, err)
+				}
+			} else if rspOut.ErrNo == fatalErrNo {
+				if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonAtosDataAgent{FatalErrNo: rspOut.ErrNo, FatalErrMsg: rspOut.ErrMsg}); err != nil {
+					glog.Fatalf("Engine.Update with err=%v", err)
+				}
+			}
+		}
+	}
+	return
+}
+
+func (thls *businessServer) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
+	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	rspOut := thls.commonAtos(reqInOut, d)
+	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+}
+
+func (thls *businessServer) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
+	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	rspOut := thls.commonAtos(reqInOut, d)
+	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+}

@@ -512,24 +512,19 @@ func (thls *businessAgent) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dur
 		//reqInOut.Data
 		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
 	}
-	CommonAtosReq2CommonAtosDataAgent := func(reqIn *txdata.CommonAtosReq) *CommonAtosDataAgent {
-		cada := &CommonAtosDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
-		cada.ReportTime, _ = ptypes.Timestamp(reqIn.ReportTime)
-		return cada
-	}
 	for range "1" {
 		var err error
-		if reqInOut.Endeavour { //根据SeqNo可知它是否缓存
-			cada := CommonAtosReq2CommonAtosDataAgent(reqInOut)
+		if reqInOut.Endeavour { //要缓存到数据库.
+			rowData := CommonAtosReq2CommonAtosDataAgent(reqInOut)
 			var affected int64
-			if affected, err = thls.xEngine.InsertOne(cada); err != nil {
+			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
 				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
 				break
 			}
 			if affected != 1 {
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
 			}
-			reqInOut.SeqNo = cada.SeqNo //利用xorm的特性.
+			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
 		}
 		//
 		if d <= 0 {

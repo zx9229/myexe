@@ -330,3 +330,12 @@ func Message2CommonAtosReq(src proto.Message, reportTime time.Time, uniqueID str
 func CommonAtosReqRsp2CommRspData(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
 	return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }
+
+func CommonAtosReq2CommonAtosDataAgent(reqIn *txdata.CommonAtosReq) *CommonAtosDataAgent {
+	var err error
+	cada := &CommonAtosDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
+	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReportTime); err != nil {
+		glog.Fatalln(err)
+	}
+	return cada
+}
