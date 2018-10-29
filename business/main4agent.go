@@ -82,7 +82,14 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 		if true {
 			reqInOut, secTimeout = Obj2Msg(obj)
 		}
-		rspOut := globalA.commonAtos(reqInOut, time.Duration(secTimeout)*time.Second)
+		var rspOut *txdata.CommonAtosRsp
+		if (globalA != nil) && (globalS == nil) {
+			rspOut = globalA.commonAtos(reqInOut, time.Duration(secTimeout)*time.Second)
+		} else if (globalA == nil) && (globalS != nil) {
+			rspOut = globalS.commonAtos(reqInOut, time.Duration(secTimeout)*time.Second)
+		} else {
+			glog.Fatalln(globalA, globalS)
+		}
 		if true {
 			rspData.UniqueID = reqInOut.UniqueID
 			rspData.SeqNo = rspOut.SeqNo
@@ -108,8 +115,8 @@ func runAgent(cfg *configAgent) {
 	cs.CbDisconnected = globalA.onDisconnected
 	cs.CbReceive = globalA.onMessage
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4a", cacheAgent4a)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4a", cacheAgent4a)
 	cs.Run()
 }

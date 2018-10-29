@@ -72,5 +72,7 @@ func runServer(cfg *configServer) {
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/executeCommand", handleExecuteCommand)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4s", cacheAgent4s)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
 	cs.Run()
 }
