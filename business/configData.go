@@ -28,9 +28,9 @@ import (
     "DataSourceName": "database_s1.db",
 	"LocationName": "Asia/Shanghai",
 	"MailCfg": {
-        "Username": "用户名@163.com",
+        "Username": "用户名@126.com",
         "Password": "用户名的密码",
-        "SMTPAddr": "smtp.163.com:25"
+        "SMTPAddr": "smtp.126.com:25"
     }
 }
 */
