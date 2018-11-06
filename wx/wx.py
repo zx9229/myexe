@@ -89,6 +89,9 @@ def text_reply(msg):
 
 
 def send_to_user(msg, name=None, nName=None, rName=None):
+    '''
+    https://itchat.readthedocs.io/zh/latest/intro/contact/
+    '''
     users = itchat.search_friends(name=name, nickName=nName, remarkName=rName)
     if not users:
         raise Exception("user not found")
