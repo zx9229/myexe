@@ -10,8 +10,10 @@ enum MsgType {
     ID_DisconnectedData  =  2;
     ID_CommonAtosReq     = 31;
     ID_CommonAtosRsp     = 32;
-    ID_ExecuteCommandReq = 33;
-    ID_ExecuteCommandRsp = 34;
+    ID_CommonStoaReq     = 33;
+    ID_CommonStoaRsp     = 34;
+    ID_ExecuteCommandReq = 35;
+    ID_ExecuteCommandRsp = 36;
 }
 
 message ConnectionInfo {
@@ -19,6 +21,7 @@ message ConnectionInfo {
         Zero2  = 0;
         SERVER = 1; //服务端
         AGENT  = 2; //代理端
+        CLIENT = 3; //客户端,受控端
     }
     enum LinkType {
         Zero3   = 0;

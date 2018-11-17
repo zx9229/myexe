@@ -18,6 +18,7 @@ import (
 type businessServer struct {
 	cacheSock   *safeWsSocketMap
 	cacheAgent  *safeConnInfoMap
+	cacheClient *safeConnInfoMap
 	cacheReqRsp *safeNodeReqRspCache
 	ownInfo     txdata.ConnectionInfo
 	mailCfg     config4mail
@@ -32,6 +33,7 @@ func newBusinessServer(cfg *configServer) *businessServer {
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheAgent = newSafeConnInfoMap()
+	curData.cacheClient = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
 	curData.ownInfo.UniqueID = cfg.UniqueID
