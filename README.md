@@ -3,7 +3,7 @@
 
 # 下载代码
 ```
-go get -u -v github.com/zx9229/myexe
+go get -u -v github.com/zx9229/myexe/business
 ```
 
 # 编译
