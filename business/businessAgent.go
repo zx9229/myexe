@@ -256,7 +256,8 @@ func (thls *businessAgent) handle_MsgType_ID_ConnectedData(msgData *txdata.Conne
 			sendToParent = thls.doDeal4myParent(msgData, msgConn)
 			break
 		} else if msgData.Info.ExeType == txdata.ConnectionInfo_CLIENT {
-			panic()
+			sendToParent = thls.doDeal4passingClient(msgData, msgConn)
+			break
 		} else if msgData.Info.ExeType == txdata.ConnectionInfo_AGENT {
 			sendToParent = thls.doDeal4agent(msgData, msgConn)
 			break
@@ -534,6 +535,10 @@ func (thls *businessAgent) doDeal4myClient(msgData *txdata.ConnectedData, msgCon
 
 	sendToParent = true
 	return
+}
+
+func (thls *businessAgent) doDeal4passingClient(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+	panic()
 }
 
 func (thls *businessAgent) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {
