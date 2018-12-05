@@ -39,7 +39,20 @@ message ConnectionInfo {
 
 message ConnectedData {
     ConnectionInfo  Info    = 1;
-    repeated string Pathway = 2;
+    repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
+/* ParentA:(父亲agent), ParentC1:(父亲client1), SonA:(儿子agent), GrandsonA:(孙子agent)
+ParentA
+│  ParentC1               ParentA收到的Pathway=[]
+│  ParentC2               ParentA收到的Pathway=[]
+│
+└─SonA                    ParentA收到的Pathway=[SonA]
+    │  SonC1              ParentA收到的Pathway=[SonA]
+    │  SonC2              ParentA收到的Pathway=[SonA]
+    │
+    └─GrandsonA           ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC1    ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC2    ParentA收到的Pathway=[GrandsonA,SonA]
+*/
 }
 
 message DisconnectedData {
