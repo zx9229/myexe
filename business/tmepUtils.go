@@ -339,3 +339,15 @@ func CommonAtosReq2CommonAtosDataAgent(reqIn *txdata.CommonAtosReq) *CommonAtosD
 	}
 	return cada
 }
+
+type agentInfo struct {
+	conn    *wsnet.WsSocket
+	Info    txdata.ConnectionInfo
+	Pathway []string
+	M       map[string]bool
+}
+
+type safeAgentInfoMap struct {
+	sync.Mutex
+	M map[string]*agentInfo
+}
