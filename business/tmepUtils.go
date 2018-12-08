@@ -231,8 +231,8 @@ func sendMail(username, password, smtpAddr, to, subject, contentType, content st
 	return smtp.SendMail(smtpAddr, currAuth, username, strings.Split(to, ";"), []byte(mailMsg))
 }
 
-//ReportDataAgent 上报的数据(存储到Agent)
-type ReportDataAgent struct {
+//ReportDataNode 上报的数据(存储到Node)
+type ReportDataNode struct {
 	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
 	UniqueID    string    //
 	Topic       string    //
@@ -262,8 +262,8 @@ type KeyValue struct {
 	Value string `xorm:"notnull"`
 }
 
-//CommonAtosDataAgent omit
-type CommonAtosDataAgent struct {
+//CommonAtosDataNode omit
+type CommonAtosDataNode struct {
 	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
 	UniqueID    string    //
 	DataType    string    //
@@ -331,9 +331,9 @@ func CommonAtosReqRsp2CommRspData(req *txdata.CommonAtosReq, rsp *txdata.CommonA
 	return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }
 
-func CommonAtosReq2CommonAtosDataAgent(reqIn *txdata.CommonAtosReq) *CommonAtosDataAgent {
+func CommonAtosReq2CommonAtosDataNode(reqIn *txdata.CommonAtosReq) *CommonAtosDataNode {
 	var err error
-	cada := &CommonAtosDataAgent{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
+	cada := &CommonAtosDataNode{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
 	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReportTime); err != nil {
 		glog.Fatalln(err)
 	}

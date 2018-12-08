@@ -58,8 +58,8 @@ func handleExecuteCommand(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(byteSlice))
 }
 
-func cacheAgent4s(w http.ResponseWriter, r *http.Request) {
-	jsonContent := globalS.cacheAgent.humanReadable()
+func cacheNode4s(w http.ResponseWriter, r *http.Request) {
+	jsonContent := globalS.cacheNode.humanReadable()
 	fmt.Fprintf(w, jsonContent)
 }
 
@@ -71,7 +71,7 @@ func runServer(cfg *configServer) {
 	cs.CbReceive = globalS.onMessage
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/executeCommand", handleExecuteCommand)
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4s", cacheAgent4s)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheNode4s", cacheNode4s)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
 	cs.Run()

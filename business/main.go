@@ -34,7 +34,7 @@ func main() {
 		fmt.Println()
 		fmt.Println("NOTE: please use (-logtostderr) to view details.")
 		fmt.Println()
-		fmt.Println(exampleConfigData("AGENT"))
+		fmt.Println(exampleConfigData("NODE"))
 		fmt.Println()
 		fmt.Println(exampleConfigData("SERVER"))
 		return
@@ -51,7 +51,7 @@ func main() {
 			break
 		}
 		if cfgA != nil {
-			runAgent(cfgA)
+			runNode(cfgA)
 		} else if cfgS != nil {
 			runServer(cfgS)
 		} else {
@@ -67,7 +67,7 @@ func main() {
 //(cfgA == nil && cfgS == nil)表示:将文件argJSON的内容写入sqlite中,此时工作已完成,程序应当直接退出.
 //(cfgA != nil)表示:执行cfgA的逻辑.
 //(cfgS != nil)表示:执行cfgS的逻辑.
-func handleArgs(argJSON, argSqlite string) (cfgA *configAgent, cfgS *configServer, err error) {
+func handleArgs(argJSON, argSqlite string) (cfgA *configNode, cfgS *configServer, err error) {
 	for range "1" {
 		var content string
 		if len(argJSON) != 0 {

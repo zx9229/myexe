@@ -10,9 +10,9 @@ import (
 )
 
 /*
-大写字母A的10进制是65，所以Agent 端暂定端口号10065
+大写字母A的10进制是65，所以Node 端暂定端口号10065
 {
-    "ConfType": "AGENT",
+    "ConfType": "NODE",
     "UniqueID": "a1",
     "BelongID": "s1",
     "ServerURL":   { "Scheme": "ws", "Host": "localhost:10065", "Path": "/websocket" },
@@ -36,10 +36,10 @@ import (
 */
 
 type configBase struct {
-	ConfType string //可选值为(AGENT/SERVER)
+	ConfType string //可选值为(NODE/SERVER)
 }
 
-type configAgent struct {
+type configNode struct {
 	configBase
 	UniqueID       string
 	BelongID       string
@@ -50,8 +50,8 @@ type configAgent struct {
 }
 
 //isValid 仅做基本检查(类似URL是否合法这种详细的检查,不做).
-func (thls *configAgent) isValid() error {
-	PREFIX := "configAgent: "
+func (thls *configNode) isValid() error {
+	PREFIX := "configNode: "
 	var err error
 	for range "1" {
 		if len(thls.UniqueID) == 0 {
@@ -128,13 +128,13 @@ func (thls *configServer) isValid() error {
 }
 
 //parseContent 解析内容到配置结构体
-func parseContent(content string) (cfgA *configAgent, cfgS *configServer, err error) {
+func parseContent(content string) (cfgA *configNode, cfgS *configServer, err error) {
 	byteSlice := []byte(content)
 	var cfgB configBase
 	if err = json.Unmarshal(byteSlice, &cfgB); err == nil {
 		switch cfgB.ConfType {
-		case "AGENT":
-			cfgA = new(configAgent)
+		case "NODE":
+			cfgA = new(configNode)
 			err = json.Unmarshal(byteSlice, cfgA)
 		case "SERVER":
 			cfgS = new(configServer)
@@ -225,8 +225,8 @@ func loadConfigFromDb(dataSourceName string) (content string, err error) {
 
 func exampleConfigData(confType string) string {
 	exampleA := func() string {
-		var cfgA configAgent
-		cfgA.ConfType = "AGENT"
+		var cfgA configNode
+		cfgA.ConfType = "NODE"
 		cfgA.UniqueID = "a1"
 		cfgA.BelongID = "s1"
 		cfgA.ServerURL = url.URL{Scheme: "ws", Host: "localhost:10065", Path: "/websocket"}
@@ -248,7 +248,7 @@ func exampleConfigData(confType string) string {
 		return string(byteSlice)
 	}
 	switch confType {
-	case "AGENT":
+	case "NODE":
 		return exampleA()
 	case "SERVER":
 		return exampleS()

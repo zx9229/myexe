@@ -14,7 +14,7 @@ import (
 	"github.com/zx9229/myexe/wsnet"
 )
 
-var globalA *businessAgent
+var globalA *businessNode
 
 func handleReportData(w http.ResponseWriter, r *http.Request) {
 	curObj := new(struct {
@@ -103,19 +103,19 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 	fmt.Fprintf(w, string(byteSlice))
 }
 
-func cacheAgent4a(w http.ResponseWriter, r *http.Request) {
-	jsonContent := globalA.cacheAgent.humanReadable()
+func cacheNode4a(w http.ResponseWriter, r *http.Request) {
+	jsonContent := globalA.cacheNode.humanReadable()
 	fmt.Fprintf(w, jsonContent)
 }
 
-func runAgent(cfg *configAgent) {
-	globalA = newBusinessAgent(cfg)
+func runNode(cfg *configNode) {
+	globalA = newBusinessNode(cfg)
 	cs := wsnet.NewWsCliSrv()
 	cs.CbConnected = globalA.onConnected
 	cs.CbDisconnected = globalA.onDisconnected
 	cs.CbReceive = globalA.onMessage
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheAgent4a", cacheAgent4a)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheNode4a", cacheNode4a)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
 	cs.Run()
