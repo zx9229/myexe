@@ -188,10 +188,10 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 		msgData = new(txdata.ExecuteCommandReq)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
 		msgData = new(txdata.ExecuteCommandRsp)
-	case txdata.MsgType_ID_CommonAtosReq:
-		msgData = new(txdata.CommonAtosReq)
-	case txdata.MsgType_ID_CommonAtosRsp:
-		msgData = new(txdata.CommonAtosRsp)
+	case txdata.MsgType_ID_CommonNtosReq:
+		msgData = new(txdata.CommonNtosReq)
+	case txdata.MsgType_ID_CommonNtosRsp:
+		msgData = new(txdata.CommonNtosRsp)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType=%v", msgType)
@@ -311,12 +311,12 @@ type CommRspData struct {
 	ErrMsg   string
 }
 
-func CommonAtosReq2CommonAtosRsp4Err(reqIn *txdata.CommonAtosReq, errNo int32, errMsg string) *txdata.CommonAtosRsp {
-	return &txdata.CommonAtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string) *txdata.CommonNtosRsp {
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
 }
 
-func Message2CommonAtosReq(src proto.Message, reportTime time.Time, uniqueID string, isEndeavour bool) *txdata.CommonAtosReq {
-	dst := &txdata.CommonAtosReq{RequestID: 0, UniqueID: uniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
+func Message2CommonNtosReq(src proto.Message, reportTime time.Time, uniqueID string, isEndeavour bool) *txdata.CommonNtosReq {
+	dst := &txdata.CommonNtosReq{RequestID: 0, UniqueID: uniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
 	var err error
 	if dst.Data, err = proto.Marshal(src); err != nil {
 		glog.Fatalln(err, src)
@@ -327,11 +327,11 @@ func Message2CommonAtosReq(src proto.Message, reportTime time.Time, uniqueID str
 	return dst
 }
 
-func CommonAtosReqRsp2CommRspData(req *txdata.CommonAtosReq, rsp *txdata.CommonAtosRsp) *CommRspData {
+func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) *CommRspData {
 	return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }
 
-func CommonAtosReq2CommonAtosDataNode(reqIn *txdata.CommonAtosReq) *CommonAtosDataNode {
+func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDataNode {
 	var err error
 	cada := &CommonAtosDataNode{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
 	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReportTime); err != nil {

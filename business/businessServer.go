@@ -116,10 +116,10 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_CommonAtosReq:
-		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
-	case txdata.MsgType_ID_CommonAtosRsp:
-		thls.handle_MsgType_ID_CommonAtosRsp(txMsgData.(*txdata.CommonAtosRsp), msgConn)
+	case txdata.MsgType_ID_CommonNtosReq:
+		thls.handle_MsgType_ID_CommonNtosReq(txMsgData.(*txdata.CommonNtosReq), msgConn)
+	case txdata.MsgType_ID_CommonNtosRsp:
+		thls.handle_MsgType_ID_CommonNtosRsp(txMsgData.(*txdata.CommonNtosRsp), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandReq:
 		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
@@ -168,13 +168,13 @@ func (thls *businessServer) handle_MsgType_ID_DisconnectedData(msgData *txdata.D
 	}
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
-	rspData := thls.handle_MsgType_ID_CommonAtosReq_inner(msgData)
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.CommonNtosReq, msgConn *wsnet.WsSocket) {
+	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner(msgData)
 	//
 	if needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
 		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UniqueID); isExist {
 			rspData.Pathway = connInfoEx.Pathway
-			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
+			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
 		} else {
 			glog.Infof("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
@@ -183,17 +183,17 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq(msgData *txdata.Comm
 
 var fatalErrNo int32 = -83
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
 	for range "1" {
 		//以(UniqueID+SeqNo)唯一定位一条数据.
 		cads := &CommonAtosDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
 		if has, err := thls.xEngine.Get(cads); err != nil {
 			glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
-			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("query from db with err=%v", err))
+			rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("query from db with err=%v", err))
 			break
 		} else if has {
 			//已经存在这一条数据了,就(ErrNo=0)然后NODE会从缓存中移除这一条数据.
-			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, 0, "already existed")
+			rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, 0, "already existed")
 			break
 		}
 		if true {
@@ -205,17 +205,17 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_inner(msgData *txdat
 		}
 		if affected, err := thls.xEngine.InsertOne(cads); err != nil {
 			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
-			rspData = CommonAtosReq2CommonAtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("insert to db with err=%v", err))
+			rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("insert to db with err=%v", err))
 			break
 		} else if affected != 1 {
 			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads) //我就是想知道,成功的话,除了1,还有其他值吗.
 		}
-		rspData = thls.handle_MsgType_ID_CommonAtosReq_process(msgData)
+		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData)
 	}
 	return
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txdata.CommonAtosReq) (rspData *txdata.CommonAtosRsp) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
 	var errNo int32
 	var errMsg string
 	switch msgData.DataType {
@@ -224,26 +224,26 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_process(msgData *txd
 		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
 			glog.Fatalln(msgData)
 		}
-		errNo, errMsg = thls.handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(msgData, curData)
+		errNo, errMsg = thls.handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(msgData, curData)
 	case "txdata.SendMailItem":
 		curData := &txdata.SendMailItem{}
 		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
 			glog.Fatalln(msgData)
 		}
-		errNo, errMsg = thls.handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(msgData, curData)
+		errNo, errMsg = thls.handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(msgData, curData)
 	default:
 		errNo = -1
 		errMsg = "unknown data type"
 	}
-	return CommonAtosReq2CommonAtosRsp4Err(msgData, errNo, errMsg)
+	return CommonNtosReq2CommonNtosRsp4Err(msgData, errNo, errMsg)
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_ReportDataItem(commReq *txdata.CommonAtosReq, item *txdata.ReportDataItem) (errNo int32, errMsg string) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(commReq *txdata.CommonNtosReq, item *txdata.ReportDataItem) (errNo int32, errMsg string) {
 	glog.Infoln(commReq.DataType, item)
 	return
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(commReq *txdata.CommonAtosReq, item *txdata.SendMailItem) (errNo int32, errMsg string) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(commReq *txdata.CommonNtosReq, item *txdata.SendMailItem) (errNo int32, errMsg string) {
 	if len(item.Username) == 0 {
 		item.Username = thls.mailCfg.Username
 		item.Password = thls.mailCfg.Password
@@ -256,7 +256,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonAtosReq_txdata_SendMailItem(
 	return
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.CommonAtosRsp, msgConn *wsnet.WsSocket) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.CommonNtosRsp, msgConn *wsnet.WsSocket) {
 	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 	return
 }
@@ -363,7 +363,7 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 	return
 }
 
-func (thls *businessServer) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Duration) (rspOut *txdata.CommonAtosRsp) {
+func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
 		reqInOut.UniqueID = thls.ownInfo.UniqueID
@@ -377,9 +377,9 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Du
 		var err error
 		var affected int64
 		if reqInOut.Endeavour { //要缓存到数据库.
-			rowData := CommonAtosReq2CommonAtosDataNode(reqInOut)
+			rowData := CommonNtosReq2CommonAtosDataNode(reqInOut)
 			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
 				break
 			}
 			if affected != 1 {
@@ -387,7 +387,7 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Du
 			}
 			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
 		}
-		rspOut = thls.handle_MsgType_ID_CommonAtosReq_inner(reqInOut)
+		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner(reqInOut)
 		if reqInOut.Endeavour {
 			if rspOut.ErrNo == 0 {
 				if affected, err = thls.xEngine.Delete(&CommonAtosDataNode{SeqNo: reqInOut.SeqNo}); (err != nil) || (affected != 1) {
@@ -404,13 +404,13 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Du
 }
 
 func (thls *businessServer) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
-	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
 
 func (thls *businessServer) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
-	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }

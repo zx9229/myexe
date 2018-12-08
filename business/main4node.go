@@ -22,14 +22,14 @@ func handleReportData(w http.ResponseWriter, r *http.Request) {
 		Cache   bool
 		Timeout int
 	})
-	obj2msg := func(obj interface{}) (req *txdata.CommonAtosReq, sec int) {
+	obj2msg := func(obj interface{}) (req *txdata.CommonNtosReq, sec int) {
 		theObj := obj.(*struct {
 			txdata.ReportDataItem
 			Cache   bool
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonAtosReq{Endeavour: theObj.Cache, DataType: reflect.TypeOf(curObj.ReportDataItem).String()}
+		req = &txdata.CommonNtosReq{Endeavour: theObj.Cache, DataType: reflect.TypeOf(curObj.ReportDataItem).String()}
 		if req.Data, err = proto.Marshal(&theObj.ReportDataItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
@@ -45,14 +45,14 @@ func handleSendMail(w http.ResponseWriter, r *http.Request) {
 		Cache   bool
 		Timeout int
 	})
-	obj2msg := func(obj interface{}) (req *txdata.CommonAtosReq, sec int) {
+	obj2msg := func(obj interface{}) (req *txdata.CommonNtosReq, sec int) {
 		theObj := obj.(*struct {
 			txdata.SendMailItem
 			Cache   bool
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonAtosReq{Endeavour: theObj.Cache, DataType: reflect.TypeOf(curObj.SendMailItem).String()}
+		req = &txdata.CommonNtosReq{Endeavour: theObj.Cache, DataType: reflect.TypeOf(curObj.SendMailItem).String()}
 		if req.Data, err = proto.Marshal(&theObj.SendMailItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
@@ -62,7 +62,7 @@ func handleSendMail(w http.ResponseWriter, r *http.Request) {
 	handleCommonFun(w, r, curObj, obj2msg)
 }
 
-func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonAtosReq, int)) {
+func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonNtosReq, int)) {
 	var err error
 	var byteSlice []byte
 	//
@@ -77,12 +77,12 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 			rspData.ErrMsg = fmt.Sprintf("Unmarshal Request with err = %v", err)
 			break
 		}
-		var reqInOut *txdata.CommonAtosReq
+		var reqInOut *txdata.CommonNtosReq
 		var secTimeout int
 		if true {
 			reqInOut, secTimeout = Obj2Msg(obj)
 		}
-		var rspOut *txdata.CommonAtosRsp
+		var rspOut *txdata.CommonNtosRsp
 		if (globalA != nil) && (globalS == nil) {
 			rspOut = globalA.commonAtos(reqInOut, time.Duration(secTimeout)*time.Second)
 		} else if (globalA == nil) && (globalS != nil) {

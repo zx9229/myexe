@@ -105,9 +105,9 @@ func (thls *businessNode) checkCachedDatabase() {
 }
 
 func (thls *businessNode) backgroundWork() {
-	CommonAtosDataNode2CommonAtosReq := func(src *CommonAtosDataNode) *txdata.CommonAtosReq {
+	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
 		//负数的RequestID表示背景工作在做事情.
-		req := &txdata.CommonAtosReq{RequestID: -1, UniqueID: src.UniqueID, SeqNo: src.SeqNo, Endeavour: true, DataType: src.DataType, Data: src.Data, ReportTime: nil}
+		req := &txdata.CommonNtosReq{RequestID: -1, UniqueID: src.UniqueID, SeqNo: src.SeqNo, Endeavour: true, DataType: src.DataType, Data: src.Data, ReportTime: nil}
 		req.ReportTime, _ = ptypes.TimestampProto(src.ReportTime)
 		return req
 	}
@@ -131,7 +131,7 @@ func (thls *businessNode) backgroundWork() {
 		if has, err = thls.xEngine.Where(builder.Eq{fnFatalErrNo: 0}.And(builder.Lt{fnReportTime: data4qry.ReportTime})).Get(&result); err != nil {
 			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
 		} else if has {
-			err = thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, CommonAtosDataNode2CommonAtosReq(&result))
+			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonAtosDataNode2CommonNtosReq(&result))
 			//如果没有东西要发送(has == false),也是等待secRecover,然后再查询一下数据库.
 			glog.Infof("background report data with SeqNo=%v and err=%v", result.SeqNo, err)
 		}
@@ -207,10 +207,10 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_CommonAtosReq:
-		thls.handle_MsgType_ID_CommonAtosReq(txMsgData.(*txdata.CommonAtosReq), msgConn)
-	case txdata.MsgType_ID_CommonAtosRsp:
-		thls.handle_MsgType_ID_CommonAtosRsp(txMsgData.(*txdata.CommonAtosRsp), msgConn)
+	case txdata.MsgType_ID_CommonNtosReq:
+		thls.handle_MsgType_ID_CommonNtosReq(txMsgData.(*txdata.CommonNtosReq), msgConn)
+	case txdata.MsgType_ID_CommonNtosRsp:
+		thls.handle_MsgType_ID_CommonNtosRsp(txMsgData.(*txdata.CommonNtosRsp), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandReq:
 		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
 	case txdata.MsgType_ID_ExecuteCommandRsp:
@@ -282,17 +282,17 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 	thls.sendDataToParent(txdata.MsgType_ID_DisconnectedData, msgData)
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonAtosReq(msgData *txdata.CommonAtosReq, msgConn *wsnet.WsSocket) {
+func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.CommonNtosReq, msgConn *wsnet.WsSocket) {
 	if thls.parentData.conn == msgConn { //上报请求,肯定要发给父亲,所以,一定不是父亲发过来的.
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
 
-	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
+	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
 		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UniqueID); isExist {
-			rspData := CommonAtosReq2CommonAtosRsp4Err(msgData, -1, err.Error())
+			rspData := CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error())
 			rspData.Pathway = connInfoEx.Pathway
-			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, rspData))
+			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
 		} else {
 			//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
 			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -300,7 +300,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonAtosReq(msgData *txdata.Common
 	}
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.CommonAtosRsp, msgConn *wsnet.WsSocket) {
+func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.CommonNtosRsp, msgConn *wsnet.WsSocket) {
 	if thls.parentData.conn != msgConn {
 		glog.Errorf("the data must come from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
@@ -318,14 +318,14 @@ func (thls *businessNode) handle_MsgType_ID_CommonAtosRsp(msgData *txdata.Common
 	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
 		nextUID := msgData.Pathway[pathwayLen-1]
 		if nextConnInfoEx, isExist := thls.cacheNode.queryData(nextUID); isExist {
-			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonAtosRsp, msgData))
+			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, msgData))
 		} else {
 			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	} else {
 		if reqrspRelated_RequestID(msgData.RequestID) {
 			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-				node.rspType = txdata.MsgType_ID_CommonAtosRsp
+				node.rspType = txdata.MsgType_ID_CommonNtosRsp
 				node.rspData = msgData
 				node.condVar.notifyAll()
 			} else {
@@ -502,7 +502,7 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 	thls.cacheNode.deleteDataByConn(conn)
 }
 
-func (thls *businessNode) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Duration) (rspOut *txdata.CommonAtosRsp) {
+func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
 		reqInOut.UniqueID = thls.ownInfo.UniqueID
@@ -515,10 +515,10 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dura
 	for range "1" {
 		var err error
 		if reqInOut.Endeavour { //要缓存到数据库.
-			rowData := CommonAtosReq2CommonAtosDataNode(reqInOut)
+			rowData := CommonNtosReq2CommonAtosDataNode(reqInOut)
 			var affected int64
 			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, fmt.Sprintf("insert to db with err=%v", err))
 				break
 			}
 			if affected != 1 {
@@ -528,30 +528,30 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dura
 		}
 		//
 		if d <= 0 {
-			if err = thls.sendDataToParent(txdata.MsgType_ID_CommonAtosReq, reqInOut); err != nil {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, err.Error())
+			if err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, reqInOut); err != nil {
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error())
 			} else {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, 0, "send success and no wait.")
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, 0, "send success and no wait.")
 			}
 		} else { //根据RequestID可知它是否在等待.
 			node := thls.cacheReqRsp.generateElement()
 			if true {
 				reqInOut.RequestID = node.requestID
 				//
-				node.reqType = txdata.MsgType_ID_CommonAtosReq
+				node.reqType = txdata.MsgType_ID_CommonNtosReq
 				node.reqData = reqInOut
 			}
 			//
 			if err = thls.sendDataToParent(node.reqType, node.reqData); err != nil {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, err.Error())
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error())
 				break
 			}
 			//
 			if isTimeout := node.condVar.waitFor(d); isTimeout {
-				rspOut = CommonAtosReq2CommonAtosRsp4Err(reqInOut, -1, "timeout")
+				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, "timeout")
 				break
 			}
-			rspOut = node.rspData.(*txdata.CommonAtosRsp)
+			rspOut = node.rspData.(*txdata.CommonNtosRsp)
 			if (rspOut.RequestID != reqInOut.RequestID) || (rspOut.SeqNo != reqInOut.SeqNo) {
 				glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
 			}
@@ -564,13 +564,13 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonAtosReq, d time.Dura
 }
 
 func (thls *businessNode) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
-	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
 
 func (thls *businessNode) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonAtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
-	return CommonAtosReqRsp2CommRspData(reqInOut, rspOut)
+	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }

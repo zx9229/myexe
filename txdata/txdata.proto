@@ -8,9 +8,9 @@ enum MsgType {
     Zero1                =  0;
     ID_ConnectedData     =  1;
     ID_DisconnectedData  =  2;
-    ID_CommonAtosReq     = 31;
-    ID_CommonAtosRsp     = 32;
-    ID_CommonStoaReq     = 33;
+    ID_CommonNtosReq     = 31;
+    ID_CommonNtosRsp     = 32;
+    ID_CommonStonReq     = 33;
     ID_CommonStoaRsp     = 34;
     ID_ExecuteCommandReq = 35;
     ID_ExecuteCommandRsp = 36;
@@ -20,7 +20,7 @@ message ConnectionInfo {
     enum AppType {
         Zero2  = 0;
         SERVER = 1; //服务端
-        AGENT  = 2; //代理端
+        NODE   = 2; //节点端
         CLIENT = 3; //客户端,受控端
     }
     enum LinkType {
@@ -73,7 +73,7 @@ message ExecuteCommandRsp {
     string          ErrMsg    = 5;
 }
 
-message CommonAtosReq {//通用请求(请求的方向是agentTOserver)
+message CommonNtosReq {//通用请求(请求的方向是agentTOserver)
     int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
     string                    UniqueID   = 2;
     int64                     SeqNo      = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
@@ -83,7 +83,7 @@ message CommonAtosReq {//通用请求(请求的方向是agentTOserver)
     google.protobuf.Timestamp ReportTime = 7;
 }
 
-message CommonAtosRsp {
+message CommonNtosRsp {
     int64           RequestID = 1;
     repeated string Pathway   = 2;
     int64           SeqNo     = 3;//这个参数可以没有,我用它检查了数据,安心
