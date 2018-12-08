@@ -32,9 +32,10 @@ message ConnectionInfo {
     string          BelongID = 2;//属于哪个ID
     string          Version  = 3;//版本号
     AppType         ExeType  = 4;
-    LinkType        LinkDir  = 5;//连接方向
-    int32           ExePid   = 6;//进程ID
-    string          ExePath  = 7;//程序路径
+    bool            IsLeaf   = 5;//叶子节点(当AppType/ExeType为NODE时,表示NODE是否为LeafNode)
+    LinkType        LinkDir  = 6;//连接方向
+    int32           ExePid   = 7;//进程ID
+    string          ExePath  = 8;//程序路径
 }
 
 message ConnectedData {

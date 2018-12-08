@@ -46,6 +46,7 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.ownInfo.BelongID = cfg.BelongID
 	curData.ownInfo.Version = "Version20181020"
 	curData.ownInfo.ExeType = txdata.ConnectionInfo_NODE
+	curData.ownInfo.IsLeaf = false
 	curData.ownInfo.LinkDir = txdata.ConnectionInfo_Zero3
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
