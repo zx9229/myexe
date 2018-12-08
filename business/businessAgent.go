@@ -22,7 +22,6 @@ import (
 type businessAgent struct {
 	cacheSock   *safeWsSocketMap
 	cacheAgent  *safeConnInfoMap
-	cacheClient *safeConnInfoMap
 	cacheReqRsp *safeNodeReqRspCache
 	ownInfo     txdata.ConnectionInfo
 	parentData  connInfoEx
@@ -41,7 +40,6 @@ func newBusinessAgent(cfg *configAgent) *businessAgent {
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheAgent = newSafeConnInfoMap()
-	curData.cacheClient = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
 	curData.ownInfo.UniqueID = cfg.UniqueID
@@ -225,9 +223,8 @@ func (thls *businessAgent) onMessage(msgConn *wsnet.WsSocket, msgData []byte, ms
 func (thls *businessAgent) handle_MsgType_ID_ConnectedData(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
 	sendToParent := true
 	for range "1" {
-		if (msgData.Pathway == nil || len(msgData.Pathway) == 0) && (msgData.Info.ExeType != txdata.ConnectionInfo_CLIENT) {
-			// 仅client直连当前agent时才会出现零步长的情况.
-			glog.Errorf("empty Pathway and not client, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
+		if (msgData.Pathway == nil) || (len(msgData.Pathway) == 0) {
+			glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
 			thls.deleteConnectionFromAll(msgConn, true)
 			sendToParent = false
 			break
@@ -249,14 +246,8 @@ func (thls *businessAgent) handle_MsgType_ID_ConnectedData(msgData *txdata.Conne
 				break
 			}
 		}
-		if thls.isMyClient(msgData) {
-			sendToParent = thls.doDeal4myClient(msgData, msgConn)
-			break
-		} else if thls.isMyParent(msgData) {
-			sendToParent = thls.doDeal4myParent(msgData, msgConn)
-			break
-		} else if msgData.Info.ExeType == txdata.ConnectionInfo_CLIENT {
-			sendToParent = thls.doDeal4passingClient(msgData, msgConn)
+		if thls.isParentConnection(msgData) {
+			sendToParent = thls.doDeal4parent(msgData, msgConn)
 			break
 		} else if msgData.Info.ExeType == txdata.ConnectionInfo_AGENT {
 			sendToParent = thls.doDeal4agent(msgData, msgConn)
@@ -407,15 +398,7 @@ func (thls *businessAgent) sendDataToParent(msgType txdata.MsgType, msgData prot
 	return conn.Send(msg2slice(msgType, msgData))
 }
 
-func (thls *businessAgent) isMyClient(data *txdata.ConnectedData) bool {
-	if (data.Pathway == nil || len(data.Pathway) == 0) && data.Info.ExeType == txdata.ConnectionInfo_CLIENT {
-		return true
-	} else {
-		return false
-	}
-}
-
-func (thls *businessAgent) isMyParent(data *txdata.ConnectedData) bool {
+func (thls *businessAgent) isParentConnection(data *txdata.ConnectedData) bool {
 	var isParent bool
 	for range "1" {
 		if thls.ownInfo.ExeType != txdata.ConnectionInfo_AGENT {
@@ -433,7 +416,7 @@ func (thls *businessAgent) isMyParent(data *txdata.ConnectedData) bool {
 	return isParent
 }
 
-func (thls *businessAgent) doDeal4myParent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+func (thls *businessAgent) doDeal4parent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
 	var isAccepted bool
 	var isExist bool
 	if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
@@ -506,39 +489,6 @@ func (thls *businessAgent) doDeal4agent(msgData *txdata.ConnectedData, msgConn *
 	sendToParent = true
 
 	return
-}
-
-func (thls *businessAgent) doDeal4myClient(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
-	var isAccepted bool
-	var isExist bool
-	if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
-		glog.Errorf("msgConn not found in cache, msgConn=%p, msgData=%v", msgConn, msgData)
-		thls.deleteConnectionFromAll(msgConn, true)
-		return
-	}
-
-	curData := new(connInfoEx)
-	curData.conn = msgConn
-	curData.Info = *msgData.Info
-	curData.Pathway = msgData.Pathway
-
-	if isSuccess := thls.cacheClient.insertData(curData); !isSuccess {
-		glog.Errorf("client already exists, msgConn=%p, msgData=%v", msgConn, msgData)
-		thls.deleteConnectionFromAll(msgConn, true)
-		return
-	}
-
-	if isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: nil}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
-	}
-
-	sendToParent = true
-	return
-}
-
-func (thls *businessAgent) doDeal4passingClient(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
-	panic()
 }
 
 func (thls *businessAgent) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {

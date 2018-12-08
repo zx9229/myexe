@@ -102,9 +102,6 @@ func (thls *businessServer) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 	if dataSlice := thls.cacheAgent.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
 		checkSunWhenDisconnected(dataSlice)
 	}
-	if dataSize := thls.cacheClient.deleteDataByConn(msgConn); dataSize != nil {
-		checkSunWhenDisconnected(dataSize)
-	}
 	thls.deleteConnectionFromAll(msgConn, false)
 }
 
@@ -317,7 +314,6 @@ func (thls *businessServer) deleteConnectionFromAll(conn *wsnet.WsSocket, closeI
 	}
 	thls.cacheSock.deleteData(conn)
 	thls.cacheAgent.deleteDataByConn(conn)
-	thls.cacheClient.deleteDataByConn(conn)
 }
 
 func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d time.Duration) (rspOut *txdata.ExecuteCommandRsp) {
