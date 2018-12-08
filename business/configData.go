@@ -10,14 +10,14 @@ import (
 )
 
 /*
-大写字母A的10进制是65，所以Node 端暂定端口号10065
+大写字母N的10进制是78，所以Node 端暂定端口号10078
 {
     "ConfType": "NODE",
-    "UniqueID": "a1",
+    "UniqueID": "n1",
     "BelongID": "s1",
-    "ServerURL":   { "Scheme": "ws", "Host": "localhost:10065", "Path": "/websocket" },
+    "ServerURL":   { "Scheme": "ws", "Host": "localhost:10078", "Path": "/websocket" },
     "ClientURL": [ { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" } ],
-    "DataSourceName": "database_a1.db",
+    "DataSourceName": "database_n1.db",
     "LocationName": "Asia/Shanghai"
 }
 大写字母S的10进制是83，所以Server端暂定端口号10083
