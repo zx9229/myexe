@@ -132,6 +132,10 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 
 func (thls *businessServer) handle_MsgType_ID_ConnectedData(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
 	for range "1" {
+		if msgData.Info.ExeType == txdata.ConnectionInfo_CLIENT {
+			thls.doDeal4client(msgData, msgConn)
+			break
+		}
 		if (msgData.Pathway == nil) || (len(msgData.Pathway) == 0) {
 			glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
 			thls.deleteConnectionFromAll(msgConn, true)
@@ -275,6 +279,34 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.
 	} else {
 		glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
 	}
+}
+
+func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
+	if isAccepted, isExist := thls.cacheSock.deleteData(msgConn); !(isExist && isAccepted) {
+		glog.Errorf("msgConn not found or not isAccepted, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
+	if msgData.Pathway != nil && 0 < len(msgData.Pathway) {
+		glog.Errorf("msgConn Pathway not empty, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
+	curData := new(connInfoEx)
+	curData.conn = msgConn
+	curData.Info = *msgData.Info
+	curData.Pathway = msgData.Pathway
+
+	if isSuccess := thls.cacheClient.insertData(curData); !isSuccess {
+		glog.Errorf("client already exists, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
+	tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+	msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 }
 
 func (thls *businessServer) doDeal4agent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
