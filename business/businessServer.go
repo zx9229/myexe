@@ -136,29 +136,15 @@ func (thls *businessServer) handle_MsgType_ID_ConnectedData(msgData *txdata.Conn
 			thls.doDeal4client(msgData, msgConn)
 			break
 		}
-		if (msgData.Pathway == nil) || (len(msgData.Pathway) == 0) {
-			glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
+		if msgData.Info.ExeType == txdata.ConnectionInfo_NODE {
+			thls.doDeal4node(msgData, msgConn)
+			break
+		}
+		if true {
+			glog.Errorf("unknown type, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
 			thls.deleteConnectionFromAll(msgConn, true)
 			break
 		}
-		if msgData.Info.ExeType != txdata.ConnectionInfo_NODE {
-			glog.Errorf("unknown message, msgConn=%p, msgData=%v", msgConn, msgData)
-			thls.deleteConnectionFromAll(msgConn, true)
-			break
-		}
-		if msgData.Info.UniqueID != msgData.Pathway[0] {
-			glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-			thls.deleteConnectionFromAll(msgConn, true)
-			break
-		}
-		if (msgData.Info.ExeType == txdata.ConnectionInfo_NODE) &&
-			(len(msgData.Pathway) == 1) &&
-			(msgData.Info.BelongID != thls.ownInfo.UniqueID) {
-			glog.Errorf("i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
-			thls.deleteConnectionFromAll(msgConn, true)
-			break
-		}
-		thls.doDeal4agent(msgData, msgConn)
 	}
 }
 
@@ -282,6 +268,10 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.
 }
 
 func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
+	if msgData.Info.ExeType != txdata.ConnectionInfo_CLIENT {
+		panic(msgData)
+	}
+
 	if isAccepted, isExist := thls.cacheSock.deleteData(msgConn); !(isExist && isAccepted) {
 		glog.Errorf("msgConn not found or not isAccepted, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
@@ -309,7 +299,30 @@ func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn
 	msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 }
 
-func (thls *businessServer) doDeal4agent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
+func (thls *businessServer) doDeal4node(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
+	if msgData.Info.ExeType != txdata.ConnectionInfo_NODE {
+		panic(msg2slice)
+	}
+
+	if msgData.Pathway == nil || len(msgData.Pathway) == 0 {
+		glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
+	if msgData.Info.UniqueID != msgData.Pathway[0] {
+		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
+	//我的儿子连过来了，我要自检，自己是不是它的父亲.
+	if (len(msgData.Pathway) == 1) && (msgData.Info.BelongID != thls.ownInfo.UniqueID) {
+		glog.Errorf("i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		return
+	}
+
 	var isAccepted bool
 	isSon := len(msgData.Pathway) == 1
 	if isSon {
