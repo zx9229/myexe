@@ -18,6 +18,8 @@ public:
 
 private slots:
     void slotClickedLogin();
+    void slotClickedClear();
+    void slotClickedQuickFill();
 
 private:
     Ui::LoginDialog* ui;

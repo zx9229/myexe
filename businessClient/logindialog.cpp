@@ -9,8 +9,8 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
     ui->setupUi(this);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
     connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);
-
-    ui->lineEdit_url->setText("ws://localhost:10083/websocket");
+    connect(ui->pushButton_clear, &QPushButton::clicked, this, &LoginDialog::slotClickedClear);
+    connect(ui->pushButton_quickFill, &QPushButton::clicked, this, &LoginDialog::slotClickedQuickFill);
 }
 
 LoginDialog::~LoginDialog()
@@ -31,4 +31,21 @@ void LoginDialog::slotClickedLogin()
     m_dataExch->Login(ui->lineEdit_url->text().trimmed(), "", "");
     //TODO:登录成功
     this->accept();
+}
+
+void LoginDialog::slotClickedClear()
+{
+    ui->lineEdit_host->clear();
+    ui->lineEdit_port->clear();
+    ui->lineEdit_path->clear();
+    ui->lineEdit_url->clear();
+}
+
+void LoginDialog::slotClickedQuickFill()
+{
+    this->slotClickedClear();
+    ui->lineEdit_host->setText("localhost");
+    ui->lineEdit_port->setText("10083");
+    ui->lineEdit_path->setText("/websocket");
+    ui->lineEdit_url->setText("ws://localhost:10083/websocket");
 }
