@@ -27,16 +27,21 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         mywebsock.cpp \
-        protobuf/txdata.pb.cc
+        protobuf/txdata.pb.cc \
+        logindialog.cpp \
+        dataexchanger.cpp
 
 HEADERS += \
         mainwindow.h \
         mywebsock.h \
         protobuf/m2b.h \
-        protobuf/txdata.pb.h
+        protobuf/txdata.pb.h \
+        logindialog.h \
+        dataexchanger.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        logindialog.ui
 
 CONFIG += mobility
 MOBILITY = 

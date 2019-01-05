@@ -2,8 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//////////////////////////////////////////////////////////////////////////
-#include "mywebsock.h"
+#include "dataexchanger.h"
 
 namespace Ui {
     class MainWindow;
@@ -14,16 +13,15 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(DataExchanger* p, QWidget *parent = 0);
     ~MainWindow();
 
 private slots:
-    void slotClickedLink();
     void slotClickedSend();
 
 private:
-    Ui::MainWindow *ui;
-    MyWebsock m_ws;
+    Ui::MainWindow* ui;
+    DataExchanger*  m_dataExch;
 };
 
 #endif // MAINWINDOW_H

@@ -12,6 +12,8 @@ class MyWebsock :public QObject
 
 public:
     explicit MyWebsock(QObject *parent = Q_NULLPTR);
+
+public:
     bool start(const QUrl& url);
     void stop();
     qint64 sendBinaryMessage(const QByteArray &data);

@@ -4,12 +4,20 @@
 //////////////////////////////////////////////////////////////////////////
 #include "mainwindow.h"
 #include <QApplication>
+#include "logindialog.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+
+    DataExchanger m_dataExchanger;
+
+    LoginDialog loginDlg(&m_dataExchanger);
+    MainWindow w(&m_dataExchanger);
+    if (loginDlg.exec() == QDialog::Accepted)
+    {
+        w.show();
+    }
 
     return a.exec();
 }
