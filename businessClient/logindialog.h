@@ -16,6 +16,9 @@ public:
     explicit LoginDialog(DataExchanger* p, QWidget *parent = 0);
     ~LoginDialog();
 
+private:
+    void initUI();
+
 private slots:
     void slotClickedLogin();
     void slotClickedClear();

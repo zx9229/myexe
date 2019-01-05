@@ -7,6 +7,7 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
     m_dataExch(p)
 {
     ui->setupUi(this);
+    initUI();
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
     connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &LoginDialog::slotClickedClear);
@@ -16,6 +17,11 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
 LoginDialog::~LoginDialog()
 {
     delete ui;
+}
+
+void LoginDialog::initUI()
+{
+    ui->lineEdit_port->setValidator(new QIntValidator());
 }
 
 void LoginDialog::slotClickedLogin()
