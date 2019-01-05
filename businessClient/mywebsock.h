@@ -1,12 +1,10 @@
 #ifndef MY_WEBSOCK_H
 #define MY_WEBSOCK_H
 
-//https://blog.csdn.net/dumuweiyang/article/details/80308431
-
 #include <QObject>
-#include <QTimer>//(QT += core)
-#include <QAbstractSocket>//(QT += network)
-#include <QWebSocket>//(QT += websockets)
+#include <QTimer>          //(QT += core)
+#include <QAbstractSocket> //(QT += network)
+#include <QWebSocket>      //(QT += websockets)
 
 class MyWebsock :public QObject
 {
@@ -17,6 +15,9 @@ public:
     bool start(const QUrl& url);
     void stop();
     qint64 sendBinaryMessage(const QByteArray &data);
+
+signals:
+    void onMessage(const QByteArray &message);
 
 private:
     void reconnect();

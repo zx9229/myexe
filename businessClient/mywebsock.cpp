@@ -71,7 +71,17 @@ void MyWebsock::pong(quint64 elapsedTime, const QByteArray &payload)
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::pong";
 }
 
+#include "m2b.h"
 void MyWebsock::binaryMessageReceived(const QByteArray &message)
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::binaryMessageReceived";
+    onMessage(message);
+
+    {
+        txdata::MsgType theType = {};
+        GPMSGPTR theMsg;
+        m2b::slice2msg(message, theType, theMsg);
+        QSharedPointer<txdata::ConnectedData> txData = qSharedPointerDynamicCast<txdata::ConnectedData>(theMsg);
+        printf("%s\n", txData->info().uniqueid().c_str());
+    }
 }

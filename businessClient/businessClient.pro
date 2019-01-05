@@ -26,11 +26,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        mywebsock.cpp
+        mywebsock.cpp \
+        protobuf/txdata.pb.cc
 
 HEADERS += \
         mainwindow.h \
-        mywebsock.h
+        mywebsock.h \
+        protobuf/m2b.h \
+        protobuf/txdata.pb.h
 
 FORMS += \
         mainwindow.ui
@@ -40,3 +43,9 @@ MOBILITY =
 
 # 让GUI程序(Run in terminal).
 CONFIG += console
+# 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+
+INCLUDEPATH += $$PWD/protobuf
+INCLUDEPATH += $$PWD/protobuf/protobuf-3.6.1/src
+LIBS        += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.a
