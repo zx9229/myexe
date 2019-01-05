@@ -19,7 +19,9 @@ public:
     qint64 sendBinaryMessage(const QByteArray &data);
 
 signals:
-    void onMessage(const QByteArray &message);
+    void sigConnected();
+    void sigDisconnected();
+    void sigMessage(const QByteArray &message);
 
 private:
     void reconnect();
@@ -32,10 +34,11 @@ private slots:
     void pong(quint64 elapsedTime, const QByteArray &payload);
 
 private:
-    const int  m_interval;
+    const int  m_interval; //重连间隔n秒.
+    QTimer     m_timer;
     QUrl       m_url;
     QWebSocket m_ws;
-    QTimer     m_timer;
+    bool       m_alive;    //socket是否正常.
 };
 
 #endif // MY_WEBSOCK_H
