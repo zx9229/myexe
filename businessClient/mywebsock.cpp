@@ -4,9 +4,9 @@
 
 MyWebsock::MyWebsock(QObject *parent /* = Q_NULLPTR */) :
     QObject(parent),
+    m_interval(5),
     m_ws(QString(), QWebSocketProtocol::VersionLatest, parent),
-    m_timer(parent),
-    m_interval(5)
+    m_timer(parent)
 {
     QObject::connect(&m_ws, &QWebSocket::connected, this, &MyWebsock::connected);
     QObject::connect(&m_ws, &QWebSocket::disconnected, this, &MyWebsock::disconnected);
