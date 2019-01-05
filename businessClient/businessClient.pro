@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        mywebsock.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+        mywebsock.h
 
 FORMS += \
         mainwindow.ui
@@ -36,3 +38,5 @@ FORMS += \
 CONFIG += mobility
 MOBILITY = 
 
+# 让GUI程序(Run in terminal).
+CONFIG += console
