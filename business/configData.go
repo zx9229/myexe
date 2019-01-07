@@ -13,7 +13,7 @@ import (
 大写字母N的10进制是78，所以Node 端暂定端口号10078
 {
     "ConfType": "NODE",
-    "UniqueID": "n1",
+    "UserID": "n1",
     "BelongID": "s1",
     "ServerURL":   { "Scheme": "ws", "Host": "localhost:10078", "Path": "/websocket" },
     "ClientURL": [ { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" } ],
@@ -23,7 +23,7 @@ import (
 大写字母S的10进制是83，所以Server端暂定端口号10083
 {
     "ConfType": "SERVER",
-    "UniqueID": "s1",
+    "UserID": "s1",
     "ServerURL": { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" },
     "DataSourceName": "database_s1.db",
 	"LocationName": "Asia/Shanghai",
@@ -41,7 +41,7 @@ type configBase struct {
 
 type configNode struct {
 	configBase
-	UniqueID       string
+	UserID         string
 	BelongID       string
 	ServerURL      url.URL
 	ClientURL      []url.URL
@@ -54,8 +54,8 @@ func (thls *configNode) isValid() error {
 	PREFIX := "configNode: "
 	var err error
 	for range "1" {
-		if len(thls.UniqueID) == 0 {
-			err = fmt.Errorf(PREFIX + "UniqueID is empty")
+		if len(thls.UserID) == 0 {
+			err = fmt.Errorf(PREFIX + "UserID is empty")
 			break
 		}
 		if len(thls.BelongID) == 0 {
@@ -90,7 +90,7 @@ type config4mail struct {
 
 type configServer struct {
 	configBase
-	UniqueID       string
+	UserID         string
 	ServerURL      url.URL
 	ClientURL      []url.URL
 	DataSourceName string //数据源的名字.
@@ -103,8 +103,8 @@ func (thls *configServer) isValid() error {
 	PREFIX := "configServer: "
 	var err error
 	for range "1" {
-		if len(thls.UniqueID) == 0 {
-			err = fmt.Errorf(PREFIX + "UniqueID is empty")
+		if len(thls.UserID) == 0 {
+			err = fmt.Errorf(PREFIX + "UserID is empty")
 			break
 		}
 		if len(thls.ServerURL.String()) == 0 {
@@ -227,7 +227,7 @@ func exampleConfigData(confType string) string {
 	exampleA := func() string {
 		var cfgA configNode
 		cfgA.ConfType = "NODE"
-		cfgA.UniqueID = "a1"
+		cfgA.UserID = "a1"
 		cfgA.BelongID = "s1"
 		cfgA.ServerURL = url.URL{Scheme: "ws", Host: "localhost:10065", Path: "/websocket"}
 		cfgA.ClientURL = []url.URL{url.URL{Scheme: "ws", Host: "localhost:10083", Path: "/websocket"}}
@@ -239,7 +239,7 @@ func exampleConfigData(confType string) string {
 	exampleS := func() string {
 		var cfgS configServer
 		cfgS.ConfType = "SERVER"
-		cfgS.UniqueID = "a1"
+		cfgS.UserID = "a1"
 		cfgS.ServerURL = url.URL{Scheme: "ws", Host: "localhost:10083", Path: "/websocket"}
 		cfgS.ClientURL = []url.URL{}
 		cfgS.DataSourceName = "database_s1.db"

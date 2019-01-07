@@ -91,29 +91,6 @@ template<> ::txdata::SendMailItem* Arena::CreateMaybeMessage<::txdata::SendMailI
 }  // namespace google
 namespace txdata {
 
-enum ConnectionInfo_AppType {
-  ConnectionInfo_AppType_Zero2 = 0,
-  ConnectionInfo_AppType_SERVER = 1,
-  ConnectionInfo_AppType_NODE = 2,
-  ConnectionInfo_AppType_CLIENT = 3,
-  ConnectionInfo_AppType_ConnectionInfo_AppType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
-  ConnectionInfo_AppType_ConnectionInfo_AppType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
-};
-bool ConnectionInfo_AppType_IsValid(int value);
-const ConnectionInfo_AppType ConnectionInfo_AppType_AppType_MIN = ConnectionInfo_AppType_Zero2;
-const ConnectionInfo_AppType ConnectionInfo_AppType_AppType_MAX = ConnectionInfo_AppType_CLIENT;
-const int ConnectionInfo_AppType_AppType_ARRAYSIZE = ConnectionInfo_AppType_AppType_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* ConnectionInfo_AppType_descriptor();
-inline const ::std::string& ConnectionInfo_AppType_Name(ConnectionInfo_AppType value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    ConnectionInfo_AppType_descriptor(), value);
-}
-inline bool ConnectionInfo_AppType_Parse(
-    const ::std::string& name, ConnectionInfo_AppType* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<ConnectionInfo_AppType>(
-    ConnectionInfo_AppType_descriptor(), name, value);
-}
 enum ConnectionInfo_LinkType {
   ConnectionInfo_LinkType_Zero3 = 0,
   ConnectionInfo_LinkType_CONNECT = 1,
@@ -163,6 +140,30 @@ inline bool MsgType_Parse(
     const ::std::string& name, MsgType* value) {
   return ::google::protobuf::internal::ParseNamedEnum<MsgType>(
     MsgType_descriptor(), name, value);
+}
+enum ProgramType {
+  Zero2 = 0,
+  CLIENT = 1,
+  SERVER = 2,
+  NODE = 3,
+  POINT = 4,
+  ProgramType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  ProgramType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool ProgramType_IsValid(int value);
+const ProgramType ProgramType_MIN = Zero2;
+const ProgramType ProgramType_MAX = POINT;
+const int ProgramType_ARRAYSIZE = ProgramType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* ProgramType_descriptor();
+inline const ::std::string& ProgramType_Name(ProgramType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    ProgramType_descriptor(), value);
+}
+inline bool ProgramType_Parse(
+    const ::std::string& name, ProgramType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<ProgramType>(
+    ProgramType_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -251,36 +252,6 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
 
   // nested types ----------------------------------------------------
 
-  typedef ConnectionInfo_AppType AppType;
-  static const AppType Zero2 =
-    ConnectionInfo_AppType_Zero2;
-  static const AppType SERVER =
-    ConnectionInfo_AppType_SERVER;
-  static const AppType NODE =
-    ConnectionInfo_AppType_NODE;
-  static const AppType CLIENT =
-    ConnectionInfo_AppType_CLIENT;
-  static inline bool AppType_IsValid(int value) {
-    return ConnectionInfo_AppType_IsValid(value);
-  }
-  static const AppType AppType_MIN =
-    ConnectionInfo_AppType_AppType_MIN;
-  static const AppType AppType_MAX =
-    ConnectionInfo_AppType_AppType_MAX;
-  static const int AppType_ARRAYSIZE =
-    ConnectionInfo_AppType_AppType_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  AppType_descriptor() {
-    return ConnectionInfo_AppType_descriptor();
-  }
-  static inline const ::std::string& AppType_Name(AppType value) {
-    return ConnectionInfo_AppType_Name(value);
-  }
-  static inline bool AppType_Parse(const ::std::string& name,
-      AppType* value) {
-    return ConnectionInfo_AppType_Parse(name, value);
-  }
-
   typedef ConnectionInfo_LinkType LinkType;
   static const LinkType Zero3 =
     ConnectionInfo_LinkType_Zero3;
@@ -311,19 +282,19 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
 
   // accessors -------------------------------------------------------
 
-  // string UniqueID = 1;
-  void clear_uniqueid();
-  static const int kUniqueIDFieldNumber = 1;
-  const ::std::string& uniqueid() const;
-  void set_uniqueid(const ::std::string& value);
+  // string UserID = 1;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 1;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
   #if LANG_CXX11
-  void set_uniqueid(::std::string&& value);
+  void set_userid(::std::string&& value);
   #endif
-  void set_uniqueid(const char* value);
-  void set_uniqueid(const char* value, size_t size);
-  ::std::string* mutable_uniqueid();
-  ::std::string* release_uniqueid();
-  void set_allocated_uniqueid(::std::string* uniqueid);
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
 
   // string BelongID = 2;
   void clear_belongid();
@@ -367,11 +338,11 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
   ::std::string* release_exepath();
   void set_allocated_exepath(::std::string* exepath);
 
-  // .txdata.ConnectionInfo.AppType ExeType = 4;
+  // .txdata.ProgramType ExeType = 4;
   void clear_exetype();
   static const int kExeTypeFieldNumber = 4;
-  ::txdata::ConnectionInfo_AppType exetype() const;
-  void set_exetype(::txdata::ConnectionInfo_AppType value);
+  ::txdata::ProgramType exetype() const;
+  void set_exetype(::txdata::ProgramType value);
 
   // bool IsLeaf = 5;
   void clear_isleaf();
@@ -379,11 +350,11 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
   bool isleaf() const;
   void set_isleaf(bool value);
 
-  // .txdata.ConnectionInfo.LinkType LinkDir = 6;
-  void clear_linkdir();
-  static const int kLinkDirFieldNumber = 6;
-  ::txdata::ConnectionInfo_LinkType linkdir() const;
-  void set_linkdir(::txdata::ConnectionInfo_LinkType value);
+  // .txdata.ConnectionInfo.LinkType LinkMode = 6;
+  void clear_linkmode();
+  static const int kLinkModeFieldNumber = 6;
+  ::txdata::ConnectionInfo_LinkType linkmode() const;
+  void set_linkmode(::txdata::ConnectionInfo_LinkType value);
 
   // int32 ExePid = 7;
   void clear_exepid();
@@ -395,13 +366,13 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr uniqueid_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
   ::google::protobuf::internal::ArenaStringPtr belongid_;
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::google::protobuf::internal::ArenaStringPtr exepath_;
   int exetype_;
   bool isleaf_;
-  int linkdir_;
+  int linkmode_;
   ::google::protobuf::int32 exepid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
@@ -877,19 +848,19 @@ class ExecuteCommandRsp : public ::google::protobuf::Message /* @@protoc_inserti
 
   // accessors -------------------------------------------------------
 
-  // string UniqueID = 2;
-  void clear_uniqueid();
-  static const int kUniqueIDFieldNumber = 2;
-  const ::std::string& uniqueid() const;
-  void set_uniqueid(const ::std::string& value);
+  // string UserID = 2;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 2;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
   #if LANG_CXX11
-  void set_uniqueid(::std::string&& value);
+  void set_userid(::std::string&& value);
   #endif
-  void set_uniqueid(const char* value);
-  void set_uniqueid(const char* value, size_t size);
-  ::std::string* mutable_uniqueid();
-  ::std::string* release_uniqueid();
-  void set_allocated_uniqueid(::std::string* uniqueid);
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
 
   // string Result = 3;
   void clear_result();
@@ -928,17 +899,14 @@ class ExecuteCommandRsp : public ::google::protobuf::Message /* @@protoc_inserti
   // int32 ErrNo = 4;
   void clear_errno();
   static const int kErrNoFieldNumber = 4;
-#ifdef errno
-#undef errno
   ::google::protobuf::int32 errno() const;
-#endif
   void set_errno(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:txdata.ExecuteCommandRsp)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr uniqueid_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
   ::google::protobuf::internal::ArenaStringPtr result_;
   ::google::protobuf::internal::ArenaStringPtr errmsg_;
   ::google::protobuf::int64 requestid_;
@@ -1035,19 +1003,19 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
 
   // accessors -------------------------------------------------------
 
-  // string UniqueID = 2;
-  void clear_uniqueid();
-  static const int kUniqueIDFieldNumber = 2;
-  const ::std::string& uniqueid() const;
-  void set_uniqueid(const ::std::string& value);
+  // string UserID = 2;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 2;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
   #if LANG_CXX11
-  void set_uniqueid(::std::string&& value);
+  void set_userid(::std::string&& value);
   #endif
-  void set_uniqueid(const char* value);
-  void set_uniqueid(const char* value, size_t size);
-  ::std::string* mutable_uniqueid();
-  ::std::string* release_uniqueid();
-  void set_allocated_uniqueid(::std::string* uniqueid);
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
 
   // string DataType = 5;
   void clear_datatype();
@@ -1077,17 +1045,17 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::std::string* release_data();
   void set_allocated_data(::std::string* data);
 
-  // .google.protobuf.Timestamp ReportTime = 7;
-  bool has_reporttime() const;
-  void clear_reporttime();
-  static const int kReportTimeFieldNumber = 7;
+  // .google.protobuf.Timestamp ReqTime = 7;
+  bool has_reqtime() const;
+  void clear_reqtime();
+  static const int kReqTimeFieldNumber = 7;
   private:
-  const ::google::protobuf::Timestamp& _internal_reporttime() const;
+  const ::google::protobuf::Timestamp& _internal_reqtime() const;
   public:
-  const ::google::protobuf::Timestamp& reporttime() const;
-  ::google::protobuf::Timestamp* release_reporttime();
-  ::google::protobuf::Timestamp* mutable_reporttime();
-  void set_allocated_reporttime(::google::protobuf::Timestamp* reporttime);
+  const ::google::protobuf::Timestamp& reqtime() const;
+  ::google::protobuf::Timestamp* release_reqtime();
+  ::google::protobuf::Timestamp* mutable_reqtime();
+  void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
 
   // int64 RequestID = 1;
   void clear_requestid();
@@ -1111,10 +1079,10 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr uniqueid_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
   ::google::protobuf::internal::ArenaStringPtr datatype_;
   ::google::protobuf::internal::ArenaStringPtr data_;
-  ::google::protobuf::Timestamp* reporttime_;
+  ::google::protobuf::Timestamp* reqtime_;
   ::google::protobuf::int64 requestid_;
   ::google::protobuf::int64 seqno_;
   bool endeavour_;
@@ -1614,57 +1582,57 @@ class SendMailItem : public ::google::protobuf::Message /* @@protoc_insertion_po
 #endif  // __GNUC__
 // ConnectionInfo
 
-// string UniqueID = 1;
-inline void ConnectionInfo::clear_uniqueid() {
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string UserID = 1;
+inline void ConnectionInfo::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& ConnectionInfo::uniqueid() const {
-  // @@protoc_insertion_point(field_get:txdata.ConnectionInfo.UniqueID)
-  return uniqueid_.GetNoArena();
+inline const ::std::string& ConnectionInfo::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.ConnectionInfo.UserID)
+  return userid_.GetNoArena();
 }
-inline void ConnectionInfo::set_uniqueid(const ::std::string& value) {
+inline void ConnectionInfo::set_userid(const ::std::string& value) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.UserID)
 }
 #if LANG_CXX11
-inline void ConnectionInfo::set_uniqueid(::std::string&& value) {
+inline void ConnectionInfo::set_userid(::std::string&& value) {
   
-  uniqueid_.SetNoArena(
+  userid_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.ConnectionInfo.UniqueID)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.ConnectionInfo.UserID)
 }
 #endif
-inline void ConnectionInfo::set_uniqueid(const char* value) {
+inline void ConnectionInfo::set_userid(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.ConnectionInfo.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.ConnectionInfo.UserID)
 }
-inline void ConnectionInfo::set_uniqueid(const char* value, size_t size) {
+inline void ConnectionInfo::set_userid(const char* value, size_t size) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.ConnectionInfo.UniqueID)
+  // @@protoc_insertion_point(field_set_pointer:txdata.ConnectionInfo.UserID)
 }
-inline ::std::string* ConnectionInfo::mutable_uniqueid() {
+inline ::std::string* ConnectionInfo::mutable_userid() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.ConnectionInfo.UniqueID)
-  return uniqueid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.ConnectionInfo.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* ConnectionInfo::release_uniqueid() {
-  // @@protoc_insertion_point(field_release:txdata.ConnectionInfo.UniqueID)
+inline ::std::string* ConnectionInfo::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.ConnectionInfo.UserID)
   
-  return uniqueid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void ConnectionInfo::set_allocated_uniqueid(::std::string* uniqueid) {
-  if (uniqueid != NULL) {
+inline void ConnectionInfo::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
     
   } else {
     
   }
-  uniqueid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uniqueid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.ConnectionInfo.UniqueID)
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.ConnectionInfo.UserID)
 }
 
 // string BelongID = 2;
@@ -1773,15 +1741,15 @@ inline void ConnectionInfo::set_allocated_version(::std::string* version) {
   // @@protoc_insertion_point(field_set_allocated:txdata.ConnectionInfo.Version)
 }
 
-// .txdata.ConnectionInfo.AppType ExeType = 4;
+// .txdata.ProgramType ExeType = 4;
 inline void ConnectionInfo::clear_exetype() {
   exetype_ = 0;
 }
-inline ::txdata::ConnectionInfo_AppType ConnectionInfo::exetype() const {
+inline ::txdata::ProgramType ConnectionInfo::exetype() const {
   // @@protoc_insertion_point(field_get:txdata.ConnectionInfo.ExeType)
-  return static_cast< ::txdata::ConnectionInfo_AppType >(exetype_);
+  return static_cast< ::txdata::ProgramType >(exetype_);
 }
-inline void ConnectionInfo::set_exetype(::txdata::ConnectionInfo_AppType value) {
+inline void ConnectionInfo::set_exetype(::txdata::ProgramType value) {
   
   exetype_ = value;
   // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.ExeType)
@@ -1801,18 +1769,18 @@ inline void ConnectionInfo::set_isleaf(bool value) {
   // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.IsLeaf)
 }
 
-// .txdata.ConnectionInfo.LinkType LinkDir = 6;
-inline void ConnectionInfo::clear_linkdir() {
-  linkdir_ = 0;
+// .txdata.ConnectionInfo.LinkType LinkMode = 6;
+inline void ConnectionInfo::clear_linkmode() {
+  linkmode_ = 0;
 }
-inline ::txdata::ConnectionInfo_LinkType ConnectionInfo::linkdir() const {
-  // @@protoc_insertion_point(field_get:txdata.ConnectionInfo.LinkDir)
-  return static_cast< ::txdata::ConnectionInfo_LinkType >(linkdir_);
+inline ::txdata::ConnectionInfo_LinkType ConnectionInfo::linkmode() const {
+  // @@protoc_insertion_point(field_get:txdata.ConnectionInfo.LinkMode)
+  return static_cast< ::txdata::ConnectionInfo_LinkType >(linkmode_);
 }
-inline void ConnectionInfo::set_linkdir(::txdata::ConnectionInfo_LinkType value) {
+inline void ConnectionInfo::set_linkmode(::txdata::ConnectionInfo_LinkType value) {
   
-  linkdir_ = value;
-  // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.LinkDir)
+  linkmode_ = value;
+  // @@protoc_insertion_point(field_set:txdata.ConnectionInfo.LinkMode)
 }
 
 // int32 ExePid = 7;
@@ -2225,57 +2193,57 @@ inline void ExecuteCommandRsp::set_requestid(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:txdata.ExecuteCommandRsp.RequestID)
 }
 
-// string UniqueID = 2;
-inline void ExecuteCommandRsp::clear_uniqueid() {
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string UserID = 2;
+inline void ExecuteCommandRsp::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& ExecuteCommandRsp::uniqueid() const {
-  // @@protoc_insertion_point(field_get:txdata.ExecuteCommandRsp.UniqueID)
-  return uniqueid_.GetNoArena();
+inline const ::std::string& ExecuteCommandRsp::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.ExecuteCommandRsp.UserID)
+  return userid_.GetNoArena();
 }
-inline void ExecuteCommandRsp::set_uniqueid(const ::std::string& value) {
+inline void ExecuteCommandRsp::set_userid(const ::std::string& value) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.ExecuteCommandRsp.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.ExecuteCommandRsp.UserID)
 }
 #if LANG_CXX11
-inline void ExecuteCommandRsp::set_uniqueid(::std::string&& value) {
+inline void ExecuteCommandRsp::set_userid(::std::string&& value) {
   
-  uniqueid_.SetNoArena(
+  userid_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.ExecuteCommandRsp.UniqueID)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.ExecuteCommandRsp.UserID)
 }
 #endif
-inline void ExecuteCommandRsp::set_uniqueid(const char* value) {
+inline void ExecuteCommandRsp::set_userid(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.ExecuteCommandRsp.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.ExecuteCommandRsp.UserID)
 }
-inline void ExecuteCommandRsp::set_uniqueid(const char* value, size_t size) {
+inline void ExecuteCommandRsp::set_userid(const char* value, size_t size) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.ExecuteCommandRsp.UniqueID)
+  // @@protoc_insertion_point(field_set_pointer:txdata.ExecuteCommandRsp.UserID)
 }
-inline ::std::string* ExecuteCommandRsp::mutable_uniqueid() {
+inline ::std::string* ExecuteCommandRsp::mutable_userid() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.ExecuteCommandRsp.UniqueID)
-  return uniqueid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.ExecuteCommandRsp.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* ExecuteCommandRsp::release_uniqueid() {
-  // @@protoc_insertion_point(field_release:txdata.ExecuteCommandRsp.UniqueID)
+inline ::std::string* ExecuteCommandRsp::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.ExecuteCommandRsp.UserID)
   
-  return uniqueid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void ExecuteCommandRsp::set_allocated_uniqueid(::std::string* uniqueid) {
-  if (uniqueid != NULL) {
+inline void ExecuteCommandRsp::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
     
   } else {
     
   }
-  uniqueid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uniqueid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.ExecuteCommandRsp.UniqueID)
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.ExecuteCommandRsp.UserID)
 }
 
 // string Result = 3;
@@ -2416,57 +2384,57 @@ inline void CommonNtosReq::set_requestid(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.RequestID)
 }
 
-// string UniqueID = 2;
-inline void CommonNtosReq::clear_uniqueid() {
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string UserID = 2;
+inline void CommonNtosReq::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& CommonNtosReq::uniqueid() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.UniqueID)
-  return uniqueid_.GetNoArena();
+inline const ::std::string& CommonNtosReq::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.UserID)
+  return userid_.GetNoArena();
 }
-inline void CommonNtosReq::set_uniqueid(const ::std::string& value) {
+inline void CommonNtosReq::set_userid(const ::std::string& value) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.UserID)
 }
 #if LANG_CXX11
-inline void CommonNtosReq::set_uniqueid(::std::string&& value) {
+inline void CommonNtosReq::set_userid(::std::string&& value) {
   
-  uniqueid_.SetNoArena(
+  userid_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosReq.UniqueID)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosReq.UserID)
 }
 #endif
-inline void CommonNtosReq::set_uniqueid(const char* value) {
+inline void CommonNtosReq::set_userid(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosReq.UniqueID)
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosReq.UserID)
 }
-inline void CommonNtosReq::set_uniqueid(const char* value, size_t size) {
+inline void CommonNtosReq::set_userid(const char* value, size_t size) {
   
-  uniqueid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosReq.UniqueID)
+  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosReq.UserID)
 }
-inline ::std::string* CommonNtosReq::mutable_uniqueid() {
+inline ::std::string* CommonNtosReq::mutable_userid() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.UniqueID)
-  return uniqueid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* CommonNtosReq::release_uniqueid() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.UniqueID)
+inline ::std::string* CommonNtosReq::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.UserID)
   
-  return uniqueid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void CommonNtosReq::set_allocated_uniqueid(::std::string* uniqueid) {
-  if (uniqueid != NULL) {
+inline void CommonNtosReq::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
     
   } else {
     
   }
-  uniqueid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uniqueid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.UniqueID)
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.UserID)
 }
 
 // int64 SeqNo = 3;
@@ -2603,53 +2571,53 @@ inline void CommonNtosReq::set_allocated_data(::std::string* data) {
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.Data)
 }
 
-// .google.protobuf.Timestamp ReportTime = 7;
-inline bool CommonNtosReq::has_reporttime() const {
-  return this != internal_default_instance() && reporttime_ != NULL;
+// .google.protobuf.Timestamp ReqTime = 7;
+inline bool CommonNtosReq::has_reqtime() const {
+  return this != internal_default_instance() && reqtime_ != NULL;
 }
-inline const ::google::protobuf::Timestamp& CommonNtosReq::_internal_reporttime() const {
-  return *reporttime_;
+inline const ::google::protobuf::Timestamp& CommonNtosReq::_internal_reqtime() const {
+  return *reqtime_;
 }
-inline const ::google::protobuf::Timestamp& CommonNtosReq::reporttime() const {
-  const ::google::protobuf::Timestamp* p = reporttime_;
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.ReportTime)
+inline const ::google::protobuf::Timestamp& CommonNtosReq::reqtime() const {
+  const ::google::protobuf::Timestamp* p = reqtime_;
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.ReqTime)
   return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
       &::google::protobuf::_Timestamp_default_instance_);
 }
-inline ::google::protobuf::Timestamp* CommonNtosReq::release_reporttime() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.ReportTime)
+inline ::google::protobuf::Timestamp* CommonNtosReq::release_reqtime() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.ReqTime)
   
-  ::google::protobuf::Timestamp* temp = reporttime_;
-  reporttime_ = NULL;
+  ::google::protobuf::Timestamp* temp = reqtime_;
+  reqtime_ = NULL;
   return temp;
 }
-inline ::google::protobuf::Timestamp* CommonNtosReq::mutable_reporttime() {
+inline ::google::protobuf::Timestamp* CommonNtosReq::mutable_reqtime() {
   
-  if (reporttime_ == NULL) {
+  if (reqtime_ == NULL) {
     auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    reporttime_ = p;
+    reqtime_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.ReportTime)
-  return reporttime_;
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.ReqTime)
+  return reqtime_;
 }
-inline void CommonNtosReq::set_allocated_reporttime(::google::protobuf::Timestamp* reporttime) {
+inline void CommonNtosReq::set_allocated_reqtime(::google::protobuf::Timestamp* reqtime) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reporttime_);
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reqtime_);
   }
-  if (reporttime) {
+  if (reqtime) {
     ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(reporttime)->GetArena();
+      reinterpret_cast<::google::protobuf::MessageLite*>(reqtime)->GetArena();
     if (message_arena != submessage_arena) {
-      reporttime = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, reporttime, submessage_arena);
+      reqtime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, reqtime, submessage_arena);
     }
     
   } else {
     
   }
-  reporttime_ = reporttime;
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.ReportTime)
+  reqtime_ = reqtime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.ReqTime)
 }
 
 // -------------------------------------------------------------------
@@ -3332,11 +3300,6 @@ inline void SendMailItem::set_allocated_content(::std::string* content) {
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::txdata::ConnectionInfo_AppType> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::txdata::ConnectionInfo_AppType>() {
-  return ::txdata::ConnectionInfo_AppType_descriptor();
-}
 template <> struct is_proto_enum< ::txdata::ConnectionInfo_LinkType> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::txdata::ConnectionInfo_LinkType>() {
@@ -3346,6 +3309,11 @@ template <> struct is_proto_enum< ::txdata::MsgType> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::txdata::MsgType>() {
   return ::txdata::MsgType_descriptor();
+}
+template <> struct is_proto_enum< ::txdata::ProgramType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::txdata::ProgramType>() {
+  return ::txdata::ProgramType_descriptor();
 }
 
 }  // namespace protobuf

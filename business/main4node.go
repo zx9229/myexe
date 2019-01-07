@@ -91,7 +91,7 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 			glog.Fatalln(globalA, globalS)
 		}
 		if true {
-			rspData.UniqueID = reqInOut.UniqueID
+			rspData.UserID = reqInOut.UserID
 			rspData.SeqNo = rspOut.SeqNo
 			rspData.ErrNo = rspOut.ErrNo
 			rspData.ErrMsg = rspOut.ErrMsg

@@ -26,8 +26,8 @@ type businessServer struct {
 }
 
 func newBusinessServer(cfg *configServer) *businessServer {
-	if len(cfg.UniqueID) == 0 {
-		glog.Fatalf("must not be empty, UniqueID=%v", cfg.UniqueID)
+	if len(cfg.UserID) == 0 {
+		glog.Fatalf("must not be empty, UserID=%v", cfg.UserID)
 	}
 	curData := new(businessServer)
 	//
@@ -36,12 +36,12 @@ func newBusinessServer(cfg *configServer) *businessServer {
 	curData.cacheClient = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
-	curData.ownInfo.UniqueID = cfg.UniqueID
+	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = ""
 	curData.ownInfo.Version = "Version20181021"
-	curData.ownInfo.ExeType = txdata.ConnectionInfo_SERVER
+	curData.ownInfo.ExeType = txdata.ProgramType_SERVER
 	curData.ownInfo.IsLeaf = false
-	curData.ownInfo.LinkDir = txdata.ConnectionInfo_Zero3
+	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero3
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
 	//
@@ -82,7 +82,7 @@ func (thls *businessServer) onConnected(msgConn *wsnet.WsSocket, isAccepted bool
 		glog.Fatalf("already exists, msgConn=%v", msgConn)
 	}
 	if !isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 	}
 }
@@ -132,11 +132,11 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 
 func (thls *businessServer) handle_MsgType_ID_ConnectedData(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
 	for range "1" {
-		if msgData.Info.ExeType == txdata.ConnectionInfo_CLIENT {
+		if msgData.Info.ExeType == txdata.ProgramType_CLIENT {
 			thls.doDeal4client(msgData, msgConn)
 			break
 		}
-		if msgData.Info.ExeType == txdata.ConnectionInfo_NODE {
+		if msgData.Info.ExeType == txdata.ProgramType_NODE {
 			thls.doDeal4node(msgData, msgConn)
 			break
 		}
@@ -149,8 +149,8 @@ func (thls *businessServer) handle_MsgType_ID_ConnectedData(msgData *txdata.Conn
 }
 
 func (thls *businessServer) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
-	if msgData.Info.ExeType == txdata.ConnectionInfo_NODE {
-		if thls.cacheNode.deleteData(msgData.Info.UniqueID) == false {
+	if msgData.Info.ExeType == txdata.ProgramType_NODE {
+		if thls.cacheNode.deleteData(msgData.Info.UserID) == false {
 			glog.Fatalf("cache data error, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	} else {
@@ -163,7 +163,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner(msgData)
 	//
 	if needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
-		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UniqueID); isExist {
+		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UserID); isExist {
 			rspData.Pathway = connInfoEx.Pathway
 			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
 		} else {
@@ -176,8 +176,8 @@ var fatalErrNo int32 = -83
 
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
 	for range "1" {
-		//以(UniqueID+SeqNo)唯一定位一条数据.
-		cads := &CommonAtosDataServer{SeqNo: msgData.SeqNo, UniqueID: msgData.UniqueID}
+		//以(UserID+SeqNo)唯一定位一条数据.
+		cads := &CommonAtosDataServer{SeqNo: msgData.SeqNo, UserID: msgData.UserID}
 		if has, err := thls.xEngine.Get(cads); err != nil {
 			glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
 			rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, fatalErrNo, fmt.Sprintf("query from db with err=%v", err))
@@ -189,10 +189,10 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdat
 		}
 		if true {
 			//cads.SeqNo
-			//cads.UniqueID
+			//cads.UserID
 			cads.DataType = msgData.DataType
 			cads.Data = msgData.Data
-			cads.ReportTime, _ = ptypes.Timestamp(msgData.ReportTime)
+			cads.ReportTime, _ = ptypes.Timestamp(msgData.ReqTime)
 		}
 		if affected, err := thls.xEngine.InsertOne(cads); err != nil {
 			glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
@@ -268,7 +268,7 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.
 }
 
 func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
-	if msgData.Info.ExeType != txdata.ConnectionInfo_CLIENT {
+	if msgData.Info.ExeType != txdata.ProgramType_CLIENT {
 		panic(msgData)
 	}
 
@@ -295,12 +295,12 @@ func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn
 		return
 	}
 
-	tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+	tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 	msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 }
 
 func (thls *businessServer) doDeal4node(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
-	if msgData.Info.ExeType != txdata.ConnectionInfo_NODE {
+	if msgData.Info.ExeType != txdata.ProgramType_NODE {
 		panic(msg2slice)
 	}
 
@@ -310,14 +310,14 @@ func (thls *businessServer) doDeal4node(msgData *txdata.ConnectedData, msgConn *
 		return
 	}
 
-	if msgData.Info.UniqueID != msgData.Pathway[0] {
+	if msgData.Info.UserID != msgData.Pathway[0] {
 		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
 		return
 	}
 
 	//我的儿子连过来了，我要自检，自己是不是它的父亲.
-	if (len(msgData.Pathway) == 1) && (msgData.Info.BelongID != thls.ownInfo.UniqueID) {
+	if (len(msgData.Pathway) == 1) && (msgData.Info.BelongID != thls.ownInfo.UserID) {
 		glog.Errorf("i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
 		return
@@ -349,7 +349,7 @@ func (thls *businessServer) doDeal4node(msgData *txdata.ConnectedData, msgConn *
 	}
 
 	if isSon && isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 	}
 }
@@ -360,6 +360,7 @@ func (thls *businessServer) deleteConnectionFromAll(conn *wsnet.WsSocket, closeI
 	}
 	thls.cacheSock.deleteData(conn)
 	thls.cacheNode.deleteDataByConn(conn)
+	thls.cacheClient.deleteDataByConn(conn)
 }
 
 func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d time.Duration) (rspOut *txdata.ExecuteCommandRsp) {
@@ -371,7 +372,7 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 		//reqIn.Command
 	}
 	ExecuteCommandReq2ExecuteCommandRsp := func(reqIn *txdata.ExecuteCommandReq, errNo int32, errMsg string, uid string) *txdata.ExecuteCommandRsp {
-		return &txdata.ExecuteCommandRsp{RequestID: reqIn.RequestID, UniqueID: uid, Result: "", ErrNo: errNo, ErrMsg: errMsg}
+		return &txdata.ExecuteCommandRsp{RequestID: reqIn.RequestID, UserID: uid, Result: "", ErrNo: errNo, ErrMsg: errMsg}
 	}
 	for range "1" {
 		connInfoEx, isExist := thls.cacheNode.queryData(tmpUID)
@@ -412,12 +413,12 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
-		reqInOut.UniqueID = thls.ownInfo.UniqueID
+		reqInOut.UserID = thls.ownInfo.UserID
 		reqInOut.SeqNo = 0
 		//reqInOut.Endeavour
 		//reqInOut.DataType
 		//reqInOut.Data
-		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
+		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
 	}
 	for range "1" {
 		var err error
@@ -450,13 +451,13 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Du
 }
 
 func (thls *businessServer) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UserID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
 	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
 
 func (thls *businessServer) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UserID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
 	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }

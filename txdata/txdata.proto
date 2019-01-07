@@ -16,24 +16,26 @@ enum MsgType {
     ID_ExecuteCommandRsp = 36;
 }
 
+enum ProgramType {
+    Zero2  = 0;
+    CLIENT = 1; //客户端
+    SERVER = 2; //服务端
+    NODE   = 3; //节点端
+    POINT  = 4; //最末端的(采集点/受控点/等).
+}
+
 message ConnectionInfo {
-    enum AppType {
-        Zero2  = 0;
-        SERVER = 1; //服务端
-        NODE   = 2; //节点端
-        CLIENT = 3; //客户端,受控端
-    }
     enum LinkType {
         Zero3   = 0;
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    string          UniqueID = 1;//唯一ID
+    string          UserID   = 1;//唯一ID
     string          BelongID = 2;//属于哪个ID
     string          Version  = 3;//版本号
-    AppType         ExeType  = 4;
+    ProgramType     ExeType  = 4;
     bool            IsLeaf   = 5;//叶子节点(当AppType/ExeType为NODE时,表示NODE是否为LeafNode)
-    LinkType        LinkDir  = 6;//连接方向
+    LinkType        LinkMode = 6;//连接方向
     int32           ExePid   = 7;//进程ID
     string          ExePath  = 8;//程序路径
 }
@@ -68,7 +70,7 @@ message ExecuteCommandReq {
 
 message ExecuteCommandRsp {
     int64           RequestID = 1;
-    string          UniqueID  = 2;//这个参数可以没有,我用它检查了数据,安心
+    string          UserID    = 2;//这个参数可以没有,我用它检查了数据,安心
     string          Result    = 3;//结果.
     int32           ErrNo     = 4;
     string          ErrMsg    = 5;
@@ -76,12 +78,12 @@ message ExecuteCommandRsp {
 
 message CommonNtosReq {//通用请求(请求的方向是agentTOserver)
     int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
-    string                    UniqueID   = 2;
+    string                    UserID     = 2;
     int64                     SeqNo      = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
     bool                      Endeavour  = 4;//收不到服务器的响应就不罢休.
     string                    DataType   = 5;
     bytes                     Data       = 6;
-    google.protobuf.Timestamp ReportTime = 7;
+    google.protobuf.Timestamp ReqTime    = 7;
 }
 
 message CommonNtosRsp {

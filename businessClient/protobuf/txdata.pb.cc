@@ -223,12 +223,12 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, uniqueid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, userid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, belongid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, version_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, exetype_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, isleaf_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, linkdir_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, linkmode_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, exepid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ConnectionInfo, exepath_),
   ~0u,  // no _has_bits_
@@ -258,7 +258,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, requestid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, uniqueid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, userid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, result_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, errno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ExecuteCommandRsp, errmsg_),
@@ -268,12 +268,12 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, requestid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, uniqueid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, userid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, seqno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, endeavour_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, datatype_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, data_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, reporttime_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, reqtime_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -350,43 +350,42 @@ void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
       "\n\014txdata.proto\022\006txdata\032\037google/protobuf/"
-      "timestamp.proto\"\301\002\n\016ConnectionInfo\022\020\n\010Un"
-      "iqueID\030\001 \001(\t\022\020\n\010BelongID\030\002 \001(\t\022\017\n\007Versio"
-      "n\030\003 \001(\t\022/\n\007ExeType\030\004 \001(\0162\036.txdata.Connec"
-      "tionInfo.AppType\022\016\n\006IsLeaf\030\005 \001(\010\0220\n\007Link"
-      "Dir\030\006 \001(\0162\037.txdata.ConnectionInfo.LinkTy"
-      "pe\022\016\n\006ExePid\030\007 \001(\005\022\017\n\007ExePath\030\010 \001(\t\"6\n\007A"
-      "ppType\022\t\n\005Zero2\020\000\022\n\n\006SERVER\020\001\022\010\n\004NODE\020\002\022"
-      "\n\n\006CLIENT\020\003\".\n\010LinkType\022\t\n\005Zero3\020\000\022\013\n\007CO"
-      "NNECT\020\001\022\n\n\006ACCEPT\020\002\"F\n\rConnectedData\022$\n\004"
-      "Info\030\001 \001(\0132\026.txdata.ConnectionInfo\022\017\n\007Pa"
-      "thway\030\002 \003(\t\"8\n\020DisconnectedData\022$\n\004Info\030"
-      "\001 \001(\0132\026.txdata.ConnectionInfo\"H\n\021Execute"
-      "CommandReq\022\021\n\tRequestID\030\001 \001(\003\022\017\n\007Pathway"
-      "\030\002 \003(\t\022\017\n\007Command\030\003 \001(\t\"g\n\021ExecuteComman"
-      "dRsp\022\021\n\tRequestID\030\001 \001(\003\022\020\n\010UniqueID\030\002 \001("
-      "\t\022\016\n\006Result\030\003 \001(\t\022\r\n\005ErrNo\030\004 \001(\005\022\016\n\006ErrM"
-      "sg\030\005 \001(\t\"\246\001\n\rCommonNtosReq\022\021\n\tRequestID\030"
-      "\001 \001(\003\022\020\n\010UniqueID\030\002 \001(\t\022\r\n\005SeqNo\030\003 \001(\003\022\021"
-      "\n\tEndeavour\030\004 \001(\010\022\020\n\010DataType\030\005 \001(\t\022\014\n\004D"
-      "ata\030\006 \001(\014\022.\n\nReportTime\030\007 \001(\0132\032.google.p"
-      "rotobuf.Timestamp\"a\n\rCommonNtosRsp\022\021\n\tRe"
-      "questID\030\001 \001(\003\022\017\n\007Pathway\030\002 \003(\t\022\r\n\005SeqNo\030"
-      "\003 \001(\003\022\r\n\005ErrNo\030\004 \001(\005\022\016\n\006ErrMsg\030\005 \001(\t\"-\n\016"
-      "ReportDataItem\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Data\030\002 "
-      "\001(\t\"\207\001\n\014SendMailItem\022\020\n\010Username\030\001 \001(\t\022\020"
-      "\n\010Password\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To"
-      "\030\004 \001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013ContentType\030\006"
-      " \001(\t\022\017\n\007Content\030\007 \001(\t*\317\001\n\007MsgType\022\t\n\005Zer"
-      "o1\020\000\022\024\n\020ID_ConnectedData\020\001\022\027\n\023ID_Disconn"
-      "ectedData\020\002\022\024\n\020ID_CommonNtosReq\020\037\022\024\n\020ID_"
-      "CommonNtosRsp\020 \022\024\n\020ID_CommonStonReq\020!\022\024\n"
-      "\020ID_CommonStoaRsp\020\"\022\030\n\024ID_ExecuteCommand"
-      "Req\020#\022\030\n\024ID_ExecuteCommandRsp\020$P\000b\006proto"
-      "3"
+      "timestamp.proto\"\375\001\n\016ConnectionInfo\022\016\n\006Us"
+      "erID\030\001 \001(\t\022\020\n\010BelongID\030\002 \001(\t\022\017\n\007Version\030"
+      "\003 \001(\t\022$\n\007ExeType\030\004 \001(\0162\023.txdata.ProgramT"
+      "ype\022\016\n\006IsLeaf\030\005 \001(\010\0221\n\010LinkMode\030\006 \001(\0162\037."
+      "txdata.ConnectionInfo.LinkType\022\016\n\006ExePid"
+      "\030\007 \001(\005\022\017\n\007ExePath\030\010 \001(\t\".\n\010LinkType\022\t\n\005Z"
+      "ero3\020\000\022\013\n\007CONNECT\020\001\022\n\n\006ACCEPT\020\002\"F\n\rConne"
+      "ctedData\022$\n\004Info\030\001 \001(\0132\026.txdata.Connecti"
+      "onInfo\022\017\n\007Pathway\030\002 \003(\t\"8\n\020DisconnectedD"
+      "ata\022$\n\004Info\030\001 \001(\0132\026.txdata.ConnectionInf"
+      "o\"H\n\021ExecuteCommandReq\022\021\n\tRequestID\030\001 \001("
+      "\003\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Command\030\003 \001(\t\"e\n\021E"
+      "xecuteCommandRsp\022\021\n\tRequestID\030\001 \001(\003\022\016\n\006U"
+      "serID\030\002 \001(\t\022\016\n\006Result\030\003 \001(\t\022\r\n\005ErrNo\030\004 \001"
+      "(\005\022\016\n\006ErrMsg\030\005 \001(\t\"\241\001\n\rCommonNtosReq\022\021\n\t"
+      "RequestID\030\001 \001(\003\022\016\n\006UserID\030\002 \001(\t\022\r\n\005SeqNo"
+      "\030\003 \001(\003\022\021\n\tEndeavour\030\004 \001(\010\022\020\n\010DataType\030\005 "
+      "\001(\t\022\014\n\004Data\030\006 \001(\014\022+\n\007ReqTime\030\007 \001(\0132\032.goo"
+      "gle.protobuf.Timestamp\"a\n\rCommonNtosRsp\022"
+      "\021\n\tRequestID\030\001 \001(\003\022\017\n\007Pathway\030\002 \003(\t\022\r\n\005S"
+      "eqNo\030\003 \001(\003\022\r\n\005ErrNo\030\004 \001(\005\022\016\n\006ErrMsg\030\005 \001("
+      "\t\"-\n\016ReportDataItem\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Da"
+      "ta\030\002 \001(\t\"\207\001\n\014SendMailItem\022\020\n\010Username\030\001 "
+      "\001(\t\022\020\n\010Password\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022"
+      "\n\n\002To\030\004 \001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013ContentT"
+      "ype\030\006 \001(\t\022\017\n\007Content\030\007 \001(\t*\317\001\n\007MsgType\022\t"
+      "\n\005Zero1\020\000\022\024\n\020ID_ConnectedData\020\001\022\027\n\023ID_Di"
+      "sconnectedData\020\002\022\024\n\020ID_CommonNtosReq\020\037\022\024"
+      "\n\020ID_CommonNtosRsp\020 \022\024\n\020ID_CommonStonReq"
+      "\020!\022\024\n\020ID_CommonStoaRsp\020\"\022\030\n\024ID_ExecuteCo"
+      "mmandReq\020#\022\030\n\024ID_ExecuteCommandRsp\020$*E\n\013"
+      "ProgramType\022\t\n\005Zero2\020\000\022\n\n\006CLIENT\020\001\022\n\n\006SE"
+      "RVER\020\002\022\010\n\004NODE\020\003\022\t\n\005POINT\020\004P\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1361);
+      descriptor, 1357);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -404,34 +403,9 @@ struct StaticDescriptorInitializer {
 } static_descriptor_initializer;
 }  // namespace protobuf_txdata_2eproto
 namespace txdata {
-const ::google::protobuf::EnumDescriptor* ConnectionInfo_AppType_descriptor() {
-  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_txdata_2eproto::file_level_enum_descriptors[0];
-}
-bool ConnectionInfo_AppType_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-      return true;
-    default:
-      return false;
-  }
-}
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const ConnectionInfo_AppType ConnectionInfo::Zero2;
-const ConnectionInfo_AppType ConnectionInfo::SERVER;
-const ConnectionInfo_AppType ConnectionInfo::NODE;
-const ConnectionInfo_AppType ConnectionInfo::CLIENT;
-const ConnectionInfo_AppType ConnectionInfo::AppType_MIN;
-const ConnectionInfo_AppType ConnectionInfo::AppType_MAX;
-const int ConnectionInfo::AppType_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 const ::google::protobuf::EnumDescriptor* ConnectionInfo_LinkType_descriptor() {
   protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_txdata_2eproto::file_level_enum_descriptors[1];
+  return protobuf_txdata_2eproto::file_level_enum_descriptors[0];
 }
 bool ConnectionInfo_LinkType_IsValid(int value) {
   switch (value) {
@@ -454,7 +428,7 @@ const int ConnectionInfo::LinkType_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 const ::google::protobuf::EnumDescriptor* MsgType_descriptor() {
   protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_txdata_2eproto::file_level_enum_descriptors[2];
+  return protobuf_txdata_2eproto::file_level_enum_descriptors[1];
 }
 bool MsgType_IsValid(int value) {
   switch (value) {
@@ -473,18 +447,35 @@ bool MsgType_IsValid(int value) {
   }
 }
 
+const ::google::protobuf::EnumDescriptor* ProgramType_descriptor() {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_txdata_2eproto::file_level_enum_descriptors[2];
+}
+bool ProgramType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
 
 // ===================================================================
 
 void ConnectionInfo::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ConnectionInfo::kUniqueIDFieldNumber;
+const int ConnectionInfo::kUserIDFieldNumber;
 const int ConnectionInfo::kBelongIDFieldNumber;
 const int ConnectionInfo::kVersionFieldNumber;
 const int ConnectionInfo::kExeTypeFieldNumber;
 const int ConnectionInfo::kIsLeafFieldNumber;
-const int ConnectionInfo::kLinkDirFieldNumber;
+const int ConnectionInfo::kLinkModeFieldNumber;
 const int ConnectionInfo::kExePidFieldNumber;
 const int ConnectionInfo::kExePathFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -500,9 +491,9 @@ ConnectionInfo::ConnectionInfo(const ConnectionInfo& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.uniqueid().size() > 0) {
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.userid().size() > 0) {
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   belongid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.belongid().size() > 0) {
@@ -523,7 +514,7 @@ ConnectionInfo::ConnectionInfo(const ConnectionInfo& from)
 }
 
 void ConnectionInfo::SharedCtor() {
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   belongid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   exepath_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -538,7 +529,7 @@ ConnectionInfo::~ConnectionInfo() {
 }
 
 void ConnectionInfo::SharedDtor() {
-  uniqueid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   belongid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   version_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   exepath_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -564,7 +555,7 @@ void ConnectionInfo::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   belongid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   version_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   exepath_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -584,16 +575,16 @@ bool ConnectionInfo::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string UniqueID = 1;
+      // string UserID = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_uniqueid()));
+                input, this->mutable_userid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+            this->userid().data(), static_cast<int>(this->userid().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "txdata.ConnectionInfo.UniqueID"));
+            "txdata.ConnectionInfo.UserID"));
         } else {
           goto handle_unusual;
         }
@@ -632,7 +623,7 @@ bool ConnectionInfo::MergePartialFromCodedStream(
         break;
       }
 
-      // .txdata.ConnectionInfo.AppType ExeType = 4;
+      // .txdata.ProgramType ExeType = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
@@ -640,7 +631,7 @@ bool ConnectionInfo::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          set_exetype(static_cast< ::txdata::ConnectionInfo_AppType >(value));
+          set_exetype(static_cast< ::txdata::ProgramType >(value));
         } else {
           goto handle_unusual;
         }
@@ -661,7 +652,7 @@ bool ConnectionInfo::MergePartialFromCodedStream(
         break;
       }
 
-      // .txdata.ConnectionInfo.LinkType LinkDir = 6;
+      // .txdata.ConnectionInfo.LinkType LinkMode = 6;
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
@@ -669,7 +660,7 @@ bool ConnectionInfo::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          set_linkdir(static_cast< ::txdata::ConnectionInfo_LinkType >(value));
+          set_linkmode(static_cast< ::txdata::ConnectionInfo_LinkType >(value));
         } else {
           goto handle_unusual;
         }
@@ -732,14 +723,14 @@ void ConnectionInfo::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string UniqueID = 1;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.ConnectionInfo.UniqueID");
+      "txdata.ConnectionInfo.UserID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->uniqueid(), output);
+      1, this->userid(), output);
   }
 
   // string BelongID = 2;
@@ -762,7 +753,7 @@ void ConnectionInfo::SerializeWithCachedSizes(
       3, this->version(), output);
   }
 
-  // .txdata.ConnectionInfo.AppType ExeType = 4;
+  // .txdata.ProgramType ExeType = 4;
   if (this->exetype() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       4, this->exetype(), output);
@@ -773,10 +764,10 @@ void ConnectionInfo::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->isleaf(), output);
   }
 
-  // .txdata.ConnectionInfo.LinkType LinkDir = 6;
-  if (this->linkdir() != 0) {
+  // .txdata.ConnectionInfo.LinkType LinkMode = 6;
+  if (this->linkmode() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      6, this->linkdir(), output);
+      6, this->linkmode(), output);
   }
 
   // int32 ExePid = 7;
@@ -808,15 +799,15 @@ void ConnectionInfo::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string UniqueID = 1;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.ConnectionInfo.UniqueID");
+      "txdata.ConnectionInfo.UserID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->uniqueid(), target);
+        1, this->userid(), target);
   }
 
   // string BelongID = 2;
@@ -841,7 +832,7 @@ void ConnectionInfo::SerializeWithCachedSizes(
         3, this->version(), target);
   }
 
-  // .txdata.ConnectionInfo.AppType ExeType = 4;
+  // .txdata.ProgramType ExeType = 4;
   if (this->exetype() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       4, this->exetype(), target);
@@ -852,10 +843,10 @@ void ConnectionInfo::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->isleaf(), target);
   }
 
-  // .txdata.ConnectionInfo.LinkType LinkDir = 6;
-  if (this->linkdir() != 0) {
+  // .txdata.ConnectionInfo.LinkType LinkMode = 6;
+  if (this->linkmode() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      6, this->linkdir(), target);
+      6, this->linkmode(), target);
   }
 
   // int32 ExePid = 7;
@@ -891,11 +882,11 @@ size_t ConnectionInfo::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string UniqueID = 1;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->uniqueid());
+        this->userid());
   }
 
   // string BelongID = 2;
@@ -919,7 +910,7 @@ size_t ConnectionInfo::ByteSizeLong() const {
         this->exepath());
   }
 
-  // .txdata.ConnectionInfo.AppType ExeType = 4;
+  // .txdata.ProgramType ExeType = 4;
   if (this->exetype() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->exetype());
@@ -930,10 +921,10 @@ size_t ConnectionInfo::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
-  // .txdata.ConnectionInfo.LinkType LinkDir = 6;
-  if (this->linkdir() != 0) {
+  // .txdata.ConnectionInfo.LinkType LinkMode = 6;
+  if (this->linkmode() != 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->linkdir());
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->linkmode());
   }
 
   // int32 ExePid = 7;
@@ -970,9 +961,9 @@ void ConnectionInfo::MergeFrom(const ConnectionInfo& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.uniqueid().size() > 0) {
+  if (from.userid().size() > 0) {
 
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   if (from.belongid().size() > 0) {
 
@@ -992,8 +983,8 @@ void ConnectionInfo::MergeFrom(const ConnectionInfo& from) {
   if (from.isleaf() != 0) {
     set_isleaf(from.isleaf());
   }
-  if (from.linkdir() != 0) {
-    set_linkdir(from.linkdir());
+  if (from.linkmode() != 0) {
+    set_linkmode(from.linkmode());
   }
   if (from.exepid() != 0) {
     set_exepid(from.exepid());
@@ -1024,7 +1015,7 @@ void ConnectionInfo::Swap(ConnectionInfo* other) {
 }
 void ConnectionInfo::InternalSwap(ConnectionInfo* other) {
   using std::swap;
-  uniqueid_.Swap(&other->uniqueid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   belongid_.Swap(&other->belongid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
@@ -1034,7 +1025,7 @@ void ConnectionInfo::InternalSwap(ConnectionInfo* other) {
     GetArenaNoVirtual());
   swap(exetype_, other->exetype_);
   swap(isleaf_, other->isleaf_);
-  swap(linkdir_, other->linkdir_);
+  swap(linkmode_, other->linkmode_);
   swap(exepid_, other->exepid_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
@@ -1900,7 +1891,7 @@ void ExecuteCommandRsp::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ExecuteCommandRsp::kRequestIDFieldNumber;
-const int ExecuteCommandRsp::kUniqueIDFieldNumber;
+const int ExecuteCommandRsp::kUserIDFieldNumber;
 const int ExecuteCommandRsp::kResultFieldNumber;
 const int ExecuteCommandRsp::kErrNoFieldNumber;
 const int ExecuteCommandRsp::kErrMsgFieldNumber;
@@ -1917,9 +1908,9 @@ ExecuteCommandRsp::ExecuteCommandRsp(const ExecuteCommandRsp& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.uniqueid().size() > 0) {
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.userid().size() > 0) {
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   result_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.result().size() > 0) {
@@ -1936,7 +1927,7 @@ ExecuteCommandRsp::ExecuteCommandRsp(const ExecuteCommandRsp& from)
 }
 
 void ExecuteCommandRsp::SharedCtor() {
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   result_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&requestid_, 0, static_cast<size_t>(
@@ -1950,7 +1941,7 @@ ExecuteCommandRsp::~ExecuteCommandRsp() {
 }
 
 void ExecuteCommandRsp::SharedDtor() {
-  uniqueid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   result_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1975,7 +1966,7 @@ void ExecuteCommandRsp::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   result_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&requestid_, 0, static_cast<size_t>(
@@ -2008,16 +1999,16 @@ bool ExecuteCommandRsp::MergePartialFromCodedStream(
         break;
       }
 
-      // string UniqueID = 2;
+      // string UserID = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_uniqueid()));
+                input, this->mutable_userid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+            this->userid().data(), static_cast<int>(this->userid().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "txdata.ExecuteCommandRsp.UniqueID"));
+            "txdata.ExecuteCommandRsp.UserID"));
         } else {
           goto handle_unusual;
         }
@@ -2101,14 +2092,14 @@ void ExecuteCommandRsp::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->requestid(), output);
   }
 
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.ExecuteCommandRsp.UniqueID");
+      "txdata.ExecuteCommandRsp.UserID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->uniqueid(), output);
+      2, this->userid(), output);
   }
 
   // string Result = 3;
@@ -2155,15 +2146,15 @@ void ExecuteCommandRsp::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->requestid(), target);
   }
 
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.ExecuteCommandRsp.UniqueID");
+      "txdata.ExecuteCommandRsp.UserID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->uniqueid(), target);
+        2, this->userid(), target);
   }
 
   // string Result = 3;
@@ -2210,11 +2201,11 @@ size_t ExecuteCommandRsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->uniqueid());
+        this->userid());
   }
 
   // string Result = 3;
@@ -2272,9 +2263,9 @@ void ExecuteCommandRsp::MergeFrom(const ExecuteCommandRsp& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.uniqueid().size() > 0) {
+  if (from.userid().size() > 0) {
 
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   if (from.result().size() > 0) {
 
@@ -2316,7 +2307,7 @@ void ExecuteCommandRsp::Swap(ExecuteCommandRsp* other) {
 }
 void ExecuteCommandRsp::InternalSwap(ExecuteCommandRsp* other) {
   using std::swap;
-  uniqueid_.Swap(&other->uniqueid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   result_.Swap(&other->result_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
@@ -2336,23 +2327,23 @@ void ExecuteCommandRsp::InternalSwap(ExecuteCommandRsp* other) {
 // ===================================================================
 
 void CommonNtosReq::InitAsDefaultInstance() {
-  ::txdata::_CommonNtosReq_default_instance_._instance.get_mutable()->reporttime_ = const_cast< ::google::protobuf::Timestamp*>(
+  ::txdata::_CommonNtosReq_default_instance_._instance.get_mutable()->reqtime_ = const_cast< ::google::protobuf::Timestamp*>(
       ::google::protobuf::Timestamp::internal_default_instance());
 }
-void CommonNtosReq::clear_reporttime() {
-  if (GetArenaNoVirtual() == NULL && reporttime_ != NULL) {
-    delete reporttime_;
+void CommonNtosReq::clear_reqtime() {
+  if (GetArenaNoVirtual() == NULL && reqtime_ != NULL) {
+    delete reqtime_;
   }
-  reporttime_ = NULL;
+  reqtime_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int CommonNtosReq::kRequestIDFieldNumber;
-const int CommonNtosReq::kUniqueIDFieldNumber;
+const int CommonNtosReq::kUserIDFieldNumber;
 const int CommonNtosReq::kSeqNoFieldNumber;
 const int CommonNtosReq::kEndeavourFieldNumber;
 const int CommonNtosReq::kDataTypeFieldNumber;
 const int CommonNtosReq::kDataFieldNumber;
-const int CommonNtosReq::kReportTimeFieldNumber;
+const int CommonNtosReq::kReqTimeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CommonNtosReq::CommonNtosReq()
@@ -2366,9 +2357,9 @@ CommonNtosReq::CommonNtosReq(const CommonNtosReq& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.uniqueid().size() > 0) {
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.userid().size() > 0) {
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.datatype().size() > 0) {
@@ -2378,10 +2369,10 @@ CommonNtosReq::CommonNtosReq(const CommonNtosReq& from)
   if (from.data().size() > 0) {
     data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
   }
-  if (from.has_reporttime()) {
-    reporttime_ = new ::google::protobuf::Timestamp(*from.reporttime_);
+  if (from.has_reqtime()) {
+    reqtime_ = new ::google::protobuf::Timestamp(*from.reqtime_);
   } else {
-    reporttime_ = NULL;
+    reqtime_ = NULL;
   }
   ::memcpy(&requestid_, &from.requestid_,
     static_cast<size_t>(reinterpret_cast<char*>(&endeavour_) -
@@ -2390,12 +2381,12 @@ CommonNtosReq::CommonNtosReq(const CommonNtosReq& from)
 }
 
 void CommonNtosReq::SharedCtor() {
-  uniqueid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&reporttime_, 0, static_cast<size_t>(
+  ::memset(&reqtime_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&endeavour_) -
-      reinterpret_cast<char*>(&reporttime_)) + sizeof(endeavour_));
+      reinterpret_cast<char*>(&reqtime_)) + sizeof(endeavour_));
 }
 
 CommonNtosReq::~CommonNtosReq() {
@@ -2404,10 +2395,10 @@ CommonNtosReq::~CommonNtosReq() {
 }
 
 void CommonNtosReq::SharedDtor() {
-  uniqueid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   datatype_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete reporttime_;
+  if (this != internal_default_instance()) delete reqtime_;
 }
 
 void CommonNtosReq::SetCachedSize(int size) const {
@@ -2430,13 +2421,13 @@ void CommonNtosReq::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  uniqueid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && reporttime_ != NULL) {
-    delete reporttime_;
+  if (GetArenaNoVirtual() == NULL && reqtime_ != NULL) {
+    delete reqtime_;
   }
-  reporttime_ = NULL;
+  reqtime_ = NULL;
   ::memset(&requestid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&endeavour_) -
       reinterpret_cast<char*>(&requestid_)) + sizeof(endeavour_));
@@ -2467,16 +2458,16 @@ bool CommonNtosReq::MergePartialFromCodedStream(
         break;
       }
 
-      // string UniqueID = 2;
+      // string UserID = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_uniqueid()));
+                input, this->mutable_userid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+            this->userid().data(), static_cast<int>(this->userid().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "txdata.CommonNtosReq.UniqueID"));
+            "txdata.CommonNtosReq.UserID"));
         } else {
           goto handle_unusual;
         }
@@ -2539,12 +2530,12 @@ bool CommonNtosReq::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Timestamp ReportTime = 7;
+      // .google.protobuf.Timestamp ReqTime = 7;
       case 7: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(58u /* 58 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_reporttime()));
+               input, mutable_reqtime()));
         } else {
           goto handle_unusual;
         }
@@ -2582,14 +2573,14 @@ void CommonNtosReq::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->requestid(), output);
   }
 
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosReq.UniqueID");
+      "txdata.CommonNtosReq.UserID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->uniqueid(), output);
+      2, this->userid(), output);
   }
 
   // int64 SeqNo = 3;
@@ -2618,10 +2609,10 @@ void CommonNtosReq::SerializeWithCachedSizes(
       6, this->data(), output);
   }
 
-  // .google.protobuf.Timestamp ReportTime = 7;
-  if (this->has_reporttime()) {
+  // .google.protobuf.Timestamp ReqTime = 7;
+  if (this->has_reqtime()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, this->_internal_reporttime(), output);
+      7, this->_internal_reqtime(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -2643,15 +2634,15 @@ void CommonNtosReq::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->requestid(), target);
   }
 
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->uniqueid().data(), static_cast<int>(this->uniqueid().length()),
+      this->userid().data(), static_cast<int>(this->userid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosReq.UniqueID");
+      "txdata.CommonNtosReq.UserID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->uniqueid(), target);
+        2, this->userid(), target);
   }
 
   // int64 SeqNo = 3;
@@ -2682,11 +2673,11 @@ void CommonNtosReq::SerializeWithCachedSizes(
         6, this->data(), target);
   }
 
-  // .google.protobuf.Timestamp ReportTime = 7;
-  if (this->has_reporttime()) {
+  // .google.protobuf.Timestamp ReqTime = 7;
+  if (this->has_reqtime()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        7, this->_internal_reporttime(), deterministic, target);
+        7, this->_internal_reqtime(), deterministic, target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -2706,11 +2697,11 @@ size_t CommonNtosReq::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string UniqueID = 2;
-  if (this->uniqueid().size() > 0) {
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->uniqueid());
+        this->userid());
   }
 
   // string DataType = 5;
@@ -2727,11 +2718,11 @@ size_t CommonNtosReq::ByteSizeLong() const {
         this->data());
   }
 
-  // .google.protobuf.Timestamp ReportTime = 7;
-  if (this->has_reporttime()) {
+  // .google.protobuf.Timestamp ReqTime = 7;
+  if (this->has_reqtime()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *reporttime_);
+        *reqtime_);
   }
 
   // int64 RequestID = 1;
@@ -2780,9 +2771,9 @@ void CommonNtosReq::MergeFrom(const CommonNtosReq& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.uniqueid().size() > 0) {
+  if (from.userid().size() > 0) {
 
-    uniqueid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uniqueid_);
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
   if (from.datatype().size() > 0) {
 
@@ -2792,8 +2783,8 @@ void CommonNtosReq::MergeFrom(const CommonNtosReq& from) {
 
     data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
   }
-  if (from.has_reporttime()) {
-    mutable_reporttime()->::google::protobuf::Timestamp::MergeFrom(from.reporttime());
+  if (from.has_reqtime()) {
+    mutable_reqtime()->::google::protobuf::Timestamp::MergeFrom(from.reqtime());
   }
   if (from.requestid() != 0) {
     set_requestid(from.requestid());
@@ -2830,13 +2821,13 @@ void CommonNtosReq::Swap(CommonNtosReq* other) {
 }
 void CommonNtosReq::InternalSwap(CommonNtosReq* other) {
   using std::swap;
-  uniqueid_.Swap(&other->uniqueid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   datatype_.Swap(&other->datatype_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   data_.Swap(&other->data_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(reporttime_, other->reporttime_);
+  swap(reqtime_, other->reqtime_);
   swap(requestid_, other->requestid_);
   swap(seqno_, other->seqno_);
   swap(endeavour_, other->endeavour_);

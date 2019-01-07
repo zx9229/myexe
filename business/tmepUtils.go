@@ -34,8 +34,10 @@ https://bbs.csdn.net/topics/390603321
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/smtp"
 	"reflect"
 	"strings"
@@ -48,6 +50,9 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/traditionalchinese"
+	"golang.org/x/text/transform"
 )
 
 type safeWsSocketMap struct {
@@ -117,7 +122,7 @@ func (thls *safeConnInfoMap) isValidData(data *connInfoEx) bool {
 		if data.conn == nil {
 			break
 		}
-		if len(data.Info.UniqueID) == 0 {
+		if len(data.Info.UserID) == 0 {
 			break
 		}
 		if data.Pathway == nil {
@@ -130,8 +135,8 @@ func (thls *safeConnInfoMap) isValidData(data *connInfoEx) bool {
 
 func (thls *safeConnInfoMap) insertData(data *connInfoEx) (isSuccess bool) {
 	thls.Lock()
-	if _, isSuccess = thls.M[data.Info.UniqueID]; !isSuccess {
-		thls.M[data.Info.UniqueID] = data
+	if _, isSuccess = thls.M[data.Info.UserID]; !isSuccess {
+		thls.M[data.Info.UserID] = data
 	}
 	thls.Unlock()
 	isSuccess = !isSuccess
@@ -206,6 +211,21 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 	return
 }
 
+func tryToUTF8(src []byte) (utf8data string) {
+	var dst []byte
+	var err error
+	if dst, err = ioutil.ReadAll(transform.NewReader(bytes.NewReader(src), simplifiedchinese.GBK.NewDecoder())); err == nil {
+		return string(dst)
+	}
+	if dst, err = ioutil.ReadAll(transform.NewReader(bytes.NewReader(src), traditionalchinese.Big5.NewDecoder())); err == nil {
+		return string(dst)
+	}
+	if dst, err = ioutil.ReadAll(transform.NewReader(bytes.NewReader(src), simplifiedchinese.GB18030.NewDecoder())); err == nil {
+		return string(dst)
+	}
+	return string(src)
+}
+
 func sendMail(username, password, smtpAddr, to, subject, contentType, content string) error {
 	/*
 		username := "sender@163.com"
@@ -227,14 +247,14 @@ func sendMail(username, password, smtpAddr, to, subject, contentType, content st
 	mailMsg += fmt.Sprintf("Subject: %s\r\n", subject)
 	mailMsg += fmt.Sprintf("Content-Type: text/%s; charset=UTF-8\r\n", contentType)
 	mailMsg += fmt.Sprintf("\r\n")
-	mailMsg += content
+	mailMsg += tryToUTF8([]byte(content))
 	return smtp.SendMail(smtpAddr, currAuth, username, strings.Split(to, ";"), []byte(mailMsg))
 }
 
 //ReportDataNode 上报的数据(存储到Node)
 type ReportDataNode struct {
 	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
-	UniqueID    string    //
+	UserID      string    //
 	Topic       string    //
 	Data        string    //
 	ReportTime  time.Time //报告时间
@@ -249,7 +269,7 @@ type ReportDataNode struct {
 //这里需要注意的是，有些数据库并不允许非主键的自增属性。
 type ReportDataServer struct {
 	SeqNo      int64     `xorm:"pk notnull"`
-	UniqueID   string    `xorm:"pk notnull"`
+	UserID     string    `xorm:"pk notnull"`
 	Topic      string    //
 	Data       string    //
 	ReportTime time.Time //报告时间
@@ -265,7 +285,7 @@ type KeyValue struct {
 //CommonAtosDataNode omit
 type CommonAtosDataNode struct {
 	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
-	UniqueID    string    //
+	UserID      string    //
 	DataType    string    //
 	Data        []byte    //
 	ReportTime  time.Time //报告时间
@@ -277,7 +297,7 @@ type CommonAtosDataNode struct {
 //CommonAtosDataServer omit
 type CommonAtosDataServer struct {
 	SeqNo      int64     `xorm:"pk notnull"`
-	UniqueID   string    `xorm:"pk notnull"`
+	UserID     string    `xorm:"pk notnull"`
 	DataType   string    //
 	Data       []byte    //
 	ReportTime time.Time //报告时间
@@ -305,36 +325,36 @@ func dbRelated_CommonAtos_SeqNo(seqNo int64) bool {
 }
 
 type CommRspData struct {
-	UniqueID string
-	SeqNo    int64
-	ErrNo    int32
-	ErrMsg   string
+	UserID string
+	SeqNo  int64
+	ErrNo  int32
+	ErrMsg string
 }
 
 func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string) *txdata.CommonNtosRsp {
 	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
 }
 
-func Message2CommonNtosReq(src proto.Message, reportTime time.Time, uniqueID string, isEndeavour bool) *txdata.CommonNtosReq {
-	dst := &txdata.CommonNtosReq{RequestID: 0, UniqueID: uniqueID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReportTime: nil}
+func Message2CommonNtosReq(src proto.Message, reportTime time.Time, userID string, isEndeavour bool) *txdata.CommonNtosReq {
+	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReqTime: nil}
 	var err error
 	if dst.Data, err = proto.Marshal(src); err != nil {
 		glog.Fatalln(err, src)
 	}
-	if dst.ReportTime, err = ptypes.TimestampProto(reportTime); err != nil {
+	if dst.ReqTime, err = ptypes.TimestampProto(reportTime); err != nil {
 		glog.Fatalln(err, reportTime)
 	}
 	return dst
 }
 
 func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) *CommRspData {
-	return &CommRspData{UniqueID: req.UniqueID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
+	return &CommRspData{UserID: req.UserID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }
 
 func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDataNode {
 	var err error
-	cada := &CommonAtosDataNode{SeqNo: 0, UniqueID: reqIn.UniqueID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
-	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReportTime); err != nil {
+	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
+	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReqTime); err != nil {
 		glog.Fatalln(err)
 	}
 	return cada

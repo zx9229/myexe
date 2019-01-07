@@ -30,11 +30,11 @@ type businessNode struct {
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
-	if len(cfg.UniqueID) == 0 || len(cfg.BelongID) == 0 {
-		glog.Fatalf("must not be empty, UniqueID=%v, BelongID=%v", cfg.UniqueID, cfg.BelongID)
+	if len(cfg.UserID) == 0 || len(cfg.BelongID) == 0 {
+		glog.Fatalf("must not be empty, UserID=%v, BelongID=%v", cfg.UserID, cfg.BelongID)
 	}
-	if cfg.UniqueID == cfg.BelongID {
-		glog.Fatalf("must not be equal, UniqueID=%v, BelongID=%v", cfg.UniqueID, cfg.BelongID)
+	if cfg.UserID == cfg.BelongID {
+		glog.Fatalf("must not be equal, UserID=%v, BelongID=%v", cfg.UserID, cfg.BelongID)
 	}
 	curData := new(businessNode)
 	//
@@ -42,12 +42,12 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.cacheNode = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
-	curData.ownInfo.UniqueID = cfg.UniqueID
+	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = cfg.BelongID
 	curData.ownInfo.Version = "Version20181020"
-	curData.ownInfo.ExeType = txdata.ConnectionInfo_NODE
+	curData.ownInfo.ExeType = txdata.ProgramType_NODE
 	curData.ownInfo.IsLeaf = false
-	curData.ownInfo.LinkDir = txdata.ConnectionInfo_Zero3
+	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero3
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
 	//
@@ -90,13 +90,13 @@ func (thls *businessNode) checkCachedDatabase() {
 	//程序第一次启动后,可能接收并缓存了数据,然后关闭了程序,然后可能有人修改了缓存数据库里的配置,然后又启动程序,
 	//程序启动时,需要检查,缓存数据库里的数据和配置是否冲突,有冲突的话,则拒绝启动.
 	var err error
-	//(CommonAtosDataNode.UniqueID)必须等于(txdata.ConnectionInfo.UniqueID)
+	//(CommonAtosDataNode.UserID)必须等于(txdata.ConnectionInfo.UserID)
 	var rowData CommonAtosDataNode
 	var affected1, affected2 int64
 	if affected1, err = thls.xEngine.Count(&rowData); err != nil {
 		glog.Fatalln(err)
 	}
-	rowData.UniqueID = thls.ownInfo.UniqueID
+	rowData.UserID = thls.ownInfo.UserID
 	if affected2, err = thls.xEngine.Count(&rowData); err != nil {
 		glog.Fatalln(err)
 	}
@@ -108,8 +108,8 @@ func (thls *businessNode) checkCachedDatabase() {
 func (thls *businessNode) backgroundWork() {
 	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
 		//负数的RequestID表示背景工作在做事情.
-		req := &txdata.CommonNtosReq{RequestID: -1, UniqueID: src.UniqueID, SeqNo: src.SeqNo, Endeavour: true, DataType: src.DataType, Data: src.Data, ReportTime: nil}
-		req.ReportTime, _ = ptypes.TimestampProto(src.ReportTime)
+		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, Endeavour: true, DataType: src.DataType, Data: src.Data, ReqTime: nil}
+		req.ReqTime, _ = ptypes.TimestampProto(src.ReportTime)
 		return req
 	}
 	data4qry := &CommonAtosDataNode{}
@@ -164,7 +164,7 @@ func (thls *businessNode) onConnected(msgConn *wsnet.WsSocket, isAccepted bool) 
 		glog.Fatalf("already exists, msgConn=%p", msgConn)
 	}
 	if !isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 	}
 }
@@ -232,15 +232,15 @@ func (thls *businessNode) handle_MsgType_ID_ConnectedData(msgData *txdata.Connec
 		}
 		if len(msgData.Pathway) == 1 {
 			// 1<len(msgData.Pathway)时,这个消息是[孙代]发送给[子代],[子代]转发给[父代](我这一代)的消息.
-			if (msgData.Info.ExeType == txdata.ConnectionInfo_NODE) &&
-				(thls.ownInfo.ExeType == txdata.ConnectionInfo_NODE) &&
-				(msgData.Info.UniqueID == thls.ownInfo.UniqueID) {
+			if (msgData.Info.ExeType == txdata.ProgramType_NODE) &&
+				(thls.ownInfo.ExeType == txdata.ProgramType_NODE) &&
+				(msgData.Info.UserID == thls.ownInfo.UserID) {
 				glog.Errorf("maybe i connected myself, msgConn=%p, msgData=%v", msgConn, msgData)
 				thls.deleteConnectionFromAll(msgConn, true)
 				sendToParent = false
 				break
 			}
-			if (msgData.Info.UniqueID != thls.ownInfo.BelongID) && (msgData.Info.BelongID != thls.ownInfo.UniqueID) {
+			if (msgData.Info.UserID != thls.ownInfo.BelongID) && (msgData.Info.BelongID != thls.ownInfo.UserID) {
 				glog.Errorf("he is not my father, i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
 				thls.deleteConnectionFromAll(msgConn, true)
 				sendToParent = false
@@ -250,7 +250,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectedData(msgData *txdata.Connec
 		if thls.isParentConnection(msgData) {
 			sendToParent = thls.doDeal4parent(msgData, msgConn)
 			break
-		} else if msgData.Info.ExeType == txdata.ConnectionInfo_NODE {
+		} else if msgData.Info.ExeType == txdata.ProgramType_NODE {
 			sendToParent = thls.doDeal4agent(msgData, msgConn)
 			break
 		} else {
@@ -262,7 +262,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectedData(msgData *txdata.Connec
 	}
 
 	if sendToParent {
-		msgData.Pathway = append(msgData.Pathway, thls.ownInfo.UniqueID)
+		msgData.Pathway = append(msgData.Pathway, thls.ownInfo.UserID)
 		thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, msgData)
 	}
 }
@@ -272,8 +272,8 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	if msgData.Info.ExeType == txdata.ConnectionInfo_NODE {
-		if thls.cacheNode.deleteData(msgData.Info.UniqueID) == false {
+	if msgData.Info.ExeType == txdata.ProgramType_NODE {
+		if thls.cacheNode.deleteData(msgData.Info.UserID) == false {
 			glog.Fatalf("cache data error, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	} else {
@@ -290,7 +290,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Common
 	}
 
 	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, msgData); err != nil && needSendRsp_CommonAtos_RequestID(msgData.RequestID) {
-		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UniqueID); isExist {
+		if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UserID); isExist {
 			rspData := CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error())
 			rspData.Pathway = connInfoEx.Pathway
 			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
@@ -311,7 +311,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	if thls.ownInfo.UniqueID != msgData.Pathway[pathwayLen-1] {
+	if thls.ownInfo.UserID != msgData.Pathway[pathwayLen-1] {
 		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
@@ -362,7 +362,7 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.Ex
 		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	if thls.ownInfo.UniqueID != msgData.Pathway[len(msgData.Pathway)-1] {
+	if thls.ownInfo.UserID != msgData.Pathway[len(msgData.Pathway)-1] {
 		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
@@ -378,7 +378,7 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.Ex
 	} else {
 		glog.Warningln("ExecuteCommand:", msgData.Command) //TODO:待添加真正的执行代码.
 
-		tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, UniqueID: thls.ownInfo.UniqueID, Result: "OK, Now=" + time.Now().Format("2006-01-02_15:04:05")}
+		tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, UserID: thls.ownInfo.UserID, Result: "OK, Now=" + time.Now().Format("2006-01-02_15:04:05")}
 		thls.sendDataToParent(txdata.MsgType_ID_ExecuteCommandRsp, &tempTxData)
 	}
 }
@@ -402,14 +402,14 @@ func (thls *businessNode) sendDataToParent(msgType txdata.MsgType, msgData proto
 func (thls *businessNode) isParentConnection(data *txdata.ConnectedData) bool {
 	var isParent bool
 	for range "1" {
-		if thls.ownInfo.ExeType != txdata.ConnectionInfo_NODE {
+		if thls.ownInfo.ExeType != txdata.ProgramType_NODE {
 			glog.Fatalf("illegal data, ownInfo=%v", thls.ownInfo)
 			break
 		}
-		if data.Info.ExeType != txdata.ConnectionInfo_NODE && data.Info.ExeType != txdata.ConnectionInfo_SERVER {
+		if data.Info.ExeType != txdata.ProgramType_NODE && data.Info.ExeType != txdata.ProgramType_SERVER {
 			break
 		}
-		if data.Info.UniqueID != thls.ownInfo.BelongID {
+		if data.Info.UserID != thls.ownInfo.BelongID {
 			break
 		}
 		isParent = true
@@ -438,7 +438,7 @@ func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *
 		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_CONNECT {
 		//	log.Panicln("parent info is abnormal", thls.parentData.info)
 		//}
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 	} else {
 		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_ACCEPT {
@@ -450,7 +450,7 @@ func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *
 		//和父亲建立连接了,要把自己的缓存发送给父亲,更新父亲的缓存.
 		thls.cacheNode.Lock()
 		for _, node := range thls.cacheNode.M {
-			tmpTxData := txdata.ConnectedData{Info: &node.Info, Pathway: append(node.Pathway, thls.ownInfo.UniqueID)}
+			tmpTxData := txdata.ConnectedData{Info: &node.Info, Pathway: append(node.Pathway, thls.ownInfo.UserID)}
 			thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, &tmpTxData)
 		}
 		thls.cacheNode.Unlock()
@@ -483,7 +483,7 @@ func (thls *businessNode) doDeal4agent(msgData *txdata.ConnectedData, msgConn *w
 	}
 
 	if isSon && isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UniqueID}}
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
 	}
 
@@ -506,12 +506,12 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
-		reqInOut.UniqueID = thls.ownInfo.UniqueID
+		reqInOut.UserID = thls.ownInfo.UserID
 		reqInOut.SeqNo = 0
 		//reqInOut.Endeavour
 		//reqInOut.DataType
 		//reqInOut.Data
-		reqInOut.ReportTime, _ = ptypes.TimestampProto(time.Now())
+		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
 	}
 	for range "1" {
 		var err error
@@ -565,13 +565,13 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, d time.Dura
 }
 
 func (thls *businessNode) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UserID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
 	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
 
 func (thls *businessNode) sendMail(dataIn *txdata.SendMailItem, d time.Duration, isEndeavour bool) *CommRspData {
-	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UniqueID, isEndeavour)
+	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UserID, isEndeavour)
 	rspOut := thls.commonAtos(reqInOut, d)
 	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
