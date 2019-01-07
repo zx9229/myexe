@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 void MainWindow::slotClickedSend()
 {
     txdata::ConnectedData tmpData = {};
-    tmpData.mutable_info()->set_exetype(txdata::ConnectionInfo_AppType::ConnectionInfo_AppType_CLIENT);
+    tmpData.mutable_info()->set_exetype(txdata::ProgramType::CLIENT);
 
     QByteArray data;
     {

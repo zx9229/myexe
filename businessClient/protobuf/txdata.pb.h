@@ -899,7 +899,10 @@ class ExecuteCommandRsp : public ::google::protobuf::Message /* @@protoc_inserti
   // int32 ErrNo = 4;
   void clear_errno();
   static const int kErrNoFieldNumber = 4;
+#ifdef errno
+#undef errno
   ::google::protobuf::int32 errno() const;
+#endif
   void set_errno(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:txdata.ExecuteCommandRsp)

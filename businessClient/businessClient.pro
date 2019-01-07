@@ -46,11 +46,20 @@ FORMS += \
 CONFIG += mobility
 MOBILITY = 
 
-# 让GUI程序(Run in terminal).
-CONFIG += console
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 INCLUDEPATH += $$PWD/protobuf
 INCLUDEPATH += $$PWD/protobuf/protobuf-3.6.1/src
-LIBS        += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.a
+# LIBS      += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.a
+win32 {
+# 让GUI程序(Run in terminal).
+CONFIG      += console
+LIBS        += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.mingw.a
+}
+android {
+LIBS        += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.ndk.a
+}
+unix {
+# LIBS      += $$PWD/protobuf/protobuf-3.6.1/lib/libprotobuf.unix.a
+}
