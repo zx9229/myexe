@@ -36,17 +36,40 @@ void DataExchanger::slotOnConnected()
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
 
     {
+        auto atomicKey2Str = [](txdata::AtomicKey* src)->std::string {
+            return QString("/%1/%2/%3/%4")
+                .arg(src->zonename().data()).arg(src->nodename().data())
+                .arg(src->exectype()).arg(src->execname().data()).toStdString();
+        };
+
         txdata::ConnectedData tmpData = {};
+
         {
-            tmpData.mutable_info()->set_userid("");
-            tmpData.mutable_info()->set_belongid("");
+            {
+                tmpData.mutable_info()->mutable_userkey()->set_zonename("");
+                tmpData.mutable_info()->mutable_userkey()->set_nodename("");
+                tmpData.mutable_info()->mutable_userkey()->set_exectype(txdata::ProgramType::CLIENT);
+                tmpData.mutable_info()->mutable_userkey()->set_execname("QtClient");
+            }
+            tmpData.mutable_info()->set_userid(atomicKey2Str(tmpData.mutable_info()->mutable_userkey()));
+
+            {
+                tmpData.mutable_info()->mutable_belongkey()->set_zonename("");
+                tmpData.mutable_info()->mutable_belongkey()->set_nodename("s1");
+                tmpData.mutable_info()->mutable_belongkey()->set_exectype(txdata::ProgramType::SERVER);
+                tmpData.mutable_info()->mutable_belongkey()->set_execname("");
+            }
+            tmpData.mutable_info()->set_belongid(atomicKey2Str(tmpData.mutable_info()->mutable_belongkey()));
+
             tmpData.mutable_info()->set_version("20190106");
-            tmpData.mutable_info()->set_exetype(txdata::ProgramType::CLIENT);
-            tmpData.mutable_info()->set_isleaf(false);//(当AppType/ExeType为NODE时,表示NODE是否为LeafNode)
             tmpData.mutable_info()->set_linkmode(txdata::ConnectionInfo_LinkType_CONNECT);
             tmpData.mutable_info()->set_exepid(static_cast<int>(QCoreApplication::applicationPid()));
             tmpData.mutable_info()->set_exepath(QCoreApplication::applicationFilePath().toStdString());
+            tmpData.mutable_info()->set_remark("");
+
+            tmpData.add_pathway(tmpData.mutable_info()->userid());
         }
+
         QByteArray data;
         m2b::msg2slice(txdata::ID_ConnectedData, tmpData, data);
         //
