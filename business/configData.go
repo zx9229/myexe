@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/zx9229/myexe/txdata"
+
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 )
@@ -13,8 +15,8 @@ import (
 大写字母N的10进制是78，所以Node 端暂定端口号10078
 {
     "ConfType": "NODE",
-    "UserID": "n1",
-    "BelongID": "s1",
+    "UserKey":   { "ZoneName": "", "NodeName": "n1", "ExecType": "NODE",   "ExecName": "" },
+    "BelongKey": { "ZoneName": "", "NodeName": "s1", "ExecType": "SERVER", "ExecName": "" },
     "ServerURL":   { "Scheme": "ws", "Host": "localhost:10078", "Path": "/websocket" },
     "ClientURL": [ { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" } ],
     "DataSourceName": "database_n1.db",
@@ -23,7 +25,7 @@ import (
 大写字母S的10进制是83，所以Server端暂定端口号10083
 {
     "ConfType": "SERVER",
-    "UserID": "s1",
+    "UserKey": { "ZoneName": "", "NodeName": "s1", "ExecType": "SERVER", "ExecName": "" },
     "ServerURL": { "Scheme": "ws", "Host": "localhost:10083", "Path": "/websocket" },
     "DataSourceName": "database_s1.db",
 	"LocationName": "Asia/Shanghai",
@@ -34,6 +36,16 @@ import (
     }
 }
 */
+type configAtomic struct {
+	ZoneName string
+	NodeName string
+	ExecType string
+	ExecName string
+}
+
+func (thls *configAtomic) toTxAtomicKey() *txdata.AtomicKey {
+	return &txdata.AtomicKey{ZoneName: thls.ZoneName, NodeName: thls.NodeName, ExecType: str2ProgramType(thls.ExecType), ExecName: thls.ExecName}
+}
 
 type configBase struct {
 	ConfType string //可选值为(NODE/SERVER)
@@ -41,8 +53,8 @@ type configBase struct {
 
 type configNode struct {
 	configBase
-	UserID         string
-	BelongID       string
+	UserKey        configAtomic
+	BelongKey      configAtomic
 	ServerURL      url.URL
 	ClientURL      []url.URL
 	DataSourceName string //数据源的名字.
@@ -54,12 +66,37 @@ func (thls *configNode) isValid() error {
 	PREFIX := "configNode: "
 	var err error
 	for range "1" {
-		if len(thls.UserID) == 0 {
-			err = fmt.Errorf(PREFIX + "UserID is empty")
+		if !atomicKeyIsValid(thls.UserKey.toTxAtomicKey()) {
+			err = fmt.Errorf(PREFIX + "UserKey is invalid")
 			break
 		}
-		if len(thls.BelongID) == 0 {
-			err = fmt.Errorf(PREFIX + "BelongID is empty")
+		if len(thls.UserKey.NodeName) == 0 {
+			err = fmt.Errorf(PREFIX + "UserKey.NodeName must not empty")
+			break
+		}
+		if str2ProgramType(thls.UserKey.ExecType) != txdata.ProgramType_NODE {
+			err = fmt.Errorf(PREFIX + "UserKey.ExecType must be NODE")
+			break
+		}
+		if len(thls.UserKey.ExecName) != 0 {
+			err = fmt.Errorf(PREFIX + "UserKey.ExecName must be empty")
+			break
+		}
+		if !atomicKeyIsValid(thls.BelongKey.toTxAtomicKey()) {
+			err = fmt.Errorf(PREFIX + "BelongKey is invalid")
+			break
+		}
+		if len(thls.BelongKey.NodeName) == 0 {
+			err = fmt.Errorf(PREFIX + "BelongKey.NodeName must not empty")
+			break
+		}
+		if str2ProgramType(thls.BelongKey.ExecType) != txdata.ProgramType_NODE &&
+			str2ProgramType(thls.BelongKey.ExecType) != txdata.ProgramType_SERVER {
+			err = fmt.Errorf(PREFIX + "UserKey.ExecType must be NODE or SERVER")
+			break
+		}
+		if len(thls.BelongKey.ExecName) != 0 {
+			err = fmt.Errorf(PREFIX + "BelongKey.ExecName must be empty")
 			break
 		}
 		if len(thls.ServerURL.String()) == 0 {
@@ -90,7 +127,7 @@ type config4mail struct {
 
 type configServer struct {
 	configBase
-	UserID         string
+	UserKey        configAtomic
 	ServerURL      url.URL
 	ClientURL      []url.URL
 	DataSourceName string //数据源的名字.
@@ -103,8 +140,8 @@ func (thls *configServer) isValid() error {
 	PREFIX := "configServer: "
 	var err error
 	for range "1" {
-		if len(thls.UserID) == 0 {
-			err = fmt.Errorf(PREFIX + "UserID is empty")
+		if !atomicKeyIsValid(thls.UserKey.toTxAtomicKey()) {
+			err = fmt.Errorf(PREFIX + "UserKey is invalid")
 			break
 		}
 		if len(thls.ServerURL.String()) == 0 {
@@ -227,8 +264,8 @@ func exampleConfigData(confType string) string {
 	exampleA := func() string {
 		var cfgA configNode
 		cfgA.ConfType = "NODE"
-		cfgA.UserID = "a1"
-		cfgA.BelongID = "s1"
+		cfgA.UserKey = configAtomic{NodeName: "n1", ExecType: "NODE"}
+		cfgA.BelongKey = configAtomic{NodeName: "s1", ExecType: "SERVER"}
 		cfgA.ServerURL = url.URL{Scheme: "ws", Host: "localhost:10065", Path: "/websocket"}
 		cfgA.ClientURL = []url.URL{url.URL{Scheme: "ws", Host: "localhost:10083", Path: "/websocket"}}
 		cfgA.DataSourceName = "database_a1.db"
@@ -239,7 +276,7 @@ func exampleConfigData(confType string) string {
 	exampleS := func() string {
 		var cfgS configServer
 		cfgS.ConfType = "SERVER"
-		cfgS.UserID = "a1"
+		cfgS.UserKey = configAtomic{NodeName: "s1", ExecType: "SERVER"}
 		cfgS.ServerURL = url.URL{Scheme: "ws", Host: "localhost:10083", Path: "/websocket"}
 		cfgS.ClientURL = []url.URL{}
 		cfgS.DataSourceName = "database_s1.db"

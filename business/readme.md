@@ -1,5 +1,5 @@
 ```
-curl -d '{ "UID":"a1" , "Cmd":"help" , "Timeout":5 }'    http://127.0.0.1:10083/executeCommand
+curl -d '{ "UID":"/n1/3/" , "Cmd":"help" , "Timeout":5 }'    http://127.0.0.1:10083/executeCommand
 curl -d '{ "Cache":true , "Timeout":9 , "Topic":"test" , "Data":"testData" }'    http://127.0.0.1:10083/reportData
 curl -d '{ "Cache":true , "Timeout":9 , "To":"略" , "Subject":"标题", "Content":"内容" }'    http://127.0.0.1:10083/sendMail
 ```

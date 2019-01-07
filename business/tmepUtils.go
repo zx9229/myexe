@@ -359,3 +359,55 @@ func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDa
 	}
 	return cada
 }
+
+func atomicKey2Str(src *txdata.AtomicKey) string {
+	execType := (*int32)(unsafe.Pointer(&src.ExecType))
+	return fmt.Sprintf("/%v/%v/%v/%v", src.ZoneName, src.NodeName, *execType, src.ExecName)
+}
+
+func str2ProgramType(src string) txdata.ProgramType {
+	if dst, ok := txdata.ProgramType_value[src]; ok {
+		return txdata.ProgramType(dst)
+	}
+	return txdata.ProgramType_Zero2
+}
+
+func atomicKeyIsValid(src *txdata.AtomicKey) bool {
+	isValidChar := func(c byte) bool {
+		if 33 <= c && c <= 126 && c != '/' {
+			return true
+		}
+		return false
+	}
+	for _, c := range []byte(src.ZoneName) {
+		if !isValidChar(c) {
+			return false
+		}
+	}
+	for _, c := range []byte(src.NodeName) {
+		if !isValidChar(c) {
+			return false
+		}
+	}
+	if src.ExecType == txdata.ProgramType_Zero2 {
+		return false
+	}
+	for _, c := range []byte(src.ExecName) {
+		if !isValidChar(c) {
+			return false
+		}
+	}
+	return true
+}
+
+func assert4true(cond bool) {
+	if !cond {
+		panic(cond)
+	}
+}
+
+func assert4false(cond bool) {
+	if cond {
+		panic(cond)
+	}
+}

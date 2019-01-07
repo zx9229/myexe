@@ -24,20 +24,35 @@ enum ProgramType {
     POINT  = 4; //最末端的(采集点/受控点/等).
 }
 
+//必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
+message AtomicKey {
+    string      ZoneName = 1;//区域名(机房名)(区域级别,必须唯一).
+    string      NodeName = 2;//节点名(机器名)(同一区域,必须唯一).
+    ProgramType ExecType = 3;//程序类型.
+    string      ExecName = 4;//程序名.(同一机器,必须唯一).
+}
+
 message ConnectionInfo {
     enum LinkType {
         Zero3   = 0;
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    string          UserID   = 1;//唯一ID
-    string          BelongID = 2;//属于哪个ID
-    string          Version  = 3;//版本号
-    ProgramType     ExeType  = 4;
-    bool            IsLeaf   = 5;//叶子节点(当AppType/ExeType为NODE时,表示NODE是否为LeafNode)
-    LinkType        LinkMode = 6;//连接方向
-    int32           ExePid   = 7;//进程ID
-    string          ExePath  = 8;//程序路径
+    AtomicKey UserKey   = 1;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
+    string    UserID    = 2;
+    AtomicKey BelongKey = 3;
+    string    BelongID  = 4;
+    string    Version   = 5;//版本号
+    LinkType  LinkMode  = 6;//连接方向
+    int32     ExePid    = 7;//进程ID
+    string    ExePath   = 8;//程序路径
+    string    Remark    = 9;
+}
+
+// 某user维护的所有连接,打包成一个结构体,作为一个快照,发送出去.
+message ConnInfoSnap {
+    string                  UserID = 1;
+    repeated ConnectionInfo data   = 2;
 }
 
 message ConnectedData {
@@ -62,20 +77,6 @@ message DisconnectedData {
     ConnectionInfo  Info    = 1;
 }
 
-message ExecuteCommandReq {
-    int64           RequestID = 1;
-    repeated string Pathway   = 2;
-    string          Command   = 3;
-}
-
-message ExecuteCommandRsp {
-    int64           RequestID = 1;
-    string          UserID    = 2;//这个参数可以没有,我用它检查了数据,安心
-    string          Result    = 3;//结果.
-    int32           ErrNo     = 4;
-    string          ErrMsg    = 5;
-}
-
 message CommonNtosReq {//通用请求(请求的方向是agentTOserver)
     int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
     string                    UserID     = 2;
@@ -92,6 +93,36 @@ message CommonNtosRsp {
     int64           SeqNo     = 3;//这个参数可以没有,我用它检查了数据,安心
     int32           ErrNo     = 4;//(ErrNo==0)表示SERVER处理成功,AGENT可以删除自己的缓存了.
     string          ErrMsg    = 5;//(ErrNo==0 && len(ErrMsg)==0)表示SERVER处理成功,同时没有任何警告,处理得非常完美.
+}
+
+message CommonStonReq {
+    int64                     RequestID = 1;
+    repeated string           Pathway   = 2;
+    string                    DataType  = 3;
+    bytes                     Data      = 4;
+    google.protobuf.Timestamp ReqTime   = 5;//SERVER请求(网络/NET/NETWORK)的时候的本地时间戳.
+}
+
+message CommonStonRsp {
+    int64                     RequestID = 1;
+    string                    UserID    = 2;//这个参数可以没有,我用它检查了数据,安心.
+    string                    DataType  = 3;
+    bytes                     Data      = 4;
+    google.protobuf.Timestamp RspTime   = 5;//(网络/NET/NETWORK)回应SERVER的时候的本地时间戳.
+}
+
+message ExecuteCommandReq {
+    int64           RequestID = 1;
+    repeated string Pathway   = 2;
+    string          Command   = 3;
+}
+
+message ExecuteCommandRsp {
+    int64           RequestID = 1;
+    string          UserID    = 2;//这个参数可以没有,我用它检查了数据,安心
+    string          Result    = 3;//结果.
+    int32           ErrNo     = 4;
+    string          ErrMsg    = 5;
 }
 
 message ReportDataItem {

@@ -30,26 +30,35 @@ type businessNode struct {
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
-	if len(cfg.UserID) == 0 || len(cfg.BelongID) == 0 {
-		glog.Fatalf("must not be empty, UserID=%v, BelongID=%v", cfg.UserID, cfg.BelongID)
+	if false ||
+		atomicKeyIsValid(cfg.UserKey.toTxAtomicKey()) == false ||
+		len(cfg.UserKey.NodeName) == 0 ||
+		str2ProgramType(cfg.UserKey.ExecType) != txdata.ProgramType_NODE ||
+		len(cfg.UserKey.ExecName) != 0 ||
+		atomicKeyIsValid(cfg.BelongKey.toTxAtomicKey()) == false ||
+		len(cfg.BelongKey.NodeName) == 0 ||
+		(str2ProgramType(cfg.BelongKey.ExecType) != txdata.ProgramType_NODE &&
+			str2ProgramType(cfg.BelongKey.ExecType) != txdata.ProgramType_SERVER) ||
+		len(cfg.BelongKey.ExecName) != 0 ||
+		atomicKey2Str(cfg.UserKey.toTxAtomicKey()) == atomicKey2Str(cfg.BelongKey.toTxAtomicKey()) {
+		glog.Fatalf("newBusinessNode fail")
 	}
-	if cfg.UserID == cfg.BelongID {
-		glog.Fatalf("must not be equal, UserID=%v, BelongID=%v", cfg.UserID, cfg.BelongID)
-	}
+
 	curData := new(businessNode)
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheNode = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
-	curData.ownInfo.UserID = cfg.UserID
-	curData.ownInfo.BelongID = cfg.BelongID
-	curData.ownInfo.Version = "Version20181020"
-	curData.ownInfo.ExeType = txdata.ProgramType_NODE
-	curData.ownInfo.IsLeaf = false
+	curData.ownInfo.UserKey = cfg.UserKey.toTxAtomicKey()
+	curData.ownInfo.UserID = atomicKey2Str(curData.ownInfo.UserKey)
+	curData.ownInfo.BelongKey = cfg.BelongKey.toTxAtomicKey()
+	curData.ownInfo.BelongID = atomicKey2Str(curData.ownInfo.BelongKey)
+	curData.ownInfo.Version = "Version20190107"
 	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero3
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
+	curData.ownInfo.Remark = ""
 	//
 	curData.parentData = connInfoEx{}
 	//
@@ -222,43 +231,17 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 }
 
 func (thls *businessNode) handle_MsgType_ID_ConnectedData(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
-	sendToParent := true
-	for range "1" {
-		if (msgData.Pathway == nil) || (len(msgData.Pathway) == 0) {
-			glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
-			thls.deleteConnectionFromAll(msgConn, true)
-			sendToParent = false
-			break
-		}
-		if len(msgData.Pathway) == 1 {
-			// 1<len(msgData.Pathway)时,这个消息是[孙代]发送给[子代],[子代]转发给[父代](我这一代)的消息.
-			if (msgData.Info.ExeType == txdata.ProgramType_NODE) &&
-				(thls.ownInfo.ExeType == txdata.ProgramType_NODE) &&
-				(msgData.Info.UserID == thls.ownInfo.UserID) {
-				glog.Errorf("maybe i connected myself, msgConn=%p, msgData=%v", msgConn, msgData)
-				thls.deleteConnectionFromAll(msgConn, true)
-				sendToParent = false
-				break
-			}
-			if (msgData.Info.UserID != thls.ownInfo.BelongID) && (msgData.Info.BelongID != thls.ownInfo.UserID) {
-				glog.Errorf("he is not my father, i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
-				thls.deleteConnectionFromAll(msgConn, true)
-				sendToParent = false
-				break
-			}
-		}
-		if thls.isParentConnection(msgData) {
-			sendToParent = thls.doDeal4parent(msgData, msgConn)
-			break
-		} else if msgData.Info.ExeType == txdata.ProgramType_NODE {
-			sendToParent = thls.doDeal4agent(msgData, msgConn)
-			break
-		} else {
-			glog.Errorf("unknown message, msgConn=%p, msgData=%v", msgConn, msgData)
-			thls.deleteConnectionFromAll(msgConn, true)
-			sendToParent = false
-			break
-		}
+	sendToParent := false
+
+	if (msgData.Pathway == nil) || (len(msgData.Pathway) == 0) {
+		glog.Errorf("empty Pathway, will disconnect with it, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+	} else if len(msgData.Pathway) == 1 {
+		sendToParent = thls.zxTestDeal4stepOne(msgData, msgConn)
+	} else {
+		// 1<len(msgData.Pathway)时,这个消息是[孙代]发送给[子代],[子代]转发给[父代](我这一代)的消息.
+		sendToParent = thls.zxTestDeal4stepMulti(msgData, msgConn)
 	}
 
 	if sendToParent {
@@ -272,7 +255,7 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	if msgData.Info.ExeType == txdata.ProgramType_NODE {
+	if msgData.Info.UserKey.ExecType == txdata.ProgramType_NODE {
 		if thls.cacheNode.deleteData(msgData.Info.UserID) == false {
 			glog.Fatalf("cache data error, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
@@ -399,25 +382,59 @@ func (thls *businessNode) sendDataToParent(msgType txdata.MsgType, msgData proto
 	return conn.Send(msg2slice(msgType, msgData))
 }
 
-func (thls *businessNode) isParentConnection(data *txdata.ConnectedData) bool {
-	var isParent bool
-	for range "1" {
-		if thls.ownInfo.ExeType != txdata.ProgramType_NODE {
-			glog.Fatalf("illegal data, ownInfo=%v", thls.ownInfo)
-			break
-		}
-		if data.Info.ExeType != txdata.ProgramType_NODE && data.Info.ExeType != txdata.ProgramType_SERVER {
-			break
-		}
-		if data.Info.UserID != thls.ownInfo.BelongID {
-			break
-		}
-		isParent = true
+//func (thls *businessNode) isParentConnection(data *txdata.ConnectedData) bool {
+//	var isParent bool
+//	for range "1" {
+//		assert4true(thls.ownInfo.UserKey.ExecType == txdata.ProgramType_NODE)
+//		if data.Info.UserID != thls.ownInfo.BelongID {
+//			break
+//		}
+//		if data.Info.UserKey.ExecType != txdata.ProgramType_NODE && data.Info.UserKey.ExecType != txdata.ProgramType_SERVER {
+//			break
+//		}
+//		isParent = true
+//	}
+//	return isParent
+//}
+
+func (thls *businessNode) zxTestDeal4son(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+	assert4true(len(msgData.Pathway) == 1)
+	assert4true(msgData.Info.BelongID == thls.ownInfo.UserID)
+
+	var isAccepted bool
+	var isExist bool
+	if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
+		glog.Errorf("msgConn not found in cache, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
 	}
-	return isParent
+
+	curData := new(connInfoEx)
+	curData.conn = msgConn
+	curData.Info = *msgData.Info
+	curData.Pathway = msgData.Pathway
+
+	if isSuccess := thls.cacheNode.insertData(curData); !isSuccess {
+		glog.Errorf("agent already exists, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+
+	if isAccepted {
+		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
+		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+	}
+
+	sendToParent = true
+	return
 }
 
-func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+func (thls *businessNode) zxTestDeal4parent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+	assert4true(len(msgData.Pathway) == 1)
+	assert4true(msgData.Info.UserID == thls.ownInfo.BelongID)
+
 	var isAccepted bool
 	var isExist bool
 	if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
@@ -435,15 +452,8 @@ func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *
 	thls.parentData.conn = msgConn
 	thls.parentData.Info = *msgData.Info
 	if isAccepted {
-		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_CONNECT {
-		//	log.Panicln("parent info is abnormal", thls.parentData.info)
-		//}
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
-	} else {
-		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_ACCEPT {
-		//	log.Panicln("parent info is abnormal", thls.parentData.info)
-		//}
 	}
 
 	if true {
@@ -459,17 +469,85 @@ func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *
 	return
 }
 
-func (thls *businessNode) doDeal4agent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
-	var isAccepted bool
-	isSon := len(msgData.Pathway) == 1
-	if isSon {
-		var isExist bool
-		if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
-			glog.Errorf("msgConn not found in cache, msgConn=%p, msgData=%v", msgConn, msgData)
+func (thls *businessNode) zxTestDeal4stepOne(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+	assert4true(len(msgData.Pathway) == 1)
+
+	if msgData.Info.UserID != msgData.Pathway[0] {
+		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+
+	if msgData.Info.UserID == thls.ownInfo.UserID {
+		glog.Errorf("maybe i connected myself, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+	if (msgData.Info.UserID != thls.ownInfo.BelongID) &&
+		(msgData.Info.BelongID != thls.ownInfo.UserID) {
+		glog.Errorf("he is not my father, i am not his father, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+	if atomicKey2Str(msgData.Info.UserKey) != msgData.Info.UserID {
+		glog.Errorf("msgData.Info.UserID error, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+	if atomicKey2Str(msgData.Info.BelongKey) != msgData.Info.BelongID {
+		glog.Errorf("BelongID error, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
+	}
+	if msgData.Info.UserKey.ExecType == txdata.ProgramType_POINT {
+		if msgData.Info.BelongID == thls.ownInfo.UserID {
+			sendToParent = thls.zxTestDeal4son(msgData, msgConn)
+			return
+		} else {
+			glog.Errorf("POINT and i'm not it's father, msgConn=%p, msgData=%v", msgConn, msgData)
 			thls.deleteConnectionFromAll(msgConn, true)
+			sendToParent = false
 			return
 		}
+	} else if msgData.Info.UserKey.ExecType == txdata.ProgramType_SERVER {
+		if msgData.Info.UserID == thls.ownInfo.BelongID {
+			sendToParent = thls.zxTestDeal4parent(msgData, msgConn)
+			return
+		} else {
+			glog.Errorf("SERVER and it's not my father, msgConn=%p, msgData=%v", msgConn, msgData)
+			thls.deleteConnectionFromAll(msgConn, true)
+			sendToParent = false
+			return
+		}
+	} else if msgData.Info.UserKey.ExecType == txdata.ProgramType_NODE {
+		if msgData.Info.BelongID == thls.ownInfo.UserID {
+			sendToParent = thls.zxTestDeal4son(msgData, msgConn)
+			return
+		} else if msgData.Info.UserID == thls.ownInfo.BelongID {
+			sendToParent = thls.zxTestDeal4parent(msgData, msgConn)
+			return
+		} else {
+			assert4true(false)
+			sendToParent = false
+			return
+		}
+	} else {
+		glog.Errorf("disable to connect, msgConn=%p, msgData=%v", msgConn, msgData)
+		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
+		return
 	}
+}
+
+func (thls *businessNode) zxTestDeal4stepMulti(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+	assert4true(len(msgData.Pathway) > 1)
+
+	sendToParent = false
 
 	curData := new(connInfoEx)
 	curData.conn = msgConn
@@ -479,18 +557,88 @@ func (thls *businessNode) doDeal4agent(msgData *txdata.ConnectedData, msgConn *w
 	if isSuccess := thls.cacheNode.insertData(curData); !isSuccess {
 		glog.Errorf("agent already exists, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
+		sendToParent = false
 		return
 	}
 
-	if isSon && isAccepted {
-		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
-	}
-
 	sendToParent = true
-
 	return
 }
+
+//func (thls *businessNode) doDeal4parent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+//	var isAccepted bool
+//	var isExist bool
+//	if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
+//		glog.Errorf("msgConn not found in cache, msgConn=%p, msgData=%v", msgConn, msgData)
+//		thls.deleteConnectionFromAll(msgConn, true)
+//		return
+//	}
+//
+//	if thls.parentData.conn != nil {
+//		glog.Errorf("father already exists, msgConn=%p, msgData=%v", msgConn, msgData)
+//		thls.deleteConnectionFromAll(msgConn, true)
+//		return
+//	}
+//
+//	thls.parentData.conn = msgConn
+//	thls.parentData.Info = *msgData.Info
+//	if isAccepted {
+//		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_CONNECT {
+//		//	log.Panicln("parent info is abnormal", thls.parentData.info)
+//		//}
+//		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
+//		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+//	} else {
+//		//if thls.parentData.info.LinkDir != txdata.ConnectionInfo_ACCEPT {
+//		//	log.Panicln("parent info is abnormal", thls.parentData.info)
+//		//}
+//	}
+//
+//	if true {
+//		//和父亲建立连接了,要把自己的缓存发送给父亲,更新父亲的缓存.
+//		thls.cacheNode.Lock()
+//		for _, node := range thls.cacheNode.M {
+//			tmpTxData := txdata.ConnectedData{Info: &node.Info, Pathway: append(node.Pathway, thls.ownInfo.UserID)}
+//			thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, &tmpTxData)
+//		}
+//		thls.cacheNode.Unlock()
+//	}
+//
+//	return
+//}
+
+//func (thls *businessNode) doDeal4agent(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) (sendToParent bool) {
+//	var isAccepted bool
+//	isSon := len(msgData.Pathway) == 1
+//	if isSon {
+//		var isExist bool
+//		if isAccepted, isExist = thls.cacheSock.deleteData(msgConn); !isExist {
+//			glog.Errorf("msgConn not found in cache, msgConn=%p, msgData=%v", msgConn, msgData)
+//			thls.deleteConnectionFromAll(msgConn, true)
+//			return
+//		}
+//	}
+//
+//	curData := new(connInfoEx)
+//	curData.conn = msgConn
+//	curData.Info = *msgData.Info
+//	curData.Pathway = msgData.Pathway
+//
+//	if isSuccess := thls.cacheNode.insertData(curData); !isSuccess {
+//		glog.Errorf("agent already exists, msgConn=%p, msgData=%v", msgConn, msgData)
+//		thls.deleteConnectionFromAll(msgConn, true)
+//		return
+//	}
+//
+//	if isSon && isAccepted {
+//		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
+//		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+//	}
+//
+//	sendToParent = true
+//
+//	return
+//}
 
 func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {
 	if closeIt {
