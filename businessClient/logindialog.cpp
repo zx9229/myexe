@@ -56,7 +56,9 @@ void LoginDialog::slotReady()
 
 void LoginDialog::slotClickedLogin()
 {
-    if (ui->lineEdit_url->text().trimmed().isEmpty())
+    if (!ui->lineEdit_host->text().trimmed().isEmpty() &&
+        !ui->lineEdit_port->text().trimmed().isEmpty() &&
+        !ui->lineEdit_path->text().trimmed().isEmpty())
     {
         QString url = QString("ws://%1:%2%3")
             .arg(ui->lineEdit_host->text().trimmed())
