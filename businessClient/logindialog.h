@@ -22,6 +22,7 @@ private:
     void setComboBox4ProgramType(QComboBox* obj);
 
 private slots:
+    void slotReady();
     void slotClickedLogin();
     void slotClickedClear();
     void slotClickedQuickFill();

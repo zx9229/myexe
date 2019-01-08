@@ -10,11 +10,11 @@ MyWebsock::MyWebsock(QObject *parent /* = Q_NULLPTR */) :
     m_ws(QString(), QWebSocketProtocol::VersionLatest, parent),
     m_alive(false)
 {
-    QObject::connect(&m_ws, &QWebSocket::connected, this, &MyWebsock::connected);
-    QObject::connect(&m_ws, &QWebSocket::disconnected, this, &MyWebsock::disconnected);
-    QObject::connect(&m_ws, &QWebSocket::binaryMessageReceived, this, &MyWebsock::binaryMessageReceived);
-    QObject::connect(&m_ws, static_cast<void(QWebSocket::*)(QAbstractSocket::SocketError)>(&QWebSocket::error), this, &MyWebsock::error);
-    QObject::connect(&m_ws, &QWebSocket::pong, this, &MyWebsock::pong);
+    QObject::connect(&m_ws, &QWebSocket::connected, this, &MyWebsock::slotConnected);
+    QObject::connect(&m_ws, &QWebSocket::disconnected, this, &MyWebsock::slotDisconnected);
+    QObject::connect(&m_ws, &QWebSocket::binaryMessageReceived, this, &MyWebsock::slotBinaryMessageReceived);
+    QObject::connect(&m_ws, static_cast<void(QWebSocket::*)(QAbstractSocket::SocketError)>(&QWebSocket::error), this, &MyWebsock::slotError);
+    QObject::connect(&m_ws, &QWebSocket::pong, this, &MyWebsock::slotPong);
 
     m_timer.setSingleShot(true);
     QObject::connect(&m_timer, &QTimer::timeout, this, &MyWebsock::reconnect);
@@ -42,7 +42,7 @@ void MyWebsock::stop()
 qint64 MyWebsock::sendBinaryMessage(const QByteArray &data)
 {
     qint64 sendBytes = m_ws.sendBinaryMessage(data);
-    Q_ASSERT(data.size()== sendBytes);
+    Q_ASSERT(data.size() == sendBytes);
     return sendBytes;
 }
 
@@ -54,7 +54,7 @@ void MyWebsock::reconnect()
     m_ws.open(m_url);
 }
 
-void MyWebsock::connected()
+void MyWebsock::slotConnected()
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::connected";
 
@@ -62,17 +62,17 @@ void MyWebsock::connected()
     Q_ASSERT(m_alive == false);
     m_alive = true;
 
-    sigConnected();
+    emit sigConnected();
 }
 
-void MyWebsock::disconnected()
+void MyWebsock::slotDisconnected()
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::disconnected";
 
     if (m_alive)
     {
         m_alive = false;
-        sigDisconnected();
+        emit sigDisconnected();
     }
 
     Q_ASSERT(m_alive == false);
@@ -80,19 +80,19 @@ void MyWebsock::disconnected()
     m_timer.start(m_interval * 1000);
 }
 
-void MyWebsock::error(QAbstractSocket::SocketError error)
+void MyWebsock::slotError(QAbstractSocket::SocketError error)
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::error";
 }
 
-void MyWebsock::pong(quint64 elapsedTime, const QByteArray &payload)
+void MyWebsock::slotPong(quint64 elapsedTime, const QByteArray &payload)
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::pong";
 }
 
-void MyWebsock::binaryMessageReceived(const QByteArray &message)
+void MyWebsock::slotBinaryMessageReceived(const QByteArray &message)
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::binaryMessageReceived";
 
-    sigMessage(message);
+    emit sigMessage(message);
 }

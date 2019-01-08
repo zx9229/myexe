@@ -17,18 +17,14 @@ DataExchanger::~DataExchanger()
 
 }
 
-QString DataExchanger::login()
-{
-    QString message;
-
-    m_ws.start(m_url);
-
-    return message;
-}
-
 MyWebsock& DataExchanger::ws()
 {
     return m_ws;
+}
+
+bool DataExchanger::start()
+{
+    return m_ws.start(m_url);
 }
 
 void DataExchanger::setURL(const QString &url)
@@ -85,6 +81,8 @@ void DataExchanger::slotOnConnected()
 
         m_ws.sendBinaryMessage(data);
     }
+
+    emit sigReady();
 }
 
 void DataExchanger::slotOnDisconnected()

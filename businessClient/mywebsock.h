@@ -27,11 +27,11 @@ private:
     void reconnect();
 
 private slots:
-    void connected();
-    void disconnected();
-    void binaryMessageReceived(const QByteArray &message);
-    void error(QAbstractSocket::SocketError error);
-    void pong(quint64 elapsedTime, const QByteArray &payload);
+    void slotConnected();
+    void slotDisconnected();
+    void slotBinaryMessageReceived(const QByteArray &message);
+    void slotError(QAbstractSocket::SocketError error);
+    void slotPong(quint64 elapsedTime, const QByteArray &payload);
 
 private:
     const int  m_interval; //重连间隔n秒.

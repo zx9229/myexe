@@ -8,10 +8,11 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
 {
     ui->setupUi(this);
     initUI();
-    connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
-    connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);
-    connect(ui->pushButton_clear, &QPushButton::clicked, this, &LoginDialog::slotClickedClear);
-    connect(ui->pushButton_quickFill, &QPushButton::clicked, this, &LoginDialog::slotClickedQuickFill);
+    QObject::connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
+    QObject::connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);
+    QObject::connect(ui->pushButton_clear, &QPushButton::clicked, this, &LoginDialog::slotClickedClear);
+    QObject::connect(ui->pushButton_quickFill, &QPushButton::clicked, this, &LoginDialog::slotClickedQuickFill);
+    QObject::connect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
 }
 
 LoginDialog::~LoginDialog()
@@ -47,6 +48,12 @@ void LoginDialog::setComboBox4ProgramType(QComboBox *comboBox)
     }
 }
 
+void LoginDialog::slotReady()
+{
+    QObject::disconnect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
+    this->accept();
+}
+
 void LoginDialog::slotClickedLogin()
 {
     if (ui->lineEdit_url->text().trimmed().isEmpty())
@@ -71,9 +78,7 @@ void LoginDialog::slotClickedLogin()
         static_cast<txdata::ProgramType>(ui->comboBox_BelongExecType->currentData().toInt()),
         ui->lineEdit_BelongExecName->text().trimmed());
 
-    m_dataExch->login();
-    //TODO:登录成功
-    this->accept();
+    m_dataExch->start();
 }
 
 void LoginDialog::slotClickedClear()

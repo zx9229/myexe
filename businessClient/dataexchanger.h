@@ -1,8 +1,8 @@
 #ifndef DATAEXCHANGER_H
 #define DATAEXCHANGER_H
 
-#include <QObject>
 #include "mywebsock.h"
+#include <QObject>
 #include "txdata.pb.h"
 
 class DataExchanger : public QObject
@@ -14,8 +14,8 @@ public:
     ~DataExchanger();
 
 public:
-    QString login();
     MyWebsock& ws();
+    bool start();
 
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
@@ -23,6 +23,7 @@ public:
 
 signals:
     void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
+    void sigReady();
 
 private slots:
     void slotOnConnected();
@@ -32,8 +33,6 @@ private slots:
 private:
     MyWebsock m_ws;
     QString   m_url;
-    QString   m_username;
-    QString   m_password;
     const int m_totalPos;//总进度.
 
     txdata::AtomicKey m_userKey;
