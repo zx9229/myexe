@@ -25,6 +25,10 @@ signals:
     void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
     void sigReady();
 
+private:
+    void initOwnInfo();
+    void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
+
 private slots:
     void slotOnConnected();
     void slotOnDisconnected();
@@ -33,10 +37,9 @@ private slots:
 private:
     MyWebsock m_ws;
     QString   m_url;
-    const int m_totalPos;//总进度.
 
-    txdata::AtomicKey m_userKey;
-    txdata::AtomicKey m_belongKey;
+    txdata::ConnectionInfo m_ownInfo;
+    txdata::ConnectionInfo m_parentInfo;
 };
 
 #endif // DATAEXCHANGER_H

@@ -2,14 +2,25 @@
 #include <QApplication>
 #include "m2b.h"
 
+std::string atomicKey2str(const txdata::AtomicKey& src)
+{
+    return QString("/%1/%2/%3/%4")
+        .arg(src.zonename().data())
+        .arg(src.nodename().data())
+        .arg(src.exectype())
+        .arg(src.execname().data())
+        .toStdString();
+}
+
 DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
-    m_ws(parent),
-    m_totalPos(3)
+    m_ws(parent)
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
     connect(&m_ws, &MyWebsock::sigMessage, this, &DataExchanger::slotOnMessage);
+
+    initOwnInfo();
 }
 
 DataExchanger::~DataExchanger()
@@ -34,18 +45,67 @@ void DataExchanger::setURL(const QString &url)
 
 void DataExchanger::setUserKey(const QString &zoneName, const QString &nodeName, txdata::ProgramType execType, const QString &execName)
 {
-    m_userKey.set_zonename(zoneName.toStdString());
-    m_userKey.set_nodename(nodeName.toStdString());
-    m_userKey.set_exectype(execType);
-    m_userKey.set_execname(execName.toStdString());
+    m_ownInfo.mutable_userkey()->set_zonename(zoneName.toStdString());
+    m_ownInfo.mutable_userkey()->set_nodename(nodeName.toStdString());
+    m_ownInfo.mutable_userkey()->set_exectype(execType);
+    m_ownInfo.mutable_userkey()->set_execname(execName.toStdString());
+
+    m_ownInfo.set_userid(atomicKey2str(m_ownInfo.userkey()));
 }
 
 void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeName, txdata::ProgramType execType, const QString &execName)
 {
-    m_belongKey.set_zonename(zoneName.toStdString());
-    m_belongKey.set_nodename(nodeName.toStdString());
-    m_belongKey.set_exectype(execType);
-    m_belongKey.set_execname(execName.toStdString());
+    m_ownInfo.mutable_belongkey()->set_zonename(zoneName.toStdString());
+    m_ownInfo.mutable_belongkey()->set_nodename(nodeName.toStdString());
+    m_ownInfo.mutable_belongkey()->set_exectype(execType);
+    m_ownInfo.mutable_belongkey()->set_execname(execName.toStdString());
+
+    m_ownInfo.set_belongid(atomicKey2str(m_ownInfo.belongkey()));
+}
+
+void DataExchanger::initOwnInfo()
+{
+    m_ownInfo.mutable_userkey();
+    m_ownInfo.set_userid(atomicKey2str(*m_ownInfo.mutable_userkey()));
+    m_ownInfo.mutable_belongkey();
+    m_ownInfo.set_belongid(atomicKey2str(*m_ownInfo.mutable_belongkey()));
+    m_ownInfo.set_version("20190108");
+    m_ownInfo.set_linkmode(txdata::ConnectionInfo_LinkType_CONNECT);
+    m_ownInfo.set_exepid(static_cast<int>(QCoreApplication::applicationPid()));
+    m_ownInfo.set_exepath(QCoreApplication::applicationFilePath().toStdString());
+    m_ownInfo.set_remark("");
+}
+
+void DataExchanger::handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+
+    bool checkOK = false;
+
+    do
+    {
+        if (data->info().userid() != m_ownInfo.belongid())
+            break;
+        if (atomicKey2str(data->info().userkey()) != data->info().userid())
+            break;
+        if (atomicKey2str(data->info().belongkey()) != data->info().belongid())
+            break;
+        if (data->pathway_size() != 1)
+            break;
+        if (data->pathway(0) != data->info().userid())
+            break;
+        checkOK = true;
+    } while (false);
+
+    if (checkOK)
+    {
+        m_parentInfo.CopyFrom(data->info());
+        emit sigReady();
+    }
+    else
+    {
+        m_ws.interrupt();
+    }
 }
 
 void DataExchanger::slotOnConnected()
@@ -53,36 +113,15 @@ void DataExchanger::slotOnConnected()
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
 
     {
-        auto atomicKey2Str = [](txdata::AtomicKey* src)->std::string {
-            return QString("/%1/%2/%3/%4")
-                .arg(src->zonename().data()).arg(src->nodename().data())
-                .arg(src->exectype()).arg(src->execname().data()).toStdString();
-        };
-
         txdata::ConnectedData tmpData = {};
-        {
-            tmpData.mutable_info()->mutable_userkey()->CopyFrom(m_userKey);
-            tmpData.mutable_info()->set_userid(atomicKey2Str(tmpData.mutable_info()->mutable_userkey()));
-
-            tmpData.mutable_info()->mutable_belongkey()->CopyFrom(m_belongKey);
-            tmpData.mutable_info()->set_belongid(atomicKey2Str(tmpData.mutable_info()->mutable_belongkey()));
-
-            tmpData.mutable_info()->set_version("20190106");
-            tmpData.mutable_info()->set_linkmode(txdata::ConnectionInfo_LinkType_CONNECT);
-            tmpData.mutable_info()->set_exepid(static_cast<int>(QCoreApplication::applicationPid()));
-            tmpData.mutable_info()->set_exepath(QCoreApplication::applicationFilePath().toStdString());
-            tmpData.mutable_info()->set_remark("");
-
-            tmpData.add_pathway(tmpData.mutable_info()->userid());
-        }
+        tmpData.mutable_info()->CopyFrom(m_ownInfo);
+        tmpData.add_pathway(tmpData.info().userid());
 
         QByteArray data;
         m2b::msg2slice(txdata::ID_ConnectedData, tmpData, data);
 
         m_ws.sendBinaryMessage(data);
     }
-
-    emit sigReady();
 }
 
 void DataExchanger::slotOnDisconnected()
@@ -94,11 +133,16 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnMessage";
 
-    if (true) {
-        txdata::MsgType theType = {};
-        GPMSGPTR theMsg;
-        m2b::slice2msg(message, theType, theMsg);
-        QSharedPointer<txdata::ConnectedData> txData = qSharedPointerDynamicCast<txdata::ConnectedData>(theMsg);
-        printf("%s\n", txData->info().userid().c_str());
+    txdata::MsgType theType = {};
+    GPMSGPTR theMsg;
+    if (m2b::slice2msg(message, theType, theMsg) == false)
+    {
+        qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnMessage, slice2msg, failure";
+        return;
+    }
+
+    if (theType == txdata::MsgType::ID_ConnectedData)
+    {
+        handle_ConnectedData(qSharedPointerDynamicCast<txdata::ConnectedData>(theMsg));
     }
 }
