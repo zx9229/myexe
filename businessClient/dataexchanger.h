@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "mywebsock.h"
+#include "txdata.pb.h"
 
 class DataExchanger : public QObject
 {
@@ -13,8 +14,12 @@ public:
     ~DataExchanger();
 
 public:
-    QString Login(const QString& url, const QString& username, const QString& password);
+    QString login();
     MyWebsock& ws();
+
+    void setURL(const QString& url);
+    void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
+    void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
 
 signals:
     void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
@@ -30,6 +35,9 @@ private:
     QString   m_username;
     QString   m_password;
     const int m_totalPos;//总进度.
+
+    txdata::AtomicKey m_userKey;
+    txdata::AtomicKey m_belongKey;
 };
 
 #endif // DATAEXCHANGER_H

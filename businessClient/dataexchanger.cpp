@@ -17,11 +17,11 @@ DataExchanger::~DataExchanger()
 
 }
 
-QString DataExchanger::Login(const QString &url, const QString &username, const QString &password)
+QString DataExchanger::login()
 {
     QString message;
 
-    m_ws.start(url);
+    m_ws.start(m_url);
 
     return message;
 }
@@ -29,6 +29,27 @@ QString DataExchanger::Login(const QString &url, const QString &username, const 
 MyWebsock& DataExchanger::ws()
 {
     return m_ws;
+}
+
+void DataExchanger::setURL(const QString &url)
+{
+    m_url = url;
+}
+
+void DataExchanger::setUserKey(const QString &zoneName, const QString &nodeName, txdata::ProgramType execType, const QString &execName)
+{
+    m_userKey.set_zonename(zoneName.toStdString());
+    m_userKey.set_nodename(nodeName.toStdString());
+    m_userKey.set_exectype(execType);
+    m_userKey.set_execname(execName.toStdString());
+}
+
+void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeName, txdata::ProgramType execType, const QString &execName)
+{
+    m_belongKey.set_zonename(zoneName.toStdString());
+    m_belongKey.set_nodename(nodeName.toStdString());
+    m_belongKey.set_exectype(execType);
+    m_belongKey.set_execname(execName.toStdString());
 }
 
 void DataExchanger::slotOnConnected()
@@ -43,22 +64,11 @@ void DataExchanger::slotOnConnected()
         };
 
         txdata::ConnectedData tmpData = {};
-
         {
-            {
-                tmpData.mutable_info()->mutable_userkey()->set_zonename("");
-                tmpData.mutable_info()->mutable_userkey()->set_nodename("");
-                tmpData.mutable_info()->mutable_userkey()->set_exectype(txdata::ProgramType::CLIENT);
-                tmpData.mutable_info()->mutable_userkey()->set_execname("QtClient");
-            }
+            tmpData.mutable_info()->mutable_userkey()->CopyFrom(m_userKey);
             tmpData.mutable_info()->set_userid(atomicKey2Str(tmpData.mutable_info()->mutable_userkey()));
 
-            {
-                tmpData.mutable_info()->mutable_belongkey()->set_zonename("");
-                tmpData.mutable_info()->mutable_belongkey()->set_nodename("s1");
-                tmpData.mutable_info()->mutable_belongkey()->set_exectype(txdata::ProgramType::SERVER);
-                tmpData.mutable_info()->mutable_belongkey()->set_execname("");
-            }
+            tmpData.mutable_info()->mutable_belongkey()->CopyFrom(m_belongKey);
             tmpData.mutable_info()->set_belongid(atomicKey2Str(tmpData.mutable_info()->mutable_belongkey()));
 
             tmpData.mutable_info()->set_version("20190106");
@@ -72,7 +82,7 @@ void DataExchanger::slotOnConnected()
 
         QByteArray data;
         m2b::msg2slice(txdata::ID_ConnectedData, tmpData, data);
-        //
+
         m_ws.sendBinaryMessage(data);
     }
 }

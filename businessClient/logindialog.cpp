@@ -22,6 +22,29 @@ LoginDialog::~LoginDialog()
 void LoginDialog::initUI()
 {
     ui->lineEdit_port->setValidator(new QIntValidator());
+    if (true) {
+        ui->lineEdit_UserZoneName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        ui->lineEdit_UserNodeName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        ui->lineEdit_UserExecName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        setComboBox4ProgramType(ui->comboBox_UserExecType);
+    }
+    if (true) {
+        ui->lineEdit_BelongZoneName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        ui->lineEdit_BelongNodeName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        ui->lineEdit_BelongExecName->setValidator(new QRegExpValidator(QRegExp("^[^/]+$")));
+        setComboBox4ProgramType(ui->comboBox_BelongExecType);
+    }
+}
+
+void LoginDialog::setComboBox4ProgramType(QComboBox *comboBox)
+{
+    comboBox->clear();
+    for (int i = static_cast<int>(txdata::ProgramType_MIN); i <= static_cast<int>(txdata::ProgramType_MAX); ++i)
+    {
+        txdata::ProgramType curType = static_cast<txdata::ProgramType>(i);
+        std::string curDesc = txdata::ProgramType_Name(curType);
+        comboBox->addItem(QString::fromStdString(curDesc), curType);
+    }
 }
 
 void LoginDialog::slotClickedLogin()
@@ -34,7 +57,21 @@ void LoginDialog::slotClickedLogin()
             .arg(ui->lineEdit_path->text().trimmed());
         ui->lineEdit_url->setText(url);
     }
-    m_dataExch->Login(ui->lineEdit_url->text().trimmed(), "", "");
+    m_dataExch->setURL(ui->lineEdit_url->text().trimmed());
+
+    m_dataExch->setUserKey(
+        ui->lineEdit_UserZoneName->text().trimmed(),
+        ui->lineEdit_UserNodeName->text().trimmed(),
+        static_cast<txdata::ProgramType>(ui->comboBox_UserExecType->currentData().toInt()),
+        ui->lineEdit_UserExecName->text().trimmed());
+
+    m_dataExch->setBelongKey(
+        ui->lineEdit_BelongZoneName->text().trimmed(),
+        ui->lineEdit_BelongNodeName->text().trimmed(),
+        static_cast<txdata::ProgramType>(ui->comboBox_BelongExecType->currentData().toInt()),
+        ui->lineEdit_BelongExecName->text().trimmed());
+
+    m_dataExch->login();
     //TODO:登录成功
     this->accept();
 }
@@ -45,6 +82,18 @@ void LoginDialog::slotClickedClear()
     ui->lineEdit_port->clear();
     ui->lineEdit_path->clear();
     ui->lineEdit_url->clear();
+    if (true) {
+        ui->lineEdit_UserZoneName->clear();
+        ui->lineEdit_UserNodeName->clear();
+        ui->lineEdit_UserExecName->clear();
+        ui->comboBox_UserExecType->setCurrentIndex(0);
+    }
+    if (true) {
+        ui->lineEdit_BelongZoneName->clear();
+        ui->lineEdit_BelongNodeName->clear();
+        ui->lineEdit_BelongExecName->clear();
+        ui->comboBox_BelongExecType->setCurrentIndex(0);
+    }
 }
 
 void LoginDialog::slotClickedQuickFill()

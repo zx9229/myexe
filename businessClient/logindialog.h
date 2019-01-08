@@ -2,6 +2,7 @@
 #define LOGINDIALOG_H
 
 #include <QDialog>
+#include <QComboBox>
 #include "dataexchanger.h"
 
 namespace Ui {
@@ -18,6 +19,7 @@ public:
 
 private:
     void initUI();
+    void setComboBox4ProgramType(QComboBox* obj);
 
 private slots:
     void slotClickedLogin();
