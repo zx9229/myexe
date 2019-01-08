@@ -10,7 +10,7 @@ using GPMSGPTR = ::QSharedPointer<::google::protobuf::Message>;
 class m2b
 {
 public:
-    static bool msg2slice(::txdata::MsgType msgType, const ::google::protobuf::Message& msgIn, ::QByteArray& pkgOut)
+    static bool msg2pkg(::txdata::MsgType msgType, const ::google::protobuf::Message& msgIn, ::QByteArray& pkgOut)
     {
         //令(int i = 1)则assert(reinterpret_cast<char*>(&i)[0] == 1)
         pkgOut.clear();
@@ -22,7 +22,23 @@ public:
         return true;
     }
 
-    static bool slice2msg(const ::QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
+    static QByteArray msg2pkg(::txdata::MsgType msgType, const ::google::protobuf::Message& msgIn)
+    {
+        QByteArray pkgOut;
+        bool retVal = msg2pkg(msgType, msgIn, pkgOut);
+        Q_ASSERT(retVal);
+        return pkgOut;
+    }
+
+    static std::string msg2bin(const ::google::protobuf::Message& src)
+    {
+        std::string dst;
+        bool retVal = src.SerializeToString(&dst);
+        Q_ASSERT(retVal);
+        return dst;
+    }
+
+    static bool pkg2msg(const ::QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
     {
         msgOut.clear();
 

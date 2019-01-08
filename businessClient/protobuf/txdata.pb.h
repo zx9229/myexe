@@ -40,7 +40,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[13];
+  static const ::google::protobuf::internal::ParseTable schema[14];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -87,6 +87,9 @@ extern ReportDataItemDefaultTypeInternal _ReportDataItem_default_instance_;
 class SendMailItem;
 class SendMailItemDefaultTypeInternal;
 extern SendMailItemDefaultTypeInternal _SendMailItem_default_instance_;
+class ServerCacheItem;
+class ServerCacheItemDefaultTypeInternal;
+extern ServerCacheItemDefaultTypeInternal _ServerCacheItem_default_instance_;
 }  // namespace txdata
 namespace google {
 namespace protobuf {
@@ -103,6 +106,7 @@ template<> ::txdata::ExecuteCommandReq* Arena::CreateMaybeMessage<::txdata::Exec
 template<> ::txdata::ExecuteCommandRsp* Arena::CreateMaybeMessage<::txdata::ExecuteCommandRsp>(Arena*);
 template<> ::txdata::ReportDataItem* Arena::CreateMaybeMessage<::txdata::ReportDataItem>(Arena*);
 template<> ::txdata::SendMailItem* Arena::CreateMaybeMessage<::txdata::SendMailItem>(Arena*);
+template<> ::txdata::ServerCacheItem* Arena::CreateMaybeMessage<::txdata::ServerCacheItem>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace txdata {
@@ -2216,6 +2220,102 @@ class SendMailItem : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::google::protobuf::internal::ArenaStringPtr subject_;
   ::google::protobuf::internal::ArenaStringPtr contenttype_;
   ::google::protobuf::internal::ArenaStringPtr content_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class ServerCacheItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ServerCacheItem) */ {
+ public:
+  ServerCacheItem();
+  virtual ~ServerCacheItem();
+
+  ServerCacheItem(const ServerCacheItem& from);
+
+  inline ServerCacheItem& operator=(const ServerCacheItem& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ServerCacheItem(ServerCacheItem&& from) noexcept
+    : ServerCacheItem() {
+    *this = ::std::move(from);
+  }
+
+  inline ServerCacheItem& operator=(ServerCacheItem&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ServerCacheItem& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ServerCacheItem* internal_default_instance() {
+    return reinterpret_cast<const ServerCacheItem*>(
+               &_ServerCacheItem_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  void Swap(ServerCacheItem* other);
+  friend void swap(ServerCacheItem& a, ServerCacheItem& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ServerCacheItem* New() const final {
+    return CreateMaybeMessage<ServerCacheItem>(NULL);
+  }
+
+  ServerCacheItem* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ServerCacheItem>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ServerCacheItem& from);
+  void MergeFrom(const ServerCacheItem& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ServerCacheItem* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:txdata.ServerCacheItem)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -4786,9 +4886,15 @@ inline void SendMailItem::set_allocated_content(::std::string* content) {
   // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.Content)
 }
 
+// -------------------------------------------------------------------
+
+// ServerCacheItem
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

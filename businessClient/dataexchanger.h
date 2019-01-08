@@ -28,11 +28,15 @@ signals:
 private:
     void initOwnInfo();
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
+    void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
 
 private slots:
     void slotOnConnected();
     void slotOnDisconnected();
     void slotOnMessage(const QByteArray &message);
+
+public slots:
+    void slotReqServerCache();
 
 private:
     MyWebsock m_ws;

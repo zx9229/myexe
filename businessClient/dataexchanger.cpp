@@ -108,6 +108,13 @@ void DataExchanger::handle_ConnectedData(QSharedPointer<txdata::ConnectedData> d
     }
 }
 
+void DataExchanger::handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+    Q_ASSERT(data->pathway_size() == 1);
+    Q_ASSERT(data->pathway(0) == m_ownInfo.userid());
+}
+
 void DataExchanger::slotOnConnected()
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
@@ -117,10 +124,7 @@ void DataExchanger::slotOnConnected()
         tmpData.mutable_info()->CopyFrom(m_ownInfo);
         tmpData.add_pathway(tmpData.info().userid());
 
-        QByteArray data;
-        m2b::msg2slice(txdata::ID_ConnectedData, tmpData, data);
-
-        m_ws.sendBinaryMessage(data);
+        m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_ConnectedData, tmpData));
     }
 }
 
@@ -135,7 +139,7 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
 
     txdata::MsgType theType = {};
     GPMSGPTR theMsg;
-    if (m2b::slice2msg(message, theType, theMsg) == false)
+    if (m2b::pkg2msg(message, theType, theMsg) == false)
     {
         qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnMessage, slice2msg, failure";
         return;
@@ -145,4 +149,27 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
     {
         handle_ConnectedData(qSharedPointerDynamicCast<txdata::ConnectedData>(theMsg));
     }
+    else if (theType == txdata::MsgType::ID_CommonNtosRsp)
+    {
+        handle_CommonNtosRsp(qSharedPointerDynamicCast<txdata::CommonNtosRsp>(theMsg));
+    }
+}
+
+void DataExchanger::slotReqServerCache()
+{
+    txdata::CommonNtosReq tempData;
+    {
+        txdata::ServerCacheItem itemData = {};
+        //
+        tempData.set_requestid(0);
+        tempData.set_userid(m_ownInfo.userid());
+        tempData.set_seqno(0);
+        tempData.set_endeavour(false);
+        tempData.set_datatype(itemData.GetTypeName());
+        tempData.set_data(m2b::msg2bin(itemData));
+        // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
+        tempData.mutable_reqtime()->set_seconds(time(NULL));
+        tempData.mutable_reqtime()->set_nanos(0);
+    }
+    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::MsgType::ID_CommonNtosReq, tempData));
 }

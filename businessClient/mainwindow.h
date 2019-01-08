@@ -18,6 +18,7 @@ public:
 
 private slots:
     void slotClickedSend();
+    void slotClickedReqServerCache();
 
 private:
     Ui::MainWindow* ui;

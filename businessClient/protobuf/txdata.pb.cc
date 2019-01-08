@@ -92,6 +92,11 @@ class SendMailItemDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<SendMailItem>
       _instance;
 } _SendMailItem_default_instance_;
+class ServerCacheItemDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ServerCacheItem>
+      _instance;
+} _ServerCacheItem_default_instance_;
 }  // namespace txdata
 namespace protobuf_txdata_2eproto {
 static void InitDefaultsAtomicKey() {
@@ -283,6 +288,20 @@ static void InitDefaultsSendMailItem() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_SendMailItem =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSendMailItem}, {}};
 
+static void InitDefaultsServerCacheItem() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_ServerCacheItem_default_instance_;
+    new (ptr) ::txdata::ServerCacheItem();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::txdata::ServerCacheItem::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_ServerCacheItem =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsServerCacheItem}, {}};
+
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_AtomicKey.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ConnectionInfo.base);
@@ -297,9 +316,10 @@ void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_ExecuteCommandRsp.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ReportDataItem.base);
   ::google::protobuf::internal::InitSCC(&scc_info_SendMailItem.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ServerCacheItem.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[13];
+::google::protobuf::Metadata file_level_metadata[14];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[3];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -425,6 +445,11 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SendMailItem, subject_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SendMailItem, contenttype_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SendMailItem, content_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::ServerCacheItem, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::txdata::AtomicKey)},
@@ -440,6 +465,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 93, -1, sizeof(::txdata::ExecuteCommandRsp)},
   { 103, -1, sizeof(::txdata::ReportDataItem)},
   { 110, -1, sizeof(::txdata::SendMailItem)},
+  { 122, -1, sizeof(::txdata::ServerCacheItem)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -456,6 +482,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_ExecuteCommandRsp_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_ReportDataItem_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_SendMailItem_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_ServerCacheItem_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -473,7 +500,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 13);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 14);
 }
 
 void AddDescriptorsImpl() {
@@ -517,17 +544,18 @@ void AddDescriptorsImpl() {
       "\"\207\001\n\014SendMailItem\022\020\n\010Username\030\001 \001(\t\022\020\n\010P"
       "assword\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To\030\004 "
       "\001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013ContentType\030\006 \001("
-      "\t\022\017\n\007Content\030\007 \001(\t*\317\001\n\007MsgType\022\t\n\005Zero1\020"
-      "\000\022\024\n\020ID_ConnectedData\020\001\022\027\n\023ID_Disconnect"
-      "edData\020\002\022\024\n\020ID_CommonNtosReq\020\037\022\024\n\020ID_Com"
-      "monNtosRsp\020 \022\024\n\020ID_CommonStonReq\020!\022\024\n\020ID"
-      "_CommonStoaRsp\020\"\022\030\n\024ID_ExecuteCommandReq"
-      "\020#\022\030\n\024ID_ExecuteCommandRsp\020$*E\n\013ProgramT"
-      "ype\022\t\n\005Zero2\020\000\022\n\n\006CLIENT\020\001\022\n\n\006SERVER\020\002\022\010"
-      "\n\004NODE\020\003\022\t\n\005POINT\020\004P\000b\006proto3"
+      "\t\022\017\n\007Content\030\007 \001(\t\"\021\n\017ServerCacheItem*\317\001"
+      "\n\007MsgType\022\t\n\005Zero1\020\000\022\024\n\020ID_ConnectedData"
+      "\020\001\022\027\n\023ID_DisconnectedData\020\002\022\024\n\020ID_Common"
+      "NtosReq\020\037\022\024\n\020ID_CommonNtosRsp\020 \022\024\n\020ID_Co"
+      "mmonStonReq\020!\022\024\n\020ID_CommonStoaRsp\020\"\022\030\n\024I"
+      "D_ExecuteCommandReq\020#\022\030\n\024ID_ExecuteComma"
+      "ndRsp\020$*E\n\013ProgramType\022\t\n\005Zero2\020\000\022\n\n\006CLI"
+      "ENT\020\001\022\n\n\006SERVER\020\002\022\010\n\004NODE\020\003\022\t\n\005POINT\020\004P\000"
+      "b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1829);
+      descriptor, 1848);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -5927,6 +5955,185 @@ void SendMailItem::InternalSwap(SendMailItem* other) {
 }
 
 
+// ===================================================================
+
+void ServerCacheItem::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ServerCacheItem::ServerCacheItem()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_txdata_2eproto::scc_info_ServerCacheItem.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:txdata.ServerCacheItem)
+}
+ServerCacheItem::ServerCacheItem(const ServerCacheItem& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:txdata.ServerCacheItem)
+}
+
+void ServerCacheItem::SharedCtor() {
+}
+
+ServerCacheItem::~ServerCacheItem() {
+  // @@protoc_insertion_point(destructor:txdata.ServerCacheItem)
+  SharedDtor();
+}
+
+void ServerCacheItem::SharedDtor() {
+}
+
+void ServerCacheItem::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* ServerCacheItem::descriptor() {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const ServerCacheItem& ServerCacheItem::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_txdata_2eproto::scc_info_ServerCacheItem.base);
+  return *internal_default_instance();
+}
+
+
+void ServerCacheItem::Clear() {
+// @@protoc_insertion_point(message_clear_start:txdata.ServerCacheItem)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+bool ServerCacheItem::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:txdata.ServerCacheItem)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:txdata.ServerCacheItem)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:txdata.ServerCacheItem)
+  return false;
+#undef DO_
+}
+
+void ServerCacheItem::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:txdata.ServerCacheItem)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:txdata.ServerCacheItem)
+}
+
+::google::protobuf::uint8* ServerCacheItem::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:txdata.ServerCacheItem)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:txdata.ServerCacheItem)
+  return target;
+}
+
+size_t ServerCacheItem::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:txdata.ServerCacheItem)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ServerCacheItem::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:txdata.ServerCacheItem)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ServerCacheItem* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const ServerCacheItem>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:txdata.ServerCacheItem)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:txdata.ServerCacheItem)
+    MergeFrom(*source);
+  }
+}
+
+void ServerCacheItem::MergeFrom(const ServerCacheItem& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:txdata.ServerCacheItem)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void ServerCacheItem::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:txdata.ServerCacheItem)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ServerCacheItem::CopyFrom(const ServerCacheItem& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:txdata.ServerCacheItem)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ServerCacheItem::IsInitialized() const {
+  return true;
+}
+
+void ServerCacheItem::Swap(ServerCacheItem* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ServerCacheItem::InternalSwap(ServerCacheItem* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata ServerCacheItem::GetMetadata() const {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace txdata
 namespace google {
@@ -5969,6 +6176,9 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::ReportDataItem* Arena::C
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::SendMailItem* Arena::CreateMaybeMessage< ::txdata::SendMailItem >(Arena* arena) {
   return Arena::CreateInternal< ::txdata::SendMailItem >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::ServerCacheItem* Arena::CreateMaybeMessage< ::txdata::ServerCacheItem >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::ServerCacheItem >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

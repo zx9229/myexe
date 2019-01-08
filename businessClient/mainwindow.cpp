@@ -8,6 +8,7 @@ MainWindow::MainWindow(DataExchanger* p, QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->pushButton_send, &QPushButton::clicked, this, &MainWindow::slotClickedSend);
+    connect(ui->pushButton_reqServerCache, &QPushButton::clicked, this, &MainWindow::slotClickedReqServerCache);
 }
 
 MainWindow::~MainWindow()
@@ -15,15 +16,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-#include "m2b.h"
 void MainWindow::slotClickedSend()
 {
-    txdata::ConnectedData tmpData = {};
-    tmpData.mutable_info()->mutable_userkey()->set_exectype(txdata::ProgramType::CLIENT);
+}
 
-    QByteArray data;
-    {
-        m2b::msg2slice(txdata::ID_ConnectedData, tmpData, data);
-    }
-    m_dataExch->ws().sendBinaryMessage(data);
+void MainWindow::slotClickedReqServerCache()
+{
+    m_dataExch->slotReqServerCache();
 }
