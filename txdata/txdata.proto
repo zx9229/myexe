@@ -139,3 +139,6 @@ message SendMailItem {//发送邮件的项
     string ContentType = 6;
     string Content     = 7;
 }
+
+message ServerCacheItem {
+}

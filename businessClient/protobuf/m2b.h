@@ -1,7 +1,13 @@
 // 本文件以 UTF-8 无 BOM 格式编码.
 #ifndef MESSAGE_TO_BYTES_H
 #define MESSAGE_TO_BYTES_H
-
+/*
+如果编译出错了, 请搜索第一个【errno() const】并修改成类似下面的内容, 仅修改第一个就可以了:
+#ifdef errno
+#undef errno
+::google::protobuf::int32 errno() const;
+#endif
+*/
 #include "txdata.pb.h"
 #include <QSharedPointer>
 
