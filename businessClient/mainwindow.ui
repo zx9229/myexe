@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>437</height>
+    <width>404</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,74 +32,10 @@
         <string>检索</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEdit_5"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit"/>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLineEdit" name="lineEdit_4"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="lineEdit_2"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="lineEdit_6"/>
-        </item>
-        <item row="4" column="0" colspan="4">
+        <item row="1" column="0" colspan="4">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="text">
-             <string>功能1</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_reqServerCache">
+           <widget class="QPushButton" name="pushButton_ParentDataReq">
             <property name="text">
              <string>请求缓存</string>
             </property>
@@ -118,30 +54,51 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="text">
-             <string>功能2</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_3"/>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
         </item>
-        <item row="5" column="0">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEdit"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>TextLabel</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="4">
+         <widget class="QTableWidget" name="tableWidget">
+          <column>
+           <property name="text">
+            <string>UserID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>UserExecType</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>BelongID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Version</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="lineEdit_2"/>
         </item>
        </layout>
       </widget>
@@ -149,19 +106,115 @@
        <attribute name="title">
         <string>操作</string>
        </attribute>
-       <widget class="QPushButton" name="pushButton_send">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>50</y>
-          <width>75</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>发送</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_UserID"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_show">
+            <property name="text">
+             <string>详情</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_send">
+            <property name="text">
+             <string>发送</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_ConnInfoEx" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>BelongID</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEdit_10"/>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_BelongID"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_UserID"/>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>UserID</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="lineEdit_12"/>
+             </item>
+             <item row="2" column="3">
+              <widget class="QLineEdit" name="lineEdit_13"/>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLineEdit" name="lineEdit_11"/>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1" colspan="3">
+              <widget class="QLineEdit" name="lineEdit_cie_Pathway"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Pathway</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit_input"/>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit_output"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -171,9 +224,6 @@
        <string>PushButton</string>
       </property>
      </widget>
-    </item>
-    <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit"/>
     </item>
    </layout>
   </widget>

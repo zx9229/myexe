@@ -69,7 +69,7 @@ void DataExchanger::initOwnInfo()
     m_ownInfo.set_userid(atomicKey2str(*m_ownInfo.mutable_userkey()));
     m_ownInfo.mutable_belongkey();
     m_ownInfo.set_belongid(atomicKey2str(*m_ownInfo.mutable_belongkey()));
-    m_ownInfo.set_version("20190108");
+    m_ownInfo.set_version("Ver20190108");
     m_ownInfo.set_linkmode(txdata::ConnectionInfo_LinkType_CONNECT);
     m_ownInfo.set_exepid(static_cast<int>(QCoreApplication::applicationPid()));
     m_ownInfo.set_exepath(QCoreApplication::applicationFilePath().toStdString());
@@ -115,6 +115,18 @@ void DataExchanger::handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> d
     Q_ASSERT(data->pathway(0) == m_ownInfo.userid());
 }
 
+void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data)
+{
+    m_parentData.clear();
+    for (int i = 0; i < data->data_size(); ++i)
+    {
+        QConnInfoEx curData;
+        curData.from_txdata_ConnectedData(data->data(i));
+        m_parentData.insert(curData.UserID, curData);
+    }
+    sigParentData(m_parentData);
+}
+
 void DataExchanger::slotOnConnected()
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
@@ -153,23 +165,18 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
     {
         handle_CommonNtosRsp(qSharedPointerDynamicCast<txdata::CommonNtosRsp>(theMsg));
     }
+    else if (theType == txdata::MsgType::ID_ParentDataRsp)
+    {
+        handle_ParentDataRsp(qSharedPointerDynamicCast<txdata::ParentDataRsp>(theMsg));
+    }
 }
 
-void DataExchanger::slotReqServerCache()
+void DataExchanger::slotParentDataReq()
 {
-    txdata::CommonNtosReq tempData;
-    {
-        txdata::ServerCacheItem itemData = {};
-        //
-        tempData.set_requestid(0);
-        tempData.set_userid(m_ownInfo.userid());
-        tempData.set_seqno(0);
-        tempData.set_endeavour(false);
-        tempData.set_datatype(itemData.GetTypeName());
-        tempData.set_data(m2b::msg2bin(itemData));
-        // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
-        tempData.mutable_reqtime()->set_seconds(time(NULL));
-        tempData.mutable_reqtime()->set_nanos(0);
-    }
-    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::MsgType::ID_CommonNtosReq, tempData));
+    txdata::ParentDataReq reqData;
+    reqData.set_requestid(0);
+    // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
+    reqData.mutable_reqtime()->set_seconds(time(NULL));
+    reqData.mutable_reqtime()->set_nanos(0);
+    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::MsgType::ID_ParentDataReq, reqData));
 }

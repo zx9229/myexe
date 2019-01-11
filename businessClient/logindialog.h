@@ -3,12 +3,12 @@
 
 #include <QDialog>
 #include <QComboBox>
-#include "dataexchanger.h"
 
 namespace Ui {
     class LoginDialog;
 }
 
+class DataExchanger;
 class LoginDialog : public QDialog
 {
     Q_OBJECT

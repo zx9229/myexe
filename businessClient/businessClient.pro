@@ -37,7 +37,8 @@ HEADERS += \
         protobuf/m2b.h \
         protobuf/txdata.pb.h \
         logindialog.h \
-        dataexchanger.h
+        dataexchanger.h \
+        temputils.h
 
 FORMS += \
         mainwindow.ui \

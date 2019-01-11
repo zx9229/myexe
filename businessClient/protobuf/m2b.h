@@ -72,6 +72,12 @@ public:
         case ::txdata::MsgType::ID_CommonNtosRsp:
             msgOut = QSharedPointer<txdata::CommonNtosRsp>(new txdata::CommonNtosRsp);
             break;
+        case ::txdata::MsgType::ID_ParentDataReq:
+            msgOut = QSharedPointer<txdata::ParentDataReq>(new txdata::ParentDataReq);
+            break;
+        case ::txdata::MsgType::ID_ParentDataRsp:
+            msgOut = QSharedPointer<txdata::ParentDataRsp>(new txdata::ParentDataRsp);
+            break;
         default:
             break;
         }

@@ -3,7 +3,7 @@
 
 #include "mywebsock.h"
 #include <QObject>
-#include "txdata.pb.h"
+#include "temputils.h"
 
 class DataExchanger : public QObject
 {
@@ -24,11 +24,13 @@ public:
 signals:
     void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
     void sigReady();
+    void sigParentData(const QMap<QString, QConnInfoEx>& data);
 
 private:
     void initOwnInfo();
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
+    void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
 
 private slots:
     void slotOnConnected();
@@ -36,7 +38,7 @@ private slots:
     void slotOnMessage(const QByteArray &message);
 
 public slots:
-    void slotReqServerCache();
+    void slotParentDataReq();
 
 private:
     MyWebsock m_ws;
@@ -44,6 +46,8 @@ private:
 
     txdata::ConnectionInfo m_ownInfo;
     txdata::ConnectionInfo m_parentInfo;
+
+    QMap<QString, QConnInfoEx> m_parentData;
 };
 
 #endif // DATAEXCHANGER_H

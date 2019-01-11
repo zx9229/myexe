@@ -1,5 +1,6 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
+#include "dataexchanger.h"
 
 LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
     QDialog(parent),
