@@ -1,6 +1,7 @@
 #include "mywebsock.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QThread>
 
 MyWebsock::MyWebsock(QObject *parent /* = Q_NULLPTR */) :
     QObject(parent),
@@ -36,12 +37,16 @@ void MyWebsock::interrupt()
     m_ws.abort(); // 类似于"拔网线"的操作, 破坏连接, 但是不破坏重连机制.
 }
 
-void MyWebsock::stop()
+void MyWebsock::stop(bool sync /* = false */)
 {
     m_timer.stop();
     m_ws.abort();
     m_url.clear();
     // 让回调函数重置m_alive的值.
+    while (sync && m_alive)
+    {
+        QThread::msleep(1);
+    }
 }
 
 qint64 MyWebsock::sendBinaryMessage(const QByteArray &data)
@@ -85,19 +90,21 @@ void MyWebsock::slotDisconnected()
     m_timer.start(m_interval * 1000);
 }
 
-void MyWebsock::slotError(QAbstractSocket::SocketError error)
-{
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::slotError";
-}
-
-void MyWebsock::slotPong(quint64 elapsedTime, const QByteArray &payload)
-{
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::slotPong";
-}
-
 void MyWebsock::slotBinaryMessageReceived(const QByteArray &message)
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::slotBinaryMessageReceived";
 
     emit sigMessage(message);
+}
+
+void MyWebsock::slotError(QAbstractSocket::SocketError error)
+{
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::slotError "<< error;
+
+    sigError(error);
+}
+
+void MyWebsock::slotPong(quint64 elapsedTime, const QByteArray &payload)
+{
+    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "MyWebsock::slotPong";
 }

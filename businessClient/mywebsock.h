@@ -16,13 +16,14 @@ public:
 public:
     bool start(const QUrl& url);
     void interrupt();
-    void stop();
+    void stop(bool sync = false);
     qint64 sendBinaryMessage(const QByteArray &data);
 
 signals:
     void sigConnected();
     void sigDisconnected();
     void sigMessage(const QByteArray &message);
+    void sigError(QAbstractSocket::SocketError error);
 
 private:
     void reconnect();

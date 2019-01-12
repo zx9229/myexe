@@ -1,5 +1,6 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
+#include <QMetaEnum>
 #include "dataexchanger.h"
 
 LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
@@ -15,6 +16,7 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
     QObject::connect(ui->pushButton_clear, &QPushButton::clicked, this, &LoginDialog::slotClickedClear);
     QObject::connect(ui->pushButton_quickFill, &QPushButton::clicked, this, &LoginDialog::slotClickedQuickFill);
     QObject::connect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
+    QObject::connect(m_dataExch, &DataExchanger::sigWebsocketError, this, &LoginDialog::slotWebsocketError);
 }
 
 LoginDialog::~LoginDialog()
@@ -50,9 +52,19 @@ void LoginDialog::setComboBox4ProgramType(QComboBox *comboBox)
     }
 }
 
+void LoginDialog::slotWebsocketError(QAbstractSocket::SocketError error)
+{
+    QString text = QString("%1 - %2")
+        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"))
+        .arg(QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error));
+
+    ui->plainTextEdit_message->setPlainText(text);
+}
+
 void LoginDialog::slotReady()
 {
     QObject::disconnect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
+    QObject::disconnect(m_dataExch, &DataExchanger::sigWebsocketError, this, &LoginDialog::slotWebsocketError);
     this->accept();
 }
 

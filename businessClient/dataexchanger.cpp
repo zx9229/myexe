@@ -19,6 +19,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
     connect(&m_ws, &MyWebsock::sigMessage, this, &DataExchanger::slotOnMessage);
+    connect(&m_ws, &MyWebsock::sigError, this, &DataExchanger::slotOnError);
 
     initOwnInfo();
 }
@@ -35,6 +36,7 @@ MyWebsock& DataExchanger::ws()
 
 bool DataExchanger::start()
 {
+    m_ws.stop(true);
     return m_ws.start(m_url);
 }
 
@@ -179,4 +181,11 @@ void DataExchanger::slotParentDataReq()
     reqData.mutable_reqtime()->set_seconds(time(NULL));
     reqData.mutable_reqtime()->set_nanos(0);
     m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::MsgType::ID_ParentDataReq, reqData));
+}
+
+void DataExchanger::slotOnError(QAbstractSocket::SocketError error)
+{
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "DataExchanger::slotOnError " << error;
+
+    sigWebsocketError(error);
 }

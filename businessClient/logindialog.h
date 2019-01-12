@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QAbstractSocket>
 
 namespace Ui {
     class LoginDialog;
@@ -22,6 +23,7 @@ private:
     void setComboBox4ProgramType(QComboBox* obj);
 
 private slots:
+    void slotWebsocketError(QAbstractSocket::SocketError error);
     void slotReady();
     void slotClickedLogin();
     void slotClickedClear();

@@ -25,6 +25,7 @@ signals:
     void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
     void sigReady();
     void sigParentData(const QMap<QString, QConnInfoEx>& data);
+    void sigWebsocketError(QAbstractSocket::SocketError error);
 
 private:
     void initOwnInfo();
@@ -36,6 +37,7 @@ private slots:
     void slotOnConnected();
     void slotOnDisconnected();
     void slotOnMessage(const QByteArray &message);
+    void slotOnError(QAbstractSocket::SocketError error);
 
 public slots:
     void slotParentDataReq();
