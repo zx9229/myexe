@@ -88,7 +88,12 @@ void MainWindow::slotCellDoubleClicked(int row, int column)
         ui->lineEdit_cie_LinkMode->setText(cie.LinkMode);
         ui->lineEdit_cie_ExePid->setText(QString::number(cie.ExePid));
         ui->lineEdit_cie_ExePath->setText(cie.ExePath);
-        ui->lineEdit_cie_Pathway->setText(cie.Pathway.join("=>"));
+        ui->lineEdit_cie_Pathway->setText(cie.Pathway.join("✖"));
+        //按住Alt不放,在小键盘区输入8251,松开Alt键,可得※符号.
+        //Alt并08251(10进制的08251=16进制的203B)※.
+        //Alt并09745(10进制的09745=16进制的2611)☑.
+        //Alt并10004(10进制的10004=16进制的2714)✔.
+        //Alt并10006(10进制的10006=16进制的2716)✖.
     }
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 }
