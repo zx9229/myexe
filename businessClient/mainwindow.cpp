@@ -68,15 +68,27 @@ void MainWindow::slotClickedSend()
 void MainWindow::slotCellDoubleClicked(int row, int column)
 {
     if (true) {
-        QTableWidget* curObj = qobject_cast<QTableWidget*>(sender());
-        QVariant qVariant = curObj->item(row, 0)->data(Qt::UserRole);
+        QTableWidget* curTableWidget = qobject_cast<QTableWidget*>(sender());
+        QVariant qVariant = curTableWidget->item(row, 0)->data(Qt::UserRole);
         Q_ASSERT(qVariant.canConvert<QConnInfoEx>());
-        QConnInfoEx qci = qVariant.value<QConnInfoEx>();
+        QConnInfoEx cie = qVariant.value<QConnInfoEx>();
 
-        ui->lineEdit_UserID->setText(qci.UserID);
-        ui->lineEdit_cie_UserID->setText(qci.UserID);
-        ui->lineEdit_cie_BelongID->setText(qci.BelongID);
-        ui->lineEdit_cie_Pathway->setText(qci.Pathway.join("=>"));
+        ui->lineEdit_UserID->setText(cie.UserID);
+        ui->lineEdit_cie_u_ZoneName->setText(cie.UserKey.ZoneName);
+        ui->lineEdit_cie_u_NodeName->setText(cie.UserKey.NodeName);
+        ui->lineEdit_cie_u_ExecType->setText(cie.UserKey.ExecType);
+        ui->lineEdit_cie_u_ExecName->setText(cie.UserKey.ExecName);
+        ui->lineEdit_cie_b_ZoneName->setText(cie.BelongKey.ZoneName);
+        ui->lineEdit_cie_b_NodeName->setText(cie.BelongKey.NodeName);
+        ui->lineEdit_cie_b_ExecType->setText(cie.BelongKey.ExecType);
+        ui->lineEdit_cie_b_ExecName->setText(cie.BelongKey.ExecName);
+        ui->lineEdit_cie_UserID->setText(cie.UserID);
+        ui->lineEdit_cie_BelongID->setText(cie.BelongID);
+        ui->lineEdit_cie_Version->setText(cie.Version);
+        ui->lineEdit_cie_LinkMode->setText(cie.LinkMode);
+        ui->lineEdit_cie_ExePid->setText(QString::number(cie.ExePid));
+        ui->lineEdit_cie_ExePath->setText(cie.ExePath);
+        ui->lineEdit_cie_Pathway->setText(cie.Pathway.join("=>"));
     }
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 }

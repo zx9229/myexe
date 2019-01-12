@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>404</width>
-    <height>423</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -110,7 +110,11 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="lineEdit_UserID"/>
+           <widget class="QLineEdit" name="lineEdit_UserID">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_show">
@@ -133,73 +137,213 @@
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="2">
+             <item row="3" column="2">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>ExecName</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
               <widget class="QLabel" name="label_8">
                <property name="text">
                 <string>BelongID</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLineEdit" name="lineEdit_10"/>
-             </item>
-             <item row="0" column="3">
-              <widget class="QLineEdit" name="lineEdit_cie_BelongID"/>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>TextLabel</string>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_Version">
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QLineEdit" name="lineEdit_cie_UserID"/>
+             <item row="4" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_BelongID">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
-             <item row="0" column="0">
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Version</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_UserID">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
               <widget class="QLabel" name="label_7">
                <property name="text">
                 <string>UserID</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
+             <item row="5" column="2">
               <widget class="QLabel" name="label_10">
                <property name="text">
-                <string>TextLabel</string>
+                <string>LinkMode</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>ExePid</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_ExePid">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_ExePath">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_LinkMode">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>ExePath</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1" colspan="3">
+              <widget class="QLineEdit" name="lineEdit_cie_Pathway">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Pathway</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>ExecName</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_u_ExecName">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_b_ExecName">
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_11">
+              <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>TextLabel</string>
+                <string>ExecType</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>NodeName</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>ZoneName</string>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QLineEdit" name="lineEdit_12"/>
-             </item>
-             <item row="2" column="3">
-              <widget class="QLineEdit" name="lineEdit_13"/>
-             </item>
-             <item row="1" column="3">
-              <widget class="QLineEdit" name="lineEdit_11"/>
-             </item>
-             <item row="2" column="2">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>TextLabel</string>
+              <widget class="QLineEdit" name="lineEdit_cie_u_ExecType">
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="3" column="1" colspan="3">
-              <widget class="QLineEdit" name="lineEdit_cie_Pathway"/>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_u_NodeName">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_3">
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="lineEdit_cie_u_ZoneName">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_b_ExecType">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_b_NodeName">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLineEdit" name="lineEdit_cie_b_ZoneName">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_15">
                <property name="text">
-                <string>Pathway</string>
+                <string>ExecType</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>NodeName</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>ZoneName</string>
                </property>
               </widget>
              </item>
