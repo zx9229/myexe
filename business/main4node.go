@@ -107,7 +107,7 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 }
 
 func cacheNode4a(w http.ResponseWriter, r *http.Request) {
-	jsonContent := globalA.cacheNode.humanReadable()
+	jsonContent := globalA.cacheUser.humanReadable()
 	fmt.Fprintf(w, jsonContent)
 }
 

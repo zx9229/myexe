@@ -21,7 +21,7 @@ import (
 
 type businessNode struct {
 	cacheSock   *safeWsSocketMap
-	cacheNode   *safeConnInfoMap
+	cacheUser   *safeConnInfoMap
 	cacheReqRsp *safeNodeReqRspCache
 	ownInfo     txdata.ConnectionInfo
 	parentData  connInfoEx
@@ -47,7 +47,7 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData := new(businessNode)
 	//
 	curData.cacheSock = newSafeWsSocketMap()
-	curData.cacheNode = newSafeConnInfoMap()
+	curData.cacheUser = newSafeConnInfoMap()
 	curData.cacheReqRsp = newSafeNodeReqRspCache()
 	//
 	curData.ownInfo.UserKey = cfg.UserKey.toTxAtomicKey()
@@ -196,7 +196,7 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 		glog.Infof("disconnected with father, msgConn=%p", msgConn)
 		thls.parentData = connInfoEx{}
 	}
-	if dataSlice := thls.cacheNode.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
+	if dataSlice := thls.cacheUser.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
 		checkSunWhenDisconnected(dataSlice)
 		for _, data := range dataSlice { //发给父亲,让父亲也清理掉对应的缓存.
 			tmpTxData := txdata.DisconnectedData{Info: &data.Info}
@@ -258,7 +258,7 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		return
 	}
 	if msgData.Info.UserKey.ExecType == txdata.ProgramType_NODE {
-		if thls.cacheNode.deleteData(msgData.Info.UserID) == false {
+		if thls.cacheUser.deleteData(msgData.Info.UserID) == false {
 			glog.Fatalf("cache data error, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	} else {
@@ -276,7 +276,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Common
 
 	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, msgData); err != nil {
 		if _, qau, qas, r := CommonNtosReq_flag(msgData); qau || qas || r {
-			if connInfoEx, isExist := thls.cacheNode.queryData(msgData.UserID); isExist {
+			if connInfoEx, isExist := thls.cacheUser.queryData(msgData.UserID); isExist {
 				rspData := CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), false)
 				rspData.Pathway = connInfoEx.Pathway
 				connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
@@ -305,7 +305,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 	msgData.Pathway = msgData.Pathway[:pathwayLen-1]
 	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
 		nextUID := msgData.Pathway[pathwayLen-1]
-		if nextConnInfoEx, isExist := thls.cacheNode.queryData(nextUID); isExist {
+		if nextConnInfoEx, isExist := thls.cacheUser.queryData(nextUID); isExist {
 			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, msgData))
 		} else {
 			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -353,7 +353,7 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.Ex
 	msgData.Pathway = msgData.Pathway[:len(msgData.Pathway)-1]
 	if length := len(msgData.Pathway); length != 0 {
 		nextUID := msgData.Pathway[length-1]
-		if nextConnInfo, isExist := thls.cacheNode.queryData(nextUID); isExist {
+		if nextConnInfo, isExist := thls.cacheUser.queryData(nextUID); isExist {
 			nextConnInfo.conn.Send(msg2slice(txdata.MsgType_ID_ExecuteCommandReq, msgData))
 		} else {
 			tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, ErrMsg: fmt.Sprintf("next step is unreachable, nextUID=%v", nextUID)}
@@ -378,11 +378,11 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.Ex
 func (thls *businessNode) handle_MsgType_ID_ParentDataReq(msgData *txdata.ParentDataReq, msgConn *wsnet.WsSocket) {
 	rspData := &txdata.ParentDataRsp{}
 	rspData.Data = make([]*txdata.ConnectedData, 0)
-	thls.cacheNode.Lock()
-	for _, node := range thls.cacheNode.M {
+	thls.cacheUser.Lock()
+	for _, node := range thls.cacheUser.M {
 		rspData.Data = append(rspData.Data, &txdata.ConnectedData{Info: &node.Info, Pathway: node.Pathway})
 	}
-	thls.cacheNode.Unlock()
+	thls.cacheUser.Unlock()
 	msgConn.Send(msg2slice(txdata.MsgType_ID_ParentDataRsp, rspData))
 }
 
@@ -427,7 +427,7 @@ func (thls *businessNode) zxTestDeal4son(msgData *txdata.ConnectedData, msgConn 
 	curData.Info = *msgData.Info
 	curData.Pathway = msgData.Pathway
 
-	if isSuccess := thls.cacheNode.insertData(curData); !isSuccess {
+	if isSuccess := thls.cacheUser.insertData(curData); !isSuccess {
 		glog.Errorf("agent already exists, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
 		sendToParent = false
@@ -470,12 +470,12 @@ func (thls *businessNode) zxTestDeal4parent(msgData *txdata.ConnectedData, msgCo
 
 	if true {
 		//和父亲建立连接了,要把自己的缓存发送给父亲,更新父亲的缓存.
-		thls.cacheNode.Lock()
-		for _, node := range thls.cacheNode.M {
+		thls.cacheUser.Lock()
+		for _, node := range thls.cacheUser.M {
 			tmpTxData := txdata.ConnectedData{Info: &node.Info, Pathway: append(node.Pathway, thls.ownInfo.UserID)}
 			thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, &tmpTxData)
 		}
-		thls.cacheNode.Unlock()
+		thls.cacheUser.Unlock()
 	}
 
 	return
@@ -566,7 +566,7 @@ func (thls *businessNode) zxTestDeal4stepMulti(msgData *txdata.ConnectedData, ms
 	curData.Info = *msgData.Info
 	curData.Pathway = msgData.Pathway
 
-	if isSuccess := thls.cacheNode.insertData(curData); !isSuccess {
+	if isSuccess := thls.cacheUser.insertData(curData); !isSuccess {
 		glog.Errorf("agent already exists, msgConn=%p, msgData=%v", msgConn, msgData)
 		thls.deleteConnectionFromAll(msgConn, true)
 		sendToParent = false
@@ -660,7 +660,7 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 		thls.parentData = connInfoEx{}
 	}
 	thls.cacheSock.deleteData(conn)
-	thls.cacheNode.deleteDataByConn(conn)
+	thls.cacheUser.deleteDataByConn(conn)
 }
 
 func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bool, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
