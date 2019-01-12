@@ -197,6 +197,10 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 		msgData = new(txdata.CommonNtosReq)
 	case txdata.MsgType_ID_CommonNtosRsp:
 		msgData = new(txdata.CommonNtosRsp)
+	case txdata.MsgType_ID_ParentDataReq:
+		msgData = new(txdata.ParentDataReq)
+	case txdata.MsgType_ID_ParentDataRsp:
+		msgData = new(txdata.ParentDataRsp)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType=%v", msgType)
@@ -284,14 +288,17 @@ type KeyValue struct {
 
 //CommonAtosDataNode omit
 type CommonAtosDataNode struct {
-	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
-	UserID      string    //
-	DataType    string    //
-	Data        []byte    //
-	ReportTime  time.Time //报告时间
-	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	FatalErrNo  int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	FatalErrMsg string    //错误的具体原因.
+	SeqNo         int64     `xorm:"pk autoincr notnull unique"`
+	UserID        string    //
+	ReqDataType   string    //
+	ReqData       []byte    //
+	ReqTime       time.Time //报告时间
+	ReqTimeCreate time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Finish        bool      //不需要续传了.
+	ErrNo         int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	ErrMsg        string    //错误的具体原因.
+	RspDataType   string
+	RspData       []byte
 }
 
 //CommonAtosDataServer omit
@@ -331,12 +338,12 @@ type CommRspData struct {
 	ErrMsg string
 }
 
-func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, ErrNo: errNo, ErrMsg: errMsg}
+func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string, fromS bool) *txdata.CommonNtosRsp {
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
 }
 
-func Message2CommonNtosReq(src proto.Message, reportTime time.Time, userID string, isEndeavour bool) *txdata.CommonNtosReq {
-	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, Endeavour: isEndeavour, DataType: reflect.TypeOf(src).String(), Data: nil, ReqTime: nil}
+func Message2CommonNtosReq(src proto.Message, reportTime time.Time, userID string) *txdata.CommonNtosReq {
+	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, DataType: reflect.TypeOf(src).String(), Data: nil, ReqTime: nil}
 	var err error
 	if dst.Data, err = proto.Marshal(src); err != nil {
 		glog.Fatalln(err, src)
@@ -353,8 +360,8 @@ func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonN
 
 func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDataNode {
 	var err error
-	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, DataType: reqIn.DataType, Data: reqIn.Data, ReportTime: time.Time{}}
-	if cada.ReportTime, err = ptypes.Timestamp(reqIn.ReqTime); err != nil {
+	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, ReqDataType: reqIn.DataType, ReqData: reqIn.Data, ReqTime: time.Time{}}
+	if cada.ReqTime, err = ptypes.Timestamp(reqIn.ReqTime); err != nil {
 		glog.Fatalln(err)
 	}
 	return cada
@@ -410,4 +417,34 @@ func assert4false(cond bool) {
 	if cond {
 		panic(cond)
 	}
+}
+
+func CommonNtosReq_flag(dataIn *txdata.CommonNtosReq) (p, qau, qas, r bool) {
+	p = false   //推送数据,发出去之后就不管了.(isPush)
+	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
+	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
+	r = false   //请求响应,中途丢包后重试消息(retry)
+	assert4false(dataIn.SeqNo < 0)
+	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
+	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
+	qau = dataIn.RequestID > 0 && dataIn.SeqNo == 0
+	assert4false(dataIn.RequestID == 0 && dataIn.SeqNo > 0)
+	r = dataIn.RequestID < 0 && dataIn.SeqNo > 0
+	qas = dataIn.RequestID > 0 && dataIn.SeqNo > 0
+	return
+}
+
+func CommonNtosRsp_flag(dataIn *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
+	p = false   //推送数据,发出去之后就不管了.(isPush)
+	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
+	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
+	r = false   //请求响应,中途丢包后重试消息(retry)
+	assert4false(dataIn.SeqNo < 0)
+	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
+	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
+	qau = dataIn.RequestID > 0 && dataIn.SeqNo == 0
+	assert4false(dataIn.RequestID == 0 && dataIn.SeqNo > 0)
+	r = dataIn.RequestID < 0 && dataIn.SeqNo > 0
+	qas = dataIn.RequestID > 0 && dataIn.SeqNo > 0
+	return
 }

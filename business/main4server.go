@@ -59,7 +59,7 @@ func handleExecuteCommand(w http.ResponseWriter, r *http.Request) {
 }
 
 func cacheNode4s(w http.ResponseWriter, r *http.Request) {
-	jsonContent := globalS.cacheNode.humanReadable()
+	jsonContent := globalS.cacheUser.humanReadable()
 	fmt.Fprintf(w, jsonContent)
 }
 
