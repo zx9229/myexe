@@ -9,20 +9,45 @@ MainWindow::MainWindow(DataExchanger* p, QWidget *parent) :
     m_dataExch(p)
 {
     ui->setupUi(this);
-    connect(ui->pushButton_ParentDataReq, &QPushButton::clicked, this, &MainWindow::slotClickedParentDataReq);
-    connect(m_dataExch, &DataExchanger::sigParentData, this, &MainWindow::slotParentData);
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); //它俩组合在一起以设置整行选中.
-    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);//它俩组合在一起以设置整行选中.
-    ui->tableWidget->setAlternatingRowColors(true);//设置隔一行变一颜色,即:一灰一白.
-    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->tableWidget, &QTableWidget::cellDoubleClicked, this, &MainWindow::slotCellDoubleClicked);
-    connect(ui->pushButton_show, &QPushButton::clicked, this, &MainWindow::slotClickedShow);
-    connect(ui->pushButton_send, &QPushButton::clicked, this, &MainWindow::slotClickedSend);
+    initUI();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::initUI()
+{
+    if (true) {
+        ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); //它俩组合在一起以设置整行选中.
+        ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);//它俩组合在一起以设置整行选中.
+        ui->tableWidget->setAlternatingRowColors(true);//设置隔一行变一颜色,即:一灰一白.
+        ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        connect(ui->tableWidget, &QTableWidget::cellDoubleClicked, this, &MainWindow::slotCellDoubleClicked);
+    }
+    connect(m_dataExch, &DataExchanger::sigParentData, this, &MainWindow::slotParentData);
+    connect(ui->pushButton_ParentDataReq, &QPushButton::clicked, this, &MainWindow::slotClickedParentDataReq);
+    connect(ui->pushButton_show, &QPushButton::clicked, this, &MainWindow::slotClickedShow);
+    connect(ui->pushButton_send, &QPushButton::clicked, this, &MainWindow::slotClickedSend);
+    if (true) {
+        connect(ui->lineEdit_UserID, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_u_ZoneName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_u_NodeName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_u_ExecType, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_u_ExecName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_b_ZoneName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_b_NodeName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_b_ExecType, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_b_ExecName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_UserID, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_BelongID, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_Version, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_LinkMode, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_ExePid, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_ExePath, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+        connect(ui->lineEdit_cie_Pathway, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
+    }
 }
 
 void MainWindow::slotClickedParentDataReq()
@@ -96,4 +121,19 @@ void MainWindow::slotCellDoubleClicked(int row, int column)
         //Alt并10006(10进制的10006=16进制的2716)✖.
     }
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+}
+
+void MainWindow::slotCursorPositionChanged(int iOld, int iNew)
+{
+    //在手机上数据显示不全,想要一种方式可以看到全部数据,准备双击然后弹窗然后发现不太好写,
+    //遂绑定此信号以代替双击信息,同时尽量避免误操作时的弹窗,遂有此函数.
+    QLineEdit* curLineEdit = qobject_cast<QLineEdit*>(sender());
+    if (curLineEdit == nullptr)
+        return;
+    if (iOld == 0 || iOld == iNew || iNew == 0)
+        return;
+    int curTextSize = curLineEdit->text().size();
+    if (iOld == curTextSize || iNew == curTextSize)
+        return;
+    QMessageBox::information(this, "QLineEdit", curLineEdit->text());
 }

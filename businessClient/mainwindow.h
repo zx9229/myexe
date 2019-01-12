@@ -17,12 +17,16 @@ public:
     explicit MainWindow(DataExchanger* p, QWidget *parent = 0);
     ~MainWindow();
 
+private:
+    void initUI();
+
 private slots:
     void slotClickedParentDataReq();
     void slotParentData(const QMap<QString, QConnInfoEx>& data);
     void slotClickedShow();
     void slotClickedSend();
     void slotCellDoubleClicked(int row, int column);
+    void slotCursorPositionChanged(int iOld, int iNew);
 
 private:
     Ui::MainWindow* ui;
