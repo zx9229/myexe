@@ -14,6 +14,8 @@ enum MsgType {
     ID_CommonStoaRsp     = 34;
     ID_ExecuteCommandReq = 35;
     ID_ExecuteCommandRsp = 36;
+    ID_ParentDataReq     = 37;
+    ID_ParentDataRsp     = 38;
 }
 
 enum ProgramType {
@@ -49,12 +51,6 @@ message ConnectionInfo {
     string    Remark    = 9;
 }
 
-// 某user维护的所有连接,打包成一个结构体,作为一个快照,发送出去.
-message ConnInfoSnap {
-    string                  UserID = 1;
-    repeated ConnectionInfo data   = 2;
-}
-
 message ConnectedData {
     ConnectionInfo  Info    = 1;
     repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
@@ -77,22 +73,32 @@ message DisconnectedData {
     ConnectionInfo  Info    = 1;
 }
 
+//(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
+//(RequestID)是临时维护的递增值,-1:背景续传,0:上报模式,正:请求响应.
+//模式1:上报模式,扔出去就不管了,此时RequestID=0和SeqNo=0
+//模式2:请求响应模式,RequestID>0和SeqNo=0
+//模式3:请求响应且安全,RequestID>0和SeqNo>0
+//背景续传:RequestID=-1且SeqNo>0
 message CommonNtosReq {//通用请求(请求的方向是agentTOserver)
     int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
     string                    UserID     = 2;
     int64                     SeqNo      = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
-    bool                      Endeavour  = 4;//收不到服务器的响应就不罢休.
-    string                    DataType   = 5;
-    bytes                     Data       = 6;
-    google.protobuf.Timestamp ReqTime    = 7;
+    string                    DataType   = 4;//请求数据的类型
+    bytes                     Data       = 5;//请求数据的内容
+    google.protobuf.Timestamp ReqTime    = 6;
 }
 
+//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
 message CommonNtosRsp {
-    int64           RequestID = 1;
-    repeated string Pathway   = 2;
-    int64           SeqNo     = 3;//这个参数可以没有,我用它检查了数据,安心
-    int32           ErrNo     = 4;//(ErrNo==0)表示SERVER处理成功,AGENT可以删除自己的缓存了.
-    string          ErrMsg    = 5;//(ErrNo==0 && len(ErrMsg)==0)表示SERVER处理成功,同时没有任何警告,处理得非常完美.
+    int64                     RequestID  = 1;
+    repeated string           Pathway    = 2;
+    int64                     SeqNo      = 3;
+    string                    DataType   = 4;//响应数据的类型
+    bytes                     Data       = 5;//响应数据的内容
+    google.protobuf.Timestamp RspTime    = 6;
+    bool                      FromServer = 7;//响应消息是服务器发过来的,不是发送到中间,因为断线导致路途不通,发过来的消息.该消息已被服务器处理,发送端不用重传了.
+    int32                     ErrNo      = 8;
+    string                    ErrMsg     = 9;//对ErrNo的解释.
 }
 
 message CommonStonReq {
@@ -140,5 +146,16 @@ message SendMailItem {//发送邮件的项
     string Content     = 7;
 }
 
-message ServerCacheItem {
+//我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
+message ParentDataReq {
+    int64                     RequestID = 1;
+    google.protobuf.Timestamp ReqTime   = 2;
+}
+
+//我想拿到(直属于我的那个)父亲的(缓存)数据的响应.
+message ParentDataRsp {
+    int64                     RequestID = 1;
+    google.protobuf.Timestamp ReqTime   = 2;
+    google.protobuf.Timestamp RspTime   = 3;
+    repeated ConnectedData    Data      = 4;
 }
