@@ -40,7 +40,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[16];
+  static const ::google::protobuf::internal::ParseTable schema[14];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -63,9 +63,6 @@ extern CommonStonReqDefaultTypeInternal _CommonStonReq_default_instance_;
 class CommonStonRsp;
 class CommonStonRspDefaultTypeInternal;
 extern CommonStonRspDefaultTypeInternal _CommonStonRsp_default_instance_;
-class ConnInfoSnap;
-class ConnInfoSnapDefaultTypeInternal;
-extern ConnInfoSnapDefaultTypeInternal _ConnInfoSnap_default_instance_;
 class ConnectedData;
 class ConnectedDataDefaultTypeInternal;
 extern ConnectedDataDefaultTypeInternal _ConnectedData_default_instance_;
@@ -93,9 +90,6 @@ extern ReportDataItemDefaultTypeInternal _ReportDataItem_default_instance_;
 class SendMailItem;
 class SendMailItemDefaultTypeInternal;
 extern SendMailItemDefaultTypeInternal _SendMailItem_default_instance_;
-class ServerCacheItem;
-class ServerCacheItemDefaultTypeInternal;
-extern ServerCacheItemDefaultTypeInternal _ServerCacheItem_default_instance_;
 }  // namespace txdata
 namespace google {
 namespace protobuf {
@@ -104,7 +98,6 @@ template<> ::txdata::CommonNtosReq* Arena::CreateMaybeMessage<::txdata::CommonNt
 template<> ::txdata::CommonNtosRsp* Arena::CreateMaybeMessage<::txdata::CommonNtosRsp>(Arena*);
 template<> ::txdata::CommonStonReq* Arena::CreateMaybeMessage<::txdata::CommonStonReq>(Arena*);
 template<> ::txdata::CommonStonRsp* Arena::CreateMaybeMessage<::txdata::CommonStonRsp>(Arena*);
-template<> ::txdata::ConnInfoSnap* Arena::CreateMaybeMessage<::txdata::ConnInfoSnap>(Arena*);
 template<> ::txdata::ConnectedData* Arena::CreateMaybeMessage<::txdata::ConnectedData>(Arena*);
 template<> ::txdata::ConnectionInfo* Arena::CreateMaybeMessage<::txdata::ConnectionInfo>(Arena*);
 template<> ::txdata::DisconnectedData* Arena::CreateMaybeMessage<::txdata::DisconnectedData>(Arena*);
@@ -114,7 +107,6 @@ template<> ::txdata::ParentDataReq* Arena::CreateMaybeMessage<::txdata::ParentDa
 template<> ::txdata::ParentDataRsp* Arena::CreateMaybeMessage<::txdata::ParentDataRsp>(Arena*);
 template<> ::txdata::ReportDataItem* Arena::CreateMaybeMessage<::txdata::ReportDataItem>(Arena*);
 template<> ::txdata::SendMailItem* Arena::CreateMaybeMessage<::txdata::SendMailItem>(Arena*);
-template<> ::txdata::ServerCacheItem* Arena::CreateMaybeMessage<::txdata::ServerCacheItem>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace txdata {
@@ -584,130 +576,6 @@ class ConnectionInfo : public ::google::protobuf::Message /* @@protoc_insertion_
 };
 // -------------------------------------------------------------------
 
-class ConnInfoSnap : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ConnInfoSnap) */ {
- public:
-  ConnInfoSnap();
-  virtual ~ConnInfoSnap();
-
-  ConnInfoSnap(const ConnInfoSnap& from);
-
-  inline ConnInfoSnap& operator=(const ConnInfoSnap& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ConnInfoSnap(ConnInfoSnap&& from) noexcept
-    : ConnInfoSnap() {
-    *this = ::std::move(from);
-  }
-
-  inline ConnInfoSnap& operator=(ConnInfoSnap&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ConnInfoSnap& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ConnInfoSnap* internal_default_instance() {
-    return reinterpret_cast<const ConnInfoSnap*>(
-               &_ConnInfoSnap_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  void Swap(ConnInfoSnap* other);
-  friend void swap(ConnInfoSnap& a, ConnInfoSnap& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ConnInfoSnap* New() const final {
-    return CreateMaybeMessage<ConnInfoSnap>(NULL);
-  }
-
-  ConnInfoSnap* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ConnInfoSnap>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ConnInfoSnap& from);
-  void MergeFrom(const ConnInfoSnap& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ConnInfoSnap* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // repeated .txdata.ConnectionInfo data = 2;
-  int data_size() const;
-  void clear_data();
-  static const int kDataFieldNumber = 2;
-  ::txdata::ConnectionInfo* mutable_data(int index);
-  ::google::protobuf::RepeatedPtrField< ::txdata::ConnectionInfo >*
-      mutable_data();
-  const ::txdata::ConnectionInfo& data(int index) const;
-  ::txdata::ConnectionInfo* add_data();
-  const ::google::protobuf::RepeatedPtrField< ::txdata::ConnectionInfo >&
-      data() const;
-
-  // string UserID = 1;
-  void clear_userid();
-  static const int kUserIDFieldNumber = 1;
-  const ::std::string& userid() const;
-  void set_userid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_userid(::std::string&& value);
-  #endif
-  void set_userid(const char* value);
-  void set_userid(const char* value, size_t size);
-  ::std::string* mutable_userid();
-  ::std::string* release_userid();
-  void set_allocated_userid(::std::string* userid);
-
-  // @@protoc_insertion_point(class_scope:txdata.ConnInfoSnap)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::txdata::ConnectionInfo > data_;
-  ::google::protobuf::internal::ArenaStringPtr userid_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
 class ConnectedData : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ConnectedData) */ {
  public:
   ConnectedData();
@@ -743,7 +611,7 @@ class ConnectedData : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_ConnectedData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(ConnectedData* other);
   friend void swap(ConnectedData& a, ConnectedData& b) {
@@ -875,7 +743,7 @@ class DisconnectedData : public ::google::protobuf::Message /* @@protoc_insertio
                &_DisconnectedData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    3;
 
   void Swap(DisconnectedData* other);
   friend void swap(DisconnectedData& a, DisconnectedData& b) {
@@ -984,7 +852,7 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CommonNtosReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(CommonNtosReq* other);
   friend void swap(CommonNtosReq& a, CommonNtosReq& b) {
@@ -1152,7 +1020,7 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CommonNtosRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(CommonNtosRsp* other);
   friend void swap(CommonNtosRsp& a, CommonNtosRsp& b) {
@@ -1226,23 +1094,9 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   const ::google::protobuf::RepeatedPtrField< ::std::string>& pathway() const;
   ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_pathway();
 
-  // string ErrMsg = 6;
-  void clear_errmsg();
-  static const int kErrMsgFieldNumber = 6;
-  const ::std::string& errmsg() const;
-  void set_errmsg(const ::std::string& value);
-  #if LANG_CXX11
-  void set_errmsg(::std::string&& value);
-  #endif
-  void set_errmsg(const char* value);
-  void set_errmsg(const char* value, size_t size);
-  ::std::string* mutable_errmsg();
-  ::std::string* release_errmsg();
-  void set_allocated_errmsg(::std::string* errmsg);
-
-  // string DataType = 7;
+  // string DataType = 4;
   void clear_datatype();
-  static const int kDataTypeFieldNumber = 7;
+  static const int kDataTypeFieldNumber = 4;
   const ::std::string& datatype() const;
   void set_datatype(const ::std::string& value);
   #if LANG_CXX11
@@ -1254,9 +1108,9 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::std::string* release_datatype();
   void set_allocated_datatype(::std::string* datatype);
 
-  // bytes Data = 8;
+  // bytes Data = 5;
   void clear_data();
-  static const int kDataFieldNumber = 8;
+  static const int kDataFieldNumber = 5;
   const ::std::string& data() const;
   void set_data(const ::std::string& value);
   #if LANG_CXX11
@@ -1267,6 +1121,32 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::std::string* mutable_data();
   ::std::string* release_data();
   void set_allocated_data(::std::string* data);
+
+  // string ErrMsg = 9;
+  void clear_errmsg();
+  static const int kErrMsgFieldNumber = 9;
+  const ::std::string& errmsg() const;
+  void set_errmsg(const ::std::string& value);
+  #if LANG_CXX11
+  void set_errmsg(::std::string&& value);
+  #endif
+  void set_errmsg(const char* value);
+  void set_errmsg(const char* value, size_t size);
+  ::std::string* mutable_errmsg();
+  ::std::string* release_errmsg();
+  void set_allocated_errmsg(::std::string* errmsg);
+
+  // .google.protobuf.Timestamp RspTime = 6;
+  bool has_rsptime() const;
+  void clear_rsptime();
+  static const int kRspTimeFieldNumber = 6;
+  private:
+  const ::google::protobuf::Timestamp& _internal_rsptime() const;
+  public:
+  const ::google::protobuf::Timestamp& rsptime() const;
+  ::google::protobuf::Timestamp* release_rsptime();
+  ::google::protobuf::Timestamp* mutable_rsptime();
+  void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
 
   // int64 RequestID = 1;
   void clear_requestid();
@@ -1280,15 +1160,15 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 seqno() const;
   void set_seqno(::google::protobuf::int64 value);
 
-  // bool FromServer = 4;
+  // bool FromServer = 7;
   void clear_fromserver();
-  static const int kFromServerFieldNumber = 4;
+  static const int kFromServerFieldNumber = 7;
   bool fromserver() const;
   void set_fromserver(bool value);
 
-  // int32 ErrNo = 5;
+  // int32 ErrNo = 8;
   void clear_errno();
-  static const int kErrNoFieldNumber = 5;
+  static const int kErrNoFieldNumber = 8;
 #ifdef errno
 #undef errno
   ::google::protobuf::int32 errno() const;
@@ -1300,9 +1180,10 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::std::string> pathway_;
-  ::google::protobuf::internal::ArenaStringPtr errmsg_;
   ::google::protobuf::internal::ArenaStringPtr datatype_;
   ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::internal::ArenaStringPtr errmsg_;
+  ::google::protobuf::Timestamp* rsptime_;
   ::google::protobuf::int64 requestid_;
   ::google::protobuf::int64 seqno_;
   bool fromserver_;
@@ -1347,7 +1228,7 @@ class CommonStonReq : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CommonStonReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(CommonStonReq* other);
   friend void swap(CommonStonReq& a, CommonStonReq& b) {
@@ -1516,7 +1397,7 @@ class CommonStonRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CommonStonRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(CommonStonRsp* other);
   friend void swap(CommonStonRsp& a, CommonStonRsp& b) {
@@ -1677,7 +1558,7 @@ class ExecuteCommandReq : public ::google::protobuf::Message /* @@protoc_inserti
                &_ExecuteCommandReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(ExecuteCommandReq* other);
   friend void swap(ExecuteCommandReq& a, ExecuteCommandReq& b) {
@@ -1818,7 +1699,7 @@ class ExecuteCommandRsp : public ::google::protobuf::Message /* @@protoc_inserti
                &_ExecuteCommandRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(ExecuteCommandRsp* other);
   friend void swap(ExecuteCommandRsp& a, ExecuteCommandRsp& b) {
@@ -1973,7 +1854,7 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
                &_ReportDataItem_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(ReportDataItem* other);
   friend void swap(ReportDataItem& a, ReportDataItem& b) {
@@ -2099,7 +1980,7 @@ class SendMailItem : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_SendMailItem_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(SendMailItem* other);
   friend void swap(SendMailItem& a, SendMailItem& b) {
@@ -2265,102 +2146,6 @@ class SendMailItem : public ::google::protobuf::Message /* @@protoc_insertion_po
 };
 // -------------------------------------------------------------------
 
-class ServerCacheItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ServerCacheItem) */ {
- public:
-  ServerCacheItem();
-  virtual ~ServerCacheItem();
-
-  ServerCacheItem(const ServerCacheItem& from);
-
-  inline ServerCacheItem& operator=(const ServerCacheItem& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ServerCacheItem(ServerCacheItem&& from) noexcept
-    : ServerCacheItem() {
-    *this = ::std::move(from);
-  }
-
-  inline ServerCacheItem& operator=(ServerCacheItem&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ServerCacheItem& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServerCacheItem* internal_default_instance() {
-    return reinterpret_cast<const ServerCacheItem*>(
-               &_ServerCacheItem_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    13;
-
-  void Swap(ServerCacheItem* other);
-  friend void swap(ServerCacheItem& a, ServerCacheItem& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ServerCacheItem* New() const final {
-    return CreateMaybeMessage<ServerCacheItem>(NULL);
-  }
-
-  ServerCacheItem* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServerCacheItem>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServerCacheItem& from);
-  void MergeFrom(const ServerCacheItem& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ServerCacheItem* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:txdata.ServerCacheItem)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
 class ParentDataReq : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ParentDataReq) */ {
  public:
   ParentDataReq();
@@ -2396,7 +2181,7 @@ class ParentDataReq : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_ParentDataReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    12;
 
   void Swap(ParentDataReq* other);
   friend void swap(ParentDataReq& a, ParentDataReq& b) {
@@ -2512,7 +2297,7 @@ class ParentDataRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_ParentDataRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    13;
 
   void Swap(ParentDataRsp* other);
   friend void swap(ParentDataRsp& a, ParentDataRsp& b) {
@@ -3208,93 +2993,6 @@ inline void ConnectionInfo::set_allocated_remark(::std::string* remark) {
 
 // -------------------------------------------------------------------
 
-// ConnInfoSnap
-
-// string UserID = 1;
-inline void ConnInfoSnap::clear_userid() {
-  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ConnInfoSnap::userid() const {
-  // @@protoc_insertion_point(field_get:txdata.ConnInfoSnap.UserID)
-  return userid_.GetNoArena();
-}
-inline void ConnInfoSnap::set_userid(const ::std::string& value) {
-  
-  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.ConnInfoSnap.UserID)
-}
-#if LANG_CXX11
-inline void ConnInfoSnap::set_userid(::std::string&& value) {
-  
-  userid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.ConnInfoSnap.UserID)
-}
-#endif
-inline void ConnInfoSnap::set_userid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.ConnInfoSnap.UserID)
-}
-inline void ConnInfoSnap::set_userid(const char* value, size_t size) {
-  
-  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.ConnInfoSnap.UserID)
-}
-inline ::std::string* ConnInfoSnap::mutable_userid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.ConnInfoSnap.UserID)
-  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ConnInfoSnap::release_userid() {
-  // @@protoc_insertion_point(field_release:txdata.ConnInfoSnap.UserID)
-  
-  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ConnInfoSnap::set_allocated_userid(::std::string* userid) {
-  if (userid != NULL) {
-    
-  } else {
-    
-  }
-  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.ConnInfoSnap.UserID)
-}
-
-// repeated .txdata.ConnectionInfo data = 2;
-inline int ConnInfoSnap::data_size() const {
-  return data_.size();
-}
-inline void ConnInfoSnap::clear_data() {
-  data_.Clear();
-}
-inline ::txdata::ConnectionInfo* ConnInfoSnap::mutable_data(int index) {
-  // @@protoc_insertion_point(field_mutable:txdata.ConnInfoSnap.data)
-  return data_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::txdata::ConnectionInfo >*
-ConnInfoSnap::mutable_data() {
-  // @@protoc_insertion_point(field_mutable_list:txdata.ConnInfoSnap.data)
-  return &data_;
-}
-inline const ::txdata::ConnectionInfo& ConnInfoSnap::data(int index) const {
-  // @@protoc_insertion_point(field_get:txdata.ConnInfoSnap.data)
-  return data_.Get(index);
-}
-inline ::txdata::ConnectionInfo* ConnInfoSnap::add_data() {
-  // @@protoc_insertion_point(field_add:txdata.ConnInfoSnap.data)
-  return data_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::txdata::ConnectionInfo >&
-ConnInfoSnap::data() const {
-  // @@protoc_insertion_point(field_list:txdata.ConnInfoSnap.data)
-  return data_;
-}
-
-// -------------------------------------------------------------------
-
 // ConnectedData
 
 // .txdata.ConnectionInfo Info = 1;
@@ -3819,88 +3517,7 @@ inline void CommonNtosRsp::set_seqno(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.SeqNo)
 }
 
-// bool FromServer = 4;
-inline void CommonNtosRsp::clear_fromserver() {
-  fromserver_ = false;
-}
-inline bool CommonNtosRsp::fromserver() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.FromServer)
-  return fromserver_;
-}
-inline void CommonNtosRsp::set_fromserver(bool value) {
-  
-  fromserver_ = value;
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.FromServer)
-}
-
-// int32 ErrNo = 5;
-inline void CommonNtosRsp::clear_errno() {
-  errno_ = 0;
-}
-inline ::google::protobuf::int32 CommonNtosRsp::errno() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.ErrNo)
-  return errno_;
-}
-inline void CommonNtosRsp::set_errno(::google::protobuf::int32 value) {
-  
-  errno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.ErrNo)
-}
-
-// string ErrMsg = 6;
-inline void CommonNtosRsp::clear_errmsg() {
-  errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& CommonNtosRsp::errmsg() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.ErrMsg)
-  return errmsg_.GetNoArena();
-}
-inline void CommonNtosRsp::set_errmsg(const ::std::string& value) {
-  
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.ErrMsg)
-}
-#if LANG_CXX11
-inline void CommonNtosRsp::set_errmsg(::std::string&& value) {
-  
-  errmsg_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosRsp.ErrMsg)
-}
-#endif
-inline void CommonNtosRsp::set_errmsg(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosRsp.ErrMsg)
-}
-inline void CommonNtosRsp::set_errmsg(const char* value, size_t size) {
-  
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosRsp.ErrMsg)
-}
-inline ::std::string* CommonNtosRsp::mutable_errmsg() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.ErrMsg)
-  return errmsg_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* CommonNtosRsp::release_errmsg() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.ErrMsg)
-  
-  return errmsg_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void CommonNtosRsp::set_allocated_errmsg(::std::string* errmsg) {
-  if (errmsg != NULL) {
-    
-  } else {
-    
-  }
-  errmsg_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), errmsg);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.ErrMsg)
-}
-
-// string DataType = 7;
+// string DataType = 4;
 inline void CommonNtosRsp::clear_datatype() {
   datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3953,7 +3570,7 @@ inline void CommonNtosRsp::set_allocated_datatype(::std::string* datatype) {
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.DataType)
 }
 
-// bytes Data = 8;
+// bytes Data = 5;
 inline void CommonNtosRsp::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4004,6 +3621,136 @@ inline void CommonNtosRsp::set_allocated_data(::std::string* data) {
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.Data)
+}
+
+// .google.protobuf.Timestamp RspTime = 6;
+inline bool CommonNtosRsp::has_rsptime() const {
+  return this != internal_default_instance() && rsptime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& CommonNtosRsp::_internal_rsptime() const {
+  return *rsptime_;
+}
+inline const ::google::protobuf::Timestamp& CommonNtosRsp::rsptime() const {
+  const ::google::protobuf::Timestamp* p = rsptime_;
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.RspTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* CommonNtosRsp::release_rsptime() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.RspTime)
+  
+  ::google::protobuf::Timestamp* temp = rsptime_;
+  rsptime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* CommonNtosRsp::mutable_rsptime() {
+  
+  if (rsptime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    rsptime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.RspTime)
+  return rsptime_;
+}
+inline void CommonNtosRsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsptime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(rsptime_);
+  }
+  if (rsptime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(rsptime)->GetArena();
+    if (message_arena != submessage_arena) {
+      rsptime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, rsptime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  rsptime_ = rsptime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.RspTime)
+}
+
+// bool FromServer = 7;
+inline void CommonNtosRsp::clear_fromserver() {
+  fromserver_ = false;
+}
+inline bool CommonNtosRsp::fromserver() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.FromServer)
+  return fromserver_;
+}
+inline void CommonNtosRsp::set_fromserver(bool value) {
+  
+  fromserver_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.FromServer)
+}
+
+// int32 ErrNo = 8;
+inline void CommonNtosRsp::clear_errno() {
+  errno_ = 0;
+}
+inline ::google::protobuf::int32 CommonNtosRsp::errno() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.ErrNo)
+  return errno_;
+}
+inline void CommonNtosRsp::set_errno(::google::protobuf::int32 value) {
+  
+  errno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.ErrNo)
+}
+
+// string ErrMsg = 9;
+inline void CommonNtosRsp::clear_errmsg() {
+  errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CommonNtosRsp::errmsg() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.ErrMsg)
+  return errmsg_.GetNoArena();
+}
+inline void CommonNtosRsp::set_errmsg(const ::std::string& value) {
+  
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.ErrMsg)
+}
+#if LANG_CXX11
+inline void CommonNtosRsp::set_errmsg(::std::string&& value) {
+  
+  errmsg_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosRsp.ErrMsg)
+}
+#endif
+inline void CommonNtosRsp::set_errmsg(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosRsp.ErrMsg)
+}
+inline void CommonNtosRsp::set_errmsg(const char* value, size_t size) {
+  
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosRsp.ErrMsg)
+}
+inline ::std::string* CommonNtosRsp::mutable_errmsg() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.ErrMsg)
+  return errmsg_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CommonNtosRsp::release_errmsg() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.ErrMsg)
+  
+  return errmsg_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CommonNtosRsp::set_allocated_errmsg(::std::string* errmsg) {
+  if (errmsg != NULL) {
+    
+  } else {
+    
+  }
+  errmsg_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), errmsg);
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.ErrMsg)
 }
 
 // -------------------------------------------------------------------
@@ -5292,10 +5039,6 @@ inline void SendMailItem::set_allocated_content(::std::string* content) {
 
 // -------------------------------------------------------------------
 
-// ServerCacheItem
-
-// -------------------------------------------------------------------
-
 // ParentDataReq
 
 // int64 RequestID = 1;
@@ -5510,10 +5253,6 @@ ParentDataRsp::data() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

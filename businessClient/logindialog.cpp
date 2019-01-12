@@ -63,8 +63,8 @@ void LoginDialog::slotWebsocketError(QAbstractSocket::SocketError error)
 
 void LoginDialog::slotReady()
 {
-    QObject::disconnect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
     QObject::disconnect(m_dataExch, &DataExchanger::sigWebsocketError, this, &LoginDialog::slotWebsocketError);
+    QObject::disconnect(m_dataExch, &DataExchanger::sigReady, this, &LoginDialog::slotReady);
     this->accept();
 }
 
