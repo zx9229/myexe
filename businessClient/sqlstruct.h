@@ -20,10 +20,67 @@ namespace {
     inline bool Valid(QDateTime& data) { return data.isValid(); }
 }
 
+class KeyValue
+{
+public:
+    QString Key;
+    QString Value;
+public:
+    static QString static_table_name()
+    {
+        return "KeyValue";
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            Key   TEXT NOT NULL PRIMARY KEY ,\
+            Value TEXT NOT NULL )"
+        ).QString::arg(static_table_name());
+        return sql;
+    }
+    bool insert_data(QSqlQuery& query, bool insertNotReplace)
+    {
+        bool isOk = false;
+        QString sqlStr = QObject::tr("INSERT %1 INTO %2 (Key, Value) VALUES (:Key, :Value)")
+            .arg(insertNotReplace ? "" : "OR REPLACE").arg(static_table_name());
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        query.bindValue(":Key", this->Key);
+        query.bindValue(":Value", this->Value);
+        return query.exec();
+    }
+    bool update_data(QSqlQuery& query)
+    {
+        bool isOk = false;
+        QString sqlStr = QObject::tr("UPDATE %1 SET Value=:Value WHERE Key=:Key").arg(static_table_name());
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        query.bindValue(":Key", this->Key);
+        query.bindValue(":Value", this->Value);
+        return query.exec();
+    }
+    static void select_data(QSqlQuery& query, QList<KeyValue>& results)
+    {
+        results.clear();
+        bool isOk = false;
+        QString sqlStr = QObject::tr("SELECT Key,Value FROM %1").arg(static_table_name());
+        isOk = query.exec(sqlStr);
+        Q_ASSERT(isOk);
+        while (query.next()) {
+            KeyValue result;
+            result.Key = query.value("Key").toString();
+            result.Value = query.value("Value").toString();
+            results.append(result);
+        }
+    }
+};
+
 class CommonNtosDataNode
 {
 public:
     int64_t    ID;//PK
+    int64_t    RequestID;
     int64_t    SeqNo;//UNIQUE(For the purposes of UNIQUE constraints, NULL values are considered distinct from all other values, including other NULLs.)
     QString    UserID;
     QString    ReqType;
@@ -38,6 +95,7 @@ public:
 public:
     CommonNtosDataNode()
     {
+        this->RequestID = INT64_MAX;
         this->ID = INT64_MAX;
         this->SeqNo = INT64_MAX;
         this->State = INT32_MAX;
@@ -53,6 +111,7 @@ public:
         QString sql = QObject::tr(
             "CREATE TABLE IF NOT EXISTS %1 (\
             ID         INTEGER NOT NULL PRIMARY KEY ,\
+            RequestID  INTEGER     NULL ,\
             SeqNo      INTEGER     NULL UNIQUE ,\
             UserID     TEXT    NOT NULL ,\
             ReqType    TEXT    NOT NULL ,\
@@ -77,6 +136,7 @@ public:
         this->CreateTime = QDateTime::currentDateTime();
         QStringList cols;
         if (!Valid(this->ID)) { cols.append("ID"); }
+        if (!Valid(this->RequestID)) { cols.append("RequestID"); }
         if (!Valid(this->SeqNo)) { cols.append("SeqNo"); }
         if (!Valid(this->UserID)) { cols.append("UserID"); }
         if (!Valid(this->ReqType)) { cols.append("ReqType"); }
@@ -94,6 +154,7 @@ public:
         Q_ASSERT(isOk);
         //
         if (!Valid(this->ID)) { query.bindValue(":ID", this->ID); }
+        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
         if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
         if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
         if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
@@ -117,6 +178,7 @@ public:
         //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
         QStringList cols;
         if (!Valid(this->ID)) { cols.append("ID=:ID"); }
+        if (!Valid(this->RequestID)) { cols.append("RequestID=:RequestID"); }
         if (!Valid(this->SeqNo)) { cols.append("SeqNo=:SeqNo"); }
         if (!Valid(this->UserID)) { cols.append("UserID=:UserID"); }
         if (!Valid(this->ReqType)) { cols.append("ReqType=:ReqType"); }
@@ -135,6 +197,7 @@ public:
         Q_ASSERT(isOk);
         //
         if (!Valid(this->ID)) { query.bindValue(":ID", this->ID); }
+        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
         if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
         if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
         if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }

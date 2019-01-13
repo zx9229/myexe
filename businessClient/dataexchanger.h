@@ -4,6 +4,7 @@
 #include "mywebsock.h"
 #include <QObject>
 #include "temputils.h"
+#include "sqlstruct.h"
 
 class DataExchanger : public QObject
 {
@@ -20,6 +21,7 @@ public:
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
+    bool sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp, bool needSave, int64_t& lastInsertId);
 
 signals:
     void sigReady();
@@ -32,6 +34,7 @@ private:
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
     void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
+    void toCommonNtosReq(CommonNtosDataNode& src, txdata::CommonNtosReq& dst);
 
 private slots:
     void slotOnConnected();
@@ -50,6 +53,10 @@ private:
     txdata::ConnectionInfo m_parentInfo;
 
     QMap<QString, QConnInfoEx> m_parentData;
+    KeyValue m_RequestID;
+    KeyValue m_SeqNo;
+
+    QSqlDatabase m_db;
 };
 
 #endif // DATAEXCHANGER_H

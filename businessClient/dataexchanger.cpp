@@ -68,21 +68,100 @@ void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeNam
     m_ownInfo.set_belongid(atomicKey2str(m_ownInfo.belongkey()));
 }
 
+bool DataExchanger::sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp, bool needSave, int64_t& lastInsertId)
+{
+    bool opEnd = false;
+    int64_t iRequestID = 0;
+    int64_t iSeqNo = 0;
+    if (needResp)
+    {
+        iRequestID = m_RequestID.Value.toLongLong();
+        reqData.RequestID = ++iRequestID;
+    }
+    if (needSave)
+    {
+        iSeqNo = m_SeqNo.Value.toLongLong();
+        reqData.SeqNo = ++iSeqNo;
+    }
+    if (true)
+    {
+        bool isOk = false;
+        QSqlQuery sqlQuery;
+        do
+        {
+            opEnd = m_db.transaction();//临时用(操作结束的标志)当做(事务开启成功的标志)
+            if (!opEnd) { break; }
+            if (iRequestID)
+            {
+                m_RequestID.Value.number(iRequestID);
+                isOk = m_RequestID.update_data(sqlQuery);
+                if (!isOk) { break; }
+            }
+            if (iSeqNo)
+            {
+                m_SeqNo.Value.number(iSeqNo);
+                isOk = m_SeqNo.update_data(sqlQuery);
+                if (!isOk) { break; }
+            }
+            isOk = reqData.insert_data(sqlQuery, &lastInsertId);
+            if (!isOk) { break; }
+            isOk = m_db.commit();
+            if (!isOk) { break; }
+        } while (false);
+        if (!isOk)//如果操作数据库失败.
+        {
+            lastInsertId = 0;
+            qDebug() << sqlQuery.lastError();
+            if (opEnd)//如果开启了事务,就需要回滚.
+            {
+                isOk = m_db.rollback();
+                Q_ASSERT(isOk);//如果回滚失败,那我也没有办法了.
+                opEnd = false;
+            }
+        }
+    }
+    txdata::CommonNtosReq tmpData;
+    toCommonNtosReq(reqData, tmpData);
+    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_CommonNtosReq, tmpData));
+    return opEnd;
+}
+
 void DataExchanger::initDB()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(false ? (":memory:") : ("_zx_test.db"));
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    m_db.setDatabaseName(false ? (":memory:") : ("_zx_test.db"));
     bool isOk = false;
-    isOk = db.open();
+    isOk = m_db.open();
     Q_ASSERT(isOk);
+    QSqlQuery sqlQuery;
     if (true) {
-        QSqlQuery sqlQuery;
-        isOk = db.transaction();
+        isOk = m_db.transaction();
+        Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(KeyValue::static_create_sql());
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(CommonNtosDataNode::static_create_sql());
         Q_ASSERT(isOk);
-        isOk = db.commit();
+        isOk = m_db.commit();
         Q_ASSERT(isOk);
+    }
+    if (true) {
+        QList<KeyValue> kvList;
+        KeyValue::select_data(sqlQuery, kvList);
+        for (auto&node : kvList)
+        {
+            if (node.Key == "RequestID") { m_RequestID = node; }
+            if (node.Key == "SeqNo") { m_SeqNo = node; }
+        }
+        if (m_RequestID.Key.isEmpty())
+        {
+            m_RequestID = { "RequestID","0" };
+            m_RequestID.insert_data(sqlQuery, true);
+        }
+        if (m_SeqNo.Key.isEmpty())
+        {
+            m_SeqNo = { "SeqNo","0" };
+            m_SeqNo.insert_data(sqlQuery, true);
+        }
     }
 }
 
@@ -148,6 +227,20 @@ void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> d
         m_parentData.insert(curData.UserID, curData);
     }
     sigParentData(m_parentData);
+}
+
+void DataExchanger::toCommonNtosReq(CommonNtosDataNode &src, txdata::CommonNtosReq &dst)
+{
+    dst.set_requestid(0);
+    dst.set_userid(src.UserID.toStdString());
+    dst.set_seqno(src.SeqNo);
+    dst.set_datatype(src.ReqType.toStdString());
+    dst.set_data(src.ReqData.data(), src.ReqData.size());
+    if (src.ReqTime.isValid())
+    {
+        dst.mutable_reqtime()->set_seconds(src.ReqTime.offsetFromUtc());
+        dst.mutable_reqtime()->set_nanos(src.ReqTime.time().msec() * 1000 * 1000);
+    }
 }
 
 void DataExchanger::slotOnConnected()
