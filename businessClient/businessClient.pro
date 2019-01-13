@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network websockets
+QT       += core gui network websockets sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,7 +38,8 @@ HEADERS += \
         protobuf/txdata.pb.h \
         logindialog.h \
         dataexchanger.h \
-        temputils.h
+        temputils.h \
+        sqlstruct.h
 
 FORMS += \
         mainwindow.ui \

@@ -1,6 +1,8 @@
 #include "dataexchanger.h"
 #include <QApplication>
+#include <QSqlError>
 #include "m2b.h"
+#include "sqlstruct.h"
 
 std::string atomicKey2str(const txdata::AtomicKey& src)
 {
@@ -22,6 +24,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     connect(&m_ws, &MyWebsock::sigError, this, &DataExchanger::slotOnError);
 
     initOwnInfo();
+    initDB();
 }
 
 DataExchanger::~DataExchanger()
@@ -63,6 +66,24 @@ void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeNam
     m_ownInfo.mutable_belongkey()->set_execname(execName.toStdString());
 
     m_ownInfo.set_belongid(atomicKey2str(m_ownInfo.belongkey()));
+}
+
+void DataExchanger::initDB()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(false ? (":memory:") : ("_zx_test.db"));
+    bool isOk = false;
+    isOk = db.open();
+    Q_ASSERT(isOk);
+    if (true) {
+        QSqlQuery sqlQuery;
+        isOk = db.transaction();
+        Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(CommonNtosDataNode::static_create_sql());
+        Q_ASSERT(isOk);
+        isOk = db.commit();
+        Q_ASSERT(isOk);
+    }
 }
 
 void DataExchanger::initOwnInfo()

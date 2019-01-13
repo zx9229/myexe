@@ -22,12 +22,12 @@ public:
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
 
 signals:
-    void sigLoginProgress(int curPos, int errCode, const QString& errMsg);
     void sigReady();
     void sigParentData(const QMap<QString, QConnInfoEx>& data);
     void sigWebsocketError(QAbstractSocket::SocketError error);
 
 private:
+    void initDB();
     void initOwnInfo();
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
