@@ -970,6 +970,12 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 seqno() const;
   void set_seqno(::google::protobuf::int64 value);
 
+  // int64 RefNum = 7;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 7;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
   // @@protoc_insertion_point(class_scope:txdata.CommonNtosReq)
  private:
 
@@ -980,6 +986,7 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::Timestamp* reqtime_;
   ::google::protobuf::int64 requestid_;
   ::google::protobuf::int64 seqno_;
+  ::google::protobuf::int64 refnum_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -1175,6 +1182,12 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
 #endif
   void set_errno(::google::protobuf::int32 value);
 
+  // int64 RefNum = 10;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 10;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
   // @@protoc_insertion_point(class_scope:txdata.CommonNtosRsp)
  private:
 
@@ -1188,6 +1201,7 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 seqno_;
   bool fromserver_;
   ::google::protobuf::int32 errno_;
+  ::google::protobuf::int64 refnum_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -1348,6 +1362,12 @@ class CommonStonReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 requestid() const;
   void set_requestid(::google::protobuf::int64 value);
 
+  // int64 RefNum = 6;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 6;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
   // @@protoc_insertion_point(class_scope:txdata.CommonStonReq)
  private:
 
@@ -1357,6 +1377,7 @@ class CommonStonReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::internal::ArenaStringPtr data_;
   ::google::protobuf::Timestamp* reqtime_;
   ::google::protobuf::int64 requestid_;
+  ::google::protobuf::int64 refnum_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -1509,6 +1530,12 @@ class CommonStonRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 requestid() const;
   void set_requestid(::google::protobuf::int64 value);
 
+  // int64 RefNum = 6;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 6;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
   // @@protoc_insertion_point(class_scope:txdata.CommonStonRsp)
  private:
 
@@ -1518,6 +1545,7 @@ class CommonStonRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::internal::ArenaStringPtr data_;
   ::google::protobuf::Timestamp* rsptime_;
   ::google::protobuf::int64 requestid_;
+  ::google::protobuf::int64 refnum_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -3416,6 +3444,20 @@ inline void CommonNtosReq::set_allocated_reqtime(::google::protobuf::Timestamp* 
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.ReqTime)
 }
 
+// int64 RefNum = 7;
+inline void CommonNtosReq::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 CommonNtosReq::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.RefNum)
+  return refnum_;
+}
+inline void CommonNtosReq::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.RefNum)
+}
+
 // -------------------------------------------------------------------
 
 // CommonNtosRsp
@@ -3753,6 +3795,20 @@ inline void CommonNtosRsp::set_allocated_errmsg(::std::string* errmsg) {
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.ErrMsg)
 }
 
+// int64 RefNum = 10;
+inline void CommonNtosRsp::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 CommonNtosRsp::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.RefNum)
+  return refnum_;
+}
+inline void CommonNtosRsp::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.RefNum)
+}
+
 // -------------------------------------------------------------------
 
 // CommonStonReq
@@ -3995,6 +4051,20 @@ inline void CommonStonReq::set_allocated_reqtime(::google::protobuf::Timestamp* 
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonStonReq.ReqTime)
 }
 
+// int64 RefNum = 6;
+inline void CommonStonReq::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 CommonStonReq::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonStonReq.RefNum)
+  return refnum_;
+}
+inline void CommonStonReq::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonStonReq.RefNum)
+}
+
 // -------------------------------------------------------------------
 
 // CommonStonRsp
@@ -4219,6 +4289,20 @@ inline void CommonStonRsp::set_allocated_rsptime(::google::protobuf::Timestamp* 
   }
   rsptime_ = rsptime;
   // @@protoc_insertion_point(field_set_allocated:txdata.CommonStonRsp.RspTime)
+}
+
+// int64 RefNum = 6;
+inline void CommonStonRsp::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 CommonStonRsp::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonStonRsp.RefNum)
+  return refnum_;
+}
+inline void CommonStonRsp::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonStonRsp.RefNum)
 }
 
 // -------------------------------------------------------------------

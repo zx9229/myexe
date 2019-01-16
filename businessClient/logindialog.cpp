@@ -9,7 +9,8 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
     m_dataExch(p)
 {
     ui->setupUi(this);
-    //this->setWindowFlags(this->windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+    this->setWindowFlags(this->windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+    this->showFullScreen();
     initUI();
     QObject::connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
     QObject::connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);

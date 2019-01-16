@@ -68,9 +68,9 @@ void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeNam
     m_ownInfo.set_belongid(atomicKey2str(m_ownInfo.belongkey()));
 }
 
-bool DataExchanger::sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp, bool needSave, int64_t& lastInsertId)
+bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave, int64_t& lastInsertId)
 {
-    bool opEnd = false;
+    bool opFinish = false;
     int64_t iRequestID = 0;
     int64_t iSeqNo = 0;
     if (needResp)
@@ -89,8 +89,8 @@ bool DataExchanger::sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp
         QSqlQuery sqlQuery;
         do
         {
-            opEnd = m_db.transaction();//临时用(操作结束的标志)当做(事务开启成功的标志)
-            if (!opEnd) { break; }
+            opFinish = m_db.transaction();//临时用(操作结束的标志)当做(事务开启成功的标志)
+            if (!opFinish) { break; }
             if (iRequestID)
             {
                 m_RequestID.Value.number(iRequestID);
@@ -112,18 +112,22 @@ bool DataExchanger::sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp
         {
             lastInsertId = 0;
             qDebug() << sqlQuery.lastError();
-            if (opEnd)//如果开启了事务,就需要回滚.
+            if (opFinish)//如果开启了事务,就需要回滚.
             {
                 isOk = m_db.rollback();
                 Q_ASSERT(isOk);//如果回滚失败,那我也没有办法了.
-                opEnd = false;
+                opFinish = false;
             }
         }
     }
-    txdata::CommonNtosReq tmpData;
-    toCommonNtosReq(reqData, tmpData);
-    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_CommonNtosReq, tmpData));
-    return opEnd;
+    if (opFinish)
+    {
+        reqData.RefNum = lastInsertId;
+        txdata::CommonNtosReq data4send;
+        toCommonNtosReq(reqData, data4send);
+        m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_CommonNtosReq, data4send));
+    }
+    return opFinish;
 }
 
 void DataExchanger::initDB()
@@ -139,7 +143,7 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(KeyValue::static_create_sql());
         Q_ASSERT(isOk);
-        isOk = sqlQuery.exec(CommonNtosDataNode::static_create_sql());
+        isOk = sqlQuery.exec(QCommonNtosReq::static_create_sql());
         Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
@@ -229,9 +233,9 @@ void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> d
     sigParentData(m_parentData);
 }
 
-void DataExchanger::toCommonNtosReq(CommonNtosDataNode &src, txdata::CommonNtosReq &dst)
+void DataExchanger::toCommonNtosReq(QCommonNtosReq &src, txdata::CommonNtosReq &dst)
 {
-    dst.set_requestid(0);
+    dst.set_requestid(src.RequestID);
     dst.set_userid(src.UserID.toStdString());
     dst.set_seqno(src.SeqNo);
     dst.set_datatype(src.ReqType.toStdString());
@@ -241,6 +245,7 @@ void DataExchanger::toCommonNtosReq(CommonNtosDataNode &src, txdata::CommonNtosR
         dst.mutable_reqtime()->set_seconds(src.ReqTime.offsetFromUtc());
         dst.mutable_reqtime()->set_nanos(src.ReqTime.time().msec() * 1000 * 1000);
     }
+    dst.set_refnum(src.RefNum);
 }
 
 void DataExchanger::slotOnConnected()

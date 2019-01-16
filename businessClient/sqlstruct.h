@@ -214,4 +214,77 @@ public:
     }
 };
 
+class QCommonNtosReq
+{
+public:
+    int64_t    RefNum;
+    int64_t    RequestID;
+    QString    UserID;
+    int64_t    SeqNo;
+    QString    ReqType;
+    QByteArray ReqData;
+    QDateTime  ReqTime;
+public:
+    QCommonNtosReq()
+    {
+        this->RefNum = INT64_MAX;
+        this->RequestID = INT64_MAX;
+        this->UserID.clear();
+        this->SeqNo = INT64_MAX;
+        this->ReqType.clear();
+        this->ReqData.clear();
+        this->ReqTime = QDateTime();
+    }
+public:
+    static QString static_table_name()
+    {
+        return "QCommonNtosReq";//可能会有(object_table_name)函数.
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            RefNum    INTEGER NOT NULL PRIMARY KEY ,\
+            RequestID INTEGER     NULL ,\
+            UserID    TEXT    NOT NULL ,\
+            SeqNo     INTEGER     NULL UNIQUE ,\
+            ReqType   TEXT    NOT NULL ,\
+            ReqData   BLOB        NULL ,\
+            ReqTime   TEXT        NULL )"
+        ).QString::arg(static_table_name());
+        return sql;
+    }
+    bool insert_data(QSqlQuery& query, int64_t* lastInsertId = nullptr)
+    {
+        //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
+        bool isOk = false;
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        QStringList cols;
+        if (!Valid(this->RefNum)) { cols.append("RefNum"); }
+        if (!Valid(this->RequestID)) { cols.append("RequestID"); }
+        if (!Valid(this->UserID)) { cols.append("UserID"); }
+        if (!Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (!Valid(this->ReqType)) { cols.append("ReqType"); }
+        if (!Valid(this->ReqData)) { cols.append("ReqData"); }
+        if (!Valid(this->ReqTime)) { cols.append("ReqTime"); }
+        //
+        QString sqlStr = QObject::tr("INSERT INTO %1 (%2) VALUES (%3)").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        //
+        if (!Valid(this->RefNum)) { query.bindValue(":RefNum", this->RefNum); }
+        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
+        if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
+        if (!Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
+        if (!Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
+        //
+        isOk = query.exec();
+        if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
+        return isOk;
+    }
+};
+
 #endif // SQL_STRUCT_H

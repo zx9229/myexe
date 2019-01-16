@@ -21,7 +21,7 @@ public:
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
-    bool sendCommonNtosReq(CommonNtosDataNode& reqData, bool needResp, bool needSave, int64_t& lastInsertId);
+    bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave, int64_t& lastInsertId);
 
 signals:
     void sigReady();
@@ -34,7 +34,7 @@ private:
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
     void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
-    void toCommonNtosReq(CommonNtosDataNode& src, txdata::CommonNtosReq& dst);
+    void toCommonNtosReq(QCommonNtosReq& src, txdata::CommonNtosReq& dst);
 
 private slots:
     void slotOnConnected();
