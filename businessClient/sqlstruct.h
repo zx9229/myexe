@@ -287,4 +287,101 @@ public:
     }
 };
 
+class QCommonNtosRsp
+{
+public:
+    int64_t    ID;
+    QDateTime  InsertTime;
+    int64_t    RequestID;
+    QString    Pathway;
+    int64_t    SeqNo;
+    int32_t    RspType;
+    QByteArray RspData;
+    QDateTime  RspTime;
+    int32_t    FromServer;
+    int32_t    ErrNo;
+    QString    ErrMsg;
+    int64_t    RefNum;
+public:
+    QCommonNtosRsp()
+    {
+        this->ID = INT64_MAX;
+        this->InsertTime = QDateTime();
+        this->RequestID = INT64_MAX;
+        this->Pathway.clear();
+        this->SeqNo = INT64_MAX;
+        this->RspType = INT32_MAX;
+        this->RspData.clear();
+        this->RspTime = QDateTime();
+        this->FromServer = INT32_MAX;
+        this->ErrNo = INT32_MAX;
+        this->ErrMsg.clear();
+        this->RefNum = INT64_MAX;
+    }
+public:
+    static QString static_table_name()
+    {
+        return "QCommonNtosRsp";//可能会有(object_table_name)函数.
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            ID         INTEGER NOT NULL PRIMARY KEY ,\
+            InsertTime TEXT    NOT NULL ,\
+            RequestID  INTEGER     NULL ,\
+            Pathway    TEXT        NULL ,\
+            SeqNo      INTEGER     NULL ,\
+            RspType    INTEGER     NULL ,  /*not_null*/ \
+            RspData    BLOB        NULL ,\
+            RspTime    TEXT        NULL ,  /*not_null*/ \
+            FromServer INTEGER     NULL ,  /*not_null*/ \
+            ErrNo      INTEGER     NULL ,  /*not_null*/ \
+            ErrMsg     TEXT        NULL ,\
+            RefNum     INTEGER     NULL    /*not_null*/ )"
+        ).QString::arg(static_table_name());
+        return sql;
+    }
+    bool insert_data(QSqlQuery& query)
+    {
+        this->InsertTime = QDateTime::currentDateTime();
+        //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
+        bool isOk = false;
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        QStringList cols;
+        if (Valid(this->ID)) { cols.append("ID"); }
+        if (Valid(this->InsertTime)) { cols.append("InsertTime"); }
+        if (Valid(this->RequestID)) { cols.append("RequestID"); }
+        if (Valid(this->Pathway)) { cols.append("Pathway"); }
+        if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (Valid(this->RspType)) { cols.append("RspType"); }
+        if (Valid(this->RspData)) { cols.append("RspData"); }
+        if (Valid(this->RspTime)) { cols.append("RspTime"); }
+        if (Valid(this->FromServer)) { cols.append("FromServer"); }
+        if (Valid(this->ErrNo)) { cols.append("ErrNo"); }
+        if (Valid(this->ErrMsg)) { cols.append("ErrMsg"); }
+        if (Valid(this->RefNum)) { cols.append("RefNum"); }
+        //
+        QString sqlStr = QObject::tr("INSERT INTO %1 (%2) VALUES (%3)").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        //
+        if (Valid(this->ID)) { query.bindValue(":ID", this->ID); }
+        if (Valid(this->InsertTime)) { query.bindValue(":InsertTime", this->InsertTime); }
+        if (Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
+        if (Valid(this->Pathway)) { query.bindValue(":Pathway", this->Pathway); }
+        if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->RspType)) { query.bindValue(":RspType", this->RspType); }
+        if (Valid(this->RspData)) { query.bindValue(":RspData", this->RspData); }
+        if (Valid(this->RspTime)) { query.bindValue(":RspTime", this->RspTime); }
+        if (Valid(this->FromServer)) { query.bindValue(":FromServer", this->FromServer); }
+        if (Valid(this->ErrNo)) { query.bindValue(":ErrNo", this->ErrNo); }
+        if (Valid(this->ErrMsg)) { query.bindValue(":ErrMsg", this->ErrMsg); }
+        if (Valid(this->RefNum)) { query.bindValue(":RefNum", this->RefNum); }
+        //
+        return query.exec();
+    }
+};
+
 #endif // SQL_STRUCT_H

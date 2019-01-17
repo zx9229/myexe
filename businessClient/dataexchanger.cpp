@@ -149,6 +149,8 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(QCommonNtosReq::static_create_sql());
         Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(QCommonNtosRsp::static_create_sql());
+        Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
     }
