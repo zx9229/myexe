@@ -225,6 +225,9 @@ void DataExchanger::handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> d
     Q_ASSERT(data.data() != nullptr);
     Q_ASSERT(data->pathway_size() == 1);
     Q_ASSERT(data->pathway(0) == m_ownInfo.userid());
+    QCommonNtosRsp rspData;
+    toCommonNtosRsp(*data, rspData);
+    rspData.insert_data(QSqlQuery());
 }
 
 void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data)
@@ -252,6 +255,22 @@ void DataExchanger::toCommonNtosReq(QCommonNtosReq &src, txdata::CommonNtosReq &
         dst.mutable_reqtime()->set_nanos(src.ReqTime.time().msec() * 1000 * 1000);
     }
     dst.set_refnum(src.RefNum);
+}
+
+void DataExchanger::toCommonNtosRsp(txdata::CommonNtosRsp &src, QCommonNtosRsp &dst)
+{
+    //dst.ID = INT64_MAX;
+    //dst.InsertTime = QDateTime::currentDateTime();
+    dst.RequestID = src.requestid();
+    for (int i = 0; i < src.pathway_size(); ++i) dst.Pathway.append(src.pathway(i).c_str());
+    dst.SeqNo = src.seqno();
+    dst.RspType = src.rsptype();
+    dst.RspData.append(src.rspdata().data(), src.rspdata().size());
+    dst.RspTime.fromTime_t(src.rsptime().seconds());
+    dst.FromServer = src.fromserver() ? 1 : 0;
+    dst.ErrNo = src.errno();
+    dst.ErrMsg = QString::fromStdString(src.errmsg());
+    dst.RefNum = src.refnum();
 }
 
 void DataExchanger::slotOnConnected()

@@ -35,6 +35,7 @@ private:
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
     void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
     void toCommonNtosReq(QCommonNtosReq& src, txdata::CommonNtosReq& dst);
+    void toCommonNtosRsp(txdata::CommonNtosRsp& src, QCommonNtosRsp& dst);
 
 private slots:
     void slotOnConnected();
