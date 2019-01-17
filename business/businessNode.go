@@ -116,7 +116,7 @@ func (thls *businessNode) checkCachedDatabase() {
 
 func (thls *businessNode) backgroundWork() {
 	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
-		//负数的RequestID表示背景工作在做事情.
+		//(RequestID<0)表示背景工作在做事情.
 		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, DataType: src.ReqDataType, Data: src.ReqData, ReqTime: nil}
 		req.ReqTime, _ = ptypes.TimestampProto(src.ReqTime)
 		return req
@@ -134,11 +134,11 @@ func (thls *businessNode) backgroundWork() {
 	var result CommonAtosDataNode
 	var has bool
 	var err error
-	secRecover := float64(30)
+	secRetransmit := float64(30)
 	for {
 		result = CommonAtosDataNode{}
-		data4qry.ReqTime = time.Now().Add(-1 * time.Duration(secRecover) * time.Second) //查询secRecover之前的数据(可能刚执行了一个上报操作,刚插入数据库,所以要有一个缓存时段).
-		if has, err = thls.xEngine.Where(builder.Eq{fnmFinish: true}.And(builder.Lt{fnReqTime: data4qry.ReqTime})).Get(&result); err != nil {
+		data4qry.ReqTime = time.Now().Add(-1 * time.Duration(secRetransmit) * time.Second) //查询secRetransmit之前的数据(可能刚执行了一个上报操作,刚插入数据库,所以要有一个缓存时段).
+		if has, err = thls.xEngine.Where(builder.Eq{fnmFinish: false}.And(builder.Lt{fnReqTime: data4qry.ReqTime})).Get(&result); err != nil {
 			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
 		} else if has {
 			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonAtosDataNode2CommonNtosReq(&result))
@@ -152,7 +152,7 @@ func (thls *businessNode) backgroundWork() {
 					glog.Fatalf("recv data from chan with tmpSeqNo=%v, isOk=%v", tmpSeqNo, isOk)
 				}
 				if tmpSeqNo < 0 { //负数是超时协程发送的数据.
-					if secRecover*2 < time.Now().Sub(data4qry.ReqTime).Seconds() { //超时secRecover了,就跳出循环
+					if secRetransmit*2 < time.Now().Sub(data4qry.ReqTime).Seconds() { //超时secRetransmit了,就跳出循环
 						looping = false
 					}
 					continue
@@ -160,7 +160,7 @@ func (thls *businessNode) backgroundWork() {
 				if tmpSeqNo != result.SeqNo {
 					glog.Warningf("val=%v, result.SeqNo=%v", tmpSeqNo, result.SeqNo)
 				}
-				looping = false //上报给SERVER并且收到正确的回复了,就跳出循环.
+				looping = false //上报给SERVER并且收到正确的回复了,就跳出循环.此时另一个协程已经修改数据库了,无需这边再次修改.
 			default:
 			}
 		}
@@ -311,7 +311,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
 	} else {
-		isPush, isReqRspUnsafe, isReqRspSafe, isRetry := CommonNtosRsp_flag(msgData)
+		isPush, isReqRspUnsafe, isReqRspSafe, isRetransmit := CommonNtosRsp_flag(msgData)
 		assert4true(isPush == false)
 		if isReqRspUnsafe || isReqRspSafe { //请求响应相关.
 			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
@@ -322,17 +322,17 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 				glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
 			}
 		}
-		if isReqRspSafe || isRetry { //数据库相关.
-			if msgData.FromServer { //ErrNo为0,表示SERVER处理成功,NODE可以删除自己的缓存了.
-				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataNode{Finish: msgData.FromServer, ErrNo: msgData.ErrNo, ErrMsg: msgData.ErrMsg}); err != nil {
+		if isReqRspSafe || isRetransmit { //数据库相关.
+			if msgData.FromServer { //SERVER已处理本条数据,本条数据已结束,不用重传它了.
+				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataNode{Finish: msgData.FromServer, ErrNo: msgData.ErrNo, ErrMsg: msgData.ErrMsg, RspDataType: msgData.DataType, RspData: msgData.Data}); err != nil {
 					glog.Fatalf("Engine.Update with err=%v", err)
+					assert4true(err == nil)
 				}
-				//可能NODE短时间内发送了两个相同的请求,此时,第一个响应已经删除了数据,第二个响应会执行成功,同时删除零行(猜测//TODO:).
-				//所以,可能存在(err == nil && affected == 0)的情况.
 			}
 		}
-		if isRetry {
+		if isRetransmit {
 			thls.workChan <- msgData.SeqNo
+			//给重传线程回一个消息,重传线程就会结束等待,开始处理下一条数据.
 		}
 	}
 }

@@ -288,27 +288,32 @@ type KeyValue struct {
 
 //CommonAtosDataNode omit
 type CommonAtosDataNode struct {
-	SeqNo         int64     `xorm:"pk autoincr notnull unique"`
-	UserID        string    //
-	ReqDataType   string    //
-	ReqData       []byte    //
-	ReqTime       time.Time //报告时间
-	ReqTimeCreate time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	Finish        bool      //不需要续传了.
-	ErrNo         int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	ErrMsg        string    //错误的具体原因.
-	RspDataType   string
-	RspData       []byte
+	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
+	UserID      string    //
+	ReqDataType string    //
+	ReqData     []byte    //
+	ReqTime     time.Time //报告时间
+	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Finish      bool      //不需要续传了.
+	ErrNo       int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	ErrMsg      string    //错误的具体原因.
+	RspDataType string
+	RspData     []byte
 }
 
 //CommonAtosDataServer omit
 type CommonAtosDataServer struct {
-	SeqNo      int64     `xorm:"pk notnull"`
-	UserID     string    `xorm:"pk notnull"`
-	DataType   string    //
-	Data       []byte    //
-	ReportTime time.Time //报告时间
-	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	SeqNo       int64     `xorm:"pk notnull"`
+	UserID      string    `xorm:"pk notnull"`
+	ReqDataType string    //
+	ReqData     []byte    //
+	ReqTime     time.Time //报告时间
+	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Finish      bool      //不需要续传了.
+	ErrNo       int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	ErrMsg      string    //错误的具体原因.
+	RspDataType string
+	RspData     []byte
 }
 
 func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
@@ -339,7 +344,11 @@ type CommRspData struct {
 }
 
 func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string, fromS bool) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, DataType: "", Data: nil, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
+}
+
+func CommonNtosReq2CommonNtosRsp4Rsp(reqIn *txdata.CommonNtosReq, fromS bool, errNo int32, errMsg string, rspType string, rspData []byte) *txdata.CommonNtosRsp {
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, DataType: rspType, Data: rspData, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
 }
 
 func Message2CommonNtosReq(src proto.Message, reportTime time.Time, userID string) *txdata.CommonNtosReq {
@@ -438,7 +447,7 @@ func CommonNtosRsp_flag(dataIn *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
 	p = false   //推送数据,发出去之后就不管了.(isPush)
 	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
 	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
-	r = false   //请求响应,中途丢包后重试消息(retry)
+	r = false   //请求响应,中途丢包后重试消息(retransmit)
 	assert4false(dataIn.SeqNo < 0)
 	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
 	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
@@ -447,4 +456,16 @@ func CommonNtosRsp_flag(dataIn *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
 	r = dataIn.RequestID < 0 && dataIn.SeqNo > 0
 	qas = dataIn.RequestID > 0 && dataIn.SeqNo > 0
 	return
+}
+
+//ProtoMessage omit
+type ProtoMessage interface {
+	Descriptor() ([]byte, []int)
+}
+
+//CalcMessageIndex 用法示例:CalcMessageIndex(&txdata.CommonNtosReq{})
+func CalcMessageIndex(protoMessage ProtoMessage) int {
+	var data []int
+	_, data = protoMessage.Descriptor()
+	return data[0]
 }
