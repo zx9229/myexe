@@ -125,7 +125,7 @@ bool DialogData::needSave()
     return (ui->checkBox_needSave->checkState() == Qt::Checked);
 }
 
-void DialogData::getData(QByteArray &dataOut, int &typeOut)
+void DialogData::getData(QByteArray &dataOut, int32_t& typeOut)
 {
     dataOut = m_currData;
     typeOut = m_currType;

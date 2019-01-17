@@ -92,9 +92,7 @@ void MainWindow::slotClickedSend()
     if (dlgData.exec() != QDialog::Accepted)
         return;
     QCommonNtosReq reqData;
-    int currType = 0;//TODO:
-    dlgData.getData(reqData.ReqData, currType);
-    reqData.ReqType = "";//TODO:
+    dlgData.getData(reqData.ReqData, reqData.ReqType);
     if (m_dataExch->sendCommonNtosReq(reqData, dlgData.needResp(), dlgData.needSave()) == false)
     {
         QMessageBox::information(this, tr("发送请求"), tr("发送请求失败"));

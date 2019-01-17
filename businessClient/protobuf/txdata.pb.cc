@@ -371,8 +371,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, requestid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, userid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, seqno_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, datatype_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, data_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, reqtype_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, reqdata_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, reqtime_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosReq, refnum_),
   ~0u,  // no _has_bits_
@@ -383,8 +383,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, requestid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, pathway_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, seqno_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, datatype_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, data_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, rsptype_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, rspdata_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, rsptime_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, fromserver_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::CommonNtosRsp, errno_),
@@ -535,50 +535,53 @@ void AddDescriptorsImpl() {
       "\001\022\n\n\006ACCEPT\020\002\"F\n\rConnectedData\022$\n\004Info\030\001"
       " \001(\0132\026.txdata.ConnectionInfo\022\017\n\007Pathway\030"
       "\002 \003(\t\"8\n\020DisconnectedData\022$\n\004Info\030\001 \001(\0132"
-      "\026.txdata.ConnectionInfo\"\236\001\n\rCommonNtosRe"
+      "\026.txdata.ConnectionInfo\"\261\001\n\rCommonNtosRe"
       "q\022\021\n\tRequestID\030\001 \001(\003\022\016\n\006UserID\030\002 \001(\t\022\r\n\005"
-      "SeqNo\030\003 \001(\003\022\020\n\010DataType\030\004 \001(\t\022\014\n\004Data\030\005 "
-      "\001(\014\022+\n\007ReqTime\030\006 \001(\0132\032.google.protobuf.T"
-      "imestamp\022\016\n\006RefNum\030\007 \001(\003\"\322\001\n\rCommonNtosR"
-      "sp\022\021\n\tRequestID\030\001 \001(\003\022\017\n\007Pathway\030\002 \003(\t\022\r"
-      "\n\005SeqNo\030\003 \001(\003\022\020\n\010DataType\030\004 \001(\t\022\014\n\004Data\030"
-      "\005 \001(\014\022+\n\007RspTime\030\006 \001(\0132\032.google.protobuf"
-      ".Timestamp\022\022\n\nFromServer\030\007 \001(\010\022\r\n\005ErrNo\030"
-      "\010 \001(\005\022\016\n\006ErrMsg\030\t \001(\t\022\016\n\006RefNum\030\n \001(\003\"\220\001"
-      "\n\rCommonStonReq\022\021\n\tRequestID\030\001 \001(\003\022\017\n\007Pa"
-      "thway\030\002 \003(\t\022\020\n\010DataType\030\003 \001(\t\022\014\n\004Data\030\004 "
-      "\001(\014\022+\n\007ReqTime\030\005 \001(\0132\032.google.protobuf.T"
-      "imestamp\022\016\n\006RefNum\030\006 \001(\003\"\217\001\n\rCommonStonR"
-      "sp\022\021\n\tRequestID\030\001 \001(\003\022\016\n\006UserID\030\002 \001(\t\022\020\n"
-      "\010DataType\030\003 \001(\t\022\014\n\004Data\030\004 \001(\014\022+\n\007RspTime"
-      "\030\005 \001(\0132\032.google.protobuf.Timestamp\022\016\n\006Re"
-      "fNum\030\006 \001(\003\"H\n\021ExecuteCommandReq\022\021\n\tReque"
-      "stID\030\001 \001(\003\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Command\030\003"
-      " \001(\t\"e\n\021ExecuteCommandRsp\022\021\n\tRequestID\030\001"
-      " \001(\003\022\016\n\006UserID\030\002 \001(\t\022\016\n\006Result\030\003 \001(\t\022\r\n\005"
-      "ErrNo\030\004 \001(\005\022\016\n\006ErrMsg\030\005 \001(\t\"-\n\016ReportDat"
-      "aItem\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Data\030\002 \001(\t\"\207\001\n\014S"
-      "endMailItem\022\020\n\010Username\030\001 \001(\t\022\020\n\010Passwor"
-      "d\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To\030\004 \001(\t\022\017\n"
-      "\007Subject\030\005 \001(\t\022\023\n\013ContentType\030\006 \001(\t\022\017\n\007C"
-      "ontent\030\007 \001(\t\"O\n\rParentDataReq\022\021\n\tRequest"
+      "SeqNo\030\003 \001(\003\022 \n\007ReqType\030\004 \001(\0162\017.txdata.Ms"
+      "gType\022\017\n\007ReqData\030\005 \001(\014\022+\n\007ReqTime\030\006 \001(\0132"
+      "\032.google.protobuf.Timestamp\022\016\n\006RefNum\030\007 "
+      "\001(\003\"\345\001\n\rCommonNtosRsp\022\021\n\tRequestID\030\001 \001(\003"
+      "\022\017\n\007Pathway\030\002 \003(\t\022\r\n\005SeqNo\030\003 \001(\003\022 \n\007RspT"
+      "ype\030\004 \001(\0162\017.txdata.MsgType\022\017\n\007RspData\030\005 "
+      "\001(\014\022+\n\007RspTime\030\006 \001(\0132\032.google.protobuf.T"
+      "imestamp\022\022\n\nFromServer\030\007 \001(\010\022\r\n\005ErrNo\030\010 "
+      "\001(\005\022\016\n\006ErrMsg\030\t \001(\t\022\016\n\006RefNum\030\n \001(\003\"\220\001\n\r"
+      "CommonStonReq\022\021\n\tRequestID\030\001 \001(\003\022\017\n\007Path"
+      "way\030\002 \003(\t\022\020\n\010DataType\030\003 \001(\t\022\014\n\004Data\030\004 \001("
+      "\014\022+\n\007ReqTime\030\005 \001(\0132\032.google.protobuf.Tim"
+      "estamp\022\016\n\006RefNum\030\006 \001(\003\"\217\001\n\rCommonStonRsp"
+      "\022\021\n\tRequestID\030\001 \001(\003\022\016\n\006UserID\030\002 \001(\t\022\020\n\010D"
+      "ataType\030\003 \001(\t\022\014\n\004Data\030\004 \001(\014\022+\n\007RspTime\030\005"
+      " \001(\0132\032.google.protobuf.Timestamp\022\016\n\006RefN"
+      "um\030\006 \001(\003\"H\n\021ExecuteCommandReq\022\021\n\tRequest"
+      "ID\030\001 \001(\003\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Command\030\003 \001"
+      "(\t\"e\n\021ExecuteCommandRsp\022\021\n\tRequestID\030\001 \001"
+      "(\003\022\016\n\006UserID\030\002 \001(\t\022\016\n\006Result\030\003 \001(\t\022\r\n\005Er"
+      "rNo\030\004 \001(\005\022\016\n\006ErrMsg\030\005 \001(\t\"-\n\016ReportDataI"
+      "tem\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Data\030\002 \001(\t\"\207\001\n\014Sen"
+      "dMailItem\022\020\n\010Username\030\001 \001(\t\022\020\n\010Password\030"
+      "\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To\030\004 \001(\t\022\017\n\007S"
+      "ubject\030\005 \001(\t\022\023\n\013ContentType\030\006 \001(\t\022\017\n\007Con"
+      "tent\030\007 \001(\t\"O\n\rParentDataReq\022\021\n\tRequestID"
+      "\030\001 \001(\003\022+\n\007ReqTime\030\002 \001(\0132\032.google.protobu"
+      "f.Timestamp\"\241\001\n\rParentDataRsp\022\021\n\tRequest"
       "ID\030\001 \001(\003\022+\n\007ReqTime\030\002 \001(\0132\032.google.proto"
-      "buf.Timestamp\"\241\001\n\rParentDataRsp\022\021\n\tReque"
-      "stID\030\001 \001(\003\022+\n\007ReqTime\030\002 \001(\0132\032.google.pro"
-      "tobuf.Timestamp\022+\n\007RspTime\030\003 \001(\0132\032.googl"
-      "e.protobuf.Timestamp\022#\n\004Data\030\004 \003(\0132\025.txd"
-      "ata.ConnectedData*\373\001\n\007MsgType\022\t\n\005Zero1\020\000"
-      "\022\024\n\020ID_ConnectedData\020\001\022\027\n\023ID_Disconnecte"
-      "dData\020\002\022\024\n\020ID_CommonNtosReq\020\037\022\024\n\020ID_Comm"
-      "onNtosRsp\020 \022\024\n\020ID_CommonStonReq\020!\022\024\n\020ID_"
-      "CommonStoaRsp\020\"\022\030\n\024ID_ExecuteCommandReq\020"
-      "#\022\030\n\024ID_ExecuteCommandRsp\020$\022\024\n\020ID_Parent"
-      "DataReq\020%\022\024\n\020ID_ParentDataRsp\020&*E\n\013Progr"
-      "amType\022\t\n\005Zero2\020\000\022\n\n\006CLIENT\020\001\022\n\n\006SERVER\020"
-      "\002\022\010\n\004NODE\020\003\022\t\n\005POINT\020\004P\000b\006proto3"
+      "buf.Timestamp\022+\n\007RspTime\030\003 \001(\0132\032.google."
+      "protobuf.Timestamp\022#\n\004Data\030\004 \003(\0132\025.txdat"
+      "a.ConnectedData*\276\002\n\007MsgType\022\t\n\005Zero1\020\000\022\025"
+      "\n\021ID_ConnectionInfo\020\001\022\024\n\020ID_ConnectedDat"
+      "a\020\002\022\027\n\023ID_DisconnectedData\020\003\022\024\n\020ID_Commo"
+      "nNtosReq\020\004\022\024\n\020ID_CommonNtosRsp\020\005\022\024\n\020ID_C"
+      "ommonStonReq\020\006\022\024\n\020ID_CommonStonRsp\020\007\022\030\n\024"
+      "ID_ExecuteCommandReq\020\010\022\030\n\024ID_ExecuteComm"
+      "andRsp\020\t\022\025\n\021ID_ReportDataItem\020\n\022\023\n\017ID_Se"
+      "ndMailItem\020\013\022\024\n\020ID_ParentDataReq\020\014\022\024\n\020ID"
+      "_ParentDataRsp\020\r*E\n\013ProgramType\022\t\n\005Zero2"
+      "\020\000\022\n\n\006CLIENT\020\001\022\n\n\006SERVER\020\002\022\010\n\004NODE\020\003\022\t\n\005"
+      "POINT\020\004P\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 2192);
+      descriptor, 2297);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -628,14 +631,17 @@ bool MsgType_IsValid(int value) {
     case 0:
     case 1:
     case 2:
-    case 31:
-    case 32:
-    case 33:
-    case 34:
-    case 35:
-    case 36:
-    case 37:
-    case 38:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
       return true;
     default:
       return false;
@@ -2248,8 +2254,8 @@ void CommonNtosReq::clear_reqtime() {
 const int CommonNtosReq::kRequestIDFieldNumber;
 const int CommonNtosReq::kUserIDFieldNumber;
 const int CommonNtosReq::kSeqNoFieldNumber;
-const int CommonNtosReq::kDataTypeFieldNumber;
-const int CommonNtosReq::kDataFieldNumber;
+const int CommonNtosReq::kReqTypeFieldNumber;
+const int CommonNtosReq::kReqDataFieldNumber;
 const int CommonNtosReq::kReqTimeFieldNumber;
 const int CommonNtosReq::kRefNumFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -2269,13 +2275,9 @@ CommonNtosReq::CommonNtosReq(const CommonNtosReq& from)
   if (from.userid().size() > 0) {
     userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
-  datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.datatype().size() > 0) {
-    datatype_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.datatype_);
-  }
-  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.data().size() > 0) {
-    data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
+  reqdata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.reqdata().size() > 0) {
+    reqdata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.reqdata_);
   }
   if (from.has_reqtime()) {
     reqtime_ = new ::google::protobuf::Timestamp(*from.reqtime_);
@@ -2283,18 +2285,17 @@ CommonNtosReq::CommonNtosReq(const CommonNtosReq& from)
     reqtime_ = NULL;
   }
   ::memcpy(&requestid_, &from.requestid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&refnum_) -
-    reinterpret_cast<char*>(&requestid_)) + sizeof(refnum_));
+    static_cast<size_t>(reinterpret_cast<char*>(&reqtype_) -
+    reinterpret_cast<char*>(&requestid_)) + sizeof(reqtype_));
   // @@protoc_insertion_point(copy_constructor:txdata.CommonNtosReq)
 }
 
 void CommonNtosReq::SharedCtor() {
   userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  reqdata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&reqtime_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&refnum_) -
-      reinterpret_cast<char*>(&reqtime_)) + sizeof(refnum_));
+      reinterpret_cast<char*>(&reqtype_) -
+      reinterpret_cast<char*>(&reqtime_)) + sizeof(reqtype_));
 }
 
 CommonNtosReq::~CommonNtosReq() {
@@ -2304,8 +2305,7 @@ CommonNtosReq::~CommonNtosReq() {
 
 void CommonNtosReq::SharedDtor() {
   userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  datatype_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  reqdata_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete reqtime_;
 }
 
@@ -2330,15 +2330,14 @@ void CommonNtosReq::Clear() {
   (void) cached_has_bits;
 
   userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == NULL && reqtime_ != NULL) {
     delete reqtime_;
   }
   reqtime_ = NULL;
   ::memset(&requestid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&refnum_) -
-      reinterpret_cast<char*>(&requestid_)) + sizeof(refnum_));
+      reinterpret_cast<char*>(&reqtype_) -
+      reinterpret_cast<char*>(&requestid_)) + sizeof(reqtype_));
   _internal_metadata_.Clear();
 }
 
@@ -2396,28 +2395,27 @@ bool CommonNtosReq::MergePartialFromCodedStream(
         break;
       }
 
-      // string DataType = 4;
+      // .txdata.MsgType ReqType = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_datatype()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->datatype().data(), static_cast<int>(this->datatype().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "txdata.CommonNtosReq.DataType"));
+            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_reqtype(static_cast< ::txdata::MsgType >(value));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // bytes Data = 5;
+      // bytes ReqData = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_data()));
+                input, this->mutable_reqdata()));
         } else {
           goto handle_unusual;
         }
@@ -2496,20 +2494,16 @@ void CommonNtosReq::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->seqno(), output);
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->datatype().data(), static_cast<int>(this->datatype().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosReq.DataType");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->datatype(), output);
+  // .txdata.MsgType ReqType = 4;
+  if (this->reqtype() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->reqtype(), output);
   }
 
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes ReqData = 5;
+  if (this->reqdata().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      5, this->data(), output);
+      5, this->reqdata(), output);
   }
 
   // .google.protobuf.Timestamp ReqTime = 6;
@@ -2558,22 +2552,17 @@ void CommonNtosReq::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->seqno(), target);
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->datatype().data(), static_cast<int>(this->datatype().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosReq.DataType");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->datatype(), target);
+  // .txdata.MsgType ReqType = 4;
+  if (this->reqtype() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->reqtype(), target);
   }
 
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes ReqData = 5;
+  if (this->reqdata().size() > 0) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        5, this->data(), target);
+        5, this->reqdata(), target);
   }
 
   // .google.protobuf.Timestamp ReqTime = 6;
@@ -2612,18 +2601,11 @@ size_t CommonNtosReq::ByteSizeLong() const {
         this->userid());
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->datatype());
-  }
-
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes ReqData = 5;
+  if (this->reqdata().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::BytesSize(
-        this->data());
+        this->reqdata());
   }
 
   // .google.protobuf.Timestamp ReqTime = 6;
@@ -2652,6 +2634,12 @@ size_t CommonNtosReq::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->refnum());
+  }
+
+  // .txdata.MsgType ReqType = 4;
+  if (this->reqtype() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->reqtype());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -2685,13 +2673,9 @@ void CommonNtosReq::MergeFrom(const CommonNtosReq& from) {
 
     userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
   }
-  if (from.datatype().size() > 0) {
+  if (from.reqdata().size() > 0) {
 
-    datatype_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.datatype_);
-  }
-  if (from.data().size() > 0) {
-
-    data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
+    reqdata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.reqdata_);
   }
   if (from.has_reqtime()) {
     mutable_reqtime()->::google::protobuf::Timestamp::MergeFrom(from.reqtime());
@@ -2704,6 +2688,9 @@ void CommonNtosReq::MergeFrom(const CommonNtosReq& from) {
   }
   if (from.refnum() != 0) {
     set_refnum(from.refnum());
+  }
+  if (from.reqtype() != 0) {
+    set_reqtype(from.reqtype());
   }
 }
 
@@ -2733,14 +2720,13 @@ void CommonNtosReq::InternalSwap(CommonNtosReq* other) {
   using std::swap;
   userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  datatype_.Swap(&other->datatype_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  data_.Swap(&other->data_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  reqdata_.Swap(&other->reqdata_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(reqtime_, other->reqtime_);
   swap(requestid_, other->requestid_);
   swap(seqno_, other->seqno_);
   swap(refnum_, other->refnum_);
+  swap(reqtype_, other->reqtype_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
@@ -2766,8 +2752,8 @@ void CommonNtosRsp::clear_rsptime() {
 const int CommonNtosRsp::kRequestIDFieldNumber;
 const int CommonNtosRsp::kPathwayFieldNumber;
 const int CommonNtosRsp::kSeqNoFieldNumber;
-const int CommonNtosRsp::kDataTypeFieldNumber;
-const int CommonNtosRsp::kDataFieldNumber;
+const int CommonNtosRsp::kRspTypeFieldNumber;
+const int CommonNtosRsp::kRspDataFieldNumber;
 const int CommonNtosRsp::kRspTimeFieldNumber;
 const int CommonNtosRsp::kFromServerFieldNumber;
 const int CommonNtosRsp::kErrNoFieldNumber;
@@ -2787,13 +2773,9 @@ CommonNtosRsp::CommonNtosRsp(const CommonNtosRsp& from)
       _internal_metadata_(NULL),
       pathway_(from.pathway_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.datatype().size() > 0) {
-    datatype_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.datatype_);
-  }
-  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.data().size() > 0) {
-    data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
+  rspdata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.rspdata().size() > 0) {
+    rspdata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.rspdata_);
   }
   errmsg_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.errmsg().size() > 0) {
@@ -2805,18 +2787,17 @@ CommonNtosRsp::CommonNtosRsp(const CommonNtosRsp& from)
     rsptime_ = NULL;
   }
   ::memcpy(&requestid_, &from.requestid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&refnum_) -
-    reinterpret_cast<char*>(&requestid_)) + sizeof(refnum_));
+    static_cast<size_t>(reinterpret_cast<char*>(&errno_) -
+    reinterpret_cast<char*>(&requestid_)) + sizeof(errno_));
   // @@protoc_insertion_point(copy_constructor:txdata.CommonNtosRsp)
 }
 
 void CommonNtosRsp::SharedCtor() {
-  datatype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  rspdata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&rsptime_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&refnum_) -
-      reinterpret_cast<char*>(&rsptime_)) + sizeof(refnum_));
+      reinterpret_cast<char*>(&errno_) -
+      reinterpret_cast<char*>(&rsptime_)) + sizeof(errno_));
 }
 
 CommonNtosRsp::~CommonNtosRsp() {
@@ -2825,8 +2806,7 @@ CommonNtosRsp::~CommonNtosRsp() {
 }
 
 void CommonNtosRsp::SharedDtor() {
-  datatype_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  rspdata_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete rsptime_;
 }
@@ -2852,16 +2832,15 @@ void CommonNtosRsp::Clear() {
   (void) cached_has_bits;
 
   pathway_.Clear();
-  datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == NULL && rsptime_ != NULL) {
     delete rsptime_;
   }
   rsptime_ = NULL;
   ::memset(&requestid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&refnum_) -
-      reinterpret_cast<char*>(&requestid_)) + sizeof(refnum_));
+      reinterpret_cast<char*>(&errno_) -
+      reinterpret_cast<char*>(&requestid_)) + sizeof(errno_));
   _internal_metadata_.Clear();
 }
 
@@ -2920,28 +2899,27 @@ bool CommonNtosRsp::MergePartialFromCodedStream(
         break;
       }
 
-      // string DataType = 4;
+      // .txdata.MsgType RspType = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_datatype()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->datatype().data(), static_cast<int>(this->datatype().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "txdata.CommonNtosRsp.DataType"));
+            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_rsptype(static_cast< ::txdata::MsgType >(value));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // bytes Data = 5;
+      // bytes RspData = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_data()));
+                input, this->mutable_rspdata()));
         } else {
           goto handle_unusual;
         }
@@ -3064,20 +3042,16 @@ void CommonNtosRsp::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->seqno(), output);
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->datatype().data(), static_cast<int>(this->datatype().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosRsp.DataType");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->datatype(), output);
+  // .txdata.MsgType RspType = 4;
+  if (this->rsptype() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->rsptype(), output);
   }
 
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes RspData = 5;
+  if (this->rspdata().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      5, this->data(), output);
+      5, this->rspdata(), output);
   }
 
   // .google.protobuf.Timestamp RspTime = 6;
@@ -3145,22 +3119,17 @@ void CommonNtosRsp::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->seqno(), target);
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->datatype().data(), static_cast<int>(this->datatype().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "txdata.CommonNtosRsp.DataType");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->datatype(), target);
+  // .txdata.MsgType RspType = 4;
+  if (this->rsptype() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->rsptype(), target);
   }
 
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes RspData = 5;
+  if (this->rspdata().size() > 0) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        5, this->data(), target);
+        5, this->rspdata(), target);
   }
 
   // .google.protobuf.Timestamp RspTime = 6;
@@ -3221,18 +3190,11 @@ size_t CommonNtosRsp::ByteSizeLong() const {
       this->pathway(i));
   }
 
-  // string DataType = 4;
-  if (this->datatype().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->datatype());
-  }
-
-  // bytes Data = 5;
-  if (this->data().size() > 0) {
+  // bytes RspData = 5;
+  if (this->rspdata().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::BytesSize(
-        this->data());
+        this->rspdata());
   }
 
   // string ErrMsg = 9;
@@ -3263,16 +3225,15 @@ size_t CommonNtosRsp::ByteSizeLong() const {
         this->seqno());
   }
 
+  // .txdata.MsgType RspType = 4;
+  if (this->rsptype() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->rsptype());
+  }
+
   // bool FromServer = 7;
   if (this->fromserver() != 0) {
     total_size += 1 + 1;
-  }
-
-  // int32 ErrNo = 8;
-  if (this->errno() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->errno());
   }
 
   // int64 RefNum = 10;
@@ -3280,6 +3241,13 @@ size_t CommonNtosRsp::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->refnum());
+  }
+
+  // int32 ErrNo = 8;
+  if (this->errno() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->errno());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -3310,13 +3278,9 @@ void CommonNtosRsp::MergeFrom(const CommonNtosRsp& from) {
   (void) cached_has_bits;
 
   pathway_.MergeFrom(from.pathway_);
-  if (from.datatype().size() > 0) {
+  if (from.rspdata().size() > 0) {
 
-    datatype_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.datatype_);
-  }
-  if (from.data().size() > 0) {
-
-    data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
+    rspdata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.rspdata_);
   }
   if (from.errmsg().size() > 0) {
 
@@ -3331,14 +3295,17 @@ void CommonNtosRsp::MergeFrom(const CommonNtosRsp& from) {
   if (from.seqno() != 0) {
     set_seqno(from.seqno());
   }
+  if (from.rsptype() != 0) {
+    set_rsptype(from.rsptype());
+  }
   if (from.fromserver() != 0) {
     set_fromserver(from.fromserver());
   }
-  if (from.errno() != 0) {
-    set_errno(from.errno());
-  }
   if (from.refnum() != 0) {
     set_refnum(from.refnum());
+  }
+  if (from.errno() != 0) {
+    set_errno(from.errno());
   }
 }
 
@@ -3367,18 +3334,17 @@ void CommonNtosRsp::Swap(CommonNtosRsp* other) {
 void CommonNtosRsp::InternalSwap(CommonNtosRsp* other) {
   using std::swap;
   pathway_.InternalSwap(CastToBase(&other->pathway_));
-  datatype_.Swap(&other->datatype_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  data_.Swap(&other->data_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  rspdata_.Swap(&other->rspdata_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   errmsg_.Swap(&other->errmsg_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(rsptime_, other->rsptime_);
   swap(requestid_, other->requestid_);
   swap(seqno_, other->seqno_);
+  swap(rsptype_, other->rsptype_);
   swap(fromserver_, other->fromserver_);
-  swap(errno_, other->errno_);
   swap(refnum_, other->refnum_);
+  swap(errno_, other->errno_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 

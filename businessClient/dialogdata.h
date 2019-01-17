@@ -18,7 +18,7 @@ public:
 public:
     bool needResp();
     bool needSave();
-    void getData(QByteArray& dataOut, int& typeOut);
+    void getData(QByteArray& dataOut, int32_t& typeOut);
 
 private:
     void initUI();
@@ -30,7 +30,7 @@ private slots:
 private:
     Ui::DialogData* ui;
     QByteArray      m_currData;
-    int             m_currType;
+    int32_t         m_currType;
 };
 
 #endif // DIALOGDATA_H

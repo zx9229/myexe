@@ -135,16 +135,19 @@ inline bool ConnectionInfo_LinkType_Parse(
 }
 enum MsgType {
   Zero1 = 0,
-  ID_ConnectedData = 1,
-  ID_DisconnectedData = 2,
-  ID_CommonNtosReq = 31,
-  ID_CommonNtosRsp = 32,
-  ID_CommonStonReq = 33,
-  ID_CommonStoaRsp = 34,
-  ID_ExecuteCommandReq = 35,
-  ID_ExecuteCommandRsp = 36,
-  ID_ParentDataReq = 37,
-  ID_ParentDataRsp = 38,
+  ID_ConnectionInfo = 1,
+  ID_ConnectedData = 2,
+  ID_DisconnectedData = 3,
+  ID_CommonNtosReq = 4,
+  ID_CommonNtosRsp = 5,
+  ID_CommonStonReq = 6,
+  ID_CommonStonRsp = 7,
+  ID_ExecuteCommandReq = 8,
+  ID_ExecuteCommandRsp = 9,
+  ID_ReportDataItem = 10,
+  ID_SendMailItem = 11,
+  ID_ParentDataReq = 12,
+  ID_ParentDataRsp = 13,
   MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
@@ -918,33 +921,19 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::std::string* release_userid();
   void set_allocated_userid(::std::string* userid);
 
-  // string DataType = 4;
-  void clear_datatype();
-  static const int kDataTypeFieldNumber = 4;
-  const ::std::string& datatype() const;
-  void set_datatype(const ::std::string& value);
+  // bytes ReqData = 5;
+  void clear_reqdata();
+  static const int kReqDataFieldNumber = 5;
+  const ::std::string& reqdata() const;
+  void set_reqdata(const ::std::string& value);
   #if LANG_CXX11
-  void set_datatype(::std::string&& value);
+  void set_reqdata(::std::string&& value);
   #endif
-  void set_datatype(const char* value);
-  void set_datatype(const char* value, size_t size);
-  ::std::string* mutable_datatype();
-  ::std::string* release_datatype();
-  void set_allocated_datatype(::std::string* datatype);
-
-  // bytes Data = 5;
-  void clear_data();
-  static const int kDataFieldNumber = 5;
-  const ::std::string& data() const;
-  void set_data(const ::std::string& value);
-  #if LANG_CXX11
-  void set_data(::std::string&& value);
-  #endif
-  void set_data(const char* value);
-  void set_data(const void* value, size_t size);
-  ::std::string* mutable_data();
-  ::std::string* release_data();
-  void set_allocated_data(::std::string* data);
+  void set_reqdata(const char* value);
+  void set_reqdata(const void* value, size_t size);
+  ::std::string* mutable_reqdata();
+  ::std::string* release_reqdata();
+  void set_allocated_reqdata(::std::string* reqdata);
 
   // .google.protobuf.Timestamp ReqTime = 6;
   bool has_reqtime() const;
@@ -976,17 +965,23 @@ class CommonNtosReq : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 refnum() const;
   void set_refnum(::google::protobuf::int64 value);
 
+  // .txdata.MsgType ReqType = 4;
+  void clear_reqtype();
+  static const int kReqTypeFieldNumber = 4;
+  ::txdata::MsgType reqtype() const;
+  void set_reqtype(::txdata::MsgType value);
+
   // @@protoc_insertion_point(class_scope:txdata.CommonNtosReq)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr userid_;
-  ::google::protobuf::internal::ArenaStringPtr datatype_;
-  ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::internal::ArenaStringPtr reqdata_;
   ::google::protobuf::Timestamp* reqtime_;
   ::google::protobuf::int64 requestid_;
   ::google::protobuf::int64 seqno_;
   ::google::protobuf::int64 refnum_;
+  int reqtype_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -1101,33 +1096,19 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   const ::google::protobuf::RepeatedPtrField< ::std::string>& pathway() const;
   ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_pathway();
 
-  // string DataType = 4;
-  void clear_datatype();
-  static const int kDataTypeFieldNumber = 4;
-  const ::std::string& datatype() const;
-  void set_datatype(const ::std::string& value);
+  // bytes RspData = 5;
+  void clear_rspdata();
+  static const int kRspDataFieldNumber = 5;
+  const ::std::string& rspdata() const;
+  void set_rspdata(const ::std::string& value);
   #if LANG_CXX11
-  void set_datatype(::std::string&& value);
+  void set_rspdata(::std::string&& value);
   #endif
-  void set_datatype(const char* value);
-  void set_datatype(const char* value, size_t size);
-  ::std::string* mutable_datatype();
-  ::std::string* release_datatype();
-  void set_allocated_datatype(::std::string* datatype);
-
-  // bytes Data = 5;
-  void clear_data();
-  static const int kDataFieldNumber = 5;
-  const ::std::string& data() const;
-  void set_data(const ::std::string& value);
-  #if LANG_CXX11
-  void set_data(::std::string&& value);
-  #endif
-  void set_data(const char* value);
-  void set_data(const void* value, size_t size);
-  ::std::string* mutable_data();
-  ::std::string* release_data();
-  void set_allocated_data(::std::string* data);
+  void set_rspdata(const char* value);
+  void set_rspdata(const void* value, size_t size);
+  ::std::string* mutable_rspdata();
+  ::std::string* release_rspdata();
+  void set_allocated_rspdata(::std::string* rspdata);
 
   // string ErrMsg = 9;
   void clear_errmsg();
@@ -1167,11 +1148,23 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::google::protobuf::int64 seqno() const;
   void set_seqno(::google::protobuf::int64 value);
 
+  // .txdata.MsgType RspType = 4;
+  void clear_rsptype();
+  static const int kRspTypeFieldNumber = 4;
+  ::txdata::MsgType rsptype() const;
+  void set_rsptype(::txdata::MsgType value);
+
   // bool FromServer = 7;
   void clear_fromserver();
   static const int kFromServerFieldNumber = 7;
   bool fromserver() const;
   void set_fromserver(bool value);
+
+  // int64 RefNum = 10;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 10;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
 
   // int32 ErrNo = 8;
   void clear_errno();
@@ -1182,26 +1175,20 @@ class CommonNtosRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
 #endif
   void set_errno(::google::protobuf::int32 value);
 
-  // int64 RefNum = 10;
-  void clear_refnum();
-  static const int kRefNumFieldNumber = 10;
-  ::google::protobuf::int64 refnum() const;
-  void set_refnum(::google::protobuf::int64 value);
-
   // @@protoc_insertion_point(class_scope:txdata.CommonNtosRsp)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::std::string> pathway_;
-  ::google::protobuf::internal::ArenaStringPtr datatype_;
-  ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::internal::ArenaStringPtr rspdata_;
   ::google::protobuf::internal::ArenaStringPtr errmsg_;
   ::google::protobuf::Timestamp* rsptime_;
   ::google::protobuf::int64 requestid_;
   ::google::protobuf::int64 seqno_;
+  int rsptype_;
   bool fromserver_;
-  ::google::protobuf::int32 errno_;
   ::google::protobuf::int64 refnum_;
+  ::google::protobuf::int32 errno_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -3289,110 +3276,71 @@ inline void CommonNtosReq::set_seqno(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.SeqNo)
 }
 
-// string DataType = 4;
-inline void CommonNtosReq::clear_datatype() {
-  datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .txdata.MsgType ReqType = 4;
+inline void CommonNtosReq::clear_reqtype() {
+  reqtype_ = 0;
 }
-inline const ::std::string& CommonNtosReq::datatype() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.DataType)
-  return datatype_.GetNoArena();
+inline ::txdata::MsgType CommonNtosReq::reqtype() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.ReqType)
+  return static_cast< ::txdata::MsgType >(reqtype_);
 }
-inline void CommonNtosReq::set_datatype(const ::std::string& value) {
+inline void CommonNtosReq::set_reqtype(::txdata::MsgType value) {
   
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.DataType)
-}
-#if LANG_CXX11
-inline void CommonNtosReq::set_datatype(::std::string&& value) {
-  
-  datatype_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosReq.DataType)
-}
-#endif
-inline void CommonNtosReq::set_datatype(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosReq.DataType)
-}
-inline void CommonNtosReq::set_datatype(const char* value, size_t size) {
-  
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosReq.DataType)
-}
-inline ::std::string* CommonNtosReq::mutable_datatype() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.DataType)
-  return datatype_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* CommonNtosReq::release_datatype() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.DataType)
-  
-  return datatype_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void CommonNtosReq::set_allocated_datatype(::std::string* datatype) {
-  if (datatype != NULL) {
-    
-  } else {
-    
-  }
-  datatype_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), datatype);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.DataType)
+  reqtype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.ReqType)
 }
 
-// bytes Data = 5;
-inline void CommonNtosReq::clear_data() {
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// bytes ReqData = 5;
+inline void CommonNtosReq::clear_reqdata() {
+  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& CommonNtosReq::data() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.Data)
-  return data_.GetNoArena();
+inline const ::std::string& CommonNtosReq::reqdata() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosReq.ReqData)
+  return reqdata_.GetNoArena();
 }
-inline void CommonNtosReq::set_data(const ::std::string& value) {
+inline void CommonNtosReq::set_reqdata(const ::std::string& value) {
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.Data)
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosReq.ReqData)
 }
 #if LANG_CXX11
-inline void CommonNtosReq::set_data(::std::string&& value) {
+inline void CommonNtosReq::set_reqdata(::std::string&& value) {
   
-  data_.SetNoArena(
+  reqdata_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosReq.Data)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosReq.ReqData)
 }
 #endif
-inline void CommonNtosReq::set_data(const char* value) {
+inline void CommonNtosReq::set_reqdata(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosReq.Data)
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosReq.ReqData)
 }
-inline void CommonNtosReq::set_data(const void* value, size_t size) {
+inline void CommonNtosReq::set_reqdata(const void* value, size_t size) {
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosReq.Data)
+  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosReq.ReqData)
 }
-inline ::std::string* CommonNtosReq::mutable_data() {
+inline ::std::string* CommonNtosReq::mutable_reqdata() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.Data)
-  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosReq.ReqData)
+  return reqdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* CommonNtosReq::release_data() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.Data)
+inline ::std::string* CommonNtosReq::release_reqdata() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosReq.ReqData)
   
-  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return reqdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void CommonNtosReq::set_allocated_data(::std::string* data) {
-  if (data != NULL) {
+inline void CommonNtosReq::set_allocated_reqdata(::std::string* reqdata) {
+  if (reqdata != NULL) {
     
   } else {
     
   }
-  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.Data)
+  reqdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reqdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosReq.ReqData)
 }
 
 // .google.protobuf.Timestamp ReqTime = 6;
@@ -3559,110 +3507,71 @@ inline void CommonNtosRsp::set_seqno(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.SeqNo)
 }
 
-// string DataType = 4;
-inline void CommonNtosRsp::clear_datatype() {
-  datatype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .txdata.MsgType RspType = 4;
+inline void CommonNtosRsp::clear_rsptype() {
+  rsptype_ = 0;
 }
-inline const ::std::string& CommonNtosRsp::datatype() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.DataType)
-  return datatype_.GetNoArena();
+inline ::txdata::MsgType CommonNtosRsp::rsptype() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.RspType)
+  return static_cast< ::txdata::MsgType >(rsptype_);
 }
-inline void CommonNtosRsp::set_datatype(const ::std::string& value) {
+inline void CommonNtosRsp::set_rsptype(::txdata::MsgType value) {
   
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.DataType)
-}
-#if LANG_CXX11
-inline void CommonNtosRsp::set_datatype(::std::string&& value) {
-  
-  datatype_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosRsp.DataType)
-}
-#endif
-inline void CommonNtosRsp::set_datatype(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosRsp.DataType)
-}
-inline void CommonNtosRsp::set_datatype(const char* value, size_t size) {
-  
-  datatype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosRsp.DataType)
-}
-inline ::std::string* CommonNtosRsp::mutable_datatype() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.DataType)
-  return datatype_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* CommonNtosRsp::release_datatype() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.DataType)
-  
-  return datatype_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void CommonNtosRsp::set_allocated_datatype(::std::string* datatype) {
-  if (datatype != NULL) {
-    
-  } else {
-    
-  }
-  datatype_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), datatype);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.DataType)
+  rsptype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.RspType)
 }
 
-// bytes Data = 5;
-inline void CommonNtosRsp::clear_data() {
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// bytes RspData = 5;
+inline void CommonNtosRsp::clear_rspdata() {
+  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& CommonNtosRsp::data() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.Data)
-  return data_.GetNoArena();
+inline const ::std::string& CommonNtosRsp::rspdata() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonNtosRsp.RspData)
+  return rspdata_.GetNoArena();
 }
-inline void CommonNtosRsp::set_data(const ::std::string& value) {
+inline void CommonNtosRsp::set_rspdata(const ::std::string& value) {
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.Data)
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.CommonNtosRsp.RspData)
 }
 #if LANG_CXX11
-inline void CommonNtosRsp::set_data(::std::string&& value) {
+inline void CommonNtosRsp::set_rspdata(::std::string&& value) {
   
-  data_.SetNoArena(
+  rspdata_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosRsp.Data)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonNtosRsp.RspData)
 }
 #endif
-inline void CommonNtosRsp::set_data(const char* value) {
+inline void CommonNtosRsp::set_rspdata(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosRsp.Data)
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.CommonNtosRsp.RspData)
 }
-inline void CommonNtosRsp::set_data(const void* value, size_t size) {
+inline void CommonNtosRsp::set_rspdata(const void* value, size_t size) {
   
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosRsp.Data)
+  // @@protoc_insertion_point(field_set_pointer:txdata.CommonNtosRsp.RspData)
 }
-inline ::std::string* CommonNtosRsp::mutable_data() {
+inline ::std::string* CommonNtosRsp::mutable_rspdata() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.Data)
-  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.CommonNtosRsp.RspData)
+  return rspdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* CommonNtosRsp::release_data() {
-  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.Data)
+inline ::std::string* CommonNtosRsp::release_rspdata() {
+  // @@protoc_insertion_point(field_release:txdata.CommonNtosRsp.RspData)
   
-  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return rspdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void CommonNtosRsp::set_allocated_data(::std::string* data) {
-  if (data != NULL) {
+inline void CommonNtosRsp::set_allocated_rspdata(::std::string* rspdata) {
+  if (rspdata != NULL) {
     
   } else {
     
   }
-  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.Data)
+  rspdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rspdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonNtosRsp.RspData)
 }
 
 // .google.protobuf.Timestamp RspTime = 6;

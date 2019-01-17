@@ -129,7 +129,7 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
         reqData.RefNum = lastInsertId;
         txdata::CommonNtosReq data4send;
         toCommonNtosReq(reqData, data4send);
-        m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_CommonNtosReq, data4send));
+        m_ws.sendBinaryMessage(m2b::msg2pkg(data4send));
     }
     return opFinish;
 }
@@ -242,8 +242,8 @@ void DataExchanger::toCommonNtosReq(QCommonNtosReq &src, txdata::CommonNtosReq &
     dst.set_requestid(src.RequestID);
     dst.set_userid(src.UserID.toStdString());
     dst.set_seqno(src.SeqNo);
-    dst.set_datatype(src.ReqType.toStdString());
-    dst.set_data(src.ReqData.data(), src.ReqData.size());
+    dst.set_reqtype(static_cast<txdata::MsgType>(src.ReqType));
+    dst.set_reqdata(src.ReqData.data(), src.ReqData.size());
     if (src.ReqTime.isValid())
     {
         dst.mutable_reqtime()->set_seconds(src.ReqTime.offsetFromUtc());
@@ -257,11 +257,11 @@ void DataExchanger::slotOnConnected()
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
 
     {
-        txdata::ConnectedData tmpData = {};
-        tmpData.mutable_info()->CopyFrom(m_ownInfo);
-        tmpData.add_pathway(tmpData.info().userid());
+        txdata::ConnectedData data4send = {};
+        data4send.mutable_info()->CopyFrom(m_ownInfo);
+        data4send.add_pathway(data4send.info().userid());
 
-        m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::ID_ConnectedData, tmpData));
+        m_ws.sendBinaryMessage(m2b::msg2pkg(data4send));
     }
 }
 
@@ -303,7 +303,7 @@ void DataExchanger::slotParentDataReq()
     // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
     reqData.mutable_reqtime()->set_seconds(time(NULL));
     reqData.mutable_reqtime()->set_nanos(0);
-    m_ws.sendBinaryMessage(m2b::msg2pkg(txdata::MsgType::ID_ParentDataReq, reqData));
+    m_ws.sendBinaryMessage(m2b::msg2pkg(reqData));
 }
 
 void DataExchanger::slotOnError(QAbstractSocket::SocketError error)

@@ -11,15 +11,17 @@
 #include "txdata.pb.h"
 #include <QSharedPointer>
 
-using GPMSGPTR = ::QSharedPointer<::google::protobuf::Message>;
+using GPMSGPTR = QSharedPointer<::google::protobuf::Message>;
 
 class m2b
 {
 public:
-    static bool msg2pkg(::txdata::MsgType msgType, const ::google::protobuf::Message& msgIn, ::QByteArray& pkgOut)
+    static bool msg2pkg(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
-        //令(int i = 1)则assert(reinterpret_cast<char*>(&i)[0] == 1)
         pkgOut.clear();
+        //在定义(.proto)文件的时候,就必须将其对应正确.
+        ::txdata::MsgType msgType = static_cast<::txdata::MsgType>(msgIn.GetDescriptor()->index());
+        //令(int i = 1)则assert(reinterpret_cast<char*>(&i)[0] == 1)
         pkgOut.append(reinterpret_cast<char*>(&msgType), 2);
         std::string tmpData;
         if (msgIn.SerializeToString(&tmpData) == false)
@@ -28,10 +30,10 @@ public:
         return true;
     }
 
-    static QByteArray msg2pkg(::txdata::MsgType msgType, const ::google::protobuf::Message& msgIn)
+    static QByteArray msg2pkg(const ::google::protobuf::Message& msgIn)
     {
         QByteArray pkgOut;
-        bool retVal = msg2pkg(msgType, msgIn, pkgOut);
+        bool retVal = msg2pkg(msgIn, pkgOut);
         Q_ASSERT(retVal);
         return pkgOut;
     }
@@ -44,7 +46,7 @@ public:
         return dst;
     }
 
-    static bool pkg2msg(const ::QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
+    static bool pkg2msg(const QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
     {
         msgOut.clear();
 

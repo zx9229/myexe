@@ -221,7 +221,7 @@ public:
     int64_t    RequestID;
     QString    UserID;
     int64_t    SeqNo;
-    QString    ReqType;
+    int32_t    ReqType;
     QByteArray ReqData;
     QDateTime  ReqTime;
 public:
@@ -231,7 +231,7 @@ public:
         this->RequestID = INT64_MAX;
         this->UserID.clear();
         this->SeqNo = INT64_MAX;
-        this->ReqType.clear();
+        this->ReqType = INT32_MAX;
         this->ReqData.clear();
         this->ReqTime = QDateTime();
     }
@@ -248,7 +248,7 @@ public:
             RequestID INTEGER     NULL ,\
             UserID    TEXT    NOT NULL ,\
             SeqNo     INTEGER     NULL UNIQUE ,\
-            ReqType   TEXT    NOT NULL ,\
+            ReqType   INTEGER NOT NULL ,\
             ReqData   BLOB        NULL ,\
             ReqTime   TEXT        NULL )"
         ).QString::arg(static_table_name());
