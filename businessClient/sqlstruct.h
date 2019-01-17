@@ -130,42 +130,42 @@ public:
     {
         //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
         bool isOk = false;
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){cols.append\("$1"\);}】.
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
         //注意(NOT NULL)要特殊处理.
         this->CreateTime = QDateTime::currentDateTime();
         QStringList cols;
-        if (!Valid(this->ID)) { cols.append("ID"); }
-        if (!Valid(this->RequestID)) { cols.append("RequestID"); }
-        if (!Valid(this->SeqNo)) { cols.append("SeqNo"); }
-        if (!Valid(this->UserID)) { cols.append("UserID"); }
-        if (!Valid(this->ReqType)) { cols.append("ReqType"); }
-        if (!Valid(this->ReqData)) { cols.append("ReqData"); }
-        if (!Valid(this->ReqTime)) { cols.append("ReqTime"); }
-        if (!Valid(this->CreateTime)) { cols.append("CreateTime"); }
-        if (!Valid(this->State)) { cols.append("State"); }
-        if (!Valid(this->ErrNo)) { cols.append("ErrNo"); }
-        if (!Valid(this->ErrMsg)) { cols.append("ErrMsg"); }
-        if (!Valid(this->RspType)) { cols.append("RspType"); }
-        if (!Valid(this->RspData)) { cols.append("RspData"); }
+        if (Valid(this->ID)) { cols.append("ID"); }
+        if (Valid(this->RequestID)) { cols.append("RequestID"); }
+        if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (Valid(this->UserID)) { cols.append("UserID"); }
+        if (Valid(this->ReqType)) { cols.append("ReqType"); }
+        if (Valid(this->ReqData)) { cols.append("ReqData"); }
+        if (Valid(this->ReqTime)) { cols.append("ReqTime"); }
+        if (Valid(this->CreateTime)) { cols.append("CreateTime"); }
+        if (Valid(this->State)) { cols.append("State"); }
+        if (Valid(this->ErrNo)) { cols.append("ErrNo"); }
+        if (Valid(this->ErrMsg)) { cols.append("ErrMsg"); }
+        if (Valid(this->RspType)) { cols.append("RspType"); }
+        if (Valid(this->RspData)) { cols.append("RspData"); }
         //
         QString sqlStr = QObject::tr("INSERT INTO %1 (%2) VALUES (%3)").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
         isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
         //
-        if (!Valid(this->ID)) { query.bindValue(":ID", this->ID); }
-        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
-        if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
-        if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
-        if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
-        if (!Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
-        if (!Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
-        if (!Valid(this->CreateTime)) { query.bindValue(":CreateTime", this->CreateTime); }
-        if (!Valid(this->State)) { query.bindValue(":State", this->State); }
-        if (!Valid(this->ErrNo)) { query.bindValue(":ErrNo", this->ErrNo); }
-        if (!Valid(this->ErrMsg)) { query.bindValue(":ErrMsg", this->ErrMsg); }
-        if (!Valid(this->RspType)) { query.bindValue(":RspType", this->RspType); }
-        if (!Valid(this->RspData)) { query.bindValue(":RspData", this->RspData); }
+        if (Valid(this->ID)) { query.bindValue(":ID", this->ID); }
+        if (Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
+        if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
+        if (Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
+        if (Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
+        if (Valid(this->CreateTime)) { query.bindValue(":CreateTime", this->CreateTime); }
+        if (Valid(this->State)) { query.bindValue(":State", this->State); }
+        if (Valid(this->ErrNo)) { query.bindValue(":ErrNo", this->ErrNo); }
+        if (Valid(this->ErrMsg)) { query.bindValue(":ErrMsg", this->ErrMsg); }
+        if (Valid(this->RspType)) { query.bindValue(":RspType", this->RspType); }
+        if (Valid(this->RspData)) { query.bindValue(":RspData", this->RspData); }
         //
         isOk = query.exec();
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
@@ -174,41 +174,41 @@ public:
     bool update_data(QSqlQuery& query, QString& whereCond)
     {
         bool isOk = false;
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){cols.append\("$1=:$1"\);}】.
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1=:$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
         QStringList cols;
-        if (!Valid(this->ID)) { cols.append("ID=:ID"); }
-        if (!Valid(this->RequestID)) { cols.append("RequestID=:RequestID"); }
-        if (!Valid(this->SeqNo)) { cols.append("SeqNo=:SeqNo"); }
-        if (!Valid(this->UserID)) { cols.append("UserID=:UserID"); }
-        if (!Valid(this->ReqType)) { cols.append("ReqType=:ReqType"); }
-        if (!Valid(this->ReqData)) { cols.append("ReqData=:ReqData"); }
-        if (!Valid(this->ReqTime)) { cols.append("ReqTime=:ReqTime"); }
-        if (!Valid(this->CreateTime)) { cols.append("CreateTime=:CreateTime"); }
-        if (!Valid(this->State)) { cols.append("State=:State"); }
-        if (!Valid(this->ErrNo)) { cols.append("ErrNo=:ErrNo"); }
-        if (!Valid(this->ErrMsg)) { cols.append("ErrMsg=:ErrMsg"); }
-        if (!Valid(this->RspType)) { cols.append("RspType=:RspType"); }
-        if (!Valid(this->RspData)) { cols.append("RspData=:RspData"); }
+        if (Valid(this->ID)) { cols.append("ID=:ID"); }
+        if (Valid(this->RequestID)) { cols.append("RequestID=:RequestID"); }
+        if (Valid(this->SeqNo)) { cols.append("SeqNo=:SeqNo"); }
+        if (Valid(this->UserID)) { cols.append("UserID=:UserID"); }
+        if (Valid(this->ReqType)) { cols.append("ReqType=:ReqType"); }
+        if (Valid(this->ReqData)) { cols.append("ReqData=:ReqData"); }
+        if (Valid(this->ReqTime)) { cols.append("ReqTime=:ReqTime"); }
+        if (Valid(this->CreateTime)) { cols.append("CreateTime=:CreateTime"); }
+        if (Valid(this->State)) { cols.append("State=:State"); }
+        if (Valid(this->ErrNo)) { cols.append("ErrNo=:ErrNo"); }
+        if (Valid(this->ErrMsg)) { cols.append("ErrMsg=:ErrMsg"); }
+        if (Valid(this->RspType)) { cols.append("RspType=:RspType"); }
+        if (Valid(this->RspData)) { cols.append("RspData=:RspData"); }
         //
         QString sqlStr = QObject::tr("UPDATE %1 SET %2").arg(static_table_name()).arg(cols.join(" AND "));
         if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
         isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
         //
-        if (!Valid(this->ID)) { query.bindValue(":ID", this->ID); }
-        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
-        if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
-        if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
-        if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
-        if (!Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
-        if (!Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
-        if (!Valid(this->CreateTime)) { query.bindValue(":CreateTime", this->CreateTime); }
-        if (!Valid(this->State)) { query.bindValue(":State", this->State); }
-        if (!Valid(this->ErrNo)) { query.bindValue(":ErrNo", this->ErrNo); }
-        if (!Valid(this->ErrMsg)) { query.bindValue(":ErrMsg", this->ErrMsg); }
-        if (!Valid(this->RspType)) { query.bindValue(":RspType", this->RspType); }
-        if (!Valid(this->RspData)) { query.bindValue(":RspData", this->RspData); }
+        if (Valid(this->ID)) { query.bindValue(":ID", this->ID); }
+        if (Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
+        if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
+        if (Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
+        if (Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
+        if (Valid(this->CreateTime)) { query.bindValue(":CreateTime", this->CreateTime); }
+        if (Valid(this->State)) { query.bindValue(":State", this->State); }
+        if (Valid(this->ErrNo)) { query.bindValue(":ErrNo", this->ErrNo); }
+        if (Valid(this->ErrMsg)) { query.bindValue(":ErrMsg", this->ErrMsg); }
+        if (Valid(this->RspType)) { query.bindValue(":RspType", this->RspType); }
+        if (Valid(this->RspData)) { query.bindValue(":RspData", this->RspData); }
         //
         return query.exec();
     }
@@ -258,28 +258,28 @@ public:
     {
         //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
         bool isOk = false;
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){cols.append\("$1"\);}】.
-        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(!Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
         QStringList cols;
-        if (!Valid(this->RefNum)) { cols.append("RefNum"); }
-        if (!Valid(this->RequestID)) { cols.append("RequestID"); }
-        if (!Valid(this->UserID)) { cols.append("UserID"); }
-        if (!Valid(this->SeqNo)) { cols.append("SeqNo"); }
-        if (!Valid(this->ReqType)) { cols.append("ReqType"); }
-        if (!Valid(this->ReqData)) { cols.append("ReqData"); }
-        if (!Valid(this->ReqTime)) { cols.append("ReqTime"); }
+        if (Valid(this->RefNum)) { cols.append("RefNum"); }
+        if (Valid(this->RequestID)) { cols.append("RequestID"); }
+        if (Valid(this->UserID)) { cols.append("UserID"); }
+        if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (Valid(this->ReqType)) { cols.append("ReqType"); }
+        if (Valid(this->ReqData)) { cols.append("ReqData"); }
+        if (Valid(this->ReqTime)) { cols.append("ReqTime"); }
         //
         QString sqlStr = QObject::tr("INSERT INTO %1 (%2) VALUES (%3)").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
         isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
         //
-        if (!Valid(this->RefNum)) { query.bindValue(":RefNum", this->RefNum); }
-        if (!Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
-        if (!Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
-        if (!Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
-        if (!Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
-        if (!Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
-        if (!Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
+        if (Valid(this->RefNum)) { query.bindValue(":RefNum", this->RefNum); }
+        if (Valid(this->RequestID)) { query.bindValue(":RequestID", this->RequestID); }
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->ReqType)) { query.bindValue(":ReqType", this->ReqType); }
+        if (Valid(this->ReqData)) { query.bindValue(":ReqData", this->ReqData); }
+        if (Valid(this->ReqTime)) { query.bindValue(":ReqTime", this->ReqTime); }
         //
         isOk = query.exec();
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }

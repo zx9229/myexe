@@ -51,6 +51,7 @@ void MyWebsock::stop(bool sync /* = false */)
 
 qint64 MyWebsock::sendBinaryMessage(const QByteArray &data)
 {
+    if (!m_alive) { return 0; }
     qint64 sendBytes = m_ws.sendBinaryMessage(data);
     Q_ASSERT(data.size() == sendBytes);
     return sendBytes;

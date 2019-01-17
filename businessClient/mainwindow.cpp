@@ -91,14 +91,17 @@ void MainWindow::slotClickedSend()
     DialogData dlgData;
     if (dlgData.exec() != QDialog::Accepted)
         return;
-    int64_t lastInsertId = 0;
     QCommonNtosReq reqData;
-    int currType = 0;
+    int currType = 0;//TODO:
     dlgData.getData(reqData.ReqData, currType);
-    if (m_dataExch->sendCommonNtosReq(reqData, dlgData.needResp(), dlgData.needSave(), lastInsertId) == false)
+    reqData.ReqType = "";//TODO:
+    if (m_dataExch->sendCommonNtosReq(reqData, dlgData.needResp(), dlgData.needSave()) == false)
     {
         QMessageBox::information(this, tr("发送请求"), tr("发送请求失败"));
+        return;
     }
+    ui->lineEdit_RefNum->setText(QString::number(reqData.RefNum));
+    ui->lineEdit_ReqTime->setText(reqData.ReqTime.toString("yyyy-MM-dd HH:mm:ss"));
 }
 
 void MainWindow::slotCellDoubleClicked(int row, int column)

@@ -21,7 +21,7 @@ public:
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
-    bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave, int64_t& lastInsertId);
+    bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave);
 
 signals:
     void sigReady();

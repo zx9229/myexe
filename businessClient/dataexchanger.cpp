@@ -68,8 +68,11 @@ void DataExchanger::setBelongKey(const QString &zoneName, const QString &nodeNam
     m_ownInfo.set_belongid(atomicKey2str(m_ownInfo.belongkey()));
 }
 
-bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave, int64_t& lastInsertId)
+bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave)
 {
+    int64_t lastInsertId = 0;
+    reqData.UserID = QString::fromStdString(m_ownInfo.userid());
+
     bool opFinish = false;
     int64_t iRequestID = 0;
     int64_t iSeqNo = 0;
@@ -103,6 +106,7 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
                 isOk = m_SeqNo.update_data(sqlQuery);
                 if (!isOk) { break; }
             }
+            reqData.ReqTime = QDateTime::currentDateTime();
             isOk = reqData.insert_data(sqlQuery, &lastInsertId);
             if (!isOk) { break; }
             isOk = m_db.commit();
@@ -110,7 +114,7 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
         } while (false);
         if (!isOk)//如果操作数据库失败.
         {
-            lastInsertId = 0;
+            reqData.ReqTime = QDateTime();
             qDebug() << sqlQuery.lastError();
             if (opFinish)//如果开启了事务,就需要回滚.
             {
