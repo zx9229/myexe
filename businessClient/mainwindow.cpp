@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include "dataexchanger.h"
+#include "dialogdata.h"
 
 MainWindow::MainWindow(DataExchanger* p, QWidget *parent) :
     QMainWindow(parent),
@@ -87,7 +88,17 @@ void MainWindow::slotClickedShow()
 
 void MainWindow::slotClickedSend()
 {
-    QMessageBox::information(this, "SEND", "Not Implemented");
+    DialogData dlgData;
+    if (dlgData.exec() != QDialog::Accepted)
+        return;
+    int64_t lastInsertId = 0;
+    QCommonNtosReq reqData;
+    int currType = 0;
+    dlgData.getData(reqData.ReqData, currType);
+    if (m_dataExch->sendCommonNtosReq(reqData, dlgData.needResp(), dlgData.needSave(), lastInsertId) == false)
+    {
+        QMessageBox::information(this, tr("发送请求"), tr("发送请求失败"));
+    }
 }
 
 void MainWindow::slotCellDoubleClicked(int row, int column)

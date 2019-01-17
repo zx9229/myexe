@@ -29,7 +29,8 @@ SOURCES += \
         mywebsock.cpp \
         protobuf/txdata.pb.cc \
         logindialog.cpp \
-        dataexchanger.cpp
+        dataexchanger.cpp \
+        dialogdata.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,11 +40,13 @@ HEADERS += \
         logindialog.h \
         dataexchanger.h \
         temputils.h \
-        sqlstruct.h
+        sqlstruct.h \
+        dialogdata.h
 
 FORMS += \
         mainwindow.ui \
-        logindialog.ui
+        logindialog.ui \
+        dialogdata.ui
 
 CONFIG += mobility
 MOBILITY = 

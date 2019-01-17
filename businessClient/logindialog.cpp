@@ -10,7 +10,9 @@ LoginDialog::LoginDialog(DataExchanger* p, QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(this->windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+#ifdef Q_OS_ANDROID
     this->showFullScreen();
+#endif
     initUI();
     QObject::connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoginDialog::reject);
     QObject::connect(ui->pushButton_login, &QPushButton::clicked, this, &LoginDialog::slotClickedLogin);
