@@ -23,6 +23,7 @@ private:
 private slots:
     void slotClickedParentDataReq();
     void slotParentData(const QMap<QString, QConnInfoEx>& data);
+    void slotCommonNtosRsp(qint64 RefNum);
     void slotClickedShow();
     void slotClickedSend();
     void slotCellDoubleClicked(int row, int column);

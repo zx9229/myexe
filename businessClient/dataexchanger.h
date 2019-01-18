@@ -27,6 +27,7 @@ signals:
     void sigReady();
     void sigParentData(const QMap<QString, QConnInfoEx>& data);
     void sigWebsocketError(QAbstractSocket::SocketError error);
+    void sigCommonNtosRsp(qint64 RefNum);
 
 private:
     void initDB();

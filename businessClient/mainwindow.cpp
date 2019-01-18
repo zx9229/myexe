@@ -81,6 +81,20 @@ void MainWindow::slotParentData(const QMap<QString, QConnInfoEx>& data)
     ui->tableWidget->setRowCount(rowIdx + 1);
 }
 
+void MainWindow::slotCommonNtosRsp(qint64 RefNum)
+{
+    if ((0 < RefNum && ui->lineEdit_RefNum->text().toLongLong() == RefNum) == false)
+        return;
+    QSqlQuery sqlQuery;
+    int32_t cntTime = 0;
+    QString minTime, maxTime;
+    if (QCommonNtosRsp::select_stat_info(sqlQuery, RefNum, cntTime, minTime, maxTime) == false)
+        return;
+    ui->lineEdit_RspCnt->setText(QString::number(cntTime));
+    ui->lineEdit_RspTimeFirst->setText(minTime);
+    ui->lineEdit_RspTimeLast->setText(maxTime);
+}
+
 void MainWindow::slotClickedShow()
 {
     ui->widget_ConnInfoEx->setVisible(!ui->widget_ConnInfoEx->isVisible());

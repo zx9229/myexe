@@ -227,7 +227,11 @@ void DataExchanger::handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> d
     Q_ASSERT(data->pathway(0) == m_ownInfo.userid());
     QCommonNtosRsp rspData;
     toCommonNtosRsp(*data, rspData);
-    rspData.insert_data(QSqlQuery());
+    QSqlQuery sqlQuery;
+    if (rspData.insert_data(sqlQuery))
+    {
+        sigCommonNtosRsp(rspData.RefNum);
+    }
 }
 
 void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data)
