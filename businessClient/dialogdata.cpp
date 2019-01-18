@@ -86,9 +86,9 @@ void DialogData::slotAccept()
 {
     m_currType = 0;
     m_currData.clear();
-
+    const google::protobuf::Descriptor* desc = nullptr;
     google::protobuf::Message* mesg = nullptr;
-    if (CalcObjectByName(ui->comboBox_msgType->currentText().toStdString(), nullptr, &mesg) == false)
+    if (CalcObjectByName(ui->comboBox_msgType->currentText().toStdString(), &desc, &mesg) == false)
     {
         QMessageBox::information(this, tr("name->object"), tr("名字->对象, 失败."));
         return;
@@ -110,7 +110,7 @@ void DialogData::slotAccept()
     }
 
     m_currData.append(binData.data(), binData.size());
-    m_currType = INT_MAX;//TODO:
+    m_currType = desc->index();
 
     this->accept();
 }

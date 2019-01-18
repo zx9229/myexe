@@ -382,6 +382,18 @@ public:
         //
         return query.exec();
     }
+    static bool select_stat_info(QSqlQuery& query, int64_t RefNum, int&cntTime, QString&minTime, QString& maxTime)
+    {
+        bool isOK = false;
+        QString sqlStr = QString("SELECT COUNT(InsertTime) AS CntTime, MIN(InsertTime) AS MinTime, MAX(InsertTime) AS MaxTime FROM QCommonNtosRsp WHERE RefNum=%1").arg(RefNum);
+        isOK = query.exec(sqlStr);
+        while (query.next()) {
+            cntTime = query.value("CntTime").toInt();
+            minTime = query.value("MinTime").toString();
+            maxTime = query.value("MaxTime").toString();
+        }
+        return isOK;
+    }
 };
 
 #endif // SQL_STRUCT_H
