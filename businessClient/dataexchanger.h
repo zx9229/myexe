@@ -3,6 +3,7 @@
 
 #include "mywebsock.h"
 #include <QObject>
+#include <QSharedPointer>
 #include "temputils.h"
 #include "sqlstruct.h"
 
@@ -20,14 +21,21 @@ public:
 
     static QString jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk = nullptr);
     static QString nameByMsgType(txdata::MsgType msgType, int flag = 0, bool *isOk = nullptr);
-    static QString jsonByMsgType(txdata::MsgType msgType, const QByteArray& binData, bool *isOk = nullptr);
+    static QString jsonByMsgType(txdata::MsgType msgType, const QByteArray& serializedData, bool *isOk = nullptr);
+    static bool    calcObjByName(const QString& typeName, QSharedPointer<google::protobuf::Message>& objOut);
+    static QString jsonToObjAndS(const QString& typeName, const QString& jsonStr, txdata::MsgType& msgType, QByteArray& serializedData);
+
+    static void CommonNtosReqQ2TX(const QCommonNtosReq& src, txdata::CommonNtosReq& dst);
+    static void CommonNtosRspQ2TX(const QCommonNtosRsp& src, txdata::CommonNtosRsp& dst);
+    static void CommonNtosRspTX2Q(const txdata::CommonNtosRsp& src, QCommonNtosRsp& dst);
 
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave);
 
-    static void toCommonNtosReq(const QCommonNtosReq& src, txdata::CommonNtosReq& dst);
+public slots:
+    void slotParentDataReq();
 
 signals:
     void sigReady();
@@ -42,16 +50,11 @@ private:
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
     void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
 
-    void toCommonNtosRsp(txdata::CommonNtosRsp& src, QCommonNtosRsp& dst);
-
 private slots:
     void slotOnConnected();
     void slotOnDisconnected();
     void slotOnMessage(const QByteArray &message);
     void slotOnError(QAbstractSocket::SocketError error);
-
-public slots:
-    void slotParentDataReq();
 
 private:
     MyWebsock m_ws;

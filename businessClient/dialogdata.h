@@ -30,11 +30,12 @@ private:
 private slots:
     void slotCurrentIndexChanged(const QString &text);
     void slotAccept();
+    void slotClickedShowInnerOuter();
 
 private:
     Ui::DialogData* ui;
-    QByteArray      m_currData;
-    int32_t         m_currType;
+    QByteArray      m_curData;
+    int32_t         m_curType;
 };
 
 #endif // DIALOGDATA_H

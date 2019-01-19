@@ -5,37 +5,6 @@
 #include "txdata.pb.h"
 #include "dataexchanger.h"
 
-//如果获取了(google::protobuf::Message)那么需要自行析构.
-bool CalcObjectByName(const std::string name, const google::protobuf::Descriptor** desc, google::protobuf::Message** mesg)
-{
-    if (nullptr != desc) { *desc = nullptr; }
-    if (nullptr != mesg) { *mesg = nullptr; }
-    // https://blog.csdn.net/riopho/article/details/80372510
-    const google::protobuf::Descriptor* curDesc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-    if (nullptr == curDesc)
-        return false;
-    //desc->index();
-    google::protobuf::Message* curMesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(curDesc)->New();
-    if (nullptr == curMesg)
-        return false;
-    if (nullptr != desc)
-        *desc = curDesc;
-    if (nullptr != mesg)
-        *mesg = curMesg;
-    else
-        delete mesg;
-    return ((nullptr != curDesc) && (nullptr != curMesg));
-}
-
-class MessageGuard
-{
-public:
-    MessageGuard(google::protobuf::Message* message) :m_message(message) {}
-    ~MessageGuard() { if (m_message) { delete m_message; } }
-private:
-    google::protobuf::Message* m_message;
-};
-
 DialogData::DialogData(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogData)
@@ -49,6 +18,8 @@ DialogData::DialogData(QWidget *parent) :
     QObject::connect(ui->pushButton_reject, &QPushButton::clicked, this, &DialogData::reject);
     QObject::connect(ui->pushButton_accept, &QPushButton::clicked, this, &DialogData::slotAccept);
     QObject::connect(ui->comboBox_msgType, static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this, &DialogData::slotCurrentIndexChanged);
+    QObject::connect(ui->pushButton_inner, &QPushButton::clicked, this, &DialogData::slotClickedShowInnerOuter);
+    QObject::connect(ui->pushButton_outer, &QPushButton::clicked, this, &DialogData::slotClickedShowInnerOuter);
 }
 
 DialogData::~DialogData()
@@ -84,44 +55,42 @@ void DialogData::switchMode(bool isInputNotOutput)
 
 void DialogData::slotCurrentIndexChanged(const QString &text)
 {
-    google::protobuf::Message* mesg = nullptr;
-    if (CalcObjectByName(text.toStdString(), nullptr, &mesg) == false)
-        return;
-    MessageGuard guard(mesg);
-    ui->plainTextEdit->setPlainText(DataExchanger::jsonByMsgObje(*mesg));
+    QString jsonStr;
+    QSharedPointer<google::protobuf::Message> curObj;
+    if (DataExchanger::calcObjByName(text, curObj))
+    {
+        jsonStr = DataExchanger::jsonByMsgObje(*curObj);
+    }
+    ui->plainTextEdit->setPlainText(jsonStr);
 }
 
 void DialogData::slotAccept()
 {
-    m_currType = 0;
-    m_currData.clear();
-    const google::protobuf::Descriptor* desc = nullptr;
-    google::protobuf::Message* mesg = nullptr;
-    if (CalcObjectByName(ui->comboBox_msgType->currentText().toStdString(), &desc, &mesg) == false)
+    m_curType = 0;
+    m_curData.clear();
+    txdata::MsgType currType = txdata::MsgType::Zero1;
+
+    QString typeStr = ui->comboBox_msgType->currentText();
+    QString jsonStr = ui->plainTextEdit->toPlainText();
+
+    QString message = DataExchanger::jsonToObjAndS(typeStr, jsonStr, currType, m_curData);
+    m_curType = static_cast<int32_t>(currType);
+    if (!message.isEmpty())
     {
-        QMessageBox::information(this, tr("name->object"), tr("名字->对象, 失败."));
+        QMessageBox::information(this, tr("json->obj->bin"), message);
         return;
     }
-    MessageGuard guard(mesg);
-
-    std::string jsonStr = ui->plainTextEdit->toPlainText().toStdString();
-    if (google::protobuf::util::JsonStringToMessage(jsonStr, mesg) != google::protobuf::util::Status::OK)
-    {
-        QMessageBox::information(this, tr("json->object"), tr("JSON->对象, 失败."));
-        return;
-    }
-
-    std::string binData;
-    if (mesg->SerializeToString(&binData) == false)
-    {
-        QMessageBox::information(this, tr("object->binary"), tr("对象->二进制, 失败."));
-        return;
-    }
-
-    m_currData.append(binData.data(), binData.size());
-    m_currType = desc->index();
 
     this->accept();
+}
+
+void DialogData::slotClickedShowInnerOuter()
+{
+    QPushButton* curPushButton = qobject_cast<QPushButton*>(sender());
+    QString nameStr = curPushButton->property("MsgType").toString();
+    QString jsonStr = curPushButton->property("MsgJson").toString();
+    ui->lineEdit_MsgType->setText(nameStr);
+    ui->plainTextEdit->setPlainText(jsonStr);
 }
 
 bool DialogData::needResp()
@@ -136,8 +105,8 @@ bool DialogData::needSave()
 
 void DialogData::getData(QByteArray &dataOut, int32_t& typeOut)
 {
-    dataOut = m_currData;
-    typeOut = m_currType;
+    dataOut = m_curData;
+    typeOut = m_curType;
 }
 
 void DialogData::setData(const QCommonNtosReq &data)
@@ -149,7 +118,7 @@ void DialogData::setData(const QCommonNtosReq &data)
     ui->pushButton_inner->setProperty("MsgJson", DataExchanger::jsonByMsgType(innerType, data.ReqData));
 
     txdata::CommonNtosReq dataTx;
-    DataExchanger::toCommonNtosReq(data, dataTx);
+    DataExchanger::CommonNtosReqQ2TX(data, dataTx);
     ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
     ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
 }
@@ -157,4 +126,13 @@ void DialogData::setData(const QCommonNtosReq &data)
 void DialogData::setData(const QCommonNtosRsp &data)
 {
     switchMode(false);
+
+    txdata::MsgType innerType = static_cast<txdata::MsgType>(data.RspType);
+    ui->pushButton_inner->setProperty("MsgType", DataExchanger::nameByMsgType(innerType));
+    ui->pushButton_inner->setProperty("MsgJson", DataExchanger::jsonByMsgType(innerType, data.RspData));
+
+    txdata::CommonNtosRsp dataTx;
+    DataExchanger::CommonNtosRspQ2TX(data, dataTx);
+    ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
+    ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
 }

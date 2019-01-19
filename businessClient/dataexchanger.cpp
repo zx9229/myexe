@@ -89,7 +89,7 @@ QString DataExchanger::nameByMsgType(txdata::MsgType msgType, int flag, bool* is
     return retName;
 }
 
-QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &binData, bool *isOk)
+QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &serializedData, bool *isOk)
 {
     QString jsonStr;
 
@@ -104,11 +104,58 @@ QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &
     if (nullptr == curMesg)
         return jsonStr;
 
+    QSharedPointer<google::protobuf::Message> guard(curMesg);
+
+    if (curMesg->ParseFromArray(serializedData.constData(), serializedData.size()) == false)
+        return jsonStr;
+
     jsonStr = jsonByMsgObje(*curMesg, isOk);
 
-    delete curMesg;
-
     return jsonStr;
+}
+
+bool DataExchanger::calcObjByName(const QString &typeName, QSharedPointer<google::protobuf::Message> &objOut)
+{
+    objOut.clear();
+    // https://blog.csdn.net/riopho/article/details/80372510
+    const google::protobuf::Descriptor* desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(typeName.toStdString());
+    if (nullptr == desc) { return false; }
+    // desc->index();
+    google::protobuf::Message* mesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New();
+    objOut.reset(mesg);
+    return (mesg ? true : false);
+}
+
+QString DataExchanger::jsonToObjAndS(const QString &typeName, const QString &jsonStr, txdata::MsgType &msgType, QByteArray &serializedData)
+{
+    QString message;
+    //
+    msgType = txdata::MsgType::Zero1;
+    serializedData.clear();
+    do
+    {
+        QSharedPointer<google::protobuf::Message> curObj;
+        if (calcObjByName(typeName, curObj) == false)
+        {
+            message = "calc object by name fail";
+            break;
+        }
+        if (google::protobuf::util::JsonStringToMessage(jsonStr.toStdString(), curObj.data()) != google::protobuf::util::Status::OK)
+        {
+            message = "fill object by json fail";
+            break;
+        }
+        std::string binData;
+        if (curObj->SerializeToString(&binData) == false)
+        {
+            message = "serialize object fail";
+            break;
+        }
+        serializedData.append(binData.data(), binData.size());
+        msgType = static_cast<txdata::MsgType>(curObj->GetDescriptor()->index());
+    } while (false);
+    //
+    return message;
 }
 
 void DataExchanger::setURL(const QString &url)
@@ -196,7 +243,7 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
     {
         reqData.RefNum = lastInsertId;
         txdata::CommonNtosReq data4send;
-        toCommonNtosReq(reqData, data4send);
+        CommonNtosReqQ2TX(reqData, data4send);
         m_ws.sendBinaryMessage(m2b::msg2pkg(data4send));
     }
     return opFinish;
@@ -294,7 +341,7 @@ void DataExchanger::handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> d
     Q_ASSERT(data->pathway_size() == 1);
     Q_ASSERT(data->pathway(0) == m_ownInfo.userid());
     QCommonNtosRsp rspData;
-    toCommonNtosRsp(*data, rspData);
+    CommonNtosRspTX2Q(*data, rspData);
     QSqlQuery sqlQuery;
     if (rspData.insert_data(sqlQuery))
     {
@@ -314,7 +361,7 @@ void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> d
     sigParentData(m_parentData);
 }
 
-void DataExchanger::toCommonNtosReq(const QCommonNtosReq &src, txdata::CommonNtosReq &dst)
+void DataExchanger::CommonNtosReqQ2TX(const QCommonNtosReq &src, txdata::CommonNtosReq &dst)
 {
     dst.set_requestid(src.RequestID);
     dst.set_userid(src.UserID.toStdString());
@@ -329,7 +376,24 @@ void DataExchanger::toCommonNtosReq(const QCommonNtosReq &src, txdata::CommonNto
     dst.set_refnum(src.RefNum);
 }
 
-void DataExchanger::toCommonNtosRsp(txdata::CommonNtosRsp &src, QCommonNtosRsp &dst)
+void DataExchanger::CommonNtosRspQ2TX(const QCommonNtosRsp &src, txdata::CommonNtosRsp &dst)
+{
+    dst.set_requestid(src.RequestID);
+    dst.set_pathway(0, src.Pathway.toStdString());
+    dst.set_seqno(src.SeqNo);
+    dst.set_rsptype(static_cast<txdata::MsgType>(src.RspType));
+    dst.set_rspdata(src.RspData.constData(), src.RspData.size());
+    if (src.RspTime.isValid())
+    {
+        dst.mutable_rsptime()->set_seconds(src.RspTime.offsetFromUtc());
+        dst.mutable_rsptime()->set_nanos(src.RspTime.time().msec() * 1000 * 1000);
+    }
+    dst.set_fromserver(src.FromServer);
+    dst.set_errno(src.ErrNo);
+    dst.set_refnum(src.RefNum);
+}
+
+void DataExchanger::CommonNtosRspTX2Q(const txdata::CommonNtosRsp &src, QCommonNtosRsp &dst)
 {
     //dst.ID = INT64_MAX;
     //dst.InsertTime = QDateTime::currentDateTime();
