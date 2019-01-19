@@ -45,6 +45,7 @@ void DialogData::initUI()
 
 void DialogData::switchMode(bool isInputNotOutput)
 {
+    ui->pushButton_accept->setEnabled(isInputNotOutput);
     ui->comboBox_msgType->setEnabled(isInputNotOutput);
     ui->checkBox_needResp->setEnabled(isInputNotOutput);
     ui->checkBox_needSave->setEnabled(isInputNotOutput);
