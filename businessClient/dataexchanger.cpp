@@ -211,13 +211,13 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
             if (!opFinish) { break; }
             if (iRequestID)
             {
-                m_RequestID.Value.number(iRequestID);
+                m_RequestID.Value = QString::number(iRequestID);
                 isOk = m_RequestID.update_data(sqlQuery);
                 if (!isOk) { break; }
             }
             if (iSeqNo)
             {
-                m_SeqNo.Value.number(iSeqNo);
+                m_SeqNo.Value = QString::number(iSeqNo);
                 isOk = m_SeqNo.update_data(sqlQuery);
                 if (!isOk) { break; }
             }
@@ -229,6 +229,8 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
         } while (false);
         if (!isOk)//如果操作数据库失败.
         {
+            if (iRequestID) { m_RequestID.Value = QString::number(iRequestID - 1); }
+            if (iSeqNo) { m_SeqNo.Value = QString::number(iSeqNo - 1); }
             reqData.ReqTime = QDateTime();
             qDebug() << sqlQuery.lastError();
             if (opFinish)//如果开启了事务,就需要回滚.
