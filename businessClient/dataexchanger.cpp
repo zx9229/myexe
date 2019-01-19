@@ -3,6 +3,7 @@
 #include <QSqlError>
 #include "m2b.h"
 #include "sqlstruct.h"
+#include "google/protobuf/util/json_util.h"
 
 std::string atomicKey2str(const txdata::AtomicKey& src)
 {
@@ -41,6 +42,73 @@ bool DataExchanger::start()
 {
     m_ws.stop(true);
     return m_ws.start(m_url);
+}
+
+QString DataExchanger::jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk)
+{
+    if (isOk) { *isOk = true; }
+    google::protobuf::util::JsonOptions jsonOpt;
+    if (true) {
+        jsonOpt.add_whitespace = true;
+        jsonOpt.always_print_primitive_fields = true;
+        jsonOpt.preserve_proto_field_names = true;
+    }
+    std::string jsonStr;
+    if (google::protobuf::util::MessageToJsonString(msgObj, &jsonStr, jsonOpt) != google::protobuf::util::Status::OK)
+    {
+        jsonStr.clear();
+        if (isOk) { *isOk = false; }
+    }
+    return QString::fromStdString(jsonStr);
+}
+
+QString DataExchanger::nameByMsgType(txdata::MsgType msgType, int flag, bool* isOk)
+{
+    //flag=0  结果类似(txdata.ConnectionInfo)
+    //flag=1  结果类似(ConnectionInfo)
+    if (isOk) { *isOk = false; }
+    QString retName;
+    do
+    {
+        if (txdata::MsgType_IsValid(msgType) == false)
+            break;
+        std::string name = txdata::MsgType_Name(msgType);
+        const std::string HEAD("ID_");
+        std::size_t pos = name.find(HEAD);
+        if (std::string::npos == pos)
+            break;
+        name = name.substr(HEAD.size() + pos);
+        if (flag == 0)
+            retName = "txdata." + QString::fromStdString(name);
+        else if (flag == 1)
+            retName = QString::fromStdString(name);
+        else
+            break;
+        if (isOk) { *isOk = true; }
+    } while (false);
+    return retName;
+}
+
+QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &binData, bool *isOk)
+{
+    QString jsonStr;
+
+    std::string name = nameByMsgType(msgType, 0, isOk).toStdString();
+    if (name.empty())
+        return jsonStr;
+
+    const google::protobuf::Descriptor* curDesc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
+    if (nullptr == curDesc)
+        return jsonStr;
+    google::protobuf::Message* curMesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(curDesc)->New();
+    if (nullptr == curMesg)
+        return jsonStr;
+
+    jsonStr = jsonByMsgObje(*curMesg, isOk);
+
+    delete curMesg;
+
+    return jsonStr;
 }
 
 void DataExchanger::setURL(const QString &url)
@@ -246,13 +314,13 @@ void DataExchanger::handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> d
     sigParentData(m_parentData);
 }
 
-void DataExchanger::toCommonNtosReq(QCommonNtosReq &src, txdata::CommonNtosReq &dst)
+void DataExchanger::toCommonNtosReq(const QCommonNtosReq &src, txdata::CommonNtosReq &dst)
 {
     dst.set_requestid(src.RequestID);
     dst.set_userid(src.UserID.toStdString());
     dst.set_seqno(src.SeqNo);
     dst.set_reqtype(static_cast<txdata::MsgType>(src.ReqType));
-    dst.set_reqdata(src.ReqData.data(), src.ReqData.size());
+    dst.set_reqdata(src.ReqData.constData(), src.ReqData.size());
     if (src.ReqTime.isValid())
     {
         dst.mutable_reqtime()->set_seconds(src.ReqTime.offsetFromUtc());

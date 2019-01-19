@@ -2,6 +2,7 @@
 #define DIALOGDATA_H
 
 #include <QDialog>
+#include "sqlstruct.h"
 
 namespace Ui {
     class DialogData;
@@ -19,9 +20,12 @@ public:
     bool needResp();
     bool needSave();
     void getData(QByteArray& dataOut, int32_t& typeOut);
+    void setData(const QCommonNtosReq& data);
+    void setData(const QCommonNtosRsp& data);
 
 private:
     void initUI();
+    void switchMode(bool isInputNotOutput);
 
 private slots:
     void slotCurrentIndexChanged(const QString &text);

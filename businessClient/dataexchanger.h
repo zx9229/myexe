@@ -18,10 +18,16 @@ public:
     MyWebsock& ws();
     bool start();
 
+    static QString jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk = nullptr);
+    static QString nameByMsgType(txdata::MsgType msgType, int flag = 0, bool *isOk = nullptr);
+    static QString jsonByMsgType(txdata::MsgType msgType, const QByteArray& binData, bool *isOk = nullptr);
+
     void setURL(const QString& url);
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave);
+
+    static void toCommonNtosReq(const QCommonNtosReq& src, txdata::CommonNtosReq& dst);
 
 signals:
     void sigReady();
@@ -35,7 +41,7 @@ private:
     void handle_ConnectedData(QSharedPointer<txdata::ConnectedData> data);
     void handle_CommonNtosRsp(QSharedPointer<txdata::CommonNtosRsp> data);
     void handle_ParentDataRsp(QSharedPointer<txdata::ParentDataRsp> data);
-    void toCommonNtosReq(QCommonNtosReq& src, txdata::CommonNtosReq& dst);
+
     void toCommonNtosRsp(txdata::CommonNtosRsp& src, QCommonNtosRsp& dst);
 
 private slots:

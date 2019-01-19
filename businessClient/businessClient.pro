@@ -30,7 +30,8 @@ SOURCES += \
         protobuf/txdata.pb.cc \
         logindialog.cpp \
         dataexchanger.cpp \
-        dialogdata.cpp
+        dialogdata.cpp \
+        dialogreqrsp.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -41,12 +42,14 @@ HEADERS += \
         dataexchanger.h \
         temputils.h \
         sqlstruct.h \
-        dialogdata.h
+        dialogdata.h \
+        dialogreqrsp.h
 
 FORMS += \
         mainwindow.ui \
         logindialog.ui \
-        dialogdata.ui
+        dialogdata.ui \
+        dialogreqrsp.ui
 
 CONFIG += mobility
 MOBILITY = 

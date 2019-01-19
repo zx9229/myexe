@@ -28,6 +28,7 @@ private slots:
     void slotClickedSend();
     void slotCellDoubleClicked(int row, int column);
     void slotCursorPositionChanged(int iOld, int iNew);
+    void slotClickedRefNumShow();
 
 private:
     Ui::MainWindow* ui;

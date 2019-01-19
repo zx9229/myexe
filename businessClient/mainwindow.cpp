@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include "dataexchanger.h"
 #include "dialogdata.h"
+#include "dialogreqrsp.h"
 
 MainWindow::MainWindow(DataExchanger* p, QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +32,7 @@ void MainWindow::initUI()
     connect(ui->pushButton_ParentDataReq, &QPushButton::clicked, this, &MainWindow::slotClickedParentDataReq);
     connect(ui->pushButton_show, &QPushButton::clicked, this, &MainWindow::slotClickedShow);
     connect(ui->pushButton_send, &QPushButton::clicked, this, &MainWindow::slotClickedSend);
+    connect(ui->pushButton_RefNumShow, &QPushButton::clicked, this, &MainWindow::slotClickedRefNumShow);
     if (true) {
         connect(ui->lineEdit_UserID, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
         connect(ui->lineEdit_cie_u_ZoneName, &QLineEdit::cursorPositionChanged, this, &MainWindow::slotCursorPositionChanged);
@@ -90,9 +92,9 @@ void MainWindow::slotCommonNtosRsp(qint64 RefNum)
     QString minTime, maxTime;
     if (QCommonNtosRsp::select_stat_info(sqlQuery, RefNum, cntTime, minTime, maxTime) == false)
         return;
-    ui->lineEdit_RspCnt->setText(QString::number(cntTime));
-    ui->lineEdit_RspTimeFirst->setText(minTime);
-    ui->lineEdit_RspTimeLast->setText(maxTime);
+    ui->lineEdit_RspTimeCnt->setText(QString::number(cntTime));
+    ui->lineEdit_RspTimeMin->setText(minTime);
+    ui->lineEdit_RspTimeMax->setText(maxTime);
 }
 
 void MainWindow::slotClickedShow()
@@ -162,4 +164,12 @@ void MainWindow::slotCursorPositionChanged(int iOld, int iNew)
     if (iOld == curTextSize || iNew == curTextSize)
         return;
     QMessageBox::information(this, "QLineEdit", curLineEdit->text());
+}
+
+void MainWindow::slotClickedRefNumShow()
+{
+    DialogReqRsp dlgReqRsp(m_dataExch, this);
+    int64_t refNum = ui->lineEdit_RefNum->text().toLongLong();
+    dlgReqRsp.setRefNum(refNum);
+    dlgReqRsp.exec();
 }

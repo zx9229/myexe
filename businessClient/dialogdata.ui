@@ -24,26 +24,47 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox_msgType"/>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_needResp">
-       <property name="text">
-        <string>请响</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_needSave">
-       <property name="text">
-        <string>保存</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="pushButton_accept">
        <property name="text">
         <string>确定</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="checkBox_needResp">
+       <property name="text">
+        <string>需要响应</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="checkBox_needSave">
+       <property name="text">
+        <string>需要保存</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QComboBox" name="comboBox_msgType"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="lineEdit_MsgType"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="pushButton_outer">
+       <property name="text">
+        <string>外层</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="pushButton_inner">
+       <property name="text">
+        <string>内层</string>
        </property>
       </widget>
      </item>

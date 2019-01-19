@@ -18,6 +18,11 @@ namespace {
     inline bool Valid(QString& data) { return !data.isNull(); }
     inline bool Valid(QByteArray& data) { return !data.isNull(); }
     inline bool Valid(QDateTime& data) { return data.isValid(); }
+    inline void fromQVariant(int32_t& dst, const QVariant& src) { dst = src.toInt(nullptr); }
+    inline void fromQVariant(int64_t& dst, const QVariant& src) { dst = src.toLongLong(nullptr); }
+    inline void fromQVariant(QString& dst, const QVariant& src) { dst = src.toString(); }
+    inline void fromQVariant(QByteArray& dst, const QVariant& src) { dst = src.toByteArray(); }
+    inline void fromQVariant(QDateTime& dst, const QVariant& src) { dst = QDateTime::fromString(src.toString(), Qt::ISODateWithMs); }
 }
 
 class KeyValue
@@ -285,7 +290,27 @@ public:
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
         return isOk;
     }
+    static bool select_data(QSqlQuery& query, int64_t RefNum, QList<QCommonNtosReq>& dataOut)
+    {
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【fromQVariant\(curData.$1,query.value\("$1"\)\);】.
+        QString sql = QObject::tr("SELECT * FROM %1 WHERE RefNum=%2").QString::arg(static_table_name()).arg(RefNum);
+        if (query.exec(sql) == false)
+            return false;
+        while (query.next()) {
+            QCommonNtosReq curData;
+            fromQVariant(curData.RefNum, query.value("RefNum"));
+            fromQVariant(curData.RequestID, query.value("RequestID"));
+            fromQVariant(curData.UserID, query.value("UserID"));
+            fromQVariant(curData.SeqNo, query.value("SeqNo"));
+            fromQVariant(curData.ReqType, query.value("ReqType"));
+            fromQVariant(curData.ReqData, query.value("ReqData"));
+            fromQVariant(curData.ReqTime, query.value("ReqTime"));
+            dataOut.append(curData);
+        }
+        return true;
+    }
 };
+Q_DECLARE_METATYPE(QCommonNtosReq);
 
 class QCommonNtosRsp
 {
@@ -388,12 +413,37 @@ public:
         QString sqlStr = QString("SELECT COUNT(InsertTime) AS CntTime, MIN(InsertTime) AS MinTime, MAX(InsertTime) AS MaxTime FROM QCommonNtosRsp WHERE RefNum=%1").arg(RefNum);
         isOK = query.exec(sqlStr);
         while (query.next()) {
-            cntTime = query.value("CntTime").toInt();
-            minTime = query.value("MinTime").toString();
-            maxTime = query.value("MaxTime").toString();
+            fromQVariant(cntTime, query.value("CntTime"));
+            fromQVariant(minTime, query.value("MinTime"));
+            fromQVariant(maxTime, query.value("MaxTime"));
         }
         return isOK;
     }
+    static bool select_data(QSqlQuery& query, int64_t RefNum, QList<QCommonNtosRsp>& dataOut)
+    {
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【fromQVariant\(curData.$1,query.value\("$1"\)\);】.
+        QString sql = QObject::tr("SELECT * FROM %1 WHERE RefNum=%2 ORDER BY InsertTime ASC").QString::arg(static_table_name()).arg(RefNum);
+        if (query.exec(sql) == false)
+            return false;
+        while (query.next()) {
+            QCommonNtosRsp curData;
+            fromQVariant(curData.ID, query.value("ID"));
+            fromQVariant(curData.InsertTime, query.value("InsertTime"));
+            fromQVariant(curData.RequestID, query.value("RequestID"));
+            fromQVariant(curData.Pathway, query.value("Pathway"));
+            fromQVariant(curData.SeqNo, query.value("SeqNo"));
+            fromQVariant(curData.RspType, query.value("RspType"));
+            fromQVariant(curData.RspData, query.value("RspData"));
+            fromQVariant(curData.RspTime, query.value("RspTime"));
+            fromQVariant(curData.FromServer, query.value("FromServer"));
+            fromQVariant(curData.ErrNo, query.value("ErrNo"));
+            fromQVariant(curData.ErrMsg, query.value("ErrMsg"));
+            fromQVariant(curData.RefNum, query.value("RefNum"));
+            dataOut.append(curData);
+        }
+        return true;
+    }
 };
+Q_DECLARE_METATYPE(QCommonNtosRsp);
 
 #endif // SQL_STRUCT_H

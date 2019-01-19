@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include "google/protobuf/util/json_util.h"
 #include "txdata.pb.h"
+#include "dataexchanger.h"
 
 //如果获取了(google::protobuf::Message)那么需要自行析构.
 bool CalcObjectByName(const std::string name, const google::protobuf::Descriptor** desc, google::protobuf::Message** mesg)
@@ -57,11 +58,28 @@ DialogData::~DialogData()
 
 void DialogData::initUI()
 {
-    QStringList nameList = { "","txdata.AtomicKey","txdata.ConnectionInfo","txdata.ConnectedData","txdata.DisconnectedData","txdata.CommonNtosReq","txdata.CommonNtosRsp","txdata.CommonStonReq","txdata.CommonStonRsp","txdata.ExecuteCommandReq","txdata.ExecuteCommandRsp","txdata.ReportDataItem","txdata.SendMailItem","txdata.ParentDataReq","txdata.ParentDataRsp" };
+    QStringList nameList = { "" };
+    for (int i = 1; i <= static_cast<int>(txdata::MsgType_MAX); ++i)
+    {
+        bool isOk = false;
+        nameList << DataExchanger::nameByMsgType(static_cast<txdata::MsgType>(i), 0, &isOk);
+        Q_ASSERT(isOk);
+    }
     for (auto it = nameList.begin(); it != nameList.end(); ++it)
     {
         ui->comboBox_msgType->addItem(*it);
     }
+    switchMode(true);
+}
+
+void DialogData::switchMode(bool isInputNotOutput)
+{
+    ui->comboBox_msgType->setEnabled(isInputNotOutput);
+    ui->checkBox_needResp->setEnabled(isInputNotOutput);
+    ui->checkBox_needSave->setEnabled(isInputNotOutput);
+    ui->lineEdit_MsgType->setEnabled(!isInputNotOutput);
+    ui->pushButton_outer->setEnabled(!isInputNotOutput);
+    ui->pushButton_inner->setEnabled(!isInputNotOutput);
 }
 
 void DialogData::slotCurrentIndexChanged(const QString &text)
@@ -70,16 +88,7 @@ void DialogData::slotCurrentIndexChanged(const QString &text)
     if (CalcObjectByName(text.toStdString(), nullptr, &mesg) == false)
         return;
     MessageGuard guard(mesg);
-    google::protobuf::util::JsonOptions jsonOpt;
-    if (true) {
-        jsonOpt.add_whitespace = true;
-        jsonOpt.always_print_primitive_fields = true;
-        jsonOpt.preserve_proto_field_names = true;
-    }
-    std::string jsonStr;
-    if (google::protobuf::util::MessageToJsonString(*mesg, &jsonStr, jsonOpt) != google::protobuf::util::Status::OK)
-        jsonStr.clear();
-    ui->plainTextEdit->setPlainText(QString::fromStdString(jsonStr));
+    ui->plainTextEdit->setPlainText(DataExchanger::jsonByMsgObje(*mesg));
 }
 
 void DialogData::slotAccept()
@@ -129,4 +138,23 @@ void DialogData::getData(QByteArray &dataOut, int32_t& typeOut)
 {
     dataOut = m_currData;
     typeOut = m_currType;
+}
+
+void DialogData::setData(const QCommonNtosReq &data)
+{
+    switchMode(false);
+
+    txdata::MsgType innerType = static_cast<txdata::MsgType>(data.ReqType);
+    ui->pushButton_inner->setProperty("MsgType", DataExchanger::nameByMsgType(innerType));
+    ui->pushButton_inner->setProperty("MsgJson", DataExchanger::jsonByMsgType(innerType, data.ReqData));
+
+    txdata::CommonNtosReq dataTx;
+    DataExchanger::toCommonNtosReq(data, dataTx);
+    ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
+    ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
+}
+
+void DialogData::setData(const QCommonNtosRsp &data)
+{
+    switchMode(false);
 }
