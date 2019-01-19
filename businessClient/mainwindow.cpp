@@ -29,6 +29,7 @@ void MainWindow::initUI()
         connect(ui->tableWidget, &QTableWidget::cellDoubleClicked, this, &MainWindow::slotCellDoubleClicked);
     }
     connect(m_dataExch, &DataExchanger::sigParentData, this, &MainWindow::slotParentData);
+    connect(m_dataExch, &DataExchanger::sigCommonNtosRsp, this, &MainWindow::slotCommonNtosRsp);
     connect(ui->pushButton_ParentDataReq, &QPushButton::clicked, this, &MainWindow::slotClickedParentDataReq);
     connect(ui->pushButton_show, &QPushButton::clicked, this, &MainWindow::slotClickedShow);
     connect(ui->pushButton_send, &QPushButton::clicked, this, &MainWindow::slotClickedSend);
