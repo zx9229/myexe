@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"time"
 
 	"github.com/golang/glog"
@@ -29,8 +28,8 @@ func handleReportData(w http.ResponseWriter, r *http.Request) {
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonNtosReq{DataType: reflect.TypeOf(curObj.ReportDataItem).String()}
-		if req.Data, err = proto.Marshal(&theObj.ReportDataItem); err != nil {
+		req = &txdata.CommonNtosReq{ReqType: CalcMessageType(&curObj.ReportDataItem)}
+		if req.ReqData, err = proto.Marshal(&theObj.ReportDataItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
 		saveDB = theObj.Cache
@@ -53,8 +52,8 @@ func handleSendMail(w http.ResponseWriter, r *http.Request) {
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonNtosReq{DataType: reflect.TypeOf(curObj.SendMailItem).String()}
-		if req.Data, err = proto.Marshal(&theObj.SendMailItem); err != nil {
+		req = &txdata.CommonNtosReq{ReqType: CalcMessageType(&curObj.SendMailItem)}
+		if req.ReqData, err = proto.Marshal(&theObj.SendMailItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
 		saveDB = theObj.Cache

@@ -39,7 +39,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/smtp"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -288,32 +287,33 @@ type KeyValue struct {
 
 //CommonAtosDataNode omit
 type CommonAtosDataNode struct {
-	SeqNo       int64     `xorm:"pk autoincr notnull unique"`
-	UserID      string    //
-	ReqDataType string    //
-	ReqData     []byte    //
-	ReqTime     time.Time //报告时间
-	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	Finish      bool      //不需要续传了.
-	ErrNo       int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	ErrMsg      string    //错误的具体原因.
-	RspDataType string
-	RspData     []byte
+	SeqNo      int64          `xorm:"pk autoincr notnull unique"`
+	UserID     string         //
+	ReqType    txdata.MsgType //
+	ReqData    []byte         //
+	ReqTime    time.Time      //报告时间
+	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Finish     bool           //不需要续传了.
+	ErrNo      int32          `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	ErrMsg     string         //错误的具体原因.
+	RspType    txdata.MsgType
+	RspData    []byte
 }
 
 //CommonAtosDataServer omit
 type CommonAtosDataServer struct {
-	SeqNo       int64     `xorm:"pk notnull"`
-	UserID      string    `xorm:"pk notnull"`
-	ReqDataType string    //
-	ReqData     []byte    //
-	ReqTime     time.Time //报告时间
-	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	Finish      bool      //不需要续传了.
-	ErrNo       int32     `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	ErrMsg      string    //错误的具体原因.
-	RspDataType string
-	RspData     []byte
+	SeqNo      int64          `xorm:"pk notnull"`
+	UserID     string         `xorm:"pk notnull"`
+	ReqType    txdata.MsgType //
+	ReqData    []byte         //
+	ReqTime    time.Time      //报告时间
+	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Finish     bool           //不需要续传了.
+	ErrNo      int32          `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
+	ErrMsg     string         //错误的具体原因.
+	RspType    txdata.MsgType
+	RspData    []byte
+	RefNum     int64
 }
 
 func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
@@ -344,17 +344,17 @@ type CommRspData struct {
 }
 
 func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string, fromS bool) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, DataType: "", Data: nil, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, RspType: 0, RspData: nil, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg, RefNum: reqIn.RefNum}
 }
 
-func CommonNtosReq2CommonNtosRsp4Rsp(reqIn *txdata.CommonNtosReq, fromS bool, errNo int32, errMsg string, rspType string, rspData []byte) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, DataType: rspType, Data: rspData, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg}
+func CommonNtosReq2CommonNtosRsp4Rsp(reqIn *txdata.CommonNtosReq, fromS bool, errNo int32, errMsg string, rspType txdata.MsgType, rspData []byte) *txdata.CommonNtosRsp {
+	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, RspType: rspType, RspData: rspData, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg, RefNum: reqIn.RefNum}
 }
 
-func Message2CommonNtosReq(src proto.Message, reportTime time.Time, userID string) *txdata.CommonNtosReq {
-	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, DataType: reflect.TypeOf(src).String(), Data: nil, ReqTime: nil}
+func Message2CommonNtosReq(src ProtoMessage, reportTime time.Time, userID string) *txdata.CommonNtosReq {
+	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, ReqType: CalcMessageType(src), ReqData: nil, ReqTime: nil}
 	var err error
-	if dst.Data, err = proto.Marshal(src); err != nil {
+	if dst.ReqData, err = proto.Marshal(src); err != nil {
 		glog.Fatalln(err, src)
 	}
 	if dst.ReqTime, err = ptypes.TimestampProto(reportTime); err != nil {
@@ -369,7 +369,7 @@ func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonN
 
 func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDataNode {
 	var err error
-	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, ReqDataType: reqIn.DataType, ReqData: reqIn.Data, ReqTime: time.Time{}}
+	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, ReqType: reqIn.ReqType, ReqData: reqIn.ReqData, ReqTime: time.Time{}}
 	if cada.ReqTime, err = ptypes.Timestamp(reqIn.ReqTime); err != nil {
 		glog.Fatalln(err)
 	}
@@ -432,7 +432,7 @@ func CommonNtosReq_flag(dataIn *txdata.CommonNtosReq) (p, qau, qas, r bool) {
 	p = false   //推送数据,发出去之后就不管了.(isPush)
 	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
 	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
-	r = false   //请求响应,中途丢包后重试消息(retry)
+	r = false   //请求响应,中途丢包后重试消息(retransmit)
 	assert4false(dataIn.SeqNo < 0)
 	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
 	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
@@ -460,12 +460,22 @@ func CommonNtosRsp_flag(dataIn *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
 
 //ProtoMessage omit
 type ProtoMessage interface {
-	Descriptor() ([]byte, []int)
+	Reset()                      //pb.Message
+	String() string              //pb.Message
+	ProtoMessage()               //pb.Message
+	Descriptor() ([]byte, []int) //自动生成的结构体,全都包含该成员函数.
 }
 
 //CalcMessageIndex 用法示例:CalcMessageIndex(&txdata.CommonNtosReq{})
-func CalcMessageIndex(protoMessage ProtoMessage) int {
+func CalcMessageIndex(protoMessage ProtoMessage) int32 {
 	var data []int
 	_, data = protoMessage.Descriptor()
-	return data[0]
+	return int32(data[0])
+}
+
+//CalcMessageType 用法示例:CalcMessageType(&txdata.CommonNtosReq{})
+func CalcMessageType(protoMessage ProtoMessage) txdata.MsgType {
+	var data []int
+	_, data = protoMessage.Descriptor()
+	return txdata.MsgType(data[0])
 }

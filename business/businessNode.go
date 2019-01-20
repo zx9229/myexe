@@ -117,7 +117,7 @@ func (thls *businessNode) checkCachedDatabase() {
 func (thls *businessNode) backgroundWork() {
 	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
 		//(RequestID<0)表示背景工作在做事情.
-		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, DataType: src.ReqDataType, Data: src.ReqData, ReqTime: nil}
+		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, ReqType: src.ReqType, ReqData: src.ReqData, ReqTime: nil}
 		req.ReqTime, _ = ptypes.TimestampProto(src.ReqTime)
 		return req
 	}
@@ -324,7 +324,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 		}
 		if isReqRspSafe || isRetransmit { //数据库相关.
 			if msgData.FromServer { //SERVER已处理本条数据,本条数据已结束,不用重传它了.
-				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataNode{Finish: msgData.FromServer, ErrNo: msgData.ErrNo, ErrMsg: msgData.ErrMsg, RspDataType: msgData.DataType, RspData: msgData.Data}); err != nil {
+				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataNode{Finish: msgData.FromServer, ErrNo: msgData.ErrNo, ErrMsg: msgData.ErrMsg, RspType: msgData.RspType, RspData: msgData.RspData}); err != nil {
 					glog.Fatalf("Engine.Update with err=%v", err)
 					assert4true(err == nil)
 				}

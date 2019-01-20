@@ -167,7 +167,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 		needResp = isRetransmit || isReqRspSafe || isReqRspUnsafe
 	}
 	//
-	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner(msgData, needSave, needResp)
+	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner(msgData, needSave)
 	//
 	if needResp {
 		if connInfoEx, isExist := thls.cacheUser.queryData(msgData.UserID); isExist {
@@ -179,7 +179,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 	}
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq, needSave, needResp bool) (rspData *txdata.CommonNtosRsp) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq, needSave bool) (rspData *txdata.CommonNtosRsp) {
 	for range "1" {
 		var cads *CommonAtosDataServer
 		if needSave {
@@ -196,9 +196,10 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdat
 			if true {
 				//cads.SeqNo
 				//cads.UserID
-				cads.ReqDataType = msgData.DataType
-				cads.ReqData = msgData.Data
+				cads.ReqType = msgData.ReqType
+				cads.ReqData = msgData.ReqData
 				cads.ReqTime, _ = ptypes.Timestamp(msgData.ReqTime)
+				cads.RefNum = msgData.RefNum
 			}
 			if affected, err := thls.xEngine.InsertOne(cads); err != nil {
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
@@ -209,16 +210,19 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdat
 				assert4true(affected != 1)
 			}
 		}
-		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData, needResp)
+
+		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData)
+		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, rspData.ErrNo, rspData.ErrMsg, rspData.RspType, rspData.RspData)
+
 		if needSave {
 			if true {
 				cads.Finish = true
 				cads.ErrNo = rspData.ErrNo
 				cads.ErrMsg = rspData.ErrMsg
-				cads.RspDataType = rspData.DataType
-				cads.RspData = rspData.Data
+				cads.RspType = rspData.RspType
+				cads.RspData = rspData.RspData
 			}
-			if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(cads); err != nil {
+			if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo, msgData.UserID}).Update(cads); err != nil {
 				glog.Fatalf("Engine.Update with err=%v", err)
 				assert4true(err == nil)
 			}
@@ -227,26 +231,27 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdat
 	return
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txdata.CommonNtosReq, needResp bool) (rspData *txdata.CommonNtosRsp) {
+//handle_MsgType_ID_CommonNtosReq_process 只要(ErrNo,ErrMsg,RspType,RspData)这几个字段的值正确就OK了.
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
 	var errNo int32
 	var errMsg string
-	switch msgData.DataType {
-	case "txdata.ReportDataItem":
+	switch txdata.MsgType(msgData.ReqType) {
+	case txdata.MsgType_ID_ReportDataItem:
 		curData := &txdata.ReportDataItem{}
-		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
+		if err := proto.Unmarshal(msgData.ReqData, curData); err != nil {
 			glog.Fatalln(msgData)
 			assert4true(err == nil)
 		}
-		rspData = thls.handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(msgData, curData, needResp)
-	case "txdata.SendMailItem":
+		rspData = thls.handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(msgData, curData, true)
+	case txdata.MsgType_ID_SendMailItem:
 		curData := &txdata.SendMailItem{}
-		if err := proto.Unmarshal(msgData.Data, curData); err != nil {
+		if err := proto.Unmarshal(msgData.ReqData, curData); err != nil {
 			glog.Fatalln(msgData)
 			assert4true(err == nil)
 		}
-		rspData = thls.handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(msgData, curData, needResp)
-	case "":
-		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, -1, "emtpy_type", msgData.DataType, msgData.Data)
+		rspData = thls.handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(msgData, curData, true)
+	case txdata.MsgType_Zero1:
+		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, -1, "emtpy_type", msgData.ReqType, msgData.ReqData)
 	default:
 		errNo = -1
 		errMsg = "unknown data type"
@@ -256,10 +261,10 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txd
 }
 
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(commReq *txdata.CommonNtosReq, item *txdata.ReportDataItem, needRsp bool) (rspOut *txdata.CommonNtosRsp) {
-	glog.Infoln(commReq.DataType, item)
+	glog.Infoln(commReq.ReqType, item)
 	var errNo int32
 	var errMsg string
-	var rspType string
+	var rspType txdata.MsgType
 	var rspData []byte
 	if needRsp {
 		rspOut = CommonNtosReq2CommonNtosRsp4Rsp(commReq, true, errNo, errMsg, rspType, rspData)
@@ -271,7 +276,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_ReportDataIte
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(commReq *txdata.CommonNtosReq, item *txdata.SendMailItem, needRsp bool) (rspOut *txdata.CommonNtosRsp) {
 	var errNo int32
 	var errMsg string
-	var rspType string
+	var rspType txdata.MsgType
 	var rspData []byte
 
 	if len(item.Username) == 0 {
@@ -580,7 +585,7 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bo
 			}
 			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
 		}
-		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner(reqInOut, saveDB, true)
+		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner(reqInOut, saveDB)
 		if saveDB && rspOut.FromServer {
 			if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonAtosDataNode{Finish: rspOut.FromServer, ErrNo: rspOut.ErrNo, ErrMsg: rspOut.ErrMsg}); err != nil {
 				glog.Fatalf("Engine.Update with err=%v", err)
