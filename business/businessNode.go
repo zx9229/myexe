@@ -66,7 +66,7 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.checkCachedDatabase()
 	//
 	curData.workChan = make(chan int64, 16)
-	go curData.backgroundWork()
+	go curData.backgroundWork2()
 	//
 	return curData
 }
@@ -87,10 +87,10 @@ func (thls *businessNode) initEngine(dataSourceName string, locationName string)
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonAtosDataNode{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}, &CommonAtosDataNode{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonAtosDataNode{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}, &CommonAtosDataNode{}); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -114,36 +114,94 @@ func (thls *businessNode) checkCachedDatabase() {
 	}
 }
 
-func (thls *businessNode) backgroundWork() {
-	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
+//func (thls *businessNode) backgroundWork() {
+//	CommonAtosDataNode2CommonNtosReq := func(src *CommonAtosDataNode) *txdata.CommonNtosReq {
+//		//(RequestID<0)表示背景工作在做事情.
+//		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, ReqType: src.ReqType, ReqData: src.ReqData, ReqTime: nil}
+//		req.ReqTime, _ = ptypes.TimestampProto(src.ReqTime)
+//		return req
+//	}
+//	data4qry := &CommonAtosDataNode{}
+//	fnReqTime := zxxorm.GuessColName(thls.xEngine, data4qry, unsafe.Offsetof(data4qry.ReqTime), true)
+//	fnmFinish := zxxorm.GuessColName(thls.xEngine, data4qry, unsafe.Offsetof(data4qry.Finish), true)
+//	go func() {
+//		for {
+//			time.Sleep(time.Second * 2)
+//			thls.workChan <- -1
+//		}
+//	}()
+//	//查询单条数据使用Get方法，在调用Get方法时需要传入一个对应结构体的指针，同时结构体中的非空field自动成为查询的条件和前面的方法条件组合在一起查询.
+//	var result CommonAtosDataNode
+//	var has bool
+//	var err error
+//	secRetransmit := float64(30)
+//	for {
+//		result = CommonAtosDataNode{}
+//		data4qry.ReqTime = time.Now().Add(-1 * time.Duration(secRetransmit) * time.Second) //查询secRetransmit之前的数据(可能刚执行了一个上报操作,刚插入数据库,所以要有一个缓存时段).
+//		if has, err = thls.xEngine.Where(builder.Eq{fnmFinish: false}.And(builder.Lt{fnReqTime: data4qry.ReqTime})).Get(&result); err != nil {
+//			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
+//		} else if has {
+//			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonAtosDataNode2CommonNtosReq(&result))
+//			//如果没有东西要发送(has == false),也是等待secRecover,然后再查询一下数据库.
+//			glog.Infof("background report data with SeqNo=%v and err=%v", result.SeqNo, err)
+//		}
+//		for looping := true; looping; {
+//			select {
+//			case tmpSeqNo, isOk := <-thls.workChan:
+//				if !isOk {
+//					glog.Fatalf("recv data from chan with tmpSeqNo=%v, isOk=%v", tmpSeqNo, isOk)
+//				}
+//				if tmpSeqNo < 0 { //负数是超时协程发送的数据.
+//					if secRetransmit*2 < time.Now().Sub(data4qry.ReqTime).Seconds() { //超时secRetransmit了,就跳出循环
+//						looping = false
+//					}
+//					continue
+//				}
+//				if tmpSeqNo != result.SeqNo {
+//					glog.Warningf("val=%v, result.SeqNo=%v", tmpSeqNo, result.SeqNo)
+//				}
+//				looping = false //上报给SERVER并且收到正确的回复了,就跳出循环.此时另一个协程已经修改数据库了,无需这边再次修改.
+//			default:
+//			}
+//		}
+//	}
+//}
+
+func (thls *businessNode) backgroundWork2() {
+	CommonNtosReqDbN2CommonNtosReq4Retransmit := func(src *CommonNtosReqDbN) (dst *txdata.CommonNtosReq) {
 		//(RequestID<0)表示背景工作在做事情.
-		req := &txdata.CommonNtosReq{RequestID: -1, UserID: src.UserID, SeqNo: src.SeqNo, ReqType: src.ReqType, ReqData: src.ReqData, ReqTime: nil}
-		req.ReqTime, _ = ptypes.TimestampProto(src.ReqTime)
-		return req
+		dst = CommonNtosReqDbN2CommonNtosReq(src)
+		dst.RequestID = -1
+		return
 	}
-	data4qry := &CommonAtosDataNode{}
-	fnReqTime := zxxorm.GuessColName(thls.xEngine, data4qry, unsafe.Offsetof(data4qry.ReqTime), true)
-	fnmFinish := zxxorm.GuessColName(thls.xEngine, data4qry, unsafe.Offsetof(data4qry.Finish), true)
+
+	var qryResult CommonNtosReqDbN
+	funCreateTime := zxxorm.GuessColName(thls.xEngine, &qryResult, unsafe.Offsetof(qryResult.CreateTime), true)
+	funcNameState := zxxorm.GuessColName(thls.xEngine, &qryResult, unsafe.Offsetof(qryResult.State), true)
+
 	go func() {
 		for {
 			time.Sleep(time.Second * 2)
 			thls.workChan <- -1
 		}
 	}()
-	//查询单条数据使用Get方法，在调用Get方法时需要传入一个对应结构体的指针，同时结构体中的非空field自动成为查询的条件和前面的方法条件组合在一起查询.
-	var result CommonAtosDataNode
+
+	secRetransmit := float64(30)
+	var qryValueState int //默认值是0
+	var qryCreateTime time.Time
+
 	var has bool
 	var err error
-	secRetransmit := float64(30)
 	for {
-		result = CommonAtosDataNode{}
-		data4qry.ReqTime = time.Now().Add(-1 * time.Duration(secRetransmit) * time.Second) //查询secRetransmit之前的数据(可能刚执行了一个上报操作,刚插入数据库,所以要有一个缓存时段).
-		if has, err = thls.xEngine.Where(builder.Eq{fnmFinish: false}.And(builder.Lt{fnReqTime: data4qry.ReqTime})).Get(&result); err != nil {
+		qryResult = CommonNtosReqDbN{}
+		qryCreateTime = time.Now().Add(-1 * time.Duration(secRetransmit) * time.Second) //查询secRetransmit之前的数据(可能刚执行了一个上报操作,刚插入数据库,所以要有一个缓存时段).
+
+		if has, err = thls.xEngine.Where(builder.Neq{funcNameState: qryValueState}.And(builder.Lt{funCreateTime: qryCreateTime})).Get(&qryResult); err != nil {
 			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
 		} else if has {
-			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonAtosDataNode2CommonNtosReq(&result))
-			//如果没有东西要发送(has == false),也是等待secRecover,然后再查询一下数据库.
-			glog.Infof("background report data with SeqNo=%v and err=%v", result.SeqNo, err)
+			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonNtosReqDbN2CommonNtosReq4Retransmit(&qryResult))
+			//如果没有东西要发送(has == false),也是等待(secRetransmit)然后再查询一下数据库.
+			glog.Infof("background report data with SeqNo=%v and err=%v", qryResult.SeqNo, err)
 		}
 		for looping := true; looping; {
 			select {
@@ -152,13 +210,13 @@ func (thls *businessNode) backgroundWork() {
 					glog.Fatalf("recv data from chan with tmpSeqNo=%v, isOk=%v", tmpSeqNo, isOk)
 				}
 				if tmpSeqNo < 0 { //负数是超时协程发送的数据.
-					if secRetransmit*2 < time.Now().Sub(data4qry.ReqTime).Seconds() { //超时secRetransmit了,就跳出循环
+					if secRetransmit*2 < time.Now().Sub(qryCreateTime).Seconds() { //超时(secRetransmit)就跳出循环.
 						looping = false
 					}
 					continue
 				}
-				if tmpSeqNo != result.SeqNo {
-					glog.Warningf("val=%v, result.SeqNo=%v", tmpSeqNo, result.SeqNo)
+				if tmpSeqNo != qryResult.SeqNo {
+					glog.Warningf("val=%v, result.SeqNo=%v", tmpSeqNo, qryResult.SeqNo)
 				}
 				looping = false //上报给SERVER并且收到正确的回复了,就跳出循环.此时另一个协程已经修改数据库了,无需这边再次修改.
 			default:
@@ -324,7 +382,12 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 		}
 		if isReqRspSafe || isRetransmit { //数据库相关.
 			if msgData.FromServer { //SERVER已处理本条数据,本条数据已结束,不用重传它了.
-				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonAtosDataNode{Finish: msgData.FromServer, ErrNo: msgData.ErrNo, ErrMsg: msgData.ErrMsg, RspType: msgData.RspType, RspData: msgData.RspData}); err != nil {
+				ntosRspDb := CommonNtosRsp2CommonNtosRspDb(msgData)
+				if affected, err := thls.xEngine.InsertOne(ntosRspDb); (err != nil) || (affected != 1) {
+					glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, ntosRspDb=%v", affected, err, ntosRspDb)
+					assert4true(err == nil && affected == 1)
+				}
+				if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo}).Update(&CommonNtosReqDbN{State: 1}); err != nil {
 					glog.Fatalf("Engine.Update with err=%v", err)
 					assert4true(err == nil)
 				}
@@ -668,24 +731,25 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bool
 		reqInOut.RequestID = 0
 		reqInOut.UserID = thls.ownInfo.UserID
 		reqInOut.SeqNo = 0
-		//reqInOut.Endeavour
-		//reqInOut.DataType
-		//reqInOut.Data
+		//reqInOut.ReqType
+		//reqInOut.ReqData
 		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
+		reqInOut.RefNum = 0
 	}
 	for range "1" {
 		var err error
+		var affected int64
 		if saveDB { //要缓存到数据库.
-			rowData := CommonNtosReq2CommonAtosDataNode(reqInOut)
-			var affected int64
-			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
+			ntosReqDbN := &CommonNtosReqDbN{}
+			CommonNtosReq2CommonNtosReqDbN(reqInOut, ntosReqDbN)
+			if affected, err = thls.xEngine.InsertOne(ntosReqDbN); err != nil {
 				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error(), false)
 				break
 			}
 			if affected != 1 {
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
 			}
-			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
+			reqInOut.SeqNo = ntosReqDbN.SeqNo //利用xorm的特性.
 		}
 		//
 		if d <= 0 {

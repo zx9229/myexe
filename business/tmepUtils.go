@@ -316,6 +316,93 @@ type CommonAtosDataServer struct {
 	RefNum     int64
 }
 
+//CommonNtosReqDbN omit
+type CommonNtosReqDbN struct {
+	RequestID  int64
+	UserID     string `xorm:"   notnull"`
+	SeqNo      int64  `xorm:"pk notnull"`
+	ReqType    txdata.MsgType
+	ReqData    []byte
+	ReqTime    time.Time
+	RefNum     int64
+	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	State      int32     `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
+}
+
+func CommonNtosReqDbN2CommonNtosReq(src *CommonNtosReqDbN) (dst *txdata.CommonNtosReq) {
+	dst = &txdata.CommonNtosReq{}
+	dst.RequestID = src.RequestID
+	dst.UserID = src.UserID
+	dst.SeqNo = src.SeqNo
+	dst.ReqType = src.ReqType
+	dst.ReqData = src.ReqData
+	dst.ReqTime, _ = ptypes.TimestampProto(src.ReqTime)
+	dst.RefNum = src.RefNum
+	return
+}
+
+func CommonNtosReq2CommonNtosReqDbN(src *txdata.CommonNtosReq, dst *CommonNtosReqDbN) {
+	dst.RequestID = src.RequestID
+	dst.UserID = src.UserID
+	dst.SeqNo = src.SeqNo
+	dst.ReqType = src.ReqType
+	dst.ReqData = src.ReqData
+	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
+	dst.RefNum = src.RefNum
+}
+
+//CommonNtosReqDbS omit
+type CommonNtosReqDbS struct {
+	RequestID  int64
+	UserID     string `xorm:"pk notnull"`
+	SeqNo      int64  `xorm:"pk notnull"`
+	ReqType    txdata.MsgType
+	ReqData    []byte
+	ReqTime    time.Time
+	RefNum     int64
+	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+}
+
+func CommonNtosReq2CommonNtosReqDbS(src *txdata.CommonNtosReq, dst *CommonNtosReqDbS) {
+	dst.RequestID = src.RequestID
+	dst.UserID = src.UserID
+	dst.SeqNo = src.SeqNo
+	dst.ReqType = src.ReqType
+	dst.ReqData = src.ReqData
+	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
+	dst.RefNum = src.RefNum
+}
+
+//CommonNtosRspDb omit
+type CommonNtosRspDb struct {
+	RequestID  int64
+	Pathway    []string
+	SeqNo      int64
+	RspType    txdata.MsgType
+	RspData    []byte
+	RspTime    time.Time
+	FromServer bool
+	ErrNo      int32
+	ErrMsg     string
+	RefNum     int64
+	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+}
+
+func CommonNtosRsp2CommonNtosRspDb(src *txdata.CommonNtosRsp) (dst *CommonNtosRspDb) {
+	dst = &CommonNtosRspDb{}
+	dst.RequestID = src.RequestID
+	dst.Pathway = src.Pathway
+	dst.SeqNo = src.SeqNo
+	dst.RspType = src.RspType
+	dst.RspData = src.RspData
+	dst.RspTime, _ = ptypes.Timestamp(src.RspTime)
+	dst.FromServer = src.FromServer
+	dst.ErrNo = src.ErrNo
+	dst.ErrMsg = src.ErrMsg
+	dst.RefNum = src.RefNum
+	return
+}
+
 func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
 	//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
 	return (requestID != 0)
@@ -343,12 +430,22 @@ type CommRspData struct {
 	ErrMsg string
 }
 
-func CommonNtosReq2CommonNtosRsp4Err(reqIn *txdata.CommonNtosReq, errNo int32, errMsg string, fromS bool) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, RspType: 0, RspData: nil, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg, RefNum: reqIn.RefNum}
+func fillCommonNtosRspByCommonNtosReq(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) {
+	rsp.RequestID = req.RequestID
+	rsp.SeqNo = req.SeqNo
+	rsp.RefNum = req.RefNum
 }
 
-func CommonNtosReq2CommonNtosRsp4Rsp(reqIn *txdata.CommonNtosReq, fromS bool, errNo int32, errMsg string, rspType txdata.MsgType, rspData []byte) *txdata.CommonNtosRsp {
-	return &txdata.CommonNtosRsp{RequestID: reqIn.RequestID, Pathway: nil, SeqNo: reqIn.SeqNo, RspType: rspType, RspData: rspData, RspTime: nil, FromServer: fromS, ErrNo: errNo, ErrMsg: errMsg, RefNum: reqIn.RefNum}
+func CommonNtosReq2CommonNtosRsp4Err(reqObj *txdata.CommonNtosReq, eNo int32, eMsg string, fromS bool) *txdata.CommonNtosRsp {
+	rspObj := &txdata.CommonNtosRsp{FromServer: fromS, ErrNo: eNo, ErrMsg: eMsg}
+	fillCommonNtosRspByCommonNtosReq(reqObj, rspObj)
+	return rspObj
+}
+
+func CommonNtosReq2CommonNtosRsp4Rsp(reqObj *txdata.CommonNtosReq, eNo int32, eMsg string, fromS bool, rspType txdata.MsgType, rspData []byte) *txdata.CommonNtosRsp {
+	rspObj := &txdata.CommonNtosRsp{FromServer: fromS, ErrNo: eNo, ErrMsg: eMsg, RspType: rspType, RspData: rspData}
+	fillCommonNtosRspByCommonNtosReq(reqObj, rspObj)
+	return rspObj
 }
 
 func Message2CommonNtosReq(src ProtoMessage, reportTime time.Time, userID string) *txdata.CommonNtosReq {

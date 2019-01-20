@@ -71,10 +71,10 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonAtosDataNode{}, &CommonAtosDataServer{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosReqDbS{}, &CommonNtosRspDb{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonAtosDataNode{}, &CommonAtosDataServer{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosReqDbS{}, &CommonNtosRspDb{}); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -167,7 +167,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 		needResp = isRetransmit || isReqRspSafe || isReqRspUnsafe
 	}
 	//
-	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner(msgData, needSave)
+	rspData := thls.handle_MsgType_ID_CommonNtosReq_inner2(msgData, needSave)
 	//
 	if needResp {
 		if connInfoEx, isExist := thls.cacheUser.queryData(msgData.UserID); isExist {
@@ -179,57 +179,97 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 	}
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq, needSave bool) (rspData *txdata.CommonNtosRsp) {
+func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner2(msgData *txdata.CommonNtosReq, needSave bool) (rspData *txdata.CommonNtosRsp) {
 	for range "1" {
-		var cads *CommonAtosDataServer
 		if needSave {
 			//以(UserID+SeqNo)唯一定位一条数据.
-			cads = &CommonAtosDataServer{SeqNo: msgData.SeqNo, UserID: msgData.UserID}
-			if has, err := thls.xEngine.Get(cads); err != nil {
-				glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
+			dbNtosReq := &CommonNtosReqDbS{UserID: msgData.UserID, SeqNo: msgData.SeqNo}
+			if has, err := thls.xEngine.Get(dbNtosReq); err != nil {
+				glog.Fatalf("Engine.Get with has=%v, err=%v, dbNtosReq=%v", has, err, dbNtosReq)
 				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), true)
 				break
 			} else if has {
 				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, "key already exists", true)
 				break
 			}
-			if true {
-				//cads.SeqNo
-				//cads.UserID
-				cads.ReqType = msgData.ReqType
-				cads.ReqData = msgData.ReqData
-				cads.ReqTime, _ = ptypes.Timestamp(msgData.ReqTime)
-				cads.RefNum = msgData.RefNum
-			}
-			if affected, err := thls.xEngine.InsertOne(cads); err != nil {
-				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
+			CommonNtosReq2CommonNtosReqDbS(msgData, dbNtosReq)
+			if affected, err := thls.xEngine.InsertOne(dbNtosReq); err != nil {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, dbNtosReq=%v", affected, err, dbNtosReq)
 				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), true)
 				break
 			} else if affected != 1 {
-				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads) //我就是想知道,成功的话,除了1,还有其他值吗.
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, dbNtosReq=%v", affected, err, dbNtosReq) //我就是想知道,成功的话,除了1,还有其他值吗.
 				assert4true(affected != 1)
 			}
 		}
-
 		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData)
-		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, rspData.ErrNo, rspData.ErrMsg, rspData.RspType, rspData.RspData)
-
+		if true {
+			fillCommonNtosRspByCommonNtosReq(msgData, rspData)
+			rspData.RspTime, _ = ptypes.TimestampProto(time.Now())
+			rspData.FromServer = true
+		}
 		if needSave {
-			if true {
-				cads.Finish = true
-				cads.ErrNo = rspData.ErrNo
-				cads.ErrMsg = rspData.ErrMsg
-				cads.RspType = rspData.RspType
-				cads.RspData = rspData.RspData
-			}
-			if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo, msgData.UserID}).Update(cads); err != nil {
-				glog.Fatalf("Engine.Update with err=%v", err)
-				assert4true(err == nil)
+			dbNtosRsp := CommonNtosRsp2CommonNtosRspDb(rspData)
+			if affected, err := thls.xEngine.InsertOne(dbNtosRsp); (err != nil) || (affected != 1) {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, dbNtosRsp=%v", affected, err, dbNtosRsp)
+				assert4true(err == nil && affected == 1)
 			}
 		}
 	}
 	return
 }
+
+//func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq, needSave bool) (rspData *txdata.CommonNtosRsp) {
+//	for range "1" {
+//		var cads *CommonAtosDataServer
+//		if needSave {
+//			//以(UserID+SeqNo)唯一定位一条数据.
+//			cads = &CommonAtosDataServer{SeqNo: msgData.SeqNo, UserID: msgData.UserID}
+//			if has, err := thls.xEngine.Get(cads); err != nil {
+//				glog.Fatalf("Engine.Get with has=%v, err=%v, rds=%v", has, err, cads)
+//				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), true)
+//				break
+//			} else if has {
+//				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, "key already exists", true)
+//				break
+//			}
+//			if true {
+//				//cads.SeqNo
+//				//cads.UserID
+//				cads.ReqType = msgData.ReqType
+//				cads.ReqData = msgData.ReqData
+//				cads.ReqTime, _ = ptypes.Timestamp(msgData.ReqTime)
+//				cads.RefNum = msgData.RefNum
+//			}
+//			if affected, err := thls.xEngine.InsertOne(cads); err != nil {
+//				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads)
+//				rspData = CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), true)
+//				break
+//			} else if affected != 1 {
+//				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, cads=%v", affected, err, cads) //我就是想知道,成功的话,除了1,还有其他值吗.
+//				assert4true(affected != 1)
+//			}
+//		}
+//
+//		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData)
+//		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, rspData.ErrNo, rspData.ErrMsg, rspData.RspType, rspData.RspData)
+//
+//		if needSave {
+//			if true {
+//				cads.Finish = true
+//				cads.ErrNo = rspData.ErrNo
+//				cads.ErrMsg = rspData.ErrMsg
+//				cads.RspType = rspData.RspType
+//				cads.RspData = rspData.RspData
+//			}
+//			if _, err := thls.xEngine.ID(core.PK{msgData.SeqNo, msgData.UserID}).Update(cads); err != nil {
+//				glog.Fatalf("Engine.Update with err=%v", err)
+//				assert4true(err == nil)
+//			}
+//		}
+//	}
+//	return
+//}
 
 //handle_MsgType_ID_CommonNtosReq_process 只要(ErrNo,ErrMsg,RspType,RspData)这几个字段的值正确就OK了.
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
@@ -251,7 +291,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txd
 		}
 		rspData = thls.handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(msgData, curData, true)
 	case txdata.MsgType_Zero1:
-		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, true, -1, "emtpy_type", msgData.ReqType, msgData.ReqData)
+		rspData = CommonNtosReq2CommonNtosRsp4Rsp(msgData, -1, "emtpy_type", true, msgData.ReqType, msgData.ReqData)
 	default:
 		errNo = -1
 		errMsg = "unknown data type"
@@ -267,7 +307,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_ReportDataIte
 	var rspType txdata.MsgType
 	var rspData []byte
 	if needRsp {
-		rspOut = CommonNtosReq2CommonNtosRsp4Rsp(commReq, true, errNo, errMsg, rspType, rspData)
+		rspOut = CommonNtosReq2CommonNtosRsp4Rsp(commReq, errNo, errMsg, true, rspType, rspData)
 		rspOut.RspTime, _ = ptypes.TimestampProto(time.Now())
 	}
 	return
@@ -290,7 +330,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_SendMailItem(
 	}
 
 	if needRsp {
-		rspOut = CommonNtosReq2CommonNtosRsp4Rsp(commReq, true, errNo, errMsg, rspType, rspData)
+		rspOut = CommonNtosReq2CommonNtosRsp4Rsp(commReq, errNo, errMsg, true, rspType, rspData)
 		rspOut.RspTime, _ = ptypes.TimestampProto(time.Now())
 	}
 	return
@@ -565,17 +605,18 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bo
 		reqInOut.RequestID = 0
 		reqInOut.UserID = thls.ownInfo.UserID
 		reqInOut.SeqNo = 0
-		//reqInOut.Endeavour
-		//reqInOut.DataType
-		//reqInOut.Data
+		//reqInOut.ReqType
+		//reqInOut.ReqData
 		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
+		reqInOut.RefNum = 0
 	}
 	for range "1" {
 		var err error
 		var affected int64
 		if saveDB { //要缓存到数据库.
-			rowData := CommonNtosReq2CommonAtosDataNode(reqInOut)
-			if affected, err = thls.xEngine.InsertOne(rowData); err != nil {
+			ntosReqDbN := &CommonNtosReqDbN{}
+			CommonNtosReq2CommonNtosReqDbN(reqInOut, ntosReqDbN)
+			if affected, err = thls.xEngine.InsertOne(ntosReqDbN); err != nil {
 				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error(), false) //尚未进入SERVER处理请求的逻辑就出错了,故置false.
 				break
 			}
@@ -583,11 +624,11 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bo
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
 				assert4true(affected == 1)
 			}
-			reqInOut.SeqNo = rowData.SeqNo //利用xorm的特性.
+			reqInOut.SeqNo = ntosReqDbN.SeqNo //利用xorm的特性.
 		}
-		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner(reqInOut, saveDB)
+		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner2(reqInOut, saveDB)
 		if saveDB && rspOut.FromServer {
-			if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonAtosDataNode{Finish: rspOut.FromServer, ErrNo: rspOut.ErrNo, ErrMsg: rspOut.ErrMsg}); err != nil {
+			if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonNtosReqDbN{State: 1}); err != nil {
 				glog.Fatalf("Engine.Update with err=%v", err)
 			}
 		}
