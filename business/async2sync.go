@@ -2,18 +2,13 @@ package main
 
 import (
 	"sync"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/zx9229/myexe/txdata"
 )
 
 type nodeReqRsp struct {
 	requestID int64
 	condVar   *myCondVariable
-	reqType   txdata.MsgType
-	reqData   proto.Message
-	rspType   txdata.MsgType
-	rspData   proto.Message
+	reqData   ProtoMessage
+	rspData   ProtoMessage
 }
 
 func newNodeReqRsp() *nodeReqRsp {

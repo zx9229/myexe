@@ -86,7 +86,7 @@ func (thls *businessServer) onConnected(msgConn *wsnet.WsSocket, isAccepted bool
 	}
 	if !isAccepted {
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+		msgConn.Send(msg2slice(&tmpTxData))
 	}
 }
 
@@ -172,7 +172,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Comm
 	if needResp {
 		if connInfoEx, isExist := thls.cacheUser.queryData(msgData.UserID); isExist {
 			rspData.Pathway = connInfoEx.Pathway
-			connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
+			connInfoEx.conn.Send(msg2slice(rspData))
 		} else {
 			glog.Infof("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
@@ -348,7 +348,6 @@ func (thls *businessServer) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.
 
 func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.ExecuteCommandRsp, msgConn *wsnet.WsSocket) {
 	if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-		node.rspType = txdata.MsgType_ID_ExecuteCommandRsp
 		node.rspData = msgData
 		node.condVar.notifyAll()
 	} else {
@@ -364,7 +363,7 @@ func (thls *businessServer) handle_MsgType_ID_ParentDataReq(msgData *txdata.Pare
 		rspData.Data = append(rspData.Data, &txdata.ConnectedData{Info: &node.Info, Pathway: node.Pathway})
 	}
 	thls.cacheUser.Unlock()
-	msgConn.Send(msg2slice(txdata.MsgType_ID_ParentDataRsp, rspData))
+	msgConn.Send(msg2slice(rspData))
 }
 
 //func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
@@ -424,7 +423,7 @@ func (thls *businessServer) zxTestDeal4son(msgData *txdata.ConnectedData, msgCon
 
 	if isAccepted {
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+		msgConn.Send(msg2slice(&tmpTxData))
 	}
 }
 
@@ -576,11 +575,10 @@ func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d
 		if true {
 			reqInOut.RequestID = node.requestID
 			//
-			node.reqType = txdata.MsgType_ID_ExecuteCommandReq
 			node.reqData = reqInOut
 		}
 		//
-		if err := connInfoEx.conn.Send(msg2slice(node.reqType, node.reqData)); err != nil {
+		if err := connInfoEx.conn.Send(msg2slice(node.reqData)); err != nil {
 			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, err.Error(), tmpUID)
 			break
 		}

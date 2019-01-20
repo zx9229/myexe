@@ -12,7 +12,6 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
@@ -199,7 +198,7 @@ func (thls *businessNode) backgroundWork2() {
 		if has, err = thls.xEngine.Where(builder.Neq{funcNameState: qryValueState}.And(builder.Lt{funCreateTime: qryCreateTime})).Get(&qryResult); err != nil {
 			glog.Fatalf("xorm.Get with has=%v, err=%v", has, err)
 		} else if has {
-			err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, CommonNtosReqDbN2CommonNtosReq4Retransmit(&qryResult))
+			err = thls.sendDataToParent(CommonNtosReqDbN2CommonNtosReq4Retransmit(&qryResult))
 			//如果没有东西要发送(has == false),也是等待(secRetransmit)然后再查询一下数据库.
 			glog.Infof("background report data with SeqNo=%v and err=%v", qryResult.SeqNo, err)
 		}
@@ -232,7 +231,7 @@ func (thls *businessNode) onConnected(msgConn *wsnet.WsSocket, isAccepted bool) 
 	}
 	if !isAccepted {
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+		msgConn.Send(msg2slice(&tmpTxData))
 	}
 }
 
@@ -258,7 +257,7 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 		checkSunWhenDisconnected(dataSlice)
 		for _, data := range dataSlice { //发给父亲,让父亲也清理掉对应的缓存.
 			tmpTxData := txdata.DisconnectedData{Info: &data.Info}
-			thls.sendDataToParent(txdata.MsgType_ID_DisconnectedData, &tmpTxData)
+			thls.sendDataToParent(&tmpTxData)
 		}
 	}
 	thls.deleteConnectionFromAll(msgConn, false)
@@ -306,7 +305,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectedData(msgData *txdata.Connec
 
 	if sendToParent {
 		msgData.Pathway = append(msgData.Pathway, thls.ownInfo.UserID)
-		thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, msgData)
+		thls.sendDataToParent(msgData)
 	}
 }
 
@@ -323,7 +322,7 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		glog.Errorf("unmanageable, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	thls.sendDataToParent(txdata.MsgType_ID_DisconnectedData, msgData)
+	thls.sendDataToParent(msgData)
 }
 
 func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.CommonNtosReq, msgConn *wsnet.WsSocket) {
@@ -332,12 +331,12 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Common
 		return
 	}
 
-	if err := thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, msgData); err != nil {
+	if err := thls.sendDataToParent(msgData); err != nil {
 		if _, qau, qas, r := CommonNtosReq_flag(msgData); qau || qas || r {
 			if connInfoEx, isExist := thls.cacheUser.queryData(msgData.UserID); isExist {
 				rspData := CommonNtosReq2CommonNtosRsp4Err(msgData, -1, err.Error(), false)
 				rspData.Pathway = connInfoEx.Pathway
-				connInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, rspData))
+				connInfoEx.conn.Send(msg2slice(rspData))
 			} else {
 				//儿子刚发过来数据,我还没处理呢,结果儿子和我断开了,缓存也清理掉了,然后我才开始处理.
 				glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -364,7 +363,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
 		nextUID := msgData.Pathway[pathwayLen-1]
 		if nextConnInfoEx, isExist := thls.cacheUser.queryData(nextUID); isExist {
-			nextConnInfoEx.conn.Send(msg2slice(txdata.MsgType_ID_CommonNtosRsp, msgData))
+			nextConnInfoEx.conn.Send(msg2slice(msgData))
 		} else {
 			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
 		}
@@ -373,7 +372,6 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 		assert4true(isPush == false)
 		if isReqRspUnsafe || isReqRspSafe { //请求响应相关.
 			if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-				node.rspType = txdata.MsgType_ID_CommonNtosRsp
 				node.rspData = msgData
 				node.condVar.notifyAll()
 			} else {
@@ -417,16 +415,16 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.Ex
 	if length := len(msgData.Pathway); length != 0 {
 		nextUID := msgData.Pathway[length-1]
 		if nextConnInfo, isExist := thls.cacheUser.queryData(nextUID); isExist {
-			nextConnInfo.conn.Send(msg2slice(txdata.MsgType_ID_ExecuteCommandReq, msgData))
+			nextConnInfo.conn.Send(msg2slice(msgData))
 		} else {
 			tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, ErrMsg: fmt.Sprintf("next step is unreachable, nextUID=%v", nextUID)}
-			thls.sendDataToParent(txdata.MsgType_ID_ExecuteCommandRsp, &tempTxData)
+			thls.sendDataToParent(&tempTxData)
 		}
 	} else {
 		glog.Warningln("ExecuteCommand:", msgData.Command) //TODO:待添加真正的执行代码.
 
 		tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, UserID: thls.ownInfo.UserID, Result: "OK, Now=" + time.Now().Format("2006-01-02_15:04:05")}
-		thls.sendDataToParent(txdata.MsgType_ID_ExecuteCommandRsp, &tempTxData)
+		thls.sendDataToParent(&tempTxData)
 	}
 }
 
@@ -435,7 +433,7 @@ func (thls *businessNode) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.Ex
 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	thls.sendDataToParent(txdata.MsgType_ID_ExecuteCommandRsp, msgData)
+	thls.sendDataToParent(msgData)
 }
 
 func (thls *businessNode) handle_MsgType_ID_ParentDataReq(msgData *txdata.ParentDataReq, msgConn *wsnet.WsSocket) {
@@ -446,15 +444,15 @@ func (thls *businessNode) handle_MsgType_ID_ParentDataReq(msgData *txdata.Parent
 		rspData.Data = append(rspData.Data, &txdata.ConnectedData{Info: &node.Info, Pathway: node.Pathway})
 	}
 	thls.cacheUser.Unlock()
-	msgConn.Send(msg2slice(txdata.MsgType_ID_ParentDataRsp, rspData))
+	msgConn.Send(msg2slice(rspData))
 }
 
-func (thls *businessNode) sendDataToParent(msgType txdata.MsgType, msgData proto.Message) error {
+func (thls *businessNode) sendDataToParent(msgData ProtoMessage) error {
 	conn := thls.parentData.conn
 	if conn == nil {
 		return errors.New("parent is offline")
 	}
-	return conn.Send(msg2slice(msgType, msgData))
+	return conn.Send(msg2slice(msgData))
 }
 
 //func (thls *businessNode) isParentConnection(data *txdata.ConnectedData) bool {
@@ -499,7 +497,7 @@ func (thls *businessNode) zxTestDeal4son(msgData *txdata.ConnectedData, msgConn 
 
 	if isAccepted {
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+		msgConn.Send(msg2slice(&tmpTxData))
 	}
 
 	sendToParent = true
@@ -528,7 +526,7 @@ func (thls *businessNode) zxTestDeal4parent(msgData *txdata.ConnectedData, msgCo
 	thls.parentData.Info = *msgData.Info
 	if isAccepted {
 		tmpTxData := txdata.ConnectedData{Info: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		msgConn.Send(msg2slice(txdata.MsgType_ID_ConnectedData, &tmpTxData))
+		msgConn.Send(msg2slice(&tmpTxData))
 	}
 
 	if true {
@@ -536,7 +534,7 @@ func (thls *businessNode) zxTestDeal4parent(msgData *txdata.ConnectedData, msgCo
 		thls.cacheUser.Lock()
 		for _, node := range thls.cacheUser.M {
 			tmpTxData := txdata.ConnectedData{Info: &node.Info, Pathway: append(node.Pathway, thls.ownInfo.UserID)}
-			thls.sendDataToParent(txdata.MsgType_ID_ConnectedData, &tmpTxData)
+			thls.sendDataToParent(&tmpTxData)
 		}
 		thls.cacheUser.Unlock()
 	}
@@ -753,7 +751,7 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bool
 		}
 		//
 		if d <= 0 {
-			if err = thls.sendDataToParent(txdata.MsgType_ID_CommonNtosReq, reqInOut); err != nil {
+			if err = thls.sendDataToParent(reqInOut); err != nil {
 				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error(), false)
 			} else {
 				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, 0, "send success and no wait.", false)
@@ -763,11 +761,10 @@ func (thls *businessNode) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bool
 			if true {
 				reqInOut.RequestID = node.requestID
 				//
-				node.reqType = txdata.MsgType_ID_CommonNtosReq
 				node.reqData = reqInOut
 			}
 			//
-			if err = thls.sendDataToParent(node.reqType, node.reqData); err != nil {
+			if err = thls.sendDataToParent(node.reqData); err != nil {
 				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error(), false)
 				break
 			}

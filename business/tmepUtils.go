@@ -169,11 +169,12 @@ func (thls *safeConnInfoMap) deleteDataByConn(conn *wsnet.WsSocket) []*connInfoE
 
 type byte4type [4]byte //用于int32相关
 
-func msg2slice(msgType txdata.MsgType, msgData proto.Message) (dst []byte) {
+func msg2slice(msgData ProtoMessage) (dst []byte) {
 	var err error
 	if dst, err = proto.Marshal(msgData); err != nil {
 		glog.Fatalln(err, msgData)
 	}
+	msgType := CalcMessageType(msgData)
 	dst = append((*byte4type)(unsafe.Pointer(&msgType))[:2], dst...)
 	return
 }
