@@ -87,10 +87,10 @@ func (thls *businessNode) initEngine(dataSourceName string, locationName string)
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}, &CommonAtosDataNode{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}, &CommonAtosDataNode{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -99,8 +99,8 @@ func (thls *businessNode) checkCachedDatabase() {
 	//程序第一次启动后,可能接收并缓存了数据,然后关闭了程序,然后可能有人修改了缓存数据库里的配置,然后又启动程序,
 	//程序启动时,需要检查,缓存数据库里的数据和配置是否冲突,有冲突的话,则拒绝启动.
 	var err error
-	//(CommonAtosDataNode.UserID)必须等于(txdata.ConnectionInfo.UserID)
-	var rowData CommonAtosDataNode
+	//(CommonNtosReqDbN.UserID)必须等于(txdata.ConnectionInfo.UserID)
+	var rowData CommonNtosReqDbN
 	var affected1, affected2 int64
 	if affected1, err = thls.xEngine.Count(&rowData); err != nil {
 		glog.Fatalln(err)

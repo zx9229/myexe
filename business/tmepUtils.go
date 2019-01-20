@@ -285,37 +285,6 @@ type KeyValue struct {
 	Value string `xorm:"notnull"`
 }
 
-//CommonAtosDataNode omit
-type CommonAtosDataNode struct {
-	SeqNo      int64          `xorm:"pk autoincr notnull unique"`
-	UserID     string         //
-	ReqType    txdata.MsgType //
-	ReqData    []byte         //
-	ReqTime    time.Time      //报告时间
-	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	Finish     bool           //不需要续传了.
-	ErrNo      int32          `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	ErrMsg     string         //错误的具体原因.
-	RspType    txdata.MsgType
-	RspData    []byte
-}
-
-//CommonAtosDataServer omit
-type CommonAtosDataServer struct {
-	SeqNo      int64          `xorm:"pk notnull"`
-	UserID     string         `xorm:"pk notnull"`
-	ReqType    txdata.MsgType //
-	ReqData    []byte         //
-	ReqTime    time.Time      //报告时间
-	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
-	Finish     bool           //不需要续传了.
-	ErrNo      int32          `xorm:"notnull"` //不为0,表示这一条数据,SERVER处理不了(比如:主键冲突等原因,插数据库失败),防止无限循环.
-	ErrMsg     string         //错误的具体原因.
-	RspType    txdata.MsgType
-	RspData    []byte
-	RefNum     int64
-}
-
 //CommonNtosReqDbN omit
 type CommonNtosReqDbN struct {
 	RequestID  int64
@@ -403,26 +372,6 @@ func CommonNtosRsp2CommonNtosRspDb(src *txdata.CommonNtosRsp) (dst *CommonNtosRs
 	return
 }
 
-func needSendRsp_CommonAtos_RequestID(requestID int64) bool {
-	//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
-	return (requestID != 0)
-}
-
-func reqrspRelated_RequestID(requestID int64) bool {
-	//req&rsp相关(//从safeNodeReqRspCache出来的RequestID都是正数)
-	return (0 < requestID)
-}
-
-func backgroundRelated_RequestID(requestID int64) bool {
-	//背景执行相关的请求ID. //从background出来的RequestID都是负数
-	return (requestID < 0)
-}
-
-func dbRelated_CommonAtos_SeqNo(seqNo int64) bool {
-	//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)//(SeqNo非0,表示插入了数据库)
-	return (seqNo != 0)
-}
-
 type CommRspData struct {
 	UserID string
 	SeqNo  int64
@@ -462,15 +411,6 @@ func Message2CommonNtosReq(src ProtoMessage, reportTime time.Time, userID string
 
 func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) *CommRspData {
 	return &CommRspData{UserID: req.UserID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
-}
-
-func CommonNtosReq2CommonAtosDataNode(reqIn *txdata.CommonNtosReq) *CommonAtosDataNode {
-	var err error
-	cada := &CommonAtosDataNode{SeqNo: 0, UserID: reqIn.UserID, ReqType: reqIn.ReqType, ReqData: reqIn.ReqData, ReqTime: time.Time{}}
-	if cada.ReqTime, err = ptypes.Timestamp(reqIn.ReqTime); err != nil {
-		glog.Fatalln(err)
-	}
-	return cada
 }
 
 func atomicKey2Str(src *txdata.AtomicKey) string {
