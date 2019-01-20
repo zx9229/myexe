@@ -381,7 +381,7 @@ void DataExchanger::CommonNtosReqQ2TX(const QCommonNtosReq &src, txdata::CommonN
 void DataExchanger::CommonNtosRspQ2TX(const QCommonNtosRsp &src, txdata::CommonNtosRsp &dst)
 {
     dst.set_requestid(src.RequestID);
-    dst.set_pathway(0, src.Pathway.toStdString());
+    dst.add_pathway(src.Pathway.toStdString());
     dst.set_seqno(src.SeqNo);
     dst.set_rsptype(static_cast<txdata::MsgType>(src.RspType));
     dst.set_rspdata(src.RspData.constData(), src.RspData.size());
