@@ -23,6 +23,8 @@ DialogReqRsp::DialogReqRsp(DataExchanger* p, QWidget *parent) :
         ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);//它俩组合在一起以设置整行选中.
         ui->tableWidget->setAlternatingRowColors(true);//设置隔一行变一颜色,即:一灰一白.
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//先自适应宽度.
+        ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);//然后设置要根据内容使用宽度的列.
         connect(ui->tableWidget, &QTableWidget::cellDoubleClicked, this, &DialogReqRsp::slotCellDoubleClicked);
     }
 }
