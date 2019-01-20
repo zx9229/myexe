@@ -24,9 +24,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="pushButton_resend">
        <property name="text">
-        <string>站位符</string>
+        <string>重新发送</string>
        </property>
       </widget>
      </item>

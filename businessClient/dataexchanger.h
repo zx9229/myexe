@@ -33,6 +33,7 @@ public:
     void setUserKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     void setBelongKey(const QString& zoneName, const QString& nodeName, txdata::ProgramType execType, const QString& execName);
     bool sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bool needSave);
+    void sendCommonNtosReq4resend(QCommonNtosReq& reqData);
 
 public slots:
     void slotParentDataReq();

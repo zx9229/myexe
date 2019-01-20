@@ -251,6 +251,13 @@ bool DataExchanger::sendCommonNtosReq(QCommonNtosReq& reqData, bool needResp, bo
     return opFinish;
 }
 
+void DataExchanger::sendCommonNtosReq4resend(QCommonNtosReq &reqData)
+{
+    txdata::CommonNtosReq data4send;
+    CommonNtosReqQ2TX(reqData, data4send);
+    m_ws.sendBinaryMessage(m2b::msg2pkg(data4send));
+}
+
 void DataExchanger::initDB()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");

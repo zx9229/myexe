@@ -1,5 +1,6 @@
 #include "dialogreqrsp.h"
 #include "ui_dialogreqrsp.h"
+#include <QMessageBox>
 #include "dataexchanger.h"
 #include "dialogdata.h"
 
@@ -15,7 +16,8 @@ DialogReqRsp::DialogReqRsp(DataExchanger* p, QWidget *parent) :
 #endif
     initUI();
     QObject::connect(ui->pushButton_reject, &QPushButton::clicked, this, &DialogReqRsp::reject);
-    QObject::connect(ui->pushButton_reload, &QPushButton::clicked, this, &DialogReqRsp::slotReload);
+    QObject::connect(ui->pushButton_resend, &QPushButton::clicked, this, &DialogReqRsp::slotClickedResend);
+    QObject::connect(ui->pushButton_reload, &QPushButton::clicked, this, &DialogReqRsp::slotClickedReload);
     if (true) {
         ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); //它俩组合在一起以设置整行选中.
         ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);//它俩组合在一起以设置整行选中.
@@ -39,10 +41,10 @@ void DialogReqRsp::setRefNum(int64_t refNum)
 {
     refNum = (0 <= refNum) && (refNum <= INT64_MAX) ? refNum : 0;
     ui->lineEdit_RefNum->setText(QString::number(refNum));
-    slotReload();
+    slotClickedReload();
 }
 
-void DialogReqRsp::slotReload()
+void DialogReqRsp::slotClickedReload()
 {
     int64_t refNum = ui->lineEdit_RefNum->text().toLongLong();
 
@@ -87,6 +89,24 @@ void DialogReqRsp::slotReload()
         Q_ASSERT(colCnt == 3);
     }
     ui->tableWidget->setRowCount(rowIdx + 1);
+}
+
+void DialogReqRsp::slotClickedResend()
+{
+    int curRowIdx = ui->tableWidget->currentRow();
+    if (curRowIdx < 0)
+    {
+        QMessageBox::information(this, tr("resend"), tr("请先选中一行数据"));
+        return;
+    }
+    QVariant qVariant = ui->tableWidget->item(curRowIdx, 0)->data(Qt::UserRole);
+    if (qVariant.canConvert<QCommonNtosReq>() == false)
+    {
+        QMessageBox::information(this, tr("resend"), tr("当前行不是(QCommonNtosReq)数据, 无法发送"));
+        return;
+    }
+    QCommonNtosReq node = qVariant.value<QCommonNtosReq>();
+    m_dataExch->sendCommonNtosReq4resend(node);
 }
 
 void DialogReqRsp::slotCellDoubleClicked(int row, int column)

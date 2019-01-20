@@ -21,7 +21,8 @@ public:
     void setRefNum(int64_t refNum);
 
 private slots:
-    void slotReload();
+    void slotClickedReload();
+    void slotClickedResend();
     void slotCellDoubleClicked(int row, int column);
 
 private:
