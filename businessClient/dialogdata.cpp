@@ -130,8 +130,10 @@ void DialogData::setData(const QCommonNtosRsp &data)
 
     txdata::MsgType innerType = static_cast<txdata::MsgType>(data.RspType);
     ui->pushButton_inner->setProperty("MsgType", DataExchanger::nameByMsgType(innerType));
-    ui->pushButton_inner->setProperty("MsgJson", DataExchanger::jsonByMsgType(innerType, data.RspData));
-
+    if (true) {
+        QString jsonStr = DataExchanger::jsonByMsgType(innerType, data.RspData);
+        ui->pushButton_inner->setProperty("MsgJson", jsonStr.isEmpty() ? QString(data.RspData) : jsonStr);
+    }
     txdata::CommonNtosRsp dataTx;
     DataExchanger::CommonNtosRspQ2TX(data, dataTx);
     ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));

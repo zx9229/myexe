@@ -392,6 +392,7 @@ void DataExchanger::CommonNtosRspQ2TX(const QCommonNtosRsp &src, txdata::CommonN
     }
     dst.set_fromserver(src.FromServer);
     dst.set_errno(src.ErrNo);
+    dst.set_errmsg(src.ErrMsg.toStdString());
     dst.set_refnum(src.RefNum);
 }
 
