@@ -174,12 +174,12 @@ func msg2slice(msgData ProtoMessage) (dst []byte) {
 	if dst, err = proto.Marshal(msgData); err != nil {
 		glog.Fatalln(err, msgData)
 	}
-	msgType := CalcMessageType(msgData)
+	msgType := CalcMessageIndex(msgData)
 	dst = append((*byte4type)(unsafe.Pointer(&msgType))[:2], dst...)
 	return
 }
 
-func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err error) {
+func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err error) {
 	b4 := (*byte4type)(unsafe.Pointer(&msgType))
 	b4[0] = src[0]
 	b4[1] = src[1]
@@ -211,6 +211,7 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData proto.Message, err e
 			err = fmt.Errorf("Unmarshal with err=%v, msgType=%v", err, msgType)
 		}
 	}
+	assert4true(CalcMessageType(msgData) == msgType)
 
 	return
 }
