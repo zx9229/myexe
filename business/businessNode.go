@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
@@ -86,10 +86,19 @@ func (thls *businessNode) initEngine(dataSourceName string, locationName string)
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	//
+	beanSlice := make([]interface{}, 0)
+	beanSlice = append(beanSlice, &KeyValue{})
+	beanSlice = append(beanSlice, &CommonNtosReqDbN{})
+	beanSlice = append(beanSlice, &CommonNtosReqDbS{})
+	beanSlice = append(beanSlice, &CommonNtosRspDb{})
+	beanSlice = append(beanSlice, &CommonStonReqDb{})
+	beanSlice = append(beanSlice, &CommonStonRspDb{})
+	//
+	if err = thls.xEngine.CreateTables(beanSlice); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosRspDb{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(beanSlice); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -278,10 +287,10 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_CommonNtosReq(txMsgData.(*txdata.CommonNtosReq), msgConn)
 	case txdata.MsgType_ID_CommonNtosRsp:
 		thls.handle_MsgType_ID_CommonNtosRsp(txMsgData.(*txdata.CommonNtosRsp), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandReq:
-		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandRsp:
-		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
+	case txdata.MsgType_ID_CommonStonReq:
+		thls.handle_MsgType_ID_CommonStonReq(txMsgData.(*txdata.CommonStonReq), msgConn)
+	case txdata.MsgType_ID_CommonStonRsp:
+		thls.handle_MsgType_ID_CommonStonRsp(txMsgData.(*txdata.CommonStonRsp), msgConn)
 	case txdata.MsgType_ID_ParentDataReq:
 		thls.handle_MsgType_ID_ParentDataReq(txMsgData.(*txdata.ParentDataReq), msgConn)
 	default:
@@ -345,6 +354,94 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosReq(msgData *txdata.Common
 	}
 }
 
+func (thls *businessNode) handle_MsgType_ID_CommonStonRsp(msgData *txdata.CommonStonRsp, msgConn *wsnet.WsSocket) {
+
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonStonReq(msgData *txdata.CommonStonReq, msgConn *wsnet.WsSocket) {
+	assert4true(thls.parentData.conn == msgConn)
+	pathwayLen := len(msgData.Pathway)
+	assert4true(0 < pathwayLen)
+	assert4true(thls.ownInfo.UserID == msgData.Pathway[pathwayLen-1])
+
+	msgData.Pathway = msgData.Pathway[:pathwayLen-1]
+
+	if pathwayLen = len(msgData.Pathway); pathwayLen != 0 {
+		nextUID := msgData.Pathway[pathwayLen-1]
+		if nextConnInfoEx, isExist := thls.cacheUser.queryData(nextUID); isExist {
+			nextConnInfoEx.conn.Send(msg2slice(msgData))
+		} else {
+			//TODO:貌似应当回一个响应.
+			glog.Warningf("user not found, msgConn=%p, msgData=%v", msgConn, msgData)
+		}
+	} else {
+		var needSave bool
+		var needResp bool
+		if isPush, isReqRspUnsafe, isReqRspSafe, isRetransmit := CommonStonReq_flag(msgData); true || isPush {
+			needSave = isRetransmit || isReqRspSafe
+			needResp = isRetransmit || isReqRspSafe || isReqRspUnsafe
+		}
+		rspData := thls.handle_MsgType_ID_CommonStonReq_inner(msgData, needSave)
+		if needResp {
+			thls.sendDataToParent(rspData)
+		}
+	}
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonStonReq_inner(msgData *txdata.CommonStonReq, neesSave bool) (rspData *txdata.CommonStonRsp) {
+	for range "1" {
+		if neesSave {
+			stonReqDb := &CommonStonReqDb{SeqNo: msgData.SeqNo}
+			if has, err := thls.xEngine.Get(stonReqDb); err != nil {
+				glog.Fatalf("Engine.Get with has=%v, err=%v, stonReqDb=%v", has, err, stonReqDb)
+				rspData = CommonStonReq2CommonStonRsp4Err(msgData, -1, err.Error(), true, thls.ownInfo.UserID)
+				break
+			} else if has {
+				rspData = CommonStonReq2CommonStonRsp4Err(msgData, -1, "key already exists", true, thls.ownInfo.UserID)
+				break
+			}
+			CommonStonReq2CommonStonReqDb(msgData, stonReqDb)
+			if affected, err := thls.xEngine.InsertOne(stonReqDb); err != nil {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, stonReqDb=%v", affected, err, stonReqDb)
+				rspData = CommonStonReq2CommonStonRsp4Err(msgData, -1, err.Error(), true, thls.ownInfo.UserID)
+				break
+			} else if affected != 1 {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, stonReqDb=%v", affected, err, stonReqDb) //我就是想知道,成功的话,除了1,还有其他值吗.
+				assert4true(affected == 1)
+			}
+		}
+		rspData = thls.handle_MsgType_ID_CommonStonReq_process(msgData)
+		if true {
+			fillCommonStonRspByCommonStonReq(msgData, rspData)
+			rspData.RspTime, _ = ptypes.TimestampProto(time.Now())
+			rspData.FromTarget = true
+		}
+		if neesSave {
+			stonRspDb := CommonStonRsp2CommonStonRspDb(rspData)
+			if affected, err := thls.xEngine.InsertOne(stonRspDb); (err != nil) || (affected != 1) {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, stonRspDb=%v", affected, err, stonRspDb)
+				assert4true(err == nil && affected == 1)
+			}
+		}
+	}
+	return
+}
+
+//handle_MsgType_ID_CommonStonReq_process 只要(ErrNo,ErrMsg,RspType,RspData)这几个字段的值正确就OK了.
+func (thls *businessNode) handle_MsgType_ID_CommonStonReq_process(msgData *txdata.CommonStonReq) (rspObj *txdata.CommonStonRsp) {
+	var rspType txdata.MsgType
+	var rspData []byte
+	if true {
+		rdt := &txdata.ReportDataItem{Topic: "ston_req_rsp", Data: "test"}
+		var err error
+		rspData, err = proto.Marshal(rdt)
+		assert4true(err == nil)
+		rspType = CalcMessageType(rdt)
+	}
+	rspObj = &txdata.CommonStonRsp{ErrNo: 0, ErrMsg: "", RspType: rspType, RspData: rspData}
+	return
+}
+
 func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.CommonNtosRsp, msgConn *wsnet.WsSocket) {
 	if thls.parentData.conn != msgConn {
 		glog.Errorf("the data must come from my father, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -398,43 +495,43 @@ func (thls *businessNode) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Common
 	}
 }
 
-func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn != msgConn {
-		glog.Errorf("the data must be from the father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if len(msgData.Pathway) == 0 {
-		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	if thls.ownInfo.UserID != msgData.Pathway[len(msgData.Pathway)-1] {
-		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	msgData.Pathway = msgData.Pathway[:len(msgData.Pathway)-1]
-	if length := len(msgData.Pathway); length != 0 {
-		nextUID := msgData.Pathway[length-1]
-		if nextConnInfo, isExist := thls.cacheUser.queryData(nextUID); isExist {
-			nextConnInfo.conn.Send(msg2slice(msgData))
-		} else {
-			tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, ErrMsg: fmt.Sprintf("next step is unreachable, nextUID=%v", nextUID)}
-			thls.sendDataToParent(&tempTxData)
-		}
-	} else {
-		glog.Warningln("ExecuteCommand:", msgData.Command) //TODO:待添加真正的执行代码.
+// func (thls *businessNode) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
+// 	if thls.parentData.conn != msgConn {
+// 		glog.Errorf("the data must be from the father, msgConn=%p, msgData=%v", msgConn, msgData)
+// 		return
+// 	}
+// 	if len(msgData.Pathway) == 0 {
+// 		glog.Errorf("empty Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+// 		return
+// 	}
+// 	if thls.ownInfo.UserID != msgData.Pathway[len(msgData.Pathway)-1] {
+// 		glog.Errorf("illegal Pathway, msgConn=%p, msgData=%v", msgConn, msgData)
+// 		return
+// 	}
+// 	msgData.Pathway = msgData.Pathway[:len(msgData.Pathway)-1]
+// 	if length := len(msgData.Pathway); length != 0 {
+// 		nextUID := msgData.Pathway[length-1]
+// 		if nextConnInfo, isExist := thls.cacheUser.queryData(nextUID); isExist {
+// 			nextConnInfo.conn.Send(msg2slice(msgData))
+// 		} else {
+// 			tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, ErrMsg: fmt.Sprintf("next step is unreachable, nextUID=%v", nextUID)}
+// 			thls.sendDataToParent(&tempTxData)
+// 		}
+// 	} else {
+// 		glog.Warningln("ExecuteCommand:", msgData.Command) //TODO:待添加真正的执行代码.
 
-		tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, UserID: thls.ownInfo.UserID, Result: "OK, Now=" + time.Now().Format("2006-01-02_15:04:05")}
-		thls.sendDataToParent(&tempTxData)
-	}
-}
+// 		tempTxData := txdata.ExecuteCommandRsp{RequestID: msgData.RequestID, UserID: thls.ownInfo.UserID, Result: "OK, Now=" + time.Now().Format("2006-01-02_15:04:05")}
+// 		thls.sendDataToParent(&tempTxData)
+// 	}
+// }
 
-func (thls *businessNode) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.ExecuteCommandRsp, msgConn *wsnet.WsSocket) {
-	if thls.parentData.conn == msgConn {
-		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-		return
-	}
-	thls.sendDataToParent(msgData)
-}
+// func (thls *businessNode) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.ExecuteCommandRsp, msgConn *wsnet.WsSocket) {
+// 	if thls.parentData.conn == msgConn {
+// 		glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
+// 		return
+// 	}
+// 	thls.sendDataToParent(msgData)
+// }
 
 func (thls *businessNode) handle_MsgType_ID_ParentDataReq(msgData *txdata.ParentDataReq, msgConn *wsnet.WsSocket) {
 	rspData := &txdata.ParentDataRsp{}

@@ -71,10 +71,19 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 			thls.xEngine.TZLocation = location
 		}
 	}
-	if err = thls.xEngine.CreateTables(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosReqDbS{}, &CommonNtosRspDb{}); err != nil { //应该是:只要存在这个tablename,就跳过它.
+	//
+	beanSlice := make([]interface{}, 0)
+	beanSlice = append(beanSlice, &KeyValue{})
+	beanSlice = append(beanSlice, &CommonNtosReqDbN{})
+	beanSlice = append(beanSlice, &CommonNtosReqDbS{})
+	beanSlice = append(beanSlice, &CommonNtosRspDb{})
+	beanSlice = append(beanSlice, &CommonStonReqDb{})
+	beanSlice = append(beanSlice, &CommonStonRspDb{})
+	//
+	if err = thls.xEngine.CreateTables(beanSlice...); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
 	}
-	if err = thls.xEngine.Sync2(&KeyValue{}, &CommonNtosReqDbN{}, &CommonNtosReqDbS{}, &CommonNtosRspDb{}); err != nil { //同步数据库结构
+	if err = thls.xEngine.Sync2(beanSlice...); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
 }
@@ -125,10 +134,10 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 		thls.handle_MsgType_ID_CommonNtosReq(txMsgData.(*txdata.CommonNtosReq), msgConn)
 	case txdata.MsgType_ID_CommonNtosRsp:
 		thls.handle_MsgType_ID_CommonNtosRsp(txMsgData.(*txdata.CommonNtosRsp), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandReq:
-		thls.handle_MsgType_ID_ExecuteCommandReq(txMsgData.(*txdata.ExecuteCommandReq), msgConn)
-	case txdata.MsgType_ID_ExecuteCommandRsp:
-		thls.handle_MsgType_ID_ExecuteCommandRsp(txMsgData.(*txdata.ExecuteCommandRsp), msgConn)
+	case txdata.MsgType_ID_CommonStonReq:
+		thls.handle_MsgType_ID_CommonStonReq(txMsgData.(*txdata.CommonStonReq), msgConn)
+	case txdata.MsgType_ID_CommonStonRsp:
+		thls.handle_MsgType_ID_CommonStonRsp(txMsgData.(*txdata.CommonStonRsp), msgConn)
 	case txdata.MsgType_ID_ParentDataReq:
 		thls.handle_MsgType_ID_ParentDataReq(txMsgData.(*txdata.ParentDataReq), msgConn)
 	default:
@@ -199,7 +208,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner2(msgData *txda
 				break
 			} else if affected != 1 {
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, dbNtosReq=%v", affected, err, dbNtosReq) //我就是想知道,成功的话,除了1,还有其他值吗.
-				assert4true(affected != 1)
+				assert4true(affected == 1)
 			}
 		}
 		rspData = thls.handle_MsgType_ID_CommonNtosReq_process(msgData)
@@ -341,19 +350,19 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Comm
 	return
 }
 
-func (thls *businessServer) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
-	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
-	return
-}
+// func (thls *businessServer) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
+// 	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
+// 	return
+// }
 
-func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.ExecuteCommandRsp, msgConn *wsnet.WsSocket) {
-	if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
-		node.rspData = msgData
-		node.condVar.notifyAll()
-	} else {
-		glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
-	}
-}
+// func (thls *businessServer) handle_MsgType_ID_ExecuteCommandRsp(msgData *txdata.ExecuteCommandRsp, msgConn *wsnet.WsSocket) {
+// 	if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist {
+// 		node.rspData = msgData
+// 		node.condVar.notifyAll()
+// 	} else {
+// 		glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
+// 	}
+// }
 
 func (thls *businessServer) handle_MsgType_ID_ParentDataReq(msgData *txdata.ParentDataReq, msgConn *wsnet.WsSocket) {
 	rspData := &txdata.ParentDataRsp{}
@@ -364,6 +373,41 @@ func (thls *businessServer) handle_MsgType_ID_ParentDataReq(msgData *txdata.Pare
 	}
 	thls.cacheUser.Unlock()
 	msgConn.Send(msg2slice(rspData))
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonStonReq(msgData *txdata.CommonStonReq, msgConn *wsnet.WsSocket) {
+	panic(msgData)
+}
+
+func (thls *businessServer) handle_MsgType_ID_CommonStonRsp(msgData *txdata.CommonStonRsp, msgConn *wsnet.WsSocket) {
+	isPush, isReqRspUnsafe, isReqRspSafe, isRetransmit := CommonStonRsp_flag(msgData)
+	assert4true(isPush == false)
+	if isReqRspUnsafe || isReqRspSafe { //请求响应相关.
+		if node, isExist := thls.cacheReqRsp.deleteElement(msgData.RequestID); isExist { //TODO:(1对多)
+			node.rspData = msgData
+			node.condVar.notifyAll()
+		} else {
+			glog.Infof("data not found in cache, RequestID=%v", msgData.RequestID)
+		}
+	}
+	if isReqRspSafe || isRetransmit { //数据库相关.
+		if msgData.FromTarget { //从(目的地)发过来的数据,不是从(中间端)发过来的数据.
+			stonRspDb := CommonStonRsp2CommonStonRspDb(msgData)
+			if affected, err := thls.xEngine.InsertOne(stonRspDb); (err != nil) || (affected != 1) {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v, stonRspDb=%v", affected, err, stonRspDb)
+				assert4true(err == nil && affected == 1)
+			}
+			if msgData.State != 0 {
+				if _, err := thls.xEngine.ID(core.PK{msgData.UserID, msgData.SeqNo}).Update(&CommonStonReqDb{State: msgData.State}); err != nil {
+					glog.Fatalf("Engine.Update with err=%v", err)
+					assert4true(err == nil)
+				}
+			}
+		}
+	}
+	if isRetransmit {
+		//TODO:
+	}
 }
 
 //func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
@@ -552,44 +596,107 @@ func (thls *businessServer) deleteConnectionFromAll(conn *wsnet.WsSocket, closeI
 	thls.cacheUser.deleteDataByConn(conn)
 }
 
-func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d time.Duration) (rspOut *txdata.ExecuteCommandRsp) {
-	//这里选择用(reqInOut.Pathway[0])承载(要控制哪个NODE)信息.
-	tmpUID := reqInOut.Pathway[0]
+// func (thls *businessServer) executeCommand(reqInOut *txdata.ExecuteCommandReq, d time.Duration) (rspOut *txdata.ExecuteCommandRsp) {
+// 	//这里选择用(reqInOut.Pathway[0])承载(要控制哪个NODE)信息.
+// 	tmpUID := reqInOut.Pathway[0]
+// 	if true { //修复请求结构体的相关字段.
+// 		reqInOut.RequestID = 0
+// 		reqInOut.Pathway = nil
+// 		//reqIn.Command
+// 	}
+// 	ExecuteCommandReq2ExecuteCommandRsp := func(reqIn *txdata.ExecuteCommandReq, errNo int32, errMsg string, uid string) *txdata.ExecuteCommandRsp {
+// 		return &txdata.ExecuteCommandRsp{RequestID: reqIn.RequestID, UserID: uid, Result: "", ErrNo: errNo, ErrMsg: errMsg}
+// 	}
+// 	for range "1" {
+// 		connInfoEx, isExist := thls.cacheUser.queryData(tmpUID)
+// 		if !isExist {
+// 			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, "uid not found in cache", tmpUID)
+// 			break
+// 		}
+// 		reqInOut.Pathway = connInfoEx.Pathway
+// 		//
+// 		node := thls.cacheReqRsp.generateElement()
+// 		if true {
+// 			reqInOut.RequestID = node.requestID
+// 			//
+// 			node.reqData = reqInOut
+// 		}
+// 		//
+// 		if err := connInfoEx.conn.Send(msg2slice(node.reqData)); err != nil {
+// 			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, err.Error(), tmpUID)
+// 			break
+// 		}
+// 		//
+// 		if isTimeout := node.condVar.waitFor(d); isTimeout {
+// 			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, "timeout", tmpUID)
+// 			break
+// 		}
+// 		rspOut = node.rspData.(*txdata.ExecuteCommandRsp)
+// 		if rspOut.RequestID != reqInOut.RequestID {
+// 			glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
+// 		}
+// 	}
+// 	if reqInOut.RequestID != 0 { //为0的话,还没有使用缓存呢,所以无需清理.
+// 		thls.cacheReqRsp.deleteElement(reqInOut.RequestID)
+// 	}
+// 	return
+// }
+
+func (thls *businessServer) commonSton(reqInOut *txdata.CommonStonReq, saveDB bool, d time.Duration, uID string) (rspOut *txdata.CommonStonRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
 		reqInOut.Pathway = nil
-		//reqIn.Command
-	}
-	ExecuteCommandReq2ExecuteCommandRsp := func(reqIn *txdata.ExecuteCommandReq, errNo int32, errMsg string, uid string) *txdata.ExecuteCommandRsp {
-		return &txdata.ExecuteCommandRsp{RequestID: reqIn.RequestID, UserID: uid, Result: "", ErrNo: errNo, ErrMsg: errMsg}
+		reqInOut.SeqNo = 0
+		//reqInOut.ReqType
+		//reqInOut.ReqData
+		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
+		reqInOut.RefNum = 0
 	}
 	for range "1" {
-		connInfoEx, isExist := thls.cacheUser.queryData(tmpUID)
-		if !isExist {
-			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, "uid not found in cache", tmpUID)
+		var err error
+		var affected int64
+		if saveDB { //要缓存到数据库.
+			stonReqDb := &CommonStonReqDb{}
+			CommonStonReq2CommonStonReqDb(reqInOut, stonReqDb)
+			if affected, err = thls.xEngine.InsertOne(stonReqDb); err != nil {
+				rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, err.Error(), false, uID)
+				break
+			}
+			if affected != 1 {
+				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
+				assert4true(affected == 1)
+			}
+			reqInOut.SeqNo = stonReqDb.SeqNo //利用xorm的特性.
+		}
+		var cInfoEx *connInfoEx
+		var isExist bool
+		if cInfoEx, isExist = thls.cacheUser.queryData(uID); !isExist {
+			rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, "found not pathway", false, uID)
 			break
 		}
-		reqInOut.Pathway = connInfoEx.Pathway
-		//
-		node := thls.cacheReqRsp.generateElement()
-		if true {
-			reqInOut.RequestID = node.requestID
-			//
-			node.reqData = reqInOut
-		}
-		//
-		if err := connInfoEx.conn.Send(msg2slice(node.reqData)); err != nil {
-			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, err.Error(), tmpUID)
-			break
-		}
-		//
-		if isTimeout := node.condVar.waitFor(d); isTimeout {
-			rspOut = ExecuteCommandReq2ExecuteCommandRsp(reqInOut, -1, "timeout", tmpUID)
-			break
-		}
-		rspOut = node.rspData.(*txdata.ExecuteCommandRsp)
-		if rspOut.RequestID != reqInOut.RequestID {
-			glog.Fatalf("unmanageable, reqInOut=%v, rspOut=%v", reqInOut, rspOut)
+		reqInOut.Pathway = cInfoEx.Pathway
+		if d <= 0 {
+			if err = cInfoEx.conn.Send(msg2slice(reqInOut)); err != nil {
+				rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, err.Error(), false, uID)
+			} else {
+				rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, 0, "send success and no wait.", false, uID)
+			}
+		} else { //根据RequestID可知它是否在等待.
+			node := thls.cacheReqRsp.generateElement()
+			if true {
+				reqInOut.RequestID = node.requestID
+				node.reqData = reqInOut
+			}
+			if err = cInfoEx.conn.Send(msg2slice(reqInOut)); err != nil {
+				rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, err.Error(), false, uID)
+				break
+			}
+			if isTimeout := node.condVar.waitFor(d); isTimeout {
+				rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, "timeout", false, uID)
+				break
+			}
+			rspOut = node.rspData.(*txdata.CommonStonRsp)
+			assert4true(rspOut.RequestID == reqInOut.RequestID && rspOut.SeqNo == reqInOut.SeqNo)
 		}
 	}
 	if reqInOut.RequestID != 0 { //为0的话,还没有使用缓存呢,所以无需清理.

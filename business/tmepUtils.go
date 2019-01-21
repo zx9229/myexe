@@ -374,6 +374,60 @@ func CommonNtosRsp2CommonNtosRspDb(src *txdata.CommonNtosRsp) (dst *CommonNtosRs
 	return
 }
 
+//CommonStonReqDb omit
+type CommonStonReqDb struct {
+	RequestID  int64          //
+	Pathway    string         //
+	SeqNo      int64          `xorm:"pk notnull"`
+	ReqType    txdata.MsgType //
+	ReqData    []byte         //
+	ReqTime    time.Time      //
+	RefNum     int64          //
+	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间.
+	State      int32          `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
+}
+
+func CommonStonReq2CommonStonReqDb(src *txdata.CommonStonReq, dst *CommonStonReqDb) {
+	dst.RequestID = src.RequestID
+	dst.Pathway = strings.Join(src.Pathway, ".")
+	dst.SeqNo = src.SeqNo
+	dst.ReqType = src.ReqType
+	dst.ReqData = src.ReqData
+	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
+	dst.RefNum = src.RefNum
+}
+
+//CommonStonRspDb omit
+type CommonStonRspDb struct {
+	RequestID  int64          //
+	UserID     string         //
+	SeqNo      int64          //
+	RspType    txdata.MsgType //
+	RspData    []byte         //
+	RspTime    time.Time      //
+	RefNum     int64          //
+	FromTarget bool           //
+	State      int32          //
+	ErrNo      int32          //
+	ErrMsg     string         //
+	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间.
+}
+
+func CommonStonRsp2CommonStonRspDb(src *txdata.CommonStonRsp) (dst *CommonStonRspDb) {
+	dst.RequestID = src.RequestID
+	dst.UserID = src.UserID
+	dst.SeqNo = src.SeqNo
+	dst.RspType = src.RspType
+	dst.RspData = src.RspData
+	dst.RspTime, _ = ptypes.Timestamp(src.RspTime)
+	dst.RefNum = src.RefNum
+	dst.FromTarget = src.FromTarget
+	dst.State = src.State
+	dst.ErrNo = src.ErrNo
+	dst.ErrMsg = src.ErrMsg
+	return
+}
+
 type CommRspData struct {
 	UserID string
 	SeqNo  int64
@@ -387,9 +441,21 @@ func fillCommonNtosRspByCommonNtosReq(req *txdata.CommonNtosReq, rsp *txdata.Com
 	rsp.RefNum = req.RefNum
 }
 
+func fillCommonStonRspByCommonStonReq(req *txdata.CommonStonReq, rsp *txdata.CommonStonRsp) {
+	rsp.RequestID = req.RequestID
+	rsp.SeqNo = req.SeqNo
+	rsp.RefNum = req.RefNum
+}
+
 func CommonNtosReq2CommonNtosRsp4Err(reqObj *txdata.CommonNtosReq, eNo int32, eMsg string, fromS bool) *txdata.CommonNtosRsp {
 	rspObj := &txdata.CommonNtosRsp{FromServer: fromS, ErrNo: eNo, ErrMsg: eMsg}
 	fillCommonNtosRspByCommonNtosReq(reqObj, rspObj)
+	return rspObj
+}
+
+func CommonStonReq2CommonStonRsp4Err(reqObj *txdata.CommonStonReq, eNo int32, eMsg string, fromT bool, uId string) *txdata.CommonStonRsp {
+	rspObj := &txdata.CommonStonRsp{UserID: uId, FromTarget: fromT, ErrNo: eNo, ErrMsg: eMsg}
+	fillCommonStonRspByCommonStonReq(reqObj, rspObj)
 	return rspObj
 }
 
@@ -467,34 +533,35 @@ func assert4false(cond bool) {
 	}
 }
 
-func CommonNtosReq_flag(dataIn *txdata.CommonNtosReq) (p, qau, qas, r bool) {
+func calc_flag_RequestID_SeqNo(RequestID, SeqNo int64) (p, qau, qas, r bool) {
 	p = false   //推送数据,发出去之后就不管了.(isPush)
 	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
 	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
 	r = false   //请求响应,中途丢包后重试消息(retransmit)
-	assert4false(dataIn.SeqNo < 0)
-	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
-	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
-	qau = dataIn.RequestID > 0 && dataIn.SeqNo == 0
-	assert4false(dataIn.RequestID == 0 && dataIn.SeqNo > 0)
-	r = dataIn.RequestID < 0 && dataIn.SeqNo > 0
-	qas = dataIn.RequestID > 0 && dataIn.SeqNo > 0
+	assert4false(SeqNo < 0)
+	assert4false(RequestID < 0 && SeqNo == 0)
+	p = RequestID == 0 && SeqNo == 0
+	qau = RequestID > 0 && SeqNo == 0
+	assert4false(RequestID == 0 && SeqNo > 0)
+	r = RequestID < 0 && SeqNo > 0
+	qas = RequestID > 0 && SeqNo > 0
 	return
 }
 
-func CommonNtosRsp_flag(dataIn *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
-	p = false   //推送数据,发出去之后就不管了.(isPush)
-	qau = false //请求响应,中途丢包就丢了,(question-answer-unsafe)
-	qas = false //请求响应,中途丢包会重试.(question-answer-safe)
-	r = false   //请求响应,中途丢包后重试消息(retransmit)
-	assert4false(dataIn.SeqNo < 0)
-	assert4false(dataIn.RequestID < 0 && dataIn.SeqNo == 0)
-	p = dataIn.RequestID == 0 && dataIn.SeqNo == 0
-	qau = dataIn.RequestID > 0 && dataIn.SeqNo == 0
-	assert4false(dataIn.RequestID == 0 && dataIn.SeqNo > 0)
-	r = dataIn.RequestID < 0 && dataIn.SeqNo > 0
-	qas = dataIn.RequestID > 0 && dataIn.SeqNo > 0
-	return
+func CommonNtosReq_flag(data *txdata.CommonNtosReq) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
+}
+
+func CommonNtosRsp_flag(data *txdata.CommonNtosRsp) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
+}
+
+func CommonStonReq_flag(data *txdata.CommonStonReq) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
+}
+
+func CommonStonRsp_flag(data *txdata.CommonStonRsp) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
 }
 
 //ProtoMessage omit
