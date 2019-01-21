@@ -52,7 +52,7 @@ message ConnectionInfo {
     LinkType  LinkMode  = 6;//连接方向
     int32     ExePid    = 7;//进程ID
     string    ExePath   = 8;//程序路径
-    string    Remark    = 9;
+    string    Remark    = 9;//备注
 }
 
 message ConnectedData {
@@ -83,12 +83,12 @@ message DisconnectedData {
 //模式2:请求响应模式,RequestID>0和SeqNo=0
 //模式3:请求响应且安全,RequestID>0和SeqNo>0
 //背景续传:RequestID=-1且SeqNo>0
-message CommonNtosReq {//通用请求(请求的方向是agentTOserver)
+message CommonNtosReq {//通用请求(请求的方向是node_to_server)
     int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
     string                    UserID     = 2;
     int64                     SeqNo      = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
-    MsgType                   ReqType    = 4;//请求数据的类型
-    bytes                     ReqData    = 5;//请求数据的内容
+    MsgType                   ReqType    = 4;
+    bytes                     ReqData    = 5;
     google.protobuf.Timestamp ReqTime    = 6;
     int64                     RefNum     = 7;
 }
@@ -98,31 +98,38 @@ message CommonNtosRsp {
     int64                     RequestID  =  1;
     repeated string           Pathway    =  2;
     int64                     SeqNo      =  3;
-    MsgType                   RspType    =  4;//响应数据的类型
-    bytes                     RspData    =  5;//响应数据的内容
+    MsgType                   RspType    =  4;
+    bytes                     RspData    =  5;
     google.protobuf.Timestamp RspTime    =  6;
-    bool                      FromServer =  7;//响应消息是服务器发过来的,不是发送到中间,因为断线导致路途不通,发过来的消息.该消息已被服务器处理,发送端不用重传了.
-    int32                     ErrNo      =  8;
-    string                    ErrMsg     =  9;//对ErrNo的解释.
-    int64                     RefNum     = 10;
+    int64                     RefNum     =  7;
+    bool                      FromServer =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
+    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
+    int32                     ErrNo      = 10;
+    string                    ErrMsg     = 11;//对ErrNo的解释.
 }
 
-message CommonStonReq {
+message CommonStonReq {//通用请求(请求的方向是server_to_node)
     int64                     RequestID = 1;
     repeated string           Pathway   = 2;
-    string                    DataType  = 3;
-    bytes                     Data      = 4;
-    google.protobuf.Timestamp ReqTime   = 5;//SERVER请求(网络/NET/NETWORK)的时候的本地时间戳.
-    int64                     RefNum    = 6;
+    int64                     SeqNo     = 3;
+    MsgType                   ReqType   = 4;
+    bytes                     ReqData   = 5;
+    google.protobuf.Timestamp ReqTime   = 6;
+    int64                     RefNum    = 7;
 }
 
 message CommonStonRsp {
-    int64                     RequestID = 1;
-    string                    UserID    = 2;//这个参数可以没有,我用它检查了数据,安心.
-    string                    DataType  = 3;
-    bytes                     Data      = 4;
-    google.protobuf.Timestamp RspTime   = 5;//(网络/NET/NETWORK)回应SERVER的时候的本地时间戳.
-    int64                     RefNum    = 6;
+    int64                     RequestID  =  1;
+    string                    UserID     =  2;
+    int64                     SeqNo      =  3;
+    MsgType                   RspType    =  4;
+    bytes                     RspData    =  5;
+    google.protobuf.Timestamp RspTime    =  6;
+    int64                     RefNum     =  7;
+    bool                      FromTarget =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
+    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
+    int32                     ErrNo      = 10;
+    string                    ErrMsg     = 11;//对ErrNo的解释.
 }
 
 message ExecuteCommandReq {
