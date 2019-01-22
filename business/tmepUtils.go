@@ -189,10 +189,6 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err er
 		msgData = new(txdata.ConnectedData)
 	case txdata.MsgType_ID_DisconnectedData:
 		msgData = new(txdata.DisconnectedData)
-	case txdata.MsgType_ID_ExecuteCommandReq:
-		msgData = new(txdata.ExecuteCommandReq)
-	case txdata.MsgType_ID_ExecuteCommandRsp:
-		msgData = new(txdata.ExecuteCommandRsp)
 	case txdata.MsgType_ID_CommonNtosReq:
 		msgData = new(txdata.CommonNtosReq)
 	case txdata.MsgType_ID_CommonNtosRsp:
