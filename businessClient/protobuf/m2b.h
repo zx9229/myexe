@@ -62,12 +62,6 @@ public:
         case ::txdata::MsgType::ID_DisconnectedData:
             msgOut = QSharedPointer<txdata::DisconnectedData>(new txdata::DisconnectedData);
             break;
-        case ::txdata::MsgType::ID_ExecuteCommandReq:
-            msgOut = QSharedPointer<txdata::ExecuteCommandReq>(new txdata::ExecuteCommandReq);
-            break;
-        case ::txdata::MsgType::ID_ExecuteCommandRsp:
-            msgOut = QSharedPointer<txdata::ExecuteCommandRsp>(new txdata::ExecuteCommandRsp);
-            break;
         case ::txdata::MsgType::ID_CommonNtosReq:
             msgOut = QSharedPointer<txdata::CommonNtosReq>(new txdata::CommonNtosReq);
             break;
