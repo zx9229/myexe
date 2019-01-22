@@ -4,22 +4,23 @@ package txdata;
 
 import public "google/protobuf/timestamp.proto";
 
-//注意: 务必要和各结构体的序号对应起来.
+//注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
+//Windows: grep    "^message"  txdata.proto
+//Linux  : findstr "^message"  txdata.proto
 enum MsgType {
-    Zero1                =  0;
-    ID_ConnectionInfo    =  1;
-    ID_ConnectedData     =  2;
-    ID_DisconnectedData  =  3;
-    ID_CommonNtosReq     =  4;
-    ID_CommonNtosRsp     =  5;
-    ID_CommonStonReq     =  6;
-    ID_CommonStonRsp     =  7;
-    ID_ExecuteCommandReq =  8;
-    ID_ExecuteCommandRsp =  9;
-    ID_ReportDataItem    = 10;
-    ID_SendMailItem      = 11;
-    ID_ParentDataReq     = 12;
-    ID_ParentDataRsp     = 13;
+    Zero1               =  0;
+    ID_CommonNtosReq    =  1;
+    ID_CommonNtosRsp    =  2;
+    ID_CommonStonReq    =  3;
+    ID_CommonStonRsp    =  4;
+    ID_ConnectionInfo   =  5;
+    ID_ConnectedData    =  6;
+    ID_DisconnectedData =  7;
+    ID_ParentDataReq    =  8;
+    ID_ParentDataRsp    =  9;
+    ID_EchoItem         = 10;
+    ID_SendMailItem     = 11;
+    ID_ReportDataItem   = 12;
 }
 
 enum ProgramType {
@@ -36,45 +37,6 @@ message AtomicKey {
     string      NodeName = 2;//节点名(机器名)(同一区域,必须唯一).
     ProgramType ExecType = 3;//程序类型.
     string      ExecName = 4;//程序名.(同一机器,必须唯一).
-}
-
-message ConnectionInfo {
-    enum LinkType {
-        Zero3   = 0;
-        CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
-        ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
-    }
-    AtomicKey UserKey   = 1;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
-    string    UserID    = 2;
-    AtomicKey BelongKey = 3;
-    string    BelongID  = 4;
-    string    Version   = 5;//版本号
-    LinkType  LinkMode  = 6;//连接方向
-    int32     ExePid    = 7;//进程ID
-    string    ExePath   = 8;//程序路径
-    string    Remark    = 9;//备注
-}
-
-message ConnectedData {
-    ConnectionInfo  Info    = 1;
-    repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
-/* ParentA:(父亲agent), ParentC1:(父亲client1), SonA:(儿子agent), GrandsonA:(孙子agent)
-ParentA
-│  ParentC1               ParentA收到的Pathway=[]
-│  ParentC2               ParentA收到的Pathway=[]
-│
-└─SonA                    ParentA收到的Pathway=[SonA]
-    │  SonC1              ParentA收到的Pathway=[SonA]
-    │  SonC2              ParentA收到的Pathway=[SonA]
-    │
-    └─GrandsonA           ParentA收到的Pathway=[GrandsonA,SonA]
-            GrandsonC1    ParentA收到的Pathway=[GrandsonA,SonA]
-            GrandsonC2    ParentA收到的Pathway=[GrandsonA,SonA]
-*/
-}
-
-message DisconnectedData {
-    ConnectionInfo  Info    = 1;
 }
 
 //(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
@@ -132,33 +94,43 @@ message CommonStonRsp {
     string                    ErrMsg     = 11;//对ErrNo的解释.
 }
 
-message ExecuteCommandReq {
-    int64           RequestID = 1;
-    repeated string Pathway   = 2;
-    string          Command   = 3;
+message ConnectionInfo {
+    enum LinkType {
+        Zero3   = 0;
+        CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
+        ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
+    }
+    AtomicKey UserKey   = 1;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
+    string    UserID    = 2;
+    AtomicKey BelongKey = 3;
+    string    BelongID  = 4;
+    string    Version   = 5;//版本号
+    LinkType  LinkMode  = 6;//连接方向
+    int32     ExePid    = 7;//进程ID
+    string    ExePath   = 8;//程序路径
+    string    Remark    = 9;//备注
 }
 
-message ExecuteCommandRsp {
-    int64           RequestID = 1;
-    string          UserID    = 2;//这个参数可以没有,我用它检查了数据,安心
-    string          Result    = 3;//结果.
-    int32           ErrNo     = 4;
-    string          ErrMsg    = 5;
+message ConnectedData {
+    ConnectionInfo  Info    = 1;
+    repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
+/* ParentA:(父亲agent), ParentC1:(父亲client1), SonA:(儿子agent), GrandsonA:(孙子agent)
+ParentA
+│  ParentC1               ParentA收到的Pathway=[]
+│  ParentC2               ParentA收到的Pathway=[]
+│
+└─SonA                    ParentA收到的Pathway=[SonA]
+    │  SonC1              ParentA收到的Pathway=[SonA]
+    │  SonC2              ParentA收到的Pathway=[SonA]
+    │
+    └─GrandsonA           ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC1    ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC2    ParentA收到的Pathway=[GrandsonA,SonA]
+*/
 }
 
-message ReportDataItem {
-    string Topic = 1;//Data的主题.
-    string Data  = 2;
-}
-
-message SendMailItem {//发送邮件的项
-    string Username    = 1;
-    string Password    = 2;
-    string SmtpAddr    = 3;
-    string To          = 4;
-    string Subject     = 5;
-    string ContentType = 6;
-    string Content     = 7;
+message DisconnectedData {
+    ConnectionInfo  Info    = 1;
 }
 
 //我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
@@ -173,4 +145,25 @@ message ParentDataRsp {
     google.protobuf.Timestamp ReqTime   = 2;
     google.protobuf.Timestamp RspTime   = 3;
     repeated ConnectedData    Data      = 4;
+}
+
+message EchoItem {
+    string LocalID  = 1;
+    string RemoteID = 2;
+    string Data     = 3;
+}
+
+message SendMailItem {//发送邮件的项
+    string Username    = 1;
+    string Password    = 2;
+    string SmtpAddr    = 3;
+    string To          = 4;
+    string Subject     = 5;
+    string ContentType = 6;
+    string Content     = 7;
+}
+
+message ReportDataItem {
+    string Topic = 1;//Data的主题.
+    string Data  = 2;
 }
