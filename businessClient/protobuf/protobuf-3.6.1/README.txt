@@ -1,4 +1,4 @@
-  ÎÄ¼şÃû: protobuf-all-3.6.1.zip
-ÎÄ¼ş´óĞ¡: 8643093 ×Ö½Ú
-Á´½ÓµØÖ·: https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-all-3.6.1.zip
+  æ–‡ä»¶å: protobuf-all-3.6.1.zip
+æ–‡ä»¶å¤§å°: 8643093 å­—èŠ‚
+é“¾æ¥åœ°å€: https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-all-3.6.1.zip
      MD5: 81DD96470E057889B8B53822AE35C5BB
