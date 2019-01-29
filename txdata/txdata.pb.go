@@ -3,10 +3,12 @@
 
 package txdata
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import timestamp "github.com/golang/protobuf/ptypes/timestamp"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -17,14 +19,14 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Timestamp from public import google/protobuf/timestamp.proto
 type Timestamp = timestamp.Timestamp
 
-// 注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
-// Windows: grep    "^message"  txdata.proto
-// Linux  : findstr "^message"  txdata.proto
+//注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
+//Linux  : grep    "^message"  txdata.proto
+//Windows: findstr "^message"  txdata.proto
 type MsgType int32
 
 const (
@@ -58,6 +60,7 @@ var MsgType_name = map[int32]string{
 	11: "ID_SendMailItem",
 	12: "ID_ReportDataItem",
 }
+
 var MsgType_value = map[string]int32{
 	"Zero1":               0,
 	"ID_CommonNtosReq":    1,
@@ -77,8 +80,9 @@ var MsgType_value = map[string]int32{
 func (x MsgType) String() string {
 	return proto.EnumName(MsgType_name, int32(x))
 }
+
 func (MsgType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{0}
+	return fileDescriptor_b461e23de21d1471, []int{0}
 }
 
 type ProgramType int32
@@ -98,6 +102,7 @@ var ProgramType_name = map[int32]string{
 	3: "NODE",
 	4: "POINT",
 }
+
 var ProgramType_value = map[string]int32{
 	"Zero2":  0,
 	"CLIENT": 1,
@@ -109,8 +114,9 @@ var ProgramType_value = map[string]int32{
 func (x ProgramType) String() string {
 	return proto.EnumName(ProgramType_name, int32(x))
 }
+
 func (ProgramType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{1}
+	return fileDescriptor_b461e23de21d1471, []int{1}
 }
 
 type ConnectionInfo_LinkType int32
@@ -126,6 +132,7 @@ var ConnectionInfo_LinkType_name = map[int32]string{
 	1: "CONNECT",
 	2: "ACCEPT",
 }
+
 var ConnectionInfo_LinkType_value = map[string]int32{
 	"Zero3":   0,
 	"CONNECT": 1,
@@ -135,11 +142,12 @@ var ConnectionInfo_LinkType_value = map[string]int32{
 func (x ConnectionInfo_LinkType) String() string {
 	return proto.EnumName(ConnectionInfo_LinkType_name, int32(x))
 }
+
 func (ConnectionInfo_LinkType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{5, 0}
+	return fileDescriptor_b461e23de21d1471, []int{5, 0}
 }
 
-// 必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
+//必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
 type AtomicKey struct {
 	ZoneName             string      `protobuf:"bytes,1,opt,name=ZoneName,proto3" json:"ZoneName,omitempty"`
 	NodeName             string      `protobuf:"bytes,2,opt,name=NodeName,proto3" json:"NodeName,omitempty"`
@@ -154,16 +162,17 @@ func (m *AtomicKey) Reset()         { *m = AtomicKey{} }
 func (m *AtomicKey) String() string { return proto.CompactTextString(m) }
 func (*AtomicKey) ProtoMessage()    {}
 func (*AtomicKey) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{0}
+	return fileDescriptor_b461e23de21d1471, []int{0}
 }
+
 func (m *AtomicKey) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AtomicKey.Unmarshal(m, b)
 }
 func (m *AtomicKey) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AtomicKey.Marshal(b, m, deterministic)
 }
-func (dst *AtomicKey) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AtomicKey.Merge(dst, src)
+func (m *AtomicKey) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AtomicKey.Merge(m, src)
 }
 func (m *AtomicKey) XXX_Size() int {
 	return xxx_messageInfo_AtomicKey.Size(m)
@@ -202,12 +211,12 @@ func (m *AtomicKey) GetExecName() string {
 	return ""
 }
 
-// (UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
-// (RequestID)是临时维护的递增值,-1:背景续传,0:上报模式,正:请求响应.
-// 模式1:上报模式,扔出去就不管了,此时RequestID=0和SeqNo=0
-// 模式2:请求响应模式,RequestID>0和SeqNo=0
-// 模式3:请求响应且安全,RequestID>0和SeqNo>0
-// 背景续传:RequestID=-1且SeqNo>0
+//(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
+//(RequestID)是临时维护的递增值,-1:背景续传,0:上报模式,正:请求响应.
+//模式1:上报模式,扔出去就不管了,此时RequestID=0和SeqNo=0
+//模式2:请求响应模式,RequestID>0和SeqNo=0
+//模式3:请求响应且安全,RequestID>0和SeqNo>0
+//背景续传:RequestID=-1且SeqNo>0
 type CommonNtosReq struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
 	UserID               string               `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
@@ -225,16 +234,17 @@ func (m *CommonNtosReq) Reset()         { *m = CommonNtosReq{} }
 func (m *CommonNtosReq) String() string { return proto.CompactTextString(m) }
 func (*CommonNtosReq) ProtoMessage()    {}
 func (*CommonNtosReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{1}
+	return fileDescriptor_b461e23de21d1471, []int{1}
 }
+
 func (m *CommonNtosReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonNtosReq.Unmarshal(m, b)
 }
 func (m *CommonNtosReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CommonNtosReq.Marshal(b, m, deterministic)
 }
-func (dst *CommonNtosReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommonNtosReq.Merge(dst, src)
+func (m *CommonNtosReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommonNtosReq.Merge(m, src)
 }
 func (m *CommonNtosReq) XXX_Size() int {
 	return xxx_messageInfo_CommonNtosReq.Size(m)
@@ -294,7 +304,7 @@ func (m *CommonNtosReq) GetRefNum() int64 {
 	return 0
 }
 
-// (FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
+//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
 type CommonNtosRsp struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
 	Pathway              []string             `protobuf:"bytes,2,rep,name=Pathway,proto3" json:"Pathway,omitempty"`
@@ -316,16 +326,17 @@ func (m *CommonNtosRsp) Reset()         { *m = CommonNtosRsp{} }
 func (m *CommonNtosRsp) String() string { return proto.CompactTextString(m) }
 func (*CommonNtosRsp) ProtoMessage()    {}
 func (*CommonNtosRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{2}
+	return fileDescriptor_b461e23de21d1471, []int{2}
 }
+
 func (m *CommonNtosRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonNtosRsp.Unmarshal(m, b)
 }
 func (m *CommonNtosRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CommonNtosRsp.Marshal(b, m, deterministic)
 }
-func (dst *CommonNtosRsp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommonNtosRsp.Merge(dst, src)
+func (m *CommonNtosRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommonNtosRsp.Merge(m, src)
 }
 func (m *CommonNtosRsp) XXX_Size() int {
 	return xxx_messageInfo_CommonNtosRsp.Size(m)
@@ -430,16 +441,17 @@ func (m *CommonStonReq) Reset()         { *m = CommonStonReq{} }
 func (m *CommonStonReq) String() string { return proto.CompactTextString(m) }
 func (*CommonStonReq) ProtoMessage()    {}
 func (*CommonStonReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{3}
+	return fileDescriptor_b461e23de21d1471, []int{3}
 }
+
 func (m *CommonStonReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonStonReq.Unmarshal(m, b)
 }
 func (m *CommonStonReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CommonStonReq.Marshal(b, m, deterministic)
 }
-func (dst *CommonStonReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommonStonReq.Merge(dst, src)
+func (m *CommonStonReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommonStonReq.Merge(m, src)
 }
 func (m *CommonStonReq) XXX_Size() int {
 	return xxx_messageInfo_CommonStonReq.Size(m)
@@ -520,16 +532,17 @@ func (m *CommonStonRsp) Reset()         { *m = CommonStonRsp{} }
 func (m *CommonStonRsp) String() string { return proto.CompactTextString(m) }
 func (*CommonStonRsp) ProtoMessage()    {}
 func (*CommonStonRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{4}
+	return fileDescriptor_b461e23de21d1471, []int{4}
 }
+
 func (m *CommonStonRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonStonRsp.Unmarshal(m, b)
 }
 func (m *CommonStonRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CommonStonRsp.Marshal(b, m, deterministic)
 }
-func (dst *CommonStonRsp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommonStonRsp.Merge(dst, src)
+func (m *CommonStonRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommonStonRsp.Merge(m, src)
 }
 func (m *CommonStonRsp) XXX_Size() int {
 	return xxx_messageInfo_CommonStonRsp.Size(m)
@@ -636,16 +649,17 @@ func (m *ConnectionInfo) Reset()         { *m = ConnectionInfo{} }
 func (m *ConnectionInfo) String() string { return proto.CompactTextString(m) }
 func (*ConnectionInfo) ProtoMessage()    {}
 func (*ConnectionInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{5}
+	return fileDescriptor_b461e23de21d1471, []int{5}
 }
+
 func (m *ConnectionInfo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectionInfo.Unmarshal(m, b)
 }
 func (m *ConnectionInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ConnectionInfo.Marshal(b, m, deterministic)
 }
-func (dst *ConnectionInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConnectionInfo.Merge(dst, src)
+func (m *ConnectionInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConnectionInfo.Merge(m, src)
 }
 func (m *ConnectionInfo) XXX_Size() int {
 	return xxx_messageInfo_ConnectionInfo.Size(m)
@@ -731,16 +745,17 @@ func (m *ConnectedData) Reset()         { *m = ConnectedData{} }
 func (m *ConnectedData) String() string { return proto.CompactTextString(m) }
 func (*ConnectedData) ProtoMessage()    {}
 func (*ConnectedData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{6}
+	return fileDescriptor_b461e23de21d1471, []int{6}
 }
+
 func (m *ConnectedData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectedData.Unmarshal(m, b)
 }
 func (m *ConnectedData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ConnectedData.Marshal(b, m, deterministic)
 }
-func (dst *ConnectedData) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConnectedData.Merge(dst, src)
+func (m *ConnectedData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConnectedData.Merge(m, src)
 }
 func (m *ConnectedData) XXX_Size() int {
 	return xxx_messageInfo_ConnectedData.Size(m)
@@ -776,16 +791,17 @@ func (m *DisconnectedData) Reset()         { *m = DisconnectedData{} }
 func (m *DisconnectedData) String() string { return proto.CompactTextString(m) }
 func (*DisconnectedData) ProtoMessage()    {}
 func (*DisconnectedData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{7}
+	return fileDescriptor_b461e23de21d1471, []int{7}
 }
+
 func (m *DisconnectedData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DisconnectedData.Unmarshal(m, b)
 }
 func (m *DisconnectedData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_DisconnectedData.Marshal(b, m, deterministic)
 }
-func (dst *DisconnectedData) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DisconnectedData.Merge(dst, src)
+func (m *DisconnectedData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DisconnectedData.Merge(m, src)
 }
 func (m *DisconnectedData) XXX_Size() int {
 	return xxx_messageInfo_DisconnectedData.Size(m)
@@ -803,7 +819,7 @@ func (m *DisconnectedData) GetInfo() *ConnectionInfo {
 	return nil
 }
 
-// 我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
+//我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
 type ParentDataReq struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
 	ReqTime              *timestamp.Timestamp `protobuf:"bytes,2,opt,name=ReqTime,proto3" json:"ReqTime,omitempty"`
@@ -816,16 +832,17 @@ func (m *ParentDataReq) Reset()         { *m = ParentDataReq{} }
 func (m *ParentDataReq) String() string { return proto.CompactTextString(m) }
 func (*ParentDataReq) ProtoMessage()    {}
 func (*ParentDataReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{8}
+	return fileDescriptor_b461e23de21d1471, []int{8}
 }
+
 func (m *ParentDataReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ParentDataReq.Unmarshal(m, b)
 }
 func (m *ParentDataReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ParentDataReq.Marshal(b, m, deterministic)
 }
-func (dst *ParentDataReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ParentDataReq.Merge(dst, src)
+func (m *ParentDataReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ParentDataReq.Merge(m, src)
 }
 func (m *ParentDataReq) XXX_Size() int {
 	return xxx_messageInfo_ParentDataReq.Size(m)
@@ -850,7 +867,7 @@ func (m *ParentDataReq) GetReqTime() *timestamp.Timestamp {
 	return nil
 }
 
-// 我想拿到(直属于我的那个)父亲的(缓存)数据的响应.
+//我想拿到(直属于我的那个)父亲的(缓存)数据的响应.
 type ParentDataRsp struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
 	ReqTime              *timestamp.Timestamp `protobuf:"bytes,2,opt,name=ReqTime,proto3" json:"ReqTime,omitempty"`
@@ -865,16 +882,17 @@ func (m *ParentDataRsp) Reset()         { *m = ParentDataRsp{} }
 func (m *ParentDataRsp) String() string { return proto.CompactTextString(m) }
 func (*ParentDataRsp) ProtoMessage()    {}
 func (*ParentDataRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{9}
+	return fileDescriptor_b461e23de21d1471, []int{9}
 }
+
 func (m *ParentDataRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ParentDataRsp.Unmarshal(m, b)
 }
 func (m *ParentDataRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ParentDataRsp.Marshal(b, m, deterministic)
 }
-func (dst *ParentDataRsp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ParentDataRsp.Merge(dst, src)
+func (m *ParentDataRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ParentDataRsp.Merge(m, src)
 }
 func (m *ParentDataRsp) XXX_Size() int {
 	return xxx_messageInfo_ParentDataRsp.Size(m)
@@ -926,16 +944,17 @@ func (m *EchoItem) Reset()         { *m = EchoItem{} }
 func (m *EchoItem) String() string { return proto.CompactTextString(m) }
 func (*EchoItem) ProtoMessage()    {}
 func (*EchoItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{10}
+	return fileDescriptor_b461e23de21d1471, []int{10}
 }
+
 func (m *EchoItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EchoItem.Unmarshal(m, b)
 }
 func (m *EchoItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_EchoItem.Marshal(b, m, deterministic)
 }
-func (dst *EchoItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EchoItem.Merge(dst, src)
+func (m *EchoItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EchoItem.Merge(m, src)
 }
 func (m *EchoItem) XXX_Size() int {
 	return xxx_messageInfo_EchoItem.Size(m)
@@ -984,16 +1003,17 @@ func (m *SendMailItem) Reset()         { *m = SendMailItem{} }
 func (m *SendMailItem) String() string { return proto.CompactTextString(m) }
 func (*SendMailItem) ProtoMessage()    {}
 func (*SendMailItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{11}
+	return fileDescriptor_b461e23de21d1471, []int{11}
 }
+
 func (m *SendMailItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendMailItem.Unmarshal(m, b)
 }
 func (m *SendMailItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendMailItem.Marshal(b, m, deterministic)
 }
-func (dst *SendMailItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SendMailItem.Merge(dst, src)
+func (m *SendMailItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SendMailItem.Merge(m, src)
 }
 func (m *SendMailItem) XXX_Size() int {
 	return xxx_messageInfo_SendMailItem.Size(m)
@@ -1065,16 +1085,17 @@ func (m *ReportDataItem) Reset()         { *m = ReportDataItem{} }
 func (m *ReportDataItem) String() string { return proto.CompactTextString(m) }
 func (*ReportDataItem) ProtoMessage()    {}
 func (*ReportDataItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_102877f817b7d11a, []int{12}
+	return fileDescriptor_b461e23de21d1471, []int{12}
 }
+
 func (m *ReportDataItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ReportDataItem.Unmarshal(m, b)
 }
 func (m *ReportDataItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ReportDataItem.Marshal(b, m, deterministic)
 }
-func (dst *ReportDataItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ReportDataItem.Merge(dst, src)
+func (m *ReportDataItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReportDataItem.Merge(m, src)
 }
 func (m *ReportDataItem) XXX_Size() int {
 	return xxx_messageInfo_ReportDataItem.Size(m)
@@ -1100,6 +1121,9 @@ func (m *ReportDataItem) GetData() string {
 }
 
 func init() {
+	proto.RegisterEnum("txdata.MsgType", MsgType_name, MsgType_value)
+	proto.RegisterEnum("txdata.ProgramType", ProgramType_name, ProgramType_value)
+	proto.RegisterEnum("txdata.ConnectionInfo_LinkType", ConnectionInfo_LinkType_name, ConnectionInfo_LinkType_value)
 	proto.RegisterType((*AtomicKey)(nil), "txdata.AtomicKey")
 	proto.RegisterType((*CommonNtosReq)(nil), "txdata.CommonNtosReq")
 	proto.RegisterType((*CommonNtosRsp)(nil), "txdata.CommonNtosRsp")
@@ -1113,14 +1137,11 @@ func init() {
 	proto.RegisterType((*EchoItem)(nil), "txdata.EchoItem")
 	proto.RegisterType((*SendMailItem)(nil), "txdata.SendMailItem")
 	proto.RegisterType((*ReportDataItem)(nil), "txdata.ReportDataItem")
-	proto.RegisterEnum("txdata.MsgType", MsgType_name, MsgType_value)
-	proto.RegisterEnum("txdata.ProgramType", ProgramType_name, ProgramType_value)
-	proto.RegisterEnum("txdata.ConnectionInfo_LinkType", ConnectionInfo_LinkType_name, ConnectionInfo_LinkType_value)
 }
 
-func init() { proto.RegisterFile("txdata.proto", fileDescriptor_txdata_102877f817b7d11a) }
+func init() { proto.RegisterFile("txdata.proto", fileDescriptor_b461e23de21d1471) }
 
-var fileDescriptor_txdata_102877f817b7d11a = []byte{
+var fileDescriptor_b461e23de21d1471 = []byte{
 	// 1008 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcd, 0x6e, 0xdb, 0x46,
 	0x10, 0x36, 0x49, 0xfd, 0x71, 0xe4, 0x28, 0x9b, 0xb5, 0x93, 0x12, 0x46, 0xd1, 0x08, 0x3c, 0x29,

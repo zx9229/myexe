@@ -5,8 +5,8 @@ package txdata;
 import public "google/protobuf/timestamp.proto";
 
 //注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
-//Windows: grep    "^message"  txdata.proto
-//Linux  : findstr "^message"  txdata.proto
+//Linux  : grep    "^message"  txdata.proto
+//Windows: findstr "^message"  txdata.proto
 enum MsgType {
     Zero1               =  0;
     ID_CommonNtosReq    =  1;

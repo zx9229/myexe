@@ -6,7 +6,7 @@
      MD5: EE9C100E84A6A6A64636306185993538  
 
 在执行命令前请确认以下项:  
-正确设置了GOPATH用户变量  
+确保`GOPATH`的第一个目录是`%USERPROFILE%\go`
 已经执行过 go get -u -v google.golang.org/grpc  
 已经执行过 go get -u -v github.com/golang/protobuf/protoc-gen-go  
 
