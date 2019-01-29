@@ -316,15 +316,6 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txd
 	return rspData
 }
 
-func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_EchoItem(commReq *txdata.CommonNtosReq, item *txdata.EchoItem) (rspOut *txdata.CommonNtosRsp) {
-	stonReqDb := &CommonStonReqDb{}
-	CommonStonReq2CommonStonReqDb(reqInOut, stonReqDb)
-	if affected, err = thls.xEngine.InsertOne(stonReqDb); err != nil {
-		rspOut = CommonStonReq2CommonStonRsp4Err(reqInOut, -1, err.Error(), false, uID)
-		break
-	}
-}
-
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_txdata_ReportDataItem(commReq *txdata.CommonNtosReq, item *txdata.ReportDataItem, needRsp bool) (rspOut *txdata.CommonNtosRsp) {
 	glog.Infoln(commReq.ReqType, item)
 	var errNo int32
