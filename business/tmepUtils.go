@@ -189,10 +189,10 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err er
 		msgData = new(txdata.ConnectedData)
 	case txdata.MsgType_ID_DisconnectedData:
 		msgData = new(txdata.DisconnectedData)
-	case txdata.MsgType_ID_CommonNtosReq:
-		msgData = new(txdata.CommonNtosReq)
-	case txdata.MsgType_ID_CommonNtosRsp:
-		msgData = new(txdata.CommonNtosRsp)
+	case txdata.MsgType_ID_CommonReq:
+		msgData = new(txdata.CommonReq)
+	case txdata.MsgType_ID_CommonRsp:
+		msgData = new(txdata.CommonRsp)
 	case txdata.MsgType_ID_ParentDataReq:
 		msgData = new(txdata.ParentDataReq)
 	case txdata.MsgType_ID_ParentDataRsp:
@@ -296,10 +296,42 @@ type CommonNtosReqDbN struct {
 	State      int32     `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
 }
 
-func CommonNtosReqDbN2CommonNtosReq(src *CommonNtosReqDbN) (dst *txdata.CommonNtosReq) {
-	dst = &txdata.CommonNtosReq{}
+//CommonReqDbS : CommonReq,database(Db),Node(N)/Server(S)
+type CommonReqDbS struct {
+	SenderID    string
+	RecverID    string
+	CrossServer bool
+	RequestID   int64
+	SeqNo       int64 `xorm:"pk notnull"`
+	ReqType     txdata.MsgType
+	ReqData     []byte
+	ReqTime     time.Time
+	RefNum      int64
+	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	State       int32     `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
+}
+
+//CommonReqDbN : CommonReq,database(Db),Node(N)/Server(S)
+type CommonReqDbN struct {
+	SenderID    string
+	RecverID    string
+	CrossServer bool
+	RequestID   int64
+	SeqNo       int64 `xorm:"pk notnull"`
+	ReqType     txdata.MsgType
+	ReqData     []byte
+	ReqTime     time.Time
+	RefNum      int64
+	CreateTime  time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	State       int32     `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
+}
+
+func CommonReqDbN2CommonReq(src *CommonReqDbN) (dst *txdata.CommonReq) {
+	dst = &txdata.CommonReq{}
+	dst.SenderID = src.SenderID
+	dst.RecverID = src.RecverID
+	dst.CrossServer = src.CrossServer
 	dst.RequestID = src.RequestID
-	dst.UserID = src.UserID
 	dst.SeqNo = src.SeqNo
 	dst.ReqType = src.ReqType
 	dst.ReqData = src.ReqData
@@ -308,9 +340,22 @@ func CommonNtosReqDbN2CommonNtosReq(src *CommonNtosReqDbN) (dst *txdata.CommonNt
 	return
 }
 
-func CommonNtosReq2CommonNtosReqDbN(src *txdata.CommonNtosReq, dst *CommonNtosReqDbN) {
+func CommonReq2CommonReqDbN(src *txdata.CommonReq, dst *CommonReqDbN) {
+	dst.SenderID = src.SenderID
+	dst.RecverID = src.RecverID
+	dst.CrossServer = src.CrossServer
 	dst.RequestID = src.RequestID
-	dst.UserID = src.UserID
+	dst.SeqNo = src.SeqNo
+	dst.ReqType = src.ReqType
+	dst.ReqData = src.ReqData
+	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
+	dst.RefNum = src.RefNum
+}
+func CommonReq2CommonReqDbS(src *txdata.CommonReq, dst *CommonReqDbS) {
+	dst.SenderID = src.SenderID
+	dst.RecverID = src.RecverID
+	dst.CrossServer = src.CrossServer
+	dst.RequestID = src.RequestID
 	dst.SeqNo = src.SeqNo
 	dst.ReqType = src.ReqType
 	dst.ReqData = src.ReqData
@@ -330,6 +375,7 @@ type CommonNtosReqDbS struct {
 	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
 }
 
+/*
 func CommonNtosReq2CommonNtosReqDbS(src *txdata.CommonNtosReq, dst *CommonNtosReqDbS) {
 	dst.RequestID = src.RequestID
 	dst.UserID = src.UserID
@@ -339,6 +385,7 @@ func CommonNtosReq2CommonNtosReqDbS(src *txdata.CommonNtosReq, dst *CommonNtosRe
 	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
 	dst.RefNum = src.RefNum
 }
+*/
 
 //CommonNtosRspDb omit
 type CommonNtosRspDb struct {
@@ -355,6 +402,7 @@ type CommonNtosRspDb struct {
 	CreateTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
 }
 
+/*
 func CommonNtosRsp2CommonNtosRspDb(src *txdata.CommonNtosRsp) (dst *CommonNtosRspDb) {
 	dst = &CommonNtosRspDb{}
 	dst.RequestID = src.RequestID
@@ -369,6 +417,7 @@ func CommonNtosRsp2CommonNtosRspDb(src *txdata.CommonNtosRsp) (dst *CommonNtosRs
 	dst.RefNum = src.RefNum
 	return
 }
+*/
 
 //CommonStonReqDb omit
 type CommonStonReqDb struct {
@@ -383,6 +432,7 @@ type CommonStonReqDb struct {
 	State      int32          `xorm:"notnull"` //请求消息的状态(目前将int用作bool;0=>false)
 }
 
+/*
 func CommonStonReq2CommonStonReqDb(src *txdata.CommonStonReq, dst *CommonStonReqDb) {
 	dst.RequestID = src.RequestID
 	dst.Pathway = strings.Join(src.Pathway, ".")
@@ -392,7 +442,7 @@ func CommonStonReq2CommonStonReqDb(src *txdata.CommonStonReq, dst *CommonStonReq
 	dst.ReqTime, _ = ptypes.Timestamp(src.ReqTime)
 	dst.RefNum = src.RefNum
 }
-
+*/
 //CommonStonRspDb omit
 type CommonStonRspDb struct {
 	RequestID  int64          //
@@ -409,6 +459,7 @@ type CommonStonRspDb struct {
 	CreateTime time.Time      `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间.
 }
 
+/*
 func CommonStonRsp2CommonStonRspDb(src *txdata.CommonStonRsp) (dst *CommonStonRspDb) {
 	dst.RequestID = src.RequestID
 	dst.UserID = src.UserID
@@ -423,6 +474,7 @@ func CommonStonRsp2CommonStonRspDb(src *txdata.CommonStonRsp) (dst *CommonStonRs
 	dst.ErrMsg = src.ErrMsg
 	return
 }
+*/
 
 type CommRspData struct {
 	UserID string
@@ -431,36 +483,35 @@ type CommRspData struct {
 	ErrMsg string
 }
 
-func fillCommonNtosRspByCommonNtosReq(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) {
+func fillCommonRspByCommonReq(req *txdata.CommonReq, rsp *txdata.CommonRsp) {
+	rsp.SenderID = req.RecverID
+	rsp.RecverID = req.SenderID
+	//rsp.CrossServer
 	rsp.RequestID = req.RequestID
 	rsp.SeqNo = req.SeqNo
+	//rsp.RspType
+	//rsp.RspData
+	//rsp.RspTime
 	rsp.RefNum = req.RefNum
+	//rsp.FromRecver
+	//rsp.State
+	//rsp.ErrNo
+	//rsp.ErrMsg
 }
 
-func fillCommonStonRspByCommonStonReq(req *txdata.CommonStonReq, rsp *txdata.CommonStonRsp) {
-	rsp.RequestID = req.RequestID
-	rsp.SeqNo = req.SeqNo
-	rsp.RefNum = req.RefNum
-}
-
-func CommonNtosReq2CommonNtosRsp4Err(reqObj *txdata.CommonNtosReq, eNo int32, eMsg string, fromS bool) *txdata.CommonNtosRsp {
-	rspObj := &txdata.CommonNtosRsp{FromServer: fromS, ErrNo: eNo, ErrMsg: eMsg}
-	fillCommonNtosRspByCommonNtosReq(reqObj, rspObj)
+func CommonReq2CommonRsp4Err(reqObj *txdata.CommonReq, eNo int32, eMsg string, crossS bool, fromR bool) *txdata.CommonRsp {
+	rspObj := &txdata.CommonRsp{CrossServer: crossS, FromRecver: fromR, ErrNo: eNo, ErrMsg: eMsg}
+	fillCommonRspByCommonReq(reqObj, rspObj)
 	return rspObj
 }
 
-func CommonStonReq2CommonStonRsp4Err(reqObj *txdata.CommonStonReq, eNo int32, eMsg string, fromT bool, uId string) *txdata.CommonStonRsp {
-	rspObj := &txdata.CommonStonRsp{UserID: uId, FromTarget: fromT, ErrNo: eNo, ErrMsg: eMsg}
-	fillCommonStonRspByCommonStonReq(reqObj, rspObj)
+func CommonReq2CommonRsp4Rsp(reqObj *txdata.CommonReq, eNo int32, eMsg string, crossS bool, fromR bool, rspType txdata.MsgType, rspData []byte) *txdata.CommonRsp {
+	rspObj := &txdata.CommonRsp{CrossServer: crossS, FromRecver: fromR, ErrNo: eNo, ErrMsg: eMsg, RspType: rspType, RspData: rspData}
+	fillCommonRspByCommonReq(reqObj, rspObj)
 	return rspObj
 }
 
-func CommonNtosReq2CommonNtosRsp4Rsp(reqObj *txdata.CommonNtosReq, eNo int32, eMsg string, fromS bool, rspType txdata.MsgType, rspData []byte) *txdata.CommonNtosRsp {
-	rspObj := &txdata.CommonNtosRsp{FromServer: fromS, ErrNo: eNo, ErrMsg: eMsg, RspType: rspType, RspData: rspData}
-	fillCommonNtosRspByCommonNtosReq(reqObj, rspObj)
-	return rspObj
-}
-
+/*
 func Message2CommonNtosReq(src ProtoMessage, reportTime time.Time, userID string) *txdata.CommonNtosReq {
 	dst := &txdata.CommonNtosReq{RequestID: 0, UserID: userID, SeqNo: 0, ReqType: CalcMessageType(src), ReqData: nil, ReqTime: nil}
 	var err error
@@ -476,6 +527,7 @@ func Message2CommonNtosReq(src ProtoMessage, reportTime time.Time, userID string
 func CommonNtosReqRsp2CommRspData(req *txdata.CommonNtosReq, rsp *txdata.CommonNtosRsp) *CommRspData {
 	return &CommRspData{UserID: req.UserID, SeqNo: req.SeqNo, ErrNo: rsp.ErrNo, ErrMsg: rsp.ErrMsg}
 }
+*/
 
 func atomicKey2Str(src *txdata.AtomicKey) string {
 	execType := (*int32)(unsafe.Pointer(&src.ExecType))
@@ -544,6 +596,15 @@ func calc_flag_RequestID_SeqNo(RequestID, SeqNo int64) (p, qau, qas, r bool) {
 	return
 }
 
+func CommonReq_flag(data *txdata.CommonReq) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
+}
+
+func CommonRsp_flag(data *txdata.CommonRsp) (p, qau, qas, r bool) {
+	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
+}
+
+/*
 func CommonNtosReq_flag(data *txdata.CommonNtosReq) (p, qau, qas, r bool) {
 	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
 }
@@ -559,6 +620,7 @@ func CommonStonReq_flag(data *txdata.CommonStonReq) (p, qau, qas, r bool) {
 func CommonStonRsp_flag(data *txdata.CommonStonRsp) (p, qau, qas, r bool) {
 	return calc_flag_RequestID_SeqNo(data.RequestID, data.SeqNo)
 }
+*/
 
 //ProtoMessage omit
 type ProtoMessage interface {

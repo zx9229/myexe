@@ -9,18 +9,16 @@ import public "google/protobuf/timestamp.proto";
 // Windows: findstr "^message"  txdata.proto
 enum MsgType {
     Zero1               =  0;
-    ID_CommonNtosReq    =  1;
-    ID_CommonNtosRsp    =  2;
-    ID_CommonStonReq    =  3;
-    ID_CommonStonRsp    =  4;
-    ID_ConnectionInfo   =  5;
-    ID_ConnectedData    =  6;
-    ID_DisconnectedData =  7;
-    ID_ParentDataReq    =  8;
-    ID_ParentDataRsp    =  9;
-    ID_EchoItem         = 10;
-    ID_SendMailItem     = 11;
-    ID_ReportDataItem   = 12;
+    ID_CommonReq        =  1;
+    ID_CommonRsp        =  2;
+    ID_ConnectionInfo   =  3;
+    ID_ConnectedData    =  4;
+    ID_DisconnectedData =  5;
+    ID_ParentDataReq    =  6;
+    ID_ParentDataRsp    =  7;
+    ID_EchoItem         =  8;
+    ID_SendMailItem     =  9;
+    ID_ReportDataItem   = 10;
 }
 
 enum ProgramType {
@@ -45,53 +43,33 @@ message AtomicKey {
 //模式2:请求响应模式,RequestID>0和SeqNo=0
 //模式3:请求响应且安全,RequestID>0和SeqNo>0
 //背景续传:RequestID=-1且SeqNo>0
-message CommonNtosReq {//通用请求(请求的方向是node_to_server)
-    int64                     RequestID  = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
-    string                    UserID     = 2;
-    int64                     SeqNo      = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
-    MsgType                   ReqType    = 4;
-    bytes                     ReqData    = 5;
-    google.protobuf.Timestamp ReqTime    = 6;
-    int64                     RefNum     = 7;
+message CommonReq {
+    string                    SenderID    = 1;
+    string                    RecverID    = 2;
+    bool                      CrossServer = 3;
+    int64                     RequestID   = 4;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
+    int64                     SeqNo       = 5;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
+    MsgType                   ReqType     = 6;
+    bytes                     ReqData     = 7;
+    google.protobuf.Timestamp ReqTime     = 8;
+    int64                     RefNum      = 9;
 }
 
 //(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
-message CommonNtosRsp {
-    int64                     RequestID  =  1;
-    repeated string           Pathway    =  2;
-    int64                     SeqNo      =  3;
-    MsgType                   RspType    =  4;
-    bytes                     RspData    =  5;
-    google.protobuf.Timestamp RspTime    =  6;
-    int64                     RefNum     =  7;
-    bool                      FromServer =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
-    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
-    int32                     ErrNo      = 10;
-    string                    ErrMsg     = 11;//对ErrNo的解释.
-}
-
-message CommonStonReq {//通用请求(请求的方向是server_to_node)
-    int64                     RequestID = 1;
-    repeated string           Pathway   = 2;
-    int64                     SeqNo     = 3;
-    MsgType                   ReqType   = 4;
-    bytes                     ReqData   = 5;
-    google.protobuf.Timestamp ReqTime   = 6;
-    int64                     RefNum    = 7;
-}
-
-message CommonStonRsp {
-    int64                     RequestID  =  1;
-    string                    UserID     =  2;
-    int64                     SeqNo      =  3;
-    MsgType                   RspType    =  4;
-    bytes                     RspData    =  5;
-    google.protobuf.Timestamp RspTime    =  6;
-    int64                     RefNum     =  7;
-    bool                      FromTarget =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
-    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
-    int32                     ErrNo      = 10;
-    string                    ErrMsg     = 11;//对ErrNo的解释.
+message CommonRsp {
+    string                    SenderID    = 1;
+    string                    RecverID    = 2;
+    bool                      CrossServer = 3;
+    int64                     RequestID  =  4;
+    int64                     SeqNo      =  5;
+    MsgType                   RspType    =  6;
+    bytes                     RspData    =  7;
+    google.protobuf.Timestamp RspTime    =  8;
+    int64                     RefNum     =  9;
+    bool                      FromRecver = 10;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
+    int32                     State      = 11;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
+    int32                     ErrNo      = 12;
+    string                    ErrMsg     = 13;//对ErrNo的解释.
 }
 
 message ConnectionInfo {
@@ -153,7 +131,8 @@ message EchoItem {
     string Data     = 3;
 }
 
-message SendMailItem {//发送邮件的项
+//发送邮件的项
+message SendMailItem {
     string Username    = 1;
     string Password    = 2;
     string SmtpAddr    = 3;

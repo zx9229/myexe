@@ -15,20 +15,21 @@ import (
 
 var globalA *businessNode
 
+/*
 func handleReportData(w http.ResponseWriter, r *http.Request) {
 	curObj := new(struct {
 		txdata.ReportDataItem
 		Cache   bool
 		Timeout int
 	})
-	obj2msg := func(obj interface{}) (req *txdata.CommonNtosReq, saveDB bool, sec int) {
+	obj2msg := func(obj interface{}) (req *txdata.CommonReq, saveDB bool, sec int) {
 		theObj := obj.(*struct {
 			txdata.ReportDataItem
 			Cache   bool
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonNtosReq{ReqType: CalcMessageType(&curObj.ReportDataItem)}
+		req = &txdata.CommonReq{ReqType: CalcMessageType(&curObj.ReportDataItem)}
 		if req.ReqData, err = proto.Marshal(&theObj.ReportDataItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
@@ -38,24 +39,38 @@ func handleReportData(w http.ResponseWriter, r *http.Request) {
 	}
 	handleCommonFun(w, r, curObj, obj2msg)
 }
+*/
 
-func handleSendMail(w http.ResponseWriter, r *http.Request) {
+func handleEcho(w http.ResponseWriter, r *http.Request) {
 	curObj := new(struct {
-		txdata.SendMailItem
+		txdata.EchoItem
+		Recver  string
 		Cache   bool
 		Timeout int
 	})
-	obj2msg := func(obj interface{}) (req *txdata.CommonNtosReq, saveDB bool, sec int) {
+	obj2msg := func(obj interface{}) (req *txdata.CommonReq, saveDB bool, sec int) {
 		theObj := obj.(*struct {
-			txdata.SendMailItem
+			txdata.EchoItem
+			Recver  string
 			Cache   bool
 			Timeout int
 		})
 		var err error
-		req = &txdata.CommonNtosReq{ReqType: CalcMessageType(&curObj.SendMailItem)}
-		if req.ReqData, err = proto.Marshal(&theObj.SendMailItem); err != nil {
+		req = &txdata.CommonReq{ReqType: CalcMessageType(&curObj.EchoItem)}
+		if req.ReqData, err = proto.Marshal(&theObj.EchoItem); err != nil {
 			glog.Fatalln(err, obj)
 		}
+		//
+		//req.SenderID
+		req.RecverID = theObj.Recver
+		//req.CrossServer
+		//req.RequestID
+		//req.SeqNo
+		//req.ReqType,=,
+		//req.ReqData,=,
+		//req.ReqTime
+		//req.RefNum
+		//
 		saveDB = theObj.Cache
 		sec = theObj.Timeout
 		return
@@ -63,7 +78,7 @@ func handleSendMail(w http.ResponseWriter, r *http.Request) {
 	handleCommonFun(w, r, curObj, obj2msg)
 }
 
-func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonNtosReq, bool, int)) {
+func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonReq, bool, int)) {
 	var err error
 	var byteSlice []byte
 	//
@@ -78,13 +93,13 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 			rspData.ErrMsg = fmt.Sprintf("Unmarshal Request with err = %v", err)
 			break
 		}
-		var reqInOut *txdata.CommonNtosReq
+		var reqInOut *txdata.CommonReq
 		var saveDB bool
 		var secTimeout int
 		if true {
 			reqInOut, saveDB, secTimeout = Obj2Msg(obj)
 		}
-		var rspOut *txdata.CommonNtosRsp
+		var rspOut *txdata.CommonRsp
 		if (globalA != nil) && (globalS == nil) {
 			rspOut = globalA.commonAtos(reqInOut, saveDB, time.Duration(secTimeout)*time.Second)
 		} else if (globalA == nil) && (globalS != nil) {
@@ -93,7 +108,7 @@ func handleCommonFun(w http.ResponseWriter, r *http.Request, obj interface{}, Ob
 			glog.Fatalln(globalA, globalS)
 		}
 		if true {
-			rspData.UserID = reqInOut.UserID
+			//rspData.UserID = reqInOut.UserID
 			rspData.SeqNo = rspOut.SeqNo
 			rspData.ErrNo = rspOut.ErrNo
 			rspData.ErrMsg = rspOut.ErrMsg
@@ -118,7 +133,6 @@ func runNode(cfg *configNode) {
 	cs.CbReceive = globalA.onMessage
 	cs.Init(cfg.ClientURL, cfg.ServerURL)
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cacheNode4a", cacheNode4a)
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/reportData", handleReportData)
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/sendMail", handleSendMail)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/echo", handleEcho)
 	cs.Run()
 }

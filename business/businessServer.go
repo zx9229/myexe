@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -8,7 +10,6 @@ import (
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
@@ -74,11 +75,9 @@ func (thls *businessServer) initEngine(dataSourceName string, locationName strin
 	//
 	beanSlice := make([]interface{}, 0)
 	beanSlice = append(beanSlice, &KeyValue{})
-	beanSlice = append(beanSlice, &CommonNtosReqDbN{})
-	beanSlice = append(beanSlice, &CommonNtosReqDbS{})
-	beanSlice = append(beanSlice, &CommonNtosRspDb{})
-	beanSlice = append(beanSlice, &CommonStonReqDb{})
-	beanSlice = append(beanSlice, &CommonStonRspDb{})
+	beanSlice = append(beanSlice, &CommonReqDbN{})
+	beanSlice = append(beanSlice, &CommonReqDbS{})
+	//beanSlice = append(beanSlice, &CommonRspDbN{})
 	//
 	if err = thls.xEngine.CreateTables(beanSlice...); err != nil { //应该是:只要存在这个tablename,就跳过它.
 		glog.Fatalln(err)
@@ -130,14 +129,14 @@ func (thls *businessServer) onMessage(msgConn *wsnet.WsSocket, msgData []byte, m
 		thls.handle_MsgType_ID_ConnectedData(txMsgData.(*txdata.ConnectedData), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
-	case txdata.MsgType_ID_CommonNtosReq:
-		thls.handle_MsgType_ID_CommonNtosReq(txMsgData.(*txdata.CommonNtosReq), msgConn)
-	case txdata.MsgType_ID_CommonNtosRsp:
-		thls.handle_MsgType_ID_CommonNtosRsp(txMsgData.(*txdata.CommonNtosRsp), msgConn)
-	case txdata.MsgType_ID_CommonStonReq:
+	case txdata.MsgType_ID_CommonReq:
+		thls.handle_MsgType_ID_CommonReq(txMsgData.(*txdata.CommonReq), msgConn)
+	case txdata.MsgType_ID_CommonRsp:
+		thls.handle_MsgType_ID_CommonRsp(txMsgData.(*txdata.CommonRsp), msgConn)
+	/*case txdata.MsgType_ID_CommonStonReq:
 		thls.handle_MsgType_ID_CommonStonReq(txMsgData.(*txdata.CommonStonReq), msgConn)
 	case txdata.MsgType_ID_CommonStonRsp:
-		thls.handle_MsgType_ID_CommonStonRsp(txMsgData.(*txdata.CommonStonRsp), msgConn)
+		thls.handle_MsgType_ID_CommonStonRsp(txMsgData.(*txdata.CommonStonRsp), msgConn)*/
 	case txdata.MsgType_ID_ParentDataReq:
 		thls.handle_MsgType_ID_ParentDataReq(txMsgData.(*txdata.ParentDataReq), msgConn)
 	default:
@@ -167,8 +166,42 @@ func (thls *businessServer) handle_MsgType_ID_DisconnectedData(msgData *txdata.D
 		return
 	}
 }
+func (thls *businessServer) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	fmt.Println("ZX_REQ:", msgData)
+	assert4true(msgData.CrossServer == false)
+	msgData.CrossServer = true
+	if len(msgData.RecverID) == 0 {
+		//TODO:没有RecverID表示发送到SERVER为止
+	} else {
+		var err error
+		if connInfoEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
+			err = connInfoEx.conn.Send(msg2slice(msgData))
+		} else {
+			err = errors.New("can not send to recver")
+		}
+		if err != nil {
+			glog.Warningf("ZX: CommonReq, err=%v, msgData=%v", err, msgData)
+			//TODO:发送失败要返回响应消息
+		}
+	}
+}
+func (thls *businessServer) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
+	fmt.Println("ZX_RSP:", msgData)
+	assert4true(msgData.CrossServer == false)
+	msgData.CrossServer = true
+	var err error
+	if connInfoEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
+		err = connInfoEx.conn.Send(msg2slice(msgData))
+	} else {
+		err = errors.New("can not send to recver")
+	}
 
-func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.CommonNtosReq, msgConn *wsnet.WsSocket) {
+	if err != nil {
+		glog.Warningf("send fail with err=%v", err)
+	}
+}
+
+/*func (thls *businessServer) handle_MsgType_ID_CommonNtosReq(msgData *txdata.CommonNtosReq, msgConn *wsnet.WsSocket) {
 	var needSave bool
 	var needResp bool
 	if isPush, isReqRspUnsafe, isReqRspSafe, isRetransmit := CommonNtosReq_flag(msgData); true || isPush {
@@ -227,6 +260,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner2(msgData *txda
 	}
 	return
 }
+*/
 
 //func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner(msgData *txdata.CommonNtosReq, needSave bool) (rspData *txdata.CommonNtosRsp) {
 //	for range "1" {
@@ -279,7 +313,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_inner2(msgData *txda
 //	}
 //	return
 //}
-
+/*
 //handle_MsgType_ID_CommonNtosReq_process 只要(ErrNo,ErrMsg,RspType,RspData)这几个字段的值正确就OK了.
 func (thls *businessServer) handle_MsgType_ID_CommonNtosReq_process(msgData *txdata.CommonNtosReq) (rspData *txdata.CommonNtosRsp) {
 	var errNo int32
@@ -356,6 +390,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonNtosRsp(msgData *txdata.Comm
 	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
 	return
 }
+*/
 
 // func (thls *businessServer) handle_MsgType_ID_ExecuteCommandReq(msgData *txdata.ExecuteCommandReq, msgConn *wsnet.WsSocket) {
 // 	glog.Errorf("the data must not be from my father, msgConn=%p, msgData=%v", msgConn, msgData)
@@ -382,6 +417,7 @@ func (thls *businessServer) handle_MsgType_ID_ParentDataReq(msgData *txdata.Pare
 	msgConn.Send(msg2slice(rspData))
 }
 
+/*
 func (thls *businessServer) handle_MsgType_ID_CommonStonReq(msgData *txdata.CommonStonReq, msgConn *wsnet.WsSocket) {
 	panic(msgData)
 }
@@ -416,6 +452,7 @@ func (thls *businessServer) handle_MsgType_ID_CommonStonRsp(msgData *txdata.Comm
 		//TODO:
 	}
 }
+*/
 
 //func (thls *businessServer) doDeal4client(msgData *txdata.ConnectedData, msgConn *wsnet.WsSocket) {
 //	if msgData.Info.UserKey.ExecType != txdata.ProgramType_CLIENT {
@@ -649,6 +686,7 @@ func (thls *businessServer) deleteConnectionFromAll(conn *wsnet.WsSocket, closeI
 // 	return
 // }
 
+/*
 func (thls *businessServer) commonSton(reqInOut *txdata.CommonStonReq, saveDB bool, d time.Duration, uID string) (rspOut *txdata.CommonStonRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.RequestID = 0
@@ -711,11 +749,14 @@ func (thls *businessServer) commonSton(reqInOut *txdata.CommonStonReq, saveDB bo
 	}
 	return
 }
+*/
 
-func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bool, d time.Duration) (rspOut *txdata.CommonNtosRsp) {
+func (thls *businessServer) commonAtos(reqInOut *txdata.CommonReq, saveDB bool, d time.Duration) (rspOut *txdata.CommonRsp) {
 	if true { //修复请求结构体的相关字段.
+		reqInOut.SenderID = thls.ownInfo.UserID
+		//reqInOut.RecverID
+		reqInOut.CrossServer = false
 		reqInOut.RequestID = 0
-		reqInOut.UserID = thls.ownInfo.UserID
 		reqInOut.SeqNo = 0
 		//reqInOut.ReqType
 		//reqInOut.ReqData
@@ -726,28 +767,30 @@ func (thls *businessServer) commonAtos(reqInOut *txdata.CommonNtosReq, saveDB bo
 		var err error
 		var affected int64
 		if saveDB { //要缓存到数据库.
-			ntosReqDbN := &CommonNtosReqDbN{}
-			CommonNtosReq2CommonNtosReqDbN(reqInOut, ntosReqDbN)
-			if affected, err = thls.xEngine.InsertOne(ntosReqDbN); err != nil {
-				rspOut = CommonNtosReq2CommonNtosRsp4Err(reqInOut, -1, err.Error(), false) //尚未进入SERVER处理请求的逻辑就出错了,故置false.
+			cReqDbS := &CommonReqDbS{}
+			CommonReq2CommonReqDbS(reqInOut, cReqDbS)
+			if affected, err = thls.xEngine.InsertOne(cReqDbS); err != nil {
+				rspOut = CommonReq2CommonRsp4Err(reqInOut, -1, err.Error(), false, false) //尚未进入SERVER处理请求的逻辑就出错了,故置false.
 				break
 			}
 			if affected != 1 {
 				glog.Fatalf("Engine.InsertOne with affected=%v, err=%v", affected, err) //我就是想知道,成功的话,除了1,还有其他值吗.
 				assert4true(affected == 1)
 			}
-			reqInOut.SeqNo = ntosReqDbN.SeqNo //利用xorm的特性.
+			reqInOut.SeqNo = cReqDbS.SeqNo //利用xorm的特性.
 		}
-		rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner2(reqInOut, saveDB)
-		if saveDB && rspOut.FromServer {
-			if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonNtosReqDbN{State: 1}); err != nil {
-				glog.Fatalf("Engine.Update with err=%v", err)
-			}
-		}
+		panic("not impl")
+		//rspOut = thls.handle_MsgType_ID_CommonNtosReq_inner2(reqInOut, saveDB)
+		//if saveDB && rspOut.FromServer {
+		//	if _, err := thls.xEngine.ID(core.PK{reqInOut.SeqNo}).Update(&CommonNtosReqDbN{State: 1}); err != nil {
+		//		glog.Fatalf("Engine.Update with err=%v", err)
+		//	}
+		//}
 	}
 	return
 }
 
+/*
 func (thls *businessServer) reportData(dataIn *txdata.ReportDataItem, d time.Duration, isEndeavour bool) *CommRspData {
 	reqInOut := Message2CommonNtosReq(dataIn, time.Now(), thls.ownInfo.UserID)
 	rspOut := thls.commonAtos(reqInOut, isEndeavour, d)
@@ -759,3 +802,4 @@ func (thls *businessServer) sendMail(dataIn *txdata.SendMailItem, d time.Duratio
 	rspOut := thls.commonAtos(reqInOut, isEndeavour, d)
 	return CommonNtosReqRsp2CommRspData(reqInOut, rspOut)
 }
+*/
