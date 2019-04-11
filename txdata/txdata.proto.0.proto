@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package txdata;
+
+import public "google/protobuf/timestamp.proto";
+
+// 注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
+// Linux  : grep    "^message"  txdata.proto
+// Windows: findstr "^message"  txdata.proto
+enum MsgType {
+    Zero1               =  0;
+    ID_CommonNtosReq    =  1;
+    ID_CommonNtosRsp    =  2;
+    ID_CommonStonReq    =  3;
+    ID_CommonStonRsp    =  4;
+    ID_ConnectionInfo   =  5;
+    ID_ConnectedData    =  6;
+    ID_DisconnectedData =  7;
+    ID_ParentDataReq    =  8;
+    ID_ParentDataRsp    =  9;
+    ID_EchoItem         = 10;
+    ID_SendMailItem     = 11;
+    ID_ReportDataItem   = 12;
+}
+
+enum ProgramType {
+    Zero2  = 0;
+    CLIENT = 1; //客户端
+    SERVER = 2; //服务端
+    NODE   = 3; //节点端
+    POINT  = 4; //最末端的(采集点/受控点/等).
+}
+
+message Requester { //请求者
+    int64  RequestID                 = 1;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
+    string UserID                    = 2;
+    int64  SeqNo                     = 3;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
+    int64  RefNum                    = 4;
+    google.protobuf.Timestamp ReqTime = 6;
+}
+
+message Responder{ //响应者
+    google.protobuf.Timestamp RspTime    =  6;
+    bool                      FromServer =  8;
+    int32                     State      =  9;
+    int32                     ErrNo      = 10;
+    string                    ErrMsg     = 11;//对ErrNo的解释.
+}
+
+//(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
+//(RequestID)是临时维护的递增值,-1:背景续传,0:上报模式,正:请求响应.
+//模式1:上报模式,扔出去就不管了,此时RequestID=0和SeqNo=0
+//模式2:请求响应模式,RequestID>0和SeqNo=0
+//模式3:请求响应且安全,RequestID>0和SeqNo>0
+//背景续传:RequestID=-1且SeqNo>0
+message CommonNtosReq {//通用请求(请求的方向是node_to_server)
+    MsgType ReqType = 1;
+    bytes   ReqData = 2;
+    Chatter Sender  = 3;
+    Chatter Recver  = 4;
+}
+
+
+
+//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
+message CommonNtosRsp {
+Chatter Sender = 1;
+    MsgType                   RspType    =  4;
+    bytes                     RspData    =  5;
+    google.protobuf.Timestamp RspTime    =  6;
+    bool                      FromServer =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
+    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
+    int32                     ErrNo      = 10;
+    string                    ErrMsg     = 11;//对ErrNo的解释.
+}
+
+message CommonStonReq {//通用请求(请求的方向是server_to_node)
+    int64                     RequestID = 1;
+    repeated string           Pathway   = 2;
+    int64                     SeqNo     = 3;
+    MsgType                   ReqType   = 4;
+    bytes                     ReqData   = 5;
+    google.protobuf.Timestamp ReqTime   = 6;
+    int64                     RefNum    = 7;
+}
+
+message CommonStonRsp {
+    int64                     RequestID  =  1;
+    string                    UserID     =  2;
+    int64                     SeqNo      =  3;
+    MsgType                   RspType    =  4;
+    bytes                     RspData    =  5;
+    google.protobuf.Timestamp RspTime    =  6;
+    int64                     RefNum     =  7;
+    bool                      FromTarget =  8;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
+    int32                     State      =  9;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
+    int32                     ErrNo      = 10;
+    string                    ErrMsg     = 11;//对ErrNo的解释.
+}
+
+//必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
+message AtomicKey {
+    string      ZoneName = 1;//区域名(机房名)(区域级别,必须唯一).
+    string      NodeName = 2;//节点名(机器名)(同一区域,必须唯一).
+    ProgramType ExecType = 3;//程序类型.
+    string      ExecName = 4;//程序名.(同一机器,必须唯一).
+}
+
+message ConnectionInfo {
+    enum LinkType {
+        Zero3   = 0;
+        CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
+        ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
+    }
+    AtomicKey UserKey   = 1;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
+    string    UserID    = 2;
+    AtomicKey BelongKey = 3;
+    string    BelongID  = 4;
+    string    Version   = 5;//版本号
+    LinkType  LinkMode  = 6;//连接方向
+    int32     ExePid    = 7;//进程ID
+    string    ExePath   = 8;//程序路径
+    string    Remark    = 9;//备注
+}
+
+message ConnectedData {
+    ConnectionInfo  Info    = 1;
+    repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
+/* ParentA:(父亲agent), ParentC1:(父亲client1), SonA:(儿子agent), GrandsonA:(孙子agent)
+ParentA
+│  ParentC1               ParentA收到的Pathway=[]
+│  ParentC2               ParentA收到的Pathway=[]
+│
+└─SonA                    ParentA收到的Pathway=[SonA]
+    │  SonC1              ParentA收到的Pathway=[SonA]
+    │  SonC2              ParentA收到的Pathway=[SonA]
+    │
+    └─GrandsonA           ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC1    ParentA收到的Pathway=[GrandsonA,SonA]
+            GrandsonC2    ParentA收到的Pathway=[GrandsonA,SonA]
+*/
+}
+
+message DisconnectedData {
+    ConnectionInfo  Info    = 1;
+}
+
+//我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
+message ParentDataReq {
+    int64                     RequestID = 1;
+    google.protobuf.Timestamp ReqTime   = 2;
+}
+
+//我想拿到(直属于我的那个)父亲的(缓存)数据的响应.
+message ParentDataRsp {
+    int64                     RequestID = 1;
+    google.protobuf.Timestamp ReqTime   = 2;
+    google.protobuf.Timestamp RspTime   = 3;
+    repeated ConnectedData    Data      = 4;
+}
+
+message EchoItem {
+    string LocalID  = 1;
+    string RemoteID = 2;
+    string Data     = 3;
+}
+
+message SendMailItem {//发送邮件的项
+    string Username    = 1;
+    string Password    = 2;
+    string SmtpAddr    = 3;
+    string To          = 4;
+    string Subject     = 5;
+    string ContentType = 6;
+    string Content     = 7;
+}
+
+message ReportDataItem {
+    string Topic = 1;//Data的主题.
+    string Data  = 2;
+}
