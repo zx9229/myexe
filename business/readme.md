@@ -16,3 +16,17 @@ curl -d '{ "Cache":false , "Timeout":9 , "Recver":"//n1/3/" , "Data":"test_echo"
 API：websocket通信。
 仅内存做了缓存。
 可以执行命令。
+
+9223372036854775807(int64.max)
+91231              |
+yMMddHHmmSS        |
+90208235959     |  |
+           86400000
+然后每隔(1天)重新获取该值.
+服务端如果遇到冲突的情况,立即报警(发邮件等)
+10年之内将当前表的数据迁移到历史表.
+
+sender=>server=>recver
+sender<=server<=recver
+sender=>cacher=>server=>recver
+sender<=cacher<=server<=recver
