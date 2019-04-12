@@ -5,7 +5,7 @@ package txdata;
 import public "google/protobuf/timestamp.proto";
 
 // 注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
-// Linux  : grep    "^message"  txdata.proto | awk 'BEGIN{cnt=0}{print$0,cnt++}'
+// Linux  : grep    "^message"  txdata.proto | awk -F" " 'BEGIN{cnt=0}{print"ID_"$2,"= "cnt++";"}'
 // Linux  : grep    "^message"  txdata.proto
 // Windows: findstr "^message"  txdata.proto
 enum MsgType {
