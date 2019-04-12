@@ -5,6 +5,7 @@ package txdata;
 import public "google/protobuf/timestamp.proto";
 
 // 注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
+// Linux  : grep    "^message"  txdata.proto | awk 'BEGIN{cnt=0}{print$0,cnt++}'
 // Linux  : grep    "^message"  txdata.proto
 // Windows: findstr "^message"  txdata.proto
 enum MsgType {
@@ -14,50 +15,45 @@ enum MsgType {
     ID_CommonReq        =  3;
     ID_CommonRsp        =  4;
     ID_ConnectionInfo   =  5;
-    ID_ConnectedData    =  6;
-    ID_DisconnectedData =  7;
-    ID_ParentDataReq    =  8;
-    ID_ParentDataRsp    =  9;
-    ID_EchoItem         = 10;
-    ID_SendMailItem     = 11;
-    ID_ReportDataItem   = 12;
+    ID_ConnectReq       =  6;
+    ID_ConnectRsp       =  7;
+    ID_DisconnectedData =  8;
+    ID_OnlineNotice     =  9;
+    ID_ParentDataReq    = 10;
+    ID_ParentDataRsp    = 11;
+    ID_EchoItem         = 12;
+    ID_SendMailItem     = 13;
+    ID_ReportDataItem   = 14;
+    ID_CommonErrMsg     = 15;
+    ID_QueryRecordReq   = 16;
+    ID_QueryRecordRsp   = 17;
 }
 
-enum ProgramType {
-    Zero2  = 0;
-    CLIENT = 1; //客户端
-    SERVER = 2; //服务端
-    NODE   = 3; //节点端
-    POINT  = 4; //最末端的(采集点/受控点/等).
+//一个占位符结构体.
+message DataPlaceholder {
 }
 
-//必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
-message AtomicKey {
-    string      ZoneName = 1;//区域名(机房名)(区域级别,必须唯一).
-    string      NodeName = 2;//节点名(机器名)(同一区域,必须唯一).
-    ProgramType ExecType = 3;//程序类型.
-    string      ExecName = 4;//程序名.(同一机器,必须唯一).
-}
-
-//push
+//Push
 message DataPsh {
-    string                    SenderID = 1;
-    string                    RecverID = 2;//为空,表示发送到根节点.
-    int64                     SeqNo    = 3;//(SenderID+SeqNo)唯一标识一个消息.
-    MsgType                   PshType  = 4;//传送的数据类型.
-    bytes                     PshData  = 5;//传送的数据内容.
-    bool                      UpCache  = 6;//紧邻的上游负有缓存本条数据的义务.
+    string  SenderID = 1;
+    string  RecverID = 2;//为空,表示发送到根节点.
+    string  UserID   = 3;//(UserID+SeqNo)唯一标识一个消息.
+    int64   SeqNo    = 4;//(UserID+SeqNo)唯一标识一个消息.
+    MsgType PshType  = 5;//传送的数据类型.
+    bytes   PshData  = 6;//传送的数据内容.
+    bool    UpCache  = 7;//紧邻的上游负有缓存本条数据的义务.
 }
 
 //Acknowledgement
 message DataAck {
-    string                    SenderID = 1;
-    string                    RecverID = 2;//为空,表示发送到根节点.
-    int64                     SeqNo    = 3;//(RecverID+SeqNo)唯一标识一个消息.
-    MsgType                   AckType  = 4;//预留字段.
-    bytes                     AckData  = 5;//预留字段.
-    int32                     ErrNo    = 6;//中途发现无法到达对方,然后收到不可达的回复.
-    string                    ErrMsg   = 7;//对ErrNo的解释.
+    string  SenderID = 1;
+    string  RecverID = 2;//为空,表示发送到根节点.
+    string  UserID   = 3;//(UserID+SeqNo)唯一标识一个消息.
+    int64   SeqNo    = 4;//(UserID+SeqNo)唯一标识一个消息.
+    MsgType AckType  = 5;//预留字段.
+    bytes   AckData  = 6;//预留字段.
+    int32   ErrNo    = 7;//中途发现无法到达对方,然后收到不可达的回复.
+    string  ErrMsg   = 8;//对ErrNo的解释.
 }
 
 //(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
@@ -103,9 +99,8 @@ message ConnectionInfo {
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    AtomicKey UserKey   = 1;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
-    string    UserID    = 2;
-    AtomicKey BelongKey = 3;
+    bool      IsRoot    = 1;//是根节点.
+    string    UserID    = 2;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
     string    BelongID  = 4;
     string    Version   = 5;//版本号
     LinkType  LinkMode  = 6;//连接方向
@@ -114,8 +109,8 @@ message ConnectionInfo {
     string    Remark    = 9;//备注
 }
 
-message ConnectedData {
-    ConnectionInfo  Info    = 1;
+message ConnectReq {
+    ConnectionInfo  InfoReq = 1;
     repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
 /* ParentA:(父亲agent), ParentC1:(父亲client1), SonA:(儿子agent), GrandsonA:(孙子agent)
 ParentA
@@ -132,8 +127,20 @@ ParentA
 */
 }
 
+message ConnectRsp {
+    ConnectionInfo  InfoReq = 1;
+    ConnectionInfo  InfoRsp = 2;
+    int32           ErrNo   = 3;
+    string          ErrMsg  = 4;
+}
+
 message DisconnectedData {
     ConnectionInfo  Info    = 1;
+}
+
+//从根节点发往叶子节点方向的通知,表达"收到通知的节点,此刻都能和root联通"
+message OnlineNotice {
+    bool RootIsOnline = 1;
 }
 
 //我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
@@ -147,7 +154,7 @@ message ParentDataRsp {
     int64                     RequestID = 1;
     google.protobuf.Timestamp ReqTime   = 2;
     google.protobuf.Timestamp RspTime   = 3;
-    repeated ConnectedData    Data      = 4;
+    repeated ConnectReq       Data      = 4;
 }
 
 message EchoItem {
@@ -171,3 +178,21 @@ message ReportDataItem {
     string Topic = 1;//Data的主题.
     string Data  = 2;
 }
+
+message CommonErrMsg {
+    string    UserID        = 1;//发现错误的用户.
+    repeated string Pathway = 2;//消息的传送路径.(预留字段)
+    string    Message       = 3;
+}
+
+message QueryRecordReq {
+    string UserID = 1;
+    int64  SeqNo  = 2;
+}
+
+message QueryRecordRsp {
+    string         UserID = 1;
+    int64          SeqNo  = 2;
+    repeated bytes Data   = 3;//可以用slice2msg解析.
+}
+

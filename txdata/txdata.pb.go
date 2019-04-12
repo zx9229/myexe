@@ -23,6 +23,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 type Timestamp = timestamp.Timestamp
 
 // 注意: 务必要和各结构体的序号对应起来. 校验的命令如下所示:
+// Linux  : grep    "^message"  txdata.proto | awk 'BEGIN{cnt=0}{print$0,cnt++}'
 // Linux  : grep    "^message"  txdata.proto
 // Windows: findstr "^message"  txdata.proto
 type MsgType int32
@@ -34,13 +35,18 @@ const (
 	MsgType_ID_CommonReq        MsgType = 3
 	MsgType_ID_CommonRsp        MsgType = 4
 	MsgType_ID_ConnectionInfo   MsgType = 5
-	MsgType_ID_ConnectedData    MsgType = 6
-	MsgType_ID_DisconnectedData MsgType = 7
-	MsgType_ID_ParentDataReq    MsgType = 8
-	MsgType_ID_ParentDataRsp    MsgType = 9
-	MsgType_ID_EchoItem         MsgType = 10
-	MsgType_ID_SendMailItem     MsgType = 11
-	MsgType_ID_ReportDataItem   MsgType = 12
+	MsgType_ID_ConnectReq       MsgType = 6
+	MsgType_ID_ConnectRsp       MsgType = 7
+	MsgType_ID_DisconnectedData MsgType = 8
+	MsgType_ID_OnlineNotice     MsgType = 9
+	MsgType_ID_ParentDataReq    MsgType = 10
+	MsgType_ID_ParentDataRsp    MsgType = 11
+	MsgType_ID_EchoItem         MsgType = 12
+	MsgType_ID_SendMailItem     MsgType = 13
+	MsgType_ID_ReportDataItem   MsgType = 14
+	MsgType_ID_CommonErrMsg     MsgType = 15
+	MsgType_ID_QueryRecordReq   MsgType = 16
+	MsgType_ID_QueryRecordRsp   MsgType = 17
 )
 
 var MsgType_name = map[int32]string{
@@ -50,13 +56,18 @@ var MsgType_name = map[int32]string{
 	3:  "ID_CommonReq",
 	4:  "ID_CommonRsp",
 	5:  "ID_ConnectionInfo",
-	6:  "ID_ConnectedData",
-	7:  "ID_DisconnectedData",
-	8:  "ID_ParentDataReq",
-	9:  "ID_ParentDataRsp",
-	10: "ID_EchoItem",
-	11: "ID_SendMailItem",
-	12: "ID_ReportDataItem",
+	6:  "ID_ConnectReq",
+	7:  "ID_ConnectRsp",
+	8:  "ID_DisconnectedData",
+	9:  "ID_OnlineNotice",
+	10: "ID_ParentDataReq",
+	11: "ID_ParentDataRsp",
+	12: "ID_EchoItem",
+	13: "ID_SendMailItem",
+	14: "ID_ReportDataItem",
+	15: "ID_CommonErrMsg",
+	16: "ID_QueryRecordReq",
+	17: "ID_QueryRecordRsp",
 }
 var MsgType_value = map[string]int32{
 	"Zero1":               0,
@@ -65,52 +76,25 @@ var MsgType_value = map[string]int32{
 	"ID_CommonReq":        3,
 	"ID_CommonRsp":        4,
 	"ID_ConnectionInfo":   5,
-	"ID_ConnectedData":    6,
-	"ID_DisconnectedData": 7,
-	"ID_ParentDataReq":    8,
-	"ID_ParentDataRsp":    9,
-	"ID_EchoItem":         10,
-	"ID_SendMailItem":     11,
-	"ID_ReportDataItem":   12,
+	"ID_ConnectReq":       6,
+	"ID_ConnectRsp":       7,
+	"ID_DisconnectedData": 8,
+	"ID_OnlineNotice":     9,
+	"ID_ParentDataReq":    10,
+	"ID_ParentDataRsp":    11,
+	"ID_EchoItem":         12,
+	"ID_SendMailItem":     13,
+	"ID_ReportDataItem":   14,
+	"ID_CommonErrMsg":     15,
+	"ID_QueryRecordReq":   16,
+	"ID_QueryRecordRsp":   17,
 }
 
 func (x MsgType) String() string {
 	return proto.EnumName(MsgType_name, int32(x))
 }
 func (MsgType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{0}
-}
-
-type ProgramType int32
-
-const (
-	ProgramType_Zero2  ProgramType = 0
-	ProgramType_CLIENT ProgramType = 1
-	ProgramType_SERVER ProgramType = 2
-	ProgramType_NODE   ProgramType = 3
-	ProgramType_POINT  ProgramType = 4
-)
-
-var ProgramType_name = map[int32]string{
-	0: "Zero2",
-	1: "CLIENT",
-	2: "SERVER",
-	3: "NODE",
-	4: "POINT",
-}
-var ProgramType_value = map[string]int32{
-	"Zero2":  0,
-	"CLIENT": 1,
-	"SERVER": 2,
-	"NODE":   3,
-	"POINT":  4,
-}
-
-func (x ProgramType) String() string {
-	return proto.EnumName(ProgramType_name, int32(x))
-}
-func (ProgramType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{1}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{0}
 }
 
 type ConnectionInfo_LinkType int32
@@ -136,80 +120,49 @@ func (x ConnectionInfo_LinkType) String() string {
 	return proto.EnumName(ConnectionInfo_LinkType_name, int32(x))
 }
 func (ConnectionInfo_LinkType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{5, 0}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{5, 0}
 }
 
-// 必须是可见的ASCII字符,且不能为(/),这样可以拼成(/zone/node/type/name)的样子.
-type AtomicKey struct {
-	ZoneName             string      `protobuf:"bytes,1,opt,name=ZoneName,proto3" json:"ZoneName,omitempty"`
-	NodeName             string      `protobuf:"bytes,2,opt,name=NodeName,proto3" json:"NodeName,omitempty"`
-	ExecType             ProgramType `protobuf:"varint,3,opt,name=ExecType,proto3,enum=txdata.ProgramType" json:"ExecType,omitempty"`
-	ExecName             string      `protobuf:"bytes,4,opt,name=ExecName,proto3" json:"ExecName,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+// 一个占位符结构体.
+type DataPlaceholder struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AtomicKey) Reset()         { *m = AtomicKey{} }
-func (m *AtomicKey) String() string { return proto.CompactTextString(m) }
-func (*AtomicKey) ProtoMessage()    {}
-func (*AtomicKey) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{0}
+func (m *DataPlaceholder) Reset()         { *m = DataPlaceholder{} }
+func (m *DataPlaceholder) String() string { return proto.CompactTextString(m) }
+func (*DataPlaceholder) ProtoMessage()    {}
+func (*DataPlaceholder) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{0}
 }
-func (m *AtomicKey) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AtomicKey.Unmarshal(m, b)
+func (m *DataPlaceholder) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataPlaceholder.Unmarshal(m, b)
 }
-func (m *AtomicKey) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AtomicKey.Marshal(b, m, deterministic)
+func (m *DataPlaceholder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataPlaceholder.Marshal(b, m, deterministic)
 }
-func (dst *AtomicKey) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AtomicKey.Merge(dst, src)
+func (dst *DataPlaceholder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataPlaceholder.Merge(dst, src)
 }
-func (m *AtomicKey) XXX_Size() int {
-	return xxx_messageInfo_AtomicKey.Size(m)
+func (m *DataPlaceholder) XXX_Size() int {
+	return xxx_messageInfo_DataPlaceholder.Size(m)
 }
-func (m *AtomicKey) XXX_DiscardUnknown() {
-	xxx_messageInfo_AtomicKey.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AtomicKey proto.InternalMessageInfo
-
-func (m *AtomicKey) GetZoneName() string {
-	if m != nil {
-		return m.ZoneName
-	}
-	return ""
+func (m *DataPlaceholder) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataPlaceholder.DiscardUnknown(m)
 }
 
-func (m *AtomicKey) GetNodeName() string {
-	if m != nil {
-		return m.NodeName
-	}
-	return ""
-}
+var xxx_messageInfo_DataPlaceholder proto.InternalMessageInfo
 
-func (m *AtomicKey) GetExecType() ProgramType {
-	if m != nil {
-		return m.ExecType
-	}
-	return ProgramType_Zero2
-}
-
-func (m *AtomicKey) GetExecName() string {
-	if m != nil {
-		return m.ExecName
-	}
-	return ""
-}
-
-// push
+// Push
 type DataPsh struct {
 	SenderID             string   `protobuf:"bytes,1,opt,name=SenderID,proto3" json:"SenderID,omitempty"`
 	RecverID             string   `protobuf:"bytes,2,opt,name=RecverID,proto3" json:"RecverID,omitempty"`
-	SeqNo                int64    `protobuf:"varint,3,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
-	PshType              MsgType  `protobuf:"varint,4,opt,name=PshType,proto3,enum=txdata.MsgType" json:"PshType,omitempty"`
-	PshData              []byte   `protobuf:"bytes,5,opt,name=PshData,proto3" json:"PshData,omitempty"`
-	UpCache              bool     `protobuf:"varint,6,opt,name=UpCache,proto3" json:"UpCache,omitempty"`
+	UserID               string   `protobuf:"bytes,3,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	SeqNo                int64    `protobuf:"varint,4,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
+	PshType              MsgType  `protobuf:"varint,5,opt,name=PshType,proto3,enum=txdata.MsgType" json:"PshType,omitempty"`
+	PshData              []byte   `protobuf:"bytes,6,opt,name=PshData,proto3" json:"PshData,omitempty"`
+	UpCache              bool     `protobuf:"varint,7,opt,name=UpCache,proto3" json:"UpCache,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -219,7 +172,7 @@ func (m *DataPsh) Reset()         { *m = DataPsh{} }
 func (m *DataPsh) String() string { return proto.CompactTextString(m) }
 func (*DataPsh) ProtoMessage()    {}
 func (*DataPsh) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{1}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{1}
 }
 func (m *DataPsh) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataPsh.Unmarshal(m, b)
@@ -249,6 +202,13 @@ func (m *DataPsh) GetSenderID() string {
 func (m *DataPsh) GetRecverID() string {
 	if m != nil {
 		return m.RecverID
+	}
+	return ""
+}
+
+func (m *DataPsh) GetUserID() string {
+	if m != nil {
+		return m.UserID
 	}
 	return ""
 }
@@ -285,11 +245,12 @@ func (m *DataPsh) GetUpCache() bool {
 type DataAck struct {
 	SenderID             string   `protobuf:"bytes,1,opt,name=SenderID,proto3" json:"SenderID,omitempty"`
 	RecverID             string   `protobuf:"bytes,2,opt,name=RecverID,proto3" json:"RecverID,omitempty"`
-	SeqNo                int64    `protobuf:"varint,3,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
-	AckType              MsgType  `protobuf:"varint,4,opt,name=AckType,proto3,enum=txdata.MsgType" json:"AckType,omitempty"`
-	AckData              []byte   `protobuf:"bytes,5,opt,name=AckData,proto3" json:"AckData,omitempty"`
-	ErrNo                int32    `protobuf:"varint,6,opt,name=ErrNo,proto3" json:"ErrNo,omitempty"`
-	ErrMsg               string   `protobuf:"bytes,7,opt,name=ErrMsg,proto3" json:"ErrMsg,omitempty"`
+	UserID               string   `protobuf:"bytes,3,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	SeqNo                int64    `protobuf:"varint,4,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
+	AckType              MsgType  `protobuf:"varint,5,opt,name=AckType,proto3,enum=txdata.MsgType" json:"AckType,omitempty"`
+	AckData              []byte   `protobuf:"bytes,6,opt,name=AckData,proto3" json:"AckData,omitempty"`
+	ErrNo                int32    `protobuf:"varint,7,opt,name=ErrNo,proto3" json:"ErrNo,omitempty"`
+	ErrMsg               string   `protobuf:"bytes,8,opt,name=ErrMsg,proto3" json:"ErrMsg,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -299,7 +260,7 @@ func (m *DataAck) Reset()         { *m = DataAck{} }
 func (m *DataAck) String() string { return proto.CompactTextString(m) }
 func (*DataAck) ProtoMessage()    {}
 func (*DataAck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{2}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{2}
 }
 func (m *DataAck) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DataAck.Unmarshal(m, b)
@@ -329,6 +290,13 @@ func (m *DataAck) GetSenderID() string {
 func (m *DataAck) GetRecverID() string {
 	if m != nil {
 		return m.RecverID
+	}
+	return ""
+}
+
+func (m *DataAck) GetUserID() string {
+	if m != nil {
+		return m.UserID
 	}
 	return ""
 }
@@ -394,7 +362,7 @@ func (m *CommonReq) Reset()         { *m = CommonReq{} }
 func (m *CommonReq) String() string { return proto.CompactTextString(m) }
 func (*CommonReq) ProtoMessage()    {}
 func (*CommonReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{3}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{3}
 }
 func (m *CommonReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonReq.Unmarshal(m, b)
@@ -509,7 +477,7 @@ func (m *CommonRsp) Reset()         { *m = CommonRsp{} }
 func (m *CommonRsp) String() string { return proto.CompactTextString(m) }
 func (*CommonRsp) ProtoMessage()    {}
 func (*CommonRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{4}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{4}
 }
 func (m *CommonRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonRsp.Unmarshal(m, b)
@@ -628,9 +596,8 @@ func (m *CommonRsp) GetErrMsg() string {
 }
 
 type ConnectionInfo struct {
-	UserKey              *AtomicKey              `protobuf:"bytes,1,opt,name=UserKey,proto3" json:"UserKey,omitempty"`
+	IsRoot               bool                    `protobuf:"varint,1,opt,name=IsRoot,proto3" json:"IsRoot,omitempty"`
 	UserID               string                  `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	BelongKey            *AtomicKey              `protobuf:"bytes,3,opt,name=BelongKey,proto3" json:"BelongKey,omitempty"`
 	BelongID             string                  `protobuf:"bytes,4,opt,name=BelongID,proto3" json:"BelongID,omitempty"`
 	Version              string                  `protobuf:"bytes,5,opt,name=Version,proto3" json:"Version,omitempty"`
 	LinkMode             ConnectionInfo_LinkType `protobuf:"varint,6,opt,name=LinkMode,proto3,enum=txdata.ConnectionInfo_LinkType" json:"LinkMode,omitempty"`
@@ -646,7 +613,7 @@ func (m *ConnectionInfo) Reset()         { *m = ConnectionInfo{} }
 func (m *ConnectionInfo) String() string { return proto.CompactTextString(m) }
 func (*ConnectionInfo) ProtoMessage()    {}
 func (*ConnectionInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{5}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{5}
 }
 func (m *ConnectionInfo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectionInfo.Unmarshal(m, b)
@@ -666,11 +633,11 @@ func (m *ConnectionInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ConnectionInfo proto.InternalMessageInfo
 
-func (m *ConnectionInfo) GetUserKey() *AtomicKey {
+func (m *ConnectionInfo) GetIsRoot() bool {
 	if m != nil {
-		return m.UserKey
+		return m.IsRoot
 	}
-	return nil
+	return false
 }
 
 func (m *ConnectionInfo) GetUserID() string {
@@ -678,13 +645,6 @@ func (m *ConnectionInfo) GetUserID() string {
 		return m.UserID
 	}
 	return ""
-}
-
-func (m *ConnectionInfo) GetBelongKey() *AtomicKey {
-	if m != nil {
-		return m.BelongKey
-	}
-	return nil
 }
 
 func (m *ConnectionInfo) GetBelongID() string {
@@ -729,50 +689,112 @@ func (m *ConnectionInfo) GetRemark() string {
 	return ""
 }
 
-type ConnectedData struct {
-	Info                 *ConnectionInfo `protobuf:"bytes,1,opt,name=Info,proto3" json:"Info,omitempty"`
+type ConnectReq struct {
+	InfoReq              *ConnectionInfo `protobuf:"bytes,1,opt,name=InfoReq,proto3" json:"InfoReq,omitempty"`
 	Pathway              []string        `protobuf:"bytes,2,rep,name=Pathway,proto3" json:"Pathway,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
 }
 
-func (m *ConnectedData) Reset()         { *m = ConnectedData{} }
-func (m *ConnectedData) String() string { return proto.CompactTextString(m) }
-func (*ConnectedData) ProtoMessage()    {}
-func (*ConnectedData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{6}
+func (m *ConnectReq) Reset()         { *m = ConnectReq{} }
+func (m *ConnectReq) String() string { return proto.CompactTextString(m) }
+func (*ConnectReq) ProtoMessage()    {}
+func (*ConnectReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{6}
 }
-func (m *ConnectedData) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ConnectedData.Unmarshal(m, b)
+func (m *ConnectReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ConnectReq.Unmarshal(m, b)
 }
-func (m *ConnectedData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ConnectedData.Marshal(b, m, deterministic)
+func (m *ConnectReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ConnectReq.Marshal(b, m, deterministic)
 }
-func (dst *ConnectedData) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConnectedData.Merge(dst, src)
+func (dst *ConnectReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConnectReq.Merge(dst, src)
 }
-func (m *ConnectedData) XXX_Size() int {
-	return xxx_messageInfo_ConnectedData.Size(m)
+func (m *ConnectReq) XXX_Size() int {
+	return xxx_messageInfo_ConnectReq.Size(m)
 }
-func (m *ConnectedData) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConnectedData.DiscardUnknown(m)
+func (m *ConnectReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConnectReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ConnectedData proto.InternalMessageInfo
+var xxx_messageInfo_ConnectReq proto.InternalMessageInfo
 
-func (m *ConnectedData) GetInfo() *ConnectionInfo {
+func (m *ConnectReq) GetInfoReq() *ConnectionInfo {
 	if m != nil {
-		return m.Info
+		return m.InfoReq
 	}
 	return nil
 }
 
-func (m *ConnectedData) GetPathway() []string {
+func (m *ConnectReq) GetPathway() []string {
 	if m != nil {
 		return m.Pathway
 	}
 	return nil
+}
+
+type ConnectRsp struct {
+	InfoReq              *ConnectionInfo `protobuf:"bytes,1,opt,name=InfoReq,proto3" json:"InfoReq,omitempty"`
+	InfoRsp              *ConnectionInfo `protobuf:"bytes,2,opt,name=InfoRsp,proto3" json:"InfoRsp,omitempty"`
+	ErrNo                int32           `protobuf:"varint,3,opt,name=ErrNo,proto3" json:"ErrNo,omitempty"`
+	ErrMsg               string          `protobuf:"bytes,4,opt,name=ErrMsg,proto3" json:"ErrMsg,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *ConnectRsp) Reset()         { *m = ConnectRsp{} }
+func (m *ConnectRsp) String() string { return proto.CompactTextString(m) }
+func (*ConnectRsp) ProtoMessage()    {}
+func (*ConnectRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{7}
+}
+func (m *ConnectRsp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ConnectRsp.Unmarshal(m, b)
+}
+func (m *ConnectRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ConnectRsp.Marshal(b, m, deterministic)
+}
+func (dst *ConnectRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ConnectRsp.Merge(dst, src)
+}
+func (m *ConnectRsp) XXX_Size() int {
+	return xxx_messageInfo_ConnectRsp.Size(m)
+}
+func (m *ConnectRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ConnectRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ConnectRsp proto.InternalMessageInfo
+
+func (m *ConnectRsp) GetInfoReq() *ConnectionInfo {
+	if m != nil {
+		return m.InfoReq
+	}
+	return nil
+}
+
+func (m *ConnectRsp) GetInfoRsp() *ConnectionInfo {
+	if m != nil {
+		return m.InfoRsp
+	}
+	return nil
+}
+
+func (m *ConnectRsp) GetErrNo() int32 {
+	if m != nil {
+		return m.ErrNo
+	}
+	return 0
+}
+
+func (m *ConnectRsp) GetErrMsg() string {
+	if m != nil {
+		return m.ErrMsg
+	}
+	return ""
 }
 
 type DisconnectedData struct {
@@ -786,7 +808,7 @@ func (m *DisconnectedData) Reset()         { *m = DisconnectedData{} }
 func (m *DisconnectedData) String() string { return proto.CompactTextString(m) }
 func (*DisconnectedData) ProtoMessage()    {}
 func (*DisconnectedData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{7}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{8}
 }
 func (m *DisconnectedData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DisconnectedData.Unmarshal(m, b)
@@ -813,6 +835,45 @@ func (m *DisconnectedData) GetInfo() *ConnectionInfo {
 	return nil
 }
 
+// 从根节点发往叶子节点方向的通知,表达"收到通知的节点,此刻都能和root联通"
+type OnlineNotice struct {
+	RootIsOnline         bool     `protobuf:"varint,1,opt,name=RootIsOnline,proto3" json:"RootIsOnline,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *OnlineNotice) Reset()         { *m = OnlineNotice{} }
+func (m *OnlineNotice) String() string { return proto.CompactTextString(m) }
+func (*OnlineNotice) ProtoMessage()    {}
+func (*OnlineNotice) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{9}
+}
+func (m *OnlineNotice) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OnlineNotice.Unmarshal(m, b)
+}
+func (m *OnlineNotice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OnlineNotice.Marshal(b, m, deterministic)
+}
+func (dst *OnlineNotice) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OnlineNotice.Merge(dst, src)
+}
+func (m *OnlineNotice) XXX_Size() int {
+	return xxx_messageInfo_OnlineNotice.Size(m)
+}
+func (m *OnlineNotice) XXX_DiscardUnknown() {
+	xxx_messageInfo_OnlineNotice.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OnlineNotice proto.InternalMessageInfo
+
+func (m *OnlineNotice) GetRootIsOnline() bool {
+	if m != nil {
+		return m.RootIsOnline
+	}
+	return false
+}
+
 // 我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
 type ParentDataReq struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
@@ -826,7 +887,7 @@ func (m *ParentDataReq) Reset()         { *m = ParentDataReq{} }
 func (m *ParentDataReq) String() string { return proto.CompactTextString(m) }
 func (*ParentDataReq) ProtoMessage()    {}
 func (*ParentDataReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{8}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{10}
 }
 func (m *ParentDataReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ParentDataReq.Unmarshal(m, b)
@@ -865,7 +926,7 @@ type ParentDataRsp struct {
 	RequestID            int64                `protobuf:"varint,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
 	ReqTime              *timestamp.Timestamp `protobuf:"bytes,2,opt,name=ReqTime,proto3" json:"ReqTime,omitempty"`
 	RspTime              *timestamp.Timestamp `protobuf:"bytes,3,opt,name=RspTime,proto3" json:"RspTime,omitempty"`
-	Data                 []*ConnectedData     `protobuf:"bytes,4,rep,name=Data,proto3" json:"Data,omitempty"`
+	Data                 []*ConnectReq        `protobuf:"bytes,4,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -875,7 +936,7 @@ func (m *ParentDataRsp) Reset()         { *m = ParentDataRsp{} }
 func (m *ParentDataRsp) String() string { return proto.CompactTextString(m) }
 func (*ParentDataRsp) ProtoMessage()    {}
 func (*ParentDataRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{9}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{11}
 }
 func (m *ParentDataRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ParentDataRsp.Unmarshal(m, b)
@@ -916,7 +977,7 @@ func (m *ParentDataRsp) GetRspTime() *timestamp.Timestamp {
 	return nil
 }
 
-func (m *ParentDataRsp) GetData() []*ConnectedData {
+func (m *ParentDataRsp) GetData() []*ConnectReq {
 	if m != nil {
 		return m.Data
 	}
@@ -936,7 +997,7 @@ func (m *EchoItem) Reset()         { *m = EchoItem{} }
 func (m *EchoItem) String() string { return proto.CompactTextString(m) }
 func (*EchoItem) ProtoMessage()    {}
 func (*EchoItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{10}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{12}
 }
 func (m *EchoItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EchoItem.Unmarshal(m, b)
@@ -995,7 +1056,7 @@ func (m *SendMailItem) Reset()         { *m = SendMailItem{} }
 func (m *SendMailItem) String() string { return proto.CompactTextString(m) }
 func (*SendMailItem) ProtoMessage()    {}
 func (*SendMailItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{11}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{13}
 }
 func (m *SendMailItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendMailItem.Unmarshal(m, b)
@@ -1076,7 +1137,7 @@ func (m *ReportDataItem) Reset()         { *m = ReportDataItem{} }
 func (m *ReportDataItem) String() string { return proto.CompactTextString(m) }
 func (*ReportDataItem) ProtoMessage()    {}
 func (*ReportDataItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_c01b060a12f92aa7, []int{12}
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{14}
 }
 func (m *ReportDataItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ReportDataItem.Unmarshal(m, b)
@@ -1110,95 +1171,257 @@ func (m *ReportDataItem) GetData() string {
 	return ""
 }
 
+type CommonErrMsg struct {
+	UserID               string   `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Pathway              []string `protobuf:"bytes,2,rep,name=Pathway,proto3" json:"Pathway,omitempty"`
+	Message              string   `protobuf:"bytes,3,opt,name=Message,proto3" json:"Message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CommonErrMsg) Reset()         { *m = CommonErrMsg{} }
+func (m *CommonErrMsg) String() string { return proto.CompactTextString(m) }
+func (*CommonErrMsg) ProtoMessage()    {}
+func (*CommonErrMsg) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{15}
+}
+func (m *CommonErrMsg) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CommonErrMsg.Unmarshal(m, b)
+}
+func (m *CommonErrMsg) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CommonErrMsg.Marshal(b, m, deterministic)
+}
+func (dst *CommonErrMsg) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommonErrMsg.Merge(dst, src)
+}
+func (m *CommonErrMsg) XXX_Size() int {
+	return xxx_messageInfo_CommonErrMsg.Size(m)
+}
+func (m *CommonErrMsg) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommonErrMsg.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommonErrMsg proto.InternalMessageInfo
+
+func (m *CommonErrMsg) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
+func (m *CommonErrMsg) GetPathway() []string {
+	if m != nil {
+		return m.Pathway
+	}
+	return nil
+}
+
+func (m *CommonErrMsg) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+type QueryRecordReq struct {
+	UserID               string   `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	SeqNo                int64    `protobuf:"varint,2,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *QueryRecordReq) Reset()         { *m = QueryRecordReq{} }
+func (m *QueryRecordReq) String() string { return proto.CompactTextString(m) }
+func (*QueryRecordReq) ProtoMessage()    {}
+func (*QueryRecordReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{16}
+}
+func (m *QueryRecordReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryRecordReq.Unmarshal(m, b)
+}
+func (m *QueryRecordReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryRecordReq.Marshal(b, m, deterministic)
+}
+func (dst *QueryRecordReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRecordReq.Merge(dst, src)
+}
+func (m *QueryRecordReq) XXX_Size() int {
+	return xxx_messageInfo_QueryRecordReq.Size(m)
+}
+func (m *QueryRecordReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRecordReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRecordReq proto.InternalMessageInfo
+
+func (m *QueryRecordReq) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
+func (m *QueryRecordReq) GetSeqNo() int64 {
+	if m != nil {
+		return m.SeqNo
+	}
+	return 0
+}
+
+type QueryRecordRsp struct {
+	UserID               string   `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	SeqNo                int64    `protobuf:"varint,2,opt,name=SeqNo,proto3" json:"SeqNo,omitempty"`
+	Data                 [][]byte `protobuf:"bytes,3,rep,name=Data,proto3" json:"Data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *QueryRecordRsp) Reset()         { *m = QueryRecordRsp{} }
+func (m *QueryRecordRsp) String() string { return proto.CompactTextString(m) }
+func (*QueryRecordRsp) ProtoMessage()    {}
+func (*QueryRecordRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_txdata_8c6c65d0b325a578, []int{17}
+}
+func (m *QueryRecordRsp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryRecordRsp.Unmarshal(m, b)
+}
+func (m *QueryRecordRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryRecordRsp.Marshal(b, m, deterministic)
+}
+func (dst *QueryRecordRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRecordRsp.Merge(dst, src)
+}
+func (m *QueryRecordRsp) XXX_Size() int {
+	return xxx_messageInfo_QueryRecordRsp.Size(m)
+}
+func (m *QueryRecordRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRecordRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRecordRsp proto.InternalMessageInfo
+
+func (m *QueryRecordRsp) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
+func (m *QueryRecordRsp) GetSeqNo() int64 {
+	if m != nil {
+		return m.SeqNo
+	}
+	return 0
+}
+
+func (m *QueryRecordRsp) GetData() [][]byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
 func init() {
-	proto.RegisterType((*AtomicKey)(nil), "txdata.AtomicKey")
+	proto.RegisterType((*DataPlaceholder)(nil), "txdata.DataPlaceholder")
 	proto.RegisterType((*DataPsh)(nil), "txdata.DataPsh")
 	proto.RegisterType((*DataAck)(nil), "txdata.DataAck")
 	proto.RegisterType((*CommonReq)(nil), "txdata.CommonReq")
 	proto.RegisterType((*CommonRsp)(nil), "txdata.CommonRsp")
 	proto.RegisterType((*ConnectionInfo)(nil), "txdata.ConnectionInfo")
-	proto.RegisterType((*ConnectedData)(nil), "txdata.ConnectedData")
+	proto.RegisterType((*ConnectReq)(nil), "txdata.ConnectReq")
+	proto.RegisterType((*ConnectRsp)(nil), "txdata.ConnectRsp")
 	proto.RegisterType((*DisconnectedData)(nil), "txdata.DisconnectedData")
+	proto.RegisterType((*OnlineNotice)(nil), "txdata.OnlineNotice")
 	proto.RegisterType((*ParentDataReq)(nil), "txdata.ParentDataReq")
 	proto.RegisterType((*ParentDataRsp)(nil), "txdata.ParentDataRsp")
 	proto.RegisterType((*EchoItem)(nil), "txdata.EchoItem")
 	proto.RegisterType((*SendMailItem)(nil), "txdata.SendMailItem")
 	proto.RegisterType((*ReportDataItem)(nil), "txdata.ReportDataItem")
+	proto.RegisterType((*CommonErrMsg)(nil), "txdata.CommonErrMsg")
+	proto.RegisterType((*QueryRecordReq)(nil), "txdata.QueryRecordReq")
+	proto.RegisterType((*QueryRecordRsp)(nil), "txdata.QueryRecordRsp")
 	proto.RegisterEnum("txdata.MsgType", MsgType_name, MsgType_value)
-	proto.RegisterEnum("txdata.ProgramType", ProgramType_name, ProgramType_value)
 	proto.RegisterEnum("txdata.ConnectionInfo_LinkType", ConnectionInfo_LinkType_name, ConnectionInfo_LinkType_value)
 }
 
-func init() { proto.RegisterFile("txdata.proto", fileDescriptor_txdata_c01b060a12f92aa7) }
+func init() { proto.RegisterFile("txdata.proto", fileDescriptor_txdata_8c6c65d0b325a578) }
 
-var fileDescriptor_txdata_c01b060a12f92aa7 = []byte{
-	// 1083 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_txdata_8c6c65d0b325a578 = []byte{
+	// 1140 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0xcd, 0x6e, 0xdb, 0x46,
-	0x10, 0x36, 0xa9, 0xff, 0x91, 0xa2, 0x6c, 0x36, 0x4e, 0x4a, 0x18, 0x45, 0x23, 0xf0, 0xa4, 0xb8,
-	0x80, 0x8c, 0x2a, 0x3d, 0xb5, 0x40, 0x01, 0x55, 0x62, 0x01, 0x22, 0xb6, 0x2c, 0xac, 0xe5, 0x1c,
-	0x72, 0x31, 0x68, 0x6a, 0x2d, 0xa9, 0x32, 0xb9, 0x34, 0x49, 0x27, 0xf6, 0x13, 0xf4, 0xda, 0x07,
-	0xe9, 0xb9, 0x4f, 0xd0, 0x43, 0xd0, 0xd7, 0xe9, 0x0b, 0x14, 0x3b, 0xbb, 0x2b, 0x51, 0x6e, 0x9c,
-	0x1a, 0x45, 0x7b, 0xe8, 0x8d, 0xdf, 0xce, 0x70, 0xf6, 0x9b, 0x6f, 0x7e, 0x48, 0x68, 0xe5, 0x37,
-	0xb3, 0x20, 0x0f, 0x7a, 0x49, 0x2a, 0x72, 0x41, 0xab, 0x0a, 0xed, 0xbd, 0x98, 0x0b, 0x31, 0xbf,
-	0xe4, 0x07, 0x78, 0x7a, 0x7e, 0x7d, 0x71, 0x90, 0x2f, 0x23, 0x9e, 0xe5, 0x41, 0x94, 0x28, 0x47,
-	0xf7, 0x67, 0x0b, 0x1a, 0x83, 0x5c, 0x44, 0xcb, 0xf0, 0x35, 0xbf, 0xa5, 0x7b, 0x50, 0x7f, 0x2b,
-	0x62, 0x3e, 0x0e, 0x22, 0xee, 0x58, 0x1d, 0xab, 0xdb, 0x60, 0x6b, 0x2c, 0x6d, 0x63, 0x31, 0x53,
-	0x36, 0x5b, 0xd9, 0x0c, 0xa6, 0x07, 0x50, 0xf7, 0x6e, 0x78, 0x38, 0xbd, 0x4d, 0xb8, 0x53, 0xea,
-	0x58, 0xdd, 0x76, 0xff, 0x69, 0x4f, 0xf3, 0x99, 0xa4, 0x62, 0x9e, 0x06, 0x91, 0x34, 0xb1, 0xb5,
-	0x93, 0x0c, 0x26, 0x9f, 0x31, 0x58, 0x59, 0x05, 0x33, 0xd8, 0xfd, 0xd5, 0x82, 0xda, 0x28, 0xc8,
-	0x83, 0x49, 0xb6, 0x90, 0x7e, 0x27, 0x3c, 0x9e, 0xf1, 0xd4, 0x1f, 0x19, 0x42, 0x06, 0x4b, 0x1b,
-	0xe3, 0xe1, 0x3b, 0xb4, 0x69, 0x42, 0x06, 0xd3, 0x5d, 0xa8, 0x9c, 0xf0, 0xab, 0xb1, 0x40, 0x36,
-	0x25, 0xa6, 0x00, 0x7d, 0x09, 0xb5, 0x49, 0xb6, 0x40, 0x96, 0x65, 0x64, 0xf9, 0xd8, 0xb0, 0x3c,
-	0xca, 0xe6, 0xc8, 0xd0, 0xd8, 0xa9, 0x83, 0xae, 0x92, 0x86, 0x53, 0xe9, 0x58, 0xdd, 0x16, 0x33,
-	0x50, 0x5a, 0x4e, 0x93, 0x61, 0x10, 0x2e, 0xb8, 0x53, 0xed, 0x58, 0xdd, 0x3a, 0x33, 0xd0, 0xfd,
-	0x5d, 0x13, 0x1f, 0x84, 0xab, 0x7f, 0x9f, 0xf8, 0x20, 0x5c, 0x7d, 0x92, 0xb8, 0xb6, 0x4b, 0x7a,
-	0x83, 0x70, 0x55, 0x24, 0xae, 0xa1, 0x0c, 0xed, 0xa5, 0xe9, 0x58, 0x20, 0xed, 0x0a, 0x53, 0x80,
-	0x3e, 0x87, 0xaa, 0x97, 0xa6, 0x47, 0xd9, 0xdc, 0xa9, 0x21, 0x15, 0x8d, 0xdc, 0x0f, 0x36, 0x34,
-	0x86, 0x22, 0x8a, 0x44, 0xcc, 0xf8, 0xd5, 0xdf, 0xa5, 0x83, 0xf9, 0x17, 0xd2, 0x31, 0x78, 0x2b,
-	0xd5, 0xd2, 0x9d, 0x54, 0x3b, 0xd0, 0x1c, 0xa6, 0x22, 0xcb, 0x4e, 0x78, 0xfa, 0x8e, 0xa7, 0x98,
-	0x58, 0x9d, 0x15, 0x8f, 0xe8, 0xe7, 0xd0, 0x60, 0xfc, 0xea, 0x9a, 0x67, 0xb9, 0x3f, 0xc2, 0x6c,
-	0x4a, 0x6c, 0x73, 0xb0, 0x91, 0xaa, 0x7a, 0x47, 0x2a, 0xc6, 0xaf, 0x50, 0xaa, 0xda, 0x3d, 0x52,
-	0x69, 0xbb, 0x94, 0x8a, 0xf1, 0x2b, 0x94, 0xaa, 0xae, 0xa4, 0xd2, 0x90, 0x7e, 0xad, 0x82, 0x2c,
-	0x23, 0xee, 0x34, 0x3a, 0x56, 0xb7, 0xd9, 0xdf, 0xeb, 0xa9, 0x41, 0xea, 0x99, 0x41, 0xea, 0x4d,
-	0xcd, 0x20, 0x31, 0xe3, 0x2a, 0xa5, 0x64, 0xfc, 0x62, 0x7c, 0x1d, 0x39, 0x80, 0x8c, 0x34, 0x72,
-	0x7f, 0x29, 0xad, 0xa5, 0xcc, 0x92, 0xff, 0x99, 0x94, 0x59, 0xf2, 0x69, 0x29, 0x95, 0x1d, 0xa5,
-	0xcc, 0x92, 0x2d, 0x29, 0x15, 0x44, 0x29, 0xb3, 0xe4, 0xc1, 0x52, 0x2a, 0xd7, 0xfb, 0xa4, 0xa4,
-	0x5f, 0x00, 0xfc, 0x90, 0x8a, 0x48, 0x25, 0xee, 0x34, 0x31, 0xcf, 0xc2, 0x09, 0x26, 0x92, 0x07,
-	0x39, 0x77, 0x5a, 0xaa, 0xc7, 0x11, 0x6c, 0x3a, 0xff, 0xd1, 0xc7, 0x3b, 0xbf, 0xbd, 0xd5, 0xf9,
-	0x7f, 0xd8, 0xd0, 0x1e, 0x8a, 0x38, 0xe6, 0x61, 0xbe, 0x14, 0xb1, 0x1f, 0x5f, 0x08, 0xfa, 0x25,
-	0xd4, 0x4e, 0x33, 0x9e, 0xbe, 0xe6, 0xb7, 0x58, 0xb2, 0x66, 0xff, 0x89, 0x51, 0x62, 0xbd, 0x3b,
-	0x99, 0xf1, 0x90, 0x71, 0xe5, 0xe3, 0xba, 0x84, 0x1a, 0xd1, 0x03, 0x68, 0x7c, 0xcf, 0x2f, 0x45,
-	0x3c, 0x97, 0x61, 0x4a, 0xf7, 0x85, 0xd9, 0xf8, 0xc8, 0x8a, 0x2b, 0xe0, 0x8f, 0xcc, 0x92, 0x34,
-	0x58, 0x0a, 0xfe, 0x86, 0xa7, 0xd9, 0x52, 0xc4, 0x58, 0xcd, 0x06, 0x33, 0x90, 0x7e, 0x0b, 0xf5,
-	0xc3, 0x65, 0xbc, 0x3a, 0x12, 0x33, 0xb5, 0xa0, 0xda, 0xfd, 0x17, 0xe6, 0x96, 0xed, 0xac, 0x7a,
-	0xd2, 0x4d, 0xed, 0x65, 0xf3, 0x02, 0x6a, 0x72, 0xc3, 0x27, 0xcb, 0x19, 0x56, 0xbc, 0xc2, 0x34,
-	0x92, 0xd7, 0xc9, 0xa7, 0x20, 0x5f, 0x60, 0x7d, 0x1b, 0xcc, 0x40, 0x55, 0xa9, 0x28, 0x48, 0x57,
-	0x58, 0xde, 0x06, 0xd3, 0xc8, 0xed, 0x29, 0x1a, 0xd8, 0x1d, 0x0d, 0xa8, 0xbc, 0xe5, 0xa9, 0x78,
-	0x45, 0x76, 0x68, 0x13, 0x6a, 0xc3, 0xe3, 0xf1, 0xd8, 0x1b, 0x4e, 0x89, 0x45, 0x01, 0xaa, 0x83,
-	0xe1, 0xd0, 0x9b, 0x4c, 0x89, 0xed, 0x9e, 0xc2, 0x23, 0x4d, 0x8f, 0xcf, 0xb0, 0x71, 0xf6, 0xa1,
-	0x2c, 0x59, 0x6a, 0xc1, 0x9f, 0x7f, 0x3c, 0x07, 0x86, 0x3e, 0xb8, 0xad, 0x83, 0x7c, 0xf1, 0x3e,
-	0xb8, 0x75, 0xec, 0x4e, 0x49, 0xd2, 0xd3, 0xd0, 0xfd, 0x0e, 0xc8, 0x68, 0x99, 0x85, 0xff, 0x34,
-	0xb2, 0x1b, 0xc2, 0xa3, 0x49, 0x90, 0xf2, 0x38, 0x97, 0x6f, 0xca, 0x4d, 0xb8, 0x35, 0x48, 0xd6,
-	0xdd, 0x41, 0x2a, 0x2c, 0x0e, 0xfb, 0xc1, 0x8b, 0xc3, 0xfd, 0xcd, 0xda, 0xba, 0x25, 0x4b, 0xfe,
-	0x8b, 0x5b, 0x8a, 0x93, 0x58, 0x7a, 0xf8, 0x24, 0xbe, 0x84, 0x32, 0x8e, 0x75, 0xb9, 0x53, 0xea,
-	0x36, 0xfb, 0xcf, 0xee, 0x88, 0xa5, 0x14, 0x65, 0xe8, 0xe2, 0x4e, 0xa1, 0xee, 0x85, 0x0b, 0xe1,
-	0xe7, 0x3c, 0x92, 0x15, 0x39, 0x14, 0x61, 0x70, 0xb9, 0x5e, 0x72, 0x06, 0xaa, 0x3d, 0x16, 0x89,
-	0x9c, 0x17, 0xbf, 0x7e, 0x0a, 0x53, 0xaa, 0x2f, 0x53, 0xfb, 0x4d, 0x45, 0xfd, 0x60, 0x41, 0x4b,
-	0x2e, 0xc8, 0xa3, 0x60, 0x79, 0x89, 0xa1, 0xf7, 0xa0, 0x2e, 0x27, 0x2a, 0x2e, 0xfc, 0xa4, 0x18,
-	0x2c, 0x6d, 0x93, 0x20, 0xcb, 0xde, 0x8b, 0x74, 0x66, 0x82, 0x1b, 0x8c, 0x8b, 0x37, 0xca, 0x93,
-	0xc1, 0x6c, 0x96, 0x9a, 0x05, 0x6a, 0x30, 0x6d, 0x83, 0x3d, 0x15, 0x7a, 0xc8, 0xec, 0x29, 0x36,
-	0xd4, 0xc9, 0xf5, 0xf9, 0x8f, 0x3c, 0xcc, 0xcd, 0x78, 0x69, 0x88, 0xab, 0x56, 0xc4, 0x39, 0x8f,
-	0x73, 0x5c, 0x8c, 0x55, 0xb4, 0x16, 0x8f, 0xe4, 0xbb, 0x1a, 0xea, 0x4f, 0xaa, 0x81, 0xee, 0x37,
-	0xd0, 0x66, 0x3c, 0x11, 0x29, 0x96, 0x19, 0x73, 0xd9, 0x85, 0xca, 0x54, 0x24, 0xcb, 0x50, 0x27,
-	0xa2, 0xc0, 0x5a, 0x06, 0x7b, 0x23, 0xc3, 0xfe, 0x4f, 0x36, 0xd4, 0xf4, 0xda, 0x35, 0xf3, 0xf4,
-	0x15, 0xd9, 0xa1, 0x6d, 0x00, 0x7f, 0x74, 0xa6, 0x7f, 0x97, 0x88, 0x55, 0xc0, 0x83, 0x70, 0x45,
-	0x6c, 0x4a, 0xa0, 0xe5, 0x8f, 0xce, 0xd6, 0x1f, 0x72, 0x52, 0xda, 0x3e, 0xc9, 0x12, 0x52, 0xa6,
-	0xcf, 0xe0, 0x09, 0x9e, 0x14, 0xdb, 0x9f, 0x54, 0xe8, 0x2e, 0x90, 0xcd, 0xb1, 0x2a, 0x34, 0xa9,
-	0xd2, 0xcf, 0xe0, 0xa9, 0xbc, 0xe0, 0xce, 0x4c, 0x91, 0x9a, 0x76, 0xdf, 0x1a, 0x16, 0x52, 0xff,
-	0xeb, 0x69, 0x96, 0x90, 0x06, 0x7d, 0x0c, 0x4d, 0x7f, 0x74, 0x66, 0x9a, 0x85, 0x00, 0x7d, 0x0a,
-	0x8f, 0xfd, 0xd1, 0x59, 0xb1, 0xcc, 0xa4, 0xa9, 0x79, 0x6d, 0x2b, 0x46, 0x5a, 0xfb, 0x1e, 0x34,
-	0x0b, 0x3f, 0x95, 0x46, 0x8c, 0x3e, 0xd9, 0x91, 0xfb, 0x64, 0x78, 0xe8, 0x7b, 0x63, 0xbd, 0x5b,
-	0x4e, 0x3c, 0xf6, 0xc6, 0x63, 0xc4, 0xa6, 0x75, 0x28, 0x8f, 0x8f, 0x47, 0x1e, 0x29, 0x49, 0xe7,
-	0xc9, 0xb1, 0x3f, 0x9e, 0x92, 0xf2, 0x64, 0xe7, 0xbc, 0x8a, 0x7d, 0xff, 0xea, 0xcf, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x99, 0xe2, 0xad, 0xa1, 0x3b, 0x0b, 0x00, 0x00,
+	0x10, 0x36, 0xa9, 0xff, 0x91, 0x2c, 0xaf, 0x37, 0x6e, 0x4a, 0x18, 0x45, 0x23, 0xf0, 0x50, 0xa8,
+	0x39, 0x28, 0xad, 0xd2, 0x53, 0x0b, 0x04, 0x50, 0x25, 0x17, 0x20, 0x10, 0x2b, 0xea, 0x5a, 0x29,
+	0x8a, 0x5c, 0x0c, 0x9a, 0x5a, 0x4b, 0xac, 0x44, 0x2e, 0xc5, 0xa5, 0x93, 0xf8, 0x65, 0xfa, 0x04,
+	0xed, 0x43, 0xf4, 0x96, 0x53, 0x1f, 0xa2, 0x2f, 0xd0, 0x57, 0x28, 0xf6, 0x4f, 0x22, 0x55, 0x3b,
+	0x76, 0x0b, 0xb4, 0x40, 0x6e, 0xfa, 0x66, 0x76, 0x87, 0x33, 0xdf, 0xcc, 0x7c, 0x2b, 0x68, 0x65,
+	0x6f, 0x67, 0x7e, 0xe6, 0xf7, 0x92, 0x94, 0x65, 0x0c, 0x57, 0x15, 0x3a, 0x7e, 0x34, 0x67, 0x6c,
+	0xbe, 0xa2, 0x4f, 0xa4, 0xf5, 0xe2, 0xea, 0xf2, 0x49, 0x16, 0x46, 0x94, 0x67, 0x7e, 0x94, 0xa8,
+	0x83, 0xee, 0x21, 0x1c, 0x8c, 0xfc, 0xcc, 0x9f, 0xac, 0xfc, 0x80, 0x2e, 0xd8, 0x6a, 0x46, 0x53,
+	0xf7, 0x77, 0x0b, 0x6a, 0xd2, 0xc6, 0x17, 0xf8, 0x18, 0xea, 0x67, 0x34, 0x9e, 0xd1, 0xd4, 0x1b,
+	0x39, 0x56, 0xc7, 0xea, 0x36, 0xc8, 0x06, 0x0b, 0x1f, 0xa1, 0xc1, 0x6b, 0xe9, 0xb3, 0x95, 0xcf,
+	0x60, 0xfc, 0x10, 0xaa, 0x2f, 0xb9, 0xf4, 0x94, 0xa4, 0x47, 0x23, 0x7c, 0x04, 0x95, 0x33, 0xba,
+	0x1e, 0x33, 0xa7, 0xdc, 0xb1, 0xba, 0x25, 0xa2, 0x00, 0xfe, 0x1c, 0x6a, 0x13, 0xbe, 0x98, 0x5e,
+	0x27, 0xd4, 0xa9, 0x74, 0xac, 0x6e, 0xbb, 0x7f, 0xd0, 0xd3, 0xd5, 0x9c, 0xf2, 0xb9, 0x30, 0x13,
+	0xe3, 0xc7, 0x8e, 0x3c, 0x2a, 0xd2, 0x73, 0xaa, 0x1d, 0xab, 0xdb, 0x22, 0x06, 0x0a, 0xcf, 0xcb,
+	0x64, 0xe8, 0x07, 0x0b, 0xea, 0xd4, 0x3a, 0x56, 0xb7, 0x4e, 0x0c, 0x74, 0xff, 0xd0, 0x05, 0x0d,
+	0x82, 0xe5, 0xff, 0x57, 0xd0, 0x20, 0x58, 0xbe, 0xb7, 0x20, 0xed, 0x17, 0x69, 0x0f, 0x82, 0x65,
+	0xbe, 0x20, 0x0d, 0x45, 0xe8, 0x93, 0x34, 0x1d, 0x33, 0x59, 0x4e, 0x85, 0x28, 0x20, 0x12, 0x39,
+	0x49, 0xd3, 0x53, 0x3e, 0x77, 0xea, 0x2a, 0x11, 0x85, 0xdc, 0x77, 0x36, 0x34, 0x86, 0x2c, 0x8a,
+	0x58, 0x4c, 0xe8, 0xfa, 0xae, 0x32, 0x25, 0x2f, 0xb9, 0x32, 0x0d, 0x2e, 0x50, 0x50, 0xda, 0xa1,
+	0xa0, 0x03, 0xcd, 0x61, 0xca, 0x38, 0x3f, 0xa3, 0xe9, 0x6b, 0x9a, 0xca, 0x82, 0xeb, 0x24, 0x6f,
+	0xc2, 0x9f, 0x40, 0x83, 0xd0, 0xf5, 0x15, 0xe5, 0x99, 0x37, 0x92, 0x85, 0x97, 0xc8, 0xd6, 0xb0,
+	0xa5, 0xaa, 0xba, 0x43, 0x15, 0xa1, 0x6b, 0x49, 0x55, 0xed, 0x16, 0xaa, 0xb4, 0x5f, 0x50, 0x45,
+	0xe8, 0x5a, 0x52, 0x55, 0x57, 0x54, 0x69, 0x88, 0xbf, 0x52, 0x41, 0xc2, 0x88, 0x3a, 0x8d, 0x8e,
+	0xd5, 0x6d, 0xf6, 0x8f, 0x7b, 0x6a, 0xf0, 0x7b, 0x66, 0xf0, 0x7b, 0x53, 0x33, 0xf8, 0xc4, 0x1c,
+	0x15, 0x54, 0x12, 0x7a, 0x39, 0xbe, 0x8a, 0x1c, 0x90, 0x19, 0x69, 0xe4, 0xfe, 0x52, 0xda, 0x50,
+	0xc9, 0x93, 0x0f, 0x8c, 0x4a, 0x9e, 0xbc, 0x9f, 0x4a, 0xe5, 0x97, 0x54, 0xf2, 0xa4, 0x40, 0xa5,
+	0x82, 0x92, 0x4a, 0x9e, 0xdc, 0x9b, 0x4a, 0x75, 0xf4, 0x36, 0x2a, 0xf1, 0xa7, 0x00, 0xdf, 0xa5,
+	0x2c, 0x52, 0x85, 0x3b, 0x4d, 0x59, 0x67, 0xce, 0x22, 0x0b, 0xc9, 0xfc, 0x8c, 0x3a, 0x2d, 0x35,
+	0xe3, 0x12, 0x6c, 0x27, 0x7f, 0xff, 0xe6, 0xc9, 0x6f, 0x17, 0x26, 0xff, 0x57, 0x1b, 0xda, 0x43,
+	0x16, 0xc7, 0x34, 0xc8, 0x42, 0x16, 0x7b, 0xf1, 0xa5, 0x3c, 0xea, 0x71, 0xc2, 0x58, 0x26, 0x3b,
+	0x56, 0x27, 0x1a, 0xe5, 0xb6, 0xd8, 0x2e, 0x6c, 0xf1, 0x31, 0xd4, 0xbf, 0xa5, 0x2b, 0x16, 0xcf,
+	0xbd, 0x91, 0x6c, 0x46, 0x83, 0x6c, 0xb0, 0xa0, 0xea, 0x07, 0x9a, 0xf2, 0x90, 0xc5, 0xb2, 0x0f,
+	0x0d, 0x62, 0x20, 0xfe, 0x06, 0xea, 0xcf, 0xc3, 0x78, 0x79, 0xca, 0x66, 0x54, 0x36, 0xa2, 0xdd,
+	0x7f, 0x64, 0x08, 0x2f, 0xe6, 0xd3, 0x13, 0xc7, 0x64, 0x03, 0x36, 0x17, 0x64, 0x35, 0x6f, 0xe9,
+	0x24, 0x9c, 0xe9, 0xf5, 0xd6, 0x48, 0x7c, 0x4e, 0xfc, 0xf2, 0xb3, 0x85, 0x5e, 0x70, 0x03, 0x15,
+	0xc7, 0x91, 0x9f, 0x2e, 0x65, 0x63, 0x1a, 0x44, 0x23, 0xb7, 0xa7, 0xd2, 0x90, 0x7d, 0x6d, 0x40,
+	0xe5, 0x15, 0x4d, 0xd9, 0x53, 0xb4, 0x87, 0x9b, 0x50, 0x1b, 0xbe, 0x18, 0x8f, 0x4f, 0x86, 0x53,
+	0x64, 0x61, 0x80, 0xea, 0x60, 0x38, 0x3c, 0x99, 0x4c, 0x91, 0xed, 0xfe, 0x08, 0xa0, 0xd3, 0x13,
+	0x4a, 0xf1, 0x05, 0xd4, 0x44, 0x8a, 0x84, 0xae, 0x25, 0x57, 0xcd, 0xfe, 0xc3, 0x9b, 0x6b, 0x20,
+	0xe6, 0x98, 0x94, 0x60, 0x3f, 0x5b, 0xbc, 0xf1, 0xaf, 0x1d, 0xbb, 0x53, 0x12, 0x19, 0x6a, 0xe8,
+	0xfe, 0x6c, 0x6d, 0x43, 0xf3, 0xe4, 0x5f, 0x84, 0x36, 0x37, 0x78, 0x22, 0x1b, 0x74, 0xd7, 0x0d,
+	0x9e, 0x6c, 0x47, 0xa5, 0x74, 0xf3, 0xa8, 0x94, 0x0b, 0xa3, 0xf2, 0x0c, 0xd0, 0x28, 0xe4, 0x81,
+	0x8a, 0x45, 0x67, 0x72, 0xe0, 0x1f, 0x43, 0x59, 0x04, 0xbb, 0x23, 0x45, 0x79, 0xc6, 0xed, 0x43,
+	0xeb, 0x45, 0xbc, 0x0a, 0x63, 0x3a, 0x66, 0x59, 0x18, 0x50, 0xec, 0x42, 0x4b, 0xcc, 0x95, 0xc7,
+	0x95, 0x55, 0x4f, 0x5b, 0xc1, 0xe6, 0x06, 0xb0, 0x3f, 0xf1, 0x53, 0x1a, 0x67, 0xe2, 0x6b, 0xa2,
+	0xc8, 0xc2, 0x6a, 0x5b, 0xbb, 0xab, 0x9d, 0x93, 0x32, 0xfb, 0xde, 0x52, 0xe6, 0xfe, 0x66, 0x15,
+	0xbe, 0xc2, 0x93, 0xff, 0xe2, 0x2b, 0x79, 0x6d, 0x28, 0xdd, 0x5f, 0x1b, 0x3e, 0x83, 0xb2, 0x14,
+	0x9a, 0x72, 0xa7, 0xd4, 0x6d, 0xf6, 0xf1, 0x0e, 0xc1, 0x84, 0xae, 0x89, 0xf4, 0xbb, 0x53, 0xa8,
+	0x9f, 0x04, 0x0b, 0xe6, 0x65, 0x34, 0x12, 0x33, 0xf6, 0x9c, 0x05, 0xfe, 0x6a, 0xa3, 0xb9, 0x06,
+	0x2a, 0x59, 0x8d, 0x58, 0x46, 0xf3, 0x8f, 0xb4, 0xc2, 0x18, 0xeb, 0x2f, 0x29, 0xb9, 0x55, 0x51,
+	0xdf, 0x59, 0xd0, 0x12, 0x7a, 0x7d, 0xea, 0x87, 0x2b, 0x19, 0xfa, 0x18, 0xea, 0x62, 0xeb, 0x63,
+	0x3f, 0xa2, 0x46, 0xcf, 0x0d, 0x16, 0xbe, 0x89, 0xcf, 0xf9, 0x1b, 0x96, 0xce, 0x4c, 0x70, 0x83,
+	0xe5, 0x3b, 0x10, 0x65, 0xc9, 0x60, 0x36, 0x4b, 0x8d, 0x9e, 0x1b, 0x8c, 0xdb, 0x60, 0x4f, 0x99,
+	0x9e, 0x35, 0x7b, 0xca, 0x44, 0xfa, 0x67, 0x57, 0x17, 0x3f, 0xd1, 0x20, 0x33, 0x9a, 0xa1, 0xa1,
+	0x54, 0x7e, 0x16, 0x67, 0x34, 0xce, 0xa4, 0x4e, 0x57, 0xa5, 0x37, 0x6f, 0x12, 0x77, 0x35, 0x94,
+	0xca, 0xd0, 0x20, 0x06, 0xba, 0x5f, 0x43, 0x9b, 0xd0, 0x84, 0xa5, 0xb2, 0xc7, 0xb2, 0x96, 0x23,
+	0xa8, 0x4c, 0x59, 0x12, 0x06, 0xba, 0x10, 0x05, 0x36, 0x34, 0xd8, 0x39, 0x1a, 0x5e, 0x41, 0x4b,
+	0x3d, 0x69, 0x6a, 0x13, 0x72, 0x4a, 0x68, 0x15, 0x94, 0xf0, 0xd6, 0xe5, 0x16, 0x9e, 0x53, 0xca,
+	0xb9, 0x3f, 0xa7, 0xba, 0x7c, 0x03, 0xdd, 0x67, 0xd0, 0xfe, 0xfe, 0x8a, 0xa6, 0xd7, 0x84, 0x06,
+	0x2c, 0x9d, 0x89, 0x11, 0xbf, 0x2d, 0xfa, 0xe6, 0xdd, 0xb2, 0x73, 0xef, 0x96, 0x4b, 0x8a, 0xf7,
+	0x79, 0xf2, 0xcf, 0xee, 0xe7, 0xda, 0x5e, 0xea, 0xb6, 0x54, 0xbd, 0x8f, 0xff, 0xb4, 0xa1, 0xa6,
+	0x5f, 0x3d, 0x23, 0x8a, 0x5f, 0xa2, 0x3d, 0xdc, 0x06, 0xf0, 0x46, 0xe7, 0xfa, 0xdf, 0x2d, 0xb2,
+	0x72, 0x78, 0x10, 0x2c, 0x91, 0x8d, 0x11, 0xb4, 0xbc, 0xd1, 0xf9, 0xe6, 0x7f, 0x14, 0x2a, 0x15,
+	0x2d, 0x3c, 0x41, 0x65, 0xfc, 0x11, 0x1c, 0x4a, 0x4b, 0x5e, 0x1f, 0x50, 0x05, 0x1f, 0xc2, 0xfe,
+	0xd6, 0x2c, 0xee, 0x56, 0x77, 0x4c, 0x3c, 0x41, 0x35, 0xfc, 0x31, 0x3c, 0x10, 0x1f, 0xdc, 0x11,
+	0x21, 0x54, 0xc7, 0x0f, 0xe0, 0xc0, 0x1b, 0x9d, 0xe7, 0xd5, 0x05, 0x35, 0xf0, 0x11, 0x20, 0x6f,
+	0x74, 0x5e, 0x90, 0x0f, 0x04, 0x7f, 0xb7, 0xf2, 0x04, 0x35, 0xf1, 0x01, 0x34, 0xbd, 0xd1, 0xb9,
+	0xd9, 0x20, 0xd4, 0xd2, 0x11, 0xf3, 0xb3, 0x8f, 0xf6, 0x75, 0xf2, 0xc5, 0x31, 0x42, 0x6d, 0x7d,
+	0x36, 0x3f, 0x21, 0xe8, 0x40, 0x9f, 0x2d, 0xb6, 0x16, 0xa1, 0x1b, 0xcc, 0x3c, 0x41, 0x87, 0x93,
+	0xbd, 0x8b, 0xaa, 0x54, 0x81, 0xa7, 0x7f, 0x05, 0x00, 0x00, 0xff, 0xff, 0x56, 0xf2, 0xe0, 0xc4,
+	0x8b, 0x0c, 0x00, 0x00,
 }
