@@ -23,10 +23,11 @@ type configNode struct {
 }
 
 type businessNode struct {
-	cacheSock  *safeWsSocketMap
-	cacheUser  *safeConnInfoMap
 	ownInfo    txdata.ConnectionInfo
 	parentInfo safeFatherData
+	rootOnline bool
+	cacheUser  *safeConnInfoMap
+	cacheSock  *safeWsSocketMap
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -36,9 +37,6 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	}
 
 	curData := new(businessNode)
-	//
-	curData.cacheSock = newSafeWsSocketMap()
-	curData.cacheUser = newSafeConnInfoMap()
 	//
 	curData.ownInfo.IsRoot = cfg.IsRoot
 	curData.ownInfo.UserID = cfg.UserID
@@ -50,6 +48,13 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.ownInfo.Remark = ""
 	//
 	curData.parentInfo.setData(nil, nil, true)
+	//
+	curData.cacheSock = newSafeWsSocketMap()
+	curData.cacheUser = newSafeConnInfoMap()
+	//
+	if curData.ownInfo.IsRoot {
+		curData.setRootOnline(curData.ownInfo.IsRoot)
+	}
 	//
 	return curData
 }
@@ -85,6 +90,9 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 		//如果与父亲断开连接,就清理父亲的数据,这样就不用sendDataToParent了.
 		glog.Infof("onDisconnected, disconnected with father, msgConn=%p", msgConn)
 		thls.parentInfo.setData(nil, nil, true)
+		if thls.rootOnline {
+			thls.setRootOnline(false)
+		}
 	}
 	if dataSlice := thls.cacheUser.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
 		checkSunWhenDisconnected(dataSlice)
@@ -101,7 +109,11 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 		conn.Close()
 	}
 	if thls.parentInfo.conn == conn {
-		thls.parentInfo.setData(nil, nil, true)
+		//不需要在这里处理它,因为主动断开连接,也会触发onDisconnected回调,回调里面已经有这个逻辑了.
+		//thls.parentInfo.setData(nil, nil, true)
+		//if thls.rootOnline {
+		//	thls.setRootOnline(false)
+		//}
 	}
 	thls.cacheSock.deleteData(conn)
 	thls.cacheUser.deleteDataByConn(conn)
@@ -119,6 +131,15 @@ func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, is
 		return errors.New("parent is offline")
 	}
 	return sock.Send(msg2slice(data))
+}
+
+func (thls *businessNode) setRootOnline(newValue bool) {
+	oldValue := thls.rootOnline
+	if oldValue == newValue { //我的目标是:消息无冗余无重复,很显然这里消息重复了.
+		glog.Errorf("setRootOnline, oldValue=%v, newValue=%v", oldValue, newValue)
+	}
+	thls.rootOnline = newValue
+	thls.cacheUser.sendDataToSon(&txdata.OnlineNotice{RootIsOnline: newValue})
 }
 
 func (thls *businessNode) reportCommonErrMsg(message string) {
@@ -141,6 +162,8 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectReq(txMsgData.(*txdata.ConnectReq), msgConn)
 	case txdata.MsgType_ID_ConnectRsp:
 		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
+	case txdata.MsgType_ID_OnlineNotice:
+		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
@@ -259,12 +282,15 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forSon(msgData *t
 	}
 
 	if isAccepted {
-		//曾经只有ConnectedData,没有ConnectReq+ConnectRsp,然后有通信规则:
-		//连接成功后, connect方要主动发送ConnectedData给accepted方.
-		//校验通过后,accepted方要主动发送ConnectedData给 connect方.
-		//现在已经改变通信模式了,所以这里不需要写代码了.
+		//有如下通信规则:
+		//连接建立后,_connect方要主动发送ConnectReq给accepted方.
+		//校验通过后,accepted方要主动发送ConnectReq给_connect方.
 		tmpTxData := txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		thls.sendData(msgConn, &tmpTxData)
+	}
+
+	if thls.rootOnline { //如果我能连通ROOT那么我就把这个消息通知(新建立连接的这个)儿子.
+		thls.sendData(msgConn, &txdata.OnlineNotice{RootIsOnline: true})
 	}
 
 	sendToParent = true
@@ -300,10 +326,9 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forParent(msgData
 	}
 
 	if isAccepted {
-		//曾经只有ConnectedData,没有ConnectReq+ConnectRsp,然后有通信规则:
-		//连接成功后, connect方要主动发送ConnectedData给accepted方.
-		//校验通过后,accepted方要主动发送ConnectedData给 connect方.
-		//现在已经改变通信模式了,所以这里不需要写代码了.
+		//有如下通信规则:
+		//连接建立后,_connect方要主动发送ConnectReq给accepted方.
+		//校验通过后,accepted方要主动发送ConnectReq给_connect方.
 		tmpTxData := txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
 		thls.sendData(msgConn, &tmpTxData)
 	}
@@ -343,3 +368,29 @@ func (thls *businessNode) handle_MsgType_ID_ConnectRsp(msgData *txdata.ConnectRs
 		thls.deleteConnectionFromAll(msgConn, true)
 	}
 }
+
+func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineNotice, msgConn *wsnet.WsSocket) {
+	pConn := thls.parentInfo.conn
+	if msgConn != pConn {
+		glog.Errorf("handle_MsgType_ID_OnlineNotice, OnlineNotice not from parent, msgConn=%p, pConn=%p", msgConn, pConn)
+		return
+	}
+	thls.setRootOnline(msgData.RootIsOnline)
+}
+
+/*
+func (thls *businessNode) handle_MsgType_ID_DataPsh(msgData *txdata.DataPsh, msgConn *wsnet.WsSocket) {
+	if !isValidDataPsh(msgData) {
+		//发送ACK.
+	}
+	if msgData.UpCache || msgData.RecverID == thls.ownInfo.UserID {
+
+	} else {
+		//TODO:转发出去.
+	}
+}
+
+func (thls *businessNode) fillDataAck(dataA *txdata.DataAck) {
+	dataA.SenderID = thls.ownInfo.UserID
+}
+*/

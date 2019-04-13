@@ -31,26 +31,30 @@ func main() {
 
 func calcNodeCache(node *businessNode) (jsonContent string) {
 	tmpObj := new(struct {
-		CacheSock  *safeWsSocketMap
-		CacheUser  *safeConnInfoMap
 		OwnInfo    *txdata.ConnectionInfo
 		ParentInfo *safeFatherData
+		RootOnline bool
+		CacheUser  *safeConnInfoMap
+		CacheSock  *safeWsSocketMap
 	})
-	tmpObj.CacheSock = node.cacheSock
-	tmpObj.CacheUser = node.cacheUser
 	tmpObj.OwnInfo = &node.ownInfo
 	tmpObj.ParentInfo = &node.parentInfo
+	tmpObj.RootOnline = node.rootOnline
+	tmpObj.CacheUser = node.cacheUser
+	tmpObj.CacheSock = node.cacheSock
 
-	tmpObj.CacheSock.Lock()
-	defer tmpObj.CacheSock.Unlock()
-	tmpObj.CacheUser.Lock()
-	defer tmpObj.CacheUser.Unlock()
 	tmpObj.ParentInfo.Lock()
 	defer tmpObj.ParentInfo.Unlock()
+	tmpObj.CacheUser.Lock()
+	defer tmpObj.CacheUser.Unlock()
+	tmpObj.CacheSock.Lock()
+	defer tmpObj.CacheSock.Unlock()
+
 	if byteSlice, err := json.Marshal(tmpObj); err != nil {
 		glog.Fatalln(err, tmpObj)
 	} else {
 		jsonContent = string(byteSlice)
 	}
+
 	return
 }

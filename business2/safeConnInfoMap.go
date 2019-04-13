@@ -93,3 +93,17 @@ func (thls *safeConnInfoMap) deleteDataByConn(conn *wsnet.WsSocket) []*connInfoE
 	thls.Unlock()
 	return dataSlice
 }
+
+func (thls *safeConnInfoMap) sendDataToSon(data ProtoMessage) {
+	var byteSlice []byte
+	thls.Lock()
+	for _, val := range thls.M {
+		if len(val.Pathway) == 1 {
+			if byteSlice == nil {
+				byteSlice = msg2slice(data)
+			}
+			val.conn.Send(byteSlice)
+		}
+	}
+	thls.Unlock()
+}
