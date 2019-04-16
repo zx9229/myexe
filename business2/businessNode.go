@@ -13,8 +13,8 @@ import (
 )
 
 type configNode struct {
-	IsRoot         bool //这个Node是RootNode.
-	UserID         string
+	IsRoot         bool   //这个Node是RootNode.
+	UserID         string //为空表示是ROOT节点.
 	BelongID       string
 	ServerURL      url.URL
 	ClientURL      []url.URL
@@ -28,17 +28,19 @@ type businessNode struct {
 	rootOnline bool
 	cacheUser  *safeConnInfoMap
 	cacheSock  *safeWsSocketMap
+	//cachePsh   *safeDataPshCache
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
 	if false ||
-		cfg.UserID == EMPTYSTR || (cfg.BelongID == EMPTYSTR && !cfg.IsRoot) {
+		(cfg.IsRoot && (cfg.UserID != EMPTYSTR || cfg.BelongID != EMPTYSTR)) || //(为防误操作).
+		(!cfg.IsRoot && cfg.UserID == EMPTYSTR) ||
+		(!cfg.IsRoot && cfg.UserID == cfg.BelongID) {
 		glog.Fatalf("newBusinessNode fail with cfg=%v", cfg)
 	}
 
 	curData := new(businessNode)
 	//
-	curData.ownInfo.IsRoot = cfg.IsRoot
 	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = cfg.BelongID
 	curData.ownInfo.Version = "Version20190411"
@@ -51,9 +53,10 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheUser = newSafeConnInfoMap()
+	//curData.cachePsh = newSafeDataPshCache(curData.ownInfo.UserID == EMPTYSTR)
 	//
-	if curData.ownInfo.IsRoot {
-		curData.setRootOnline(curData.ownInfo.IsRoot)
+	if curData.ownInfo.UserID == EMPTYSTR {
+		curData.setRootOnline(true)
 	}
 	//
 	return curData
@@ -201,28 +204,20 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne(msgData *txdata.C
 			rspData.ErrMsg = "req.UserID != req.Pathway[0]"
 			break
 		}
-		if msgData.InfoReq.IsRoot && thls.ownInfo.IsRoot { //不允许出现多个根节点.
-			rspData.ErrMsg = "req.IsRoot && rsp.IsRoot"
+		if (msgData.InfoReq.UserID == EMPTYSTR) && (msgData.InfoReq.BelongID != EMPTYSTR) { //ROOT节点的UserID和BelongID皆为空.
+			rspData.ErrMsg = "(req.UserID == EMPTYSTR) && (req.BelongID != EMPTYSTR)"
 			break
 		}
-		if msgData.InfoReq.UserID == EMPTYSTR {
-			rspData.ErrMsg = "req.UserID is empty"
-			break
-		}
-		if msgData.InfoReq.BelongID == EMPTYSTR && !msgData.InfoReq.IsRoot {
-			rspData.ErrMsg = "req.BelongID is empty"
+		if (msgData.InfoReq.UserID != EMPTYSTR) && (msgData.InfoReq.UserID == msgData.InfoReq.BelongID) {
+			rspData.ErrMsg = "(req.UserID != EMPTYSTR) && (req.UserID == req.BelongID)"
 			break
 		}
 		if msgData.InfoReq.UserID == thls.ownInfo.UserID {
 			rspData.ErrMsg = "req.UserID == rsp.UserID"
 			break
 		}
-		if msgData.InfoReq.UserID == msgData.InfoReq.BelongID {
-			rspData.ErrMsg = "req.UserID == req.BelongID"
-			break
-		}
-		if msgData.InfoReq.UserID != thls.ownInfo.BelongID && msgData.InfoReq.BelongID != thls.ownInfo.UserID {
-			rspData.ErrMsg = "(req.U != rsp.B) && (req.B != rsp.U)"
+		if (msgData.InfoReq.UserID != thls.ownInfo.BelongID) && (msgData.InfoReq.BelongID != thls.ownInfo.UserID) {
+			rspData.ErrMsg = "(req.UserID != rsp.BelongID) && (req.BelongID != rsp.UserID)"
 			break
 		}
 		rspData.ErrNo = 0
@@ -380,17 +375,90 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 
 /*
 func (thls *businessNode) handle_MsgType_ID_DataPsh(msgData *txdata.DataPsh, msgConn *wsnet.WsSocket) {
-	if !isValidDataPsh(msgData) {
-		//发送ACK.
-	}
-	if msgData.UpCache || msgData.RecverID == thls.ownInfo.UserID {
+	//该函数,只允许,收到数据后被回调,不允许某处主动调用它.
+	//即:只允许在onMessage里面调用该函数.
+	//TODO:检查数据合法性.
+	//if !isValidDataPsh(msgData) {
+	//	if true {
+	//		errMsg := fmt.Sprintf("invalid DataPsh=%v", msgData)
+	//		thls.reportCommonErrMsg(errMsg)
+	//	}
+	//	dataA := DataPsh2DataAck(msgData)
+	//	dataA.ErrNo = 1
+	//	dataA.ErrMsg = "invalid DataPsh"
+	//	thls.sendData(msgConn, dataA)
+	//	return
+	//}
 
+	if msgData.RecverID == thls.ownInfo.UserID { //本次传输到达(接收者)
+		if msgData.RecvUID == thls.ownInfo.UserID { //整个传输到达(最终者)
+			//我是(接收者)和(最终者)
+			//TODO:
+			if thls.ownInfo.UserID == EMPTYSTR {
+				//TODO:
+			} else {
+				assert4true(msgData.SenderID == EMPTYSTR) //本次传输的发送者一定是ROOT.
+			}
+		} else {
+			//我是(接收者)但不是(最终者),那么我是ROOT,此时我应当缓存和转发数据.
+			assert4true(thls.ownInfo.UserID == EMPTYSTR) //我一定是ROOT.
+			thls.handle_MsgType_ID_DataPsh_CacheAckPsh(msgData, msgConn, true)
+		}
 	} else {
-		//TODO:转发出去.
+		//有socket发过来了一个DataPsh,我不是RecverID,说明我在中途,不在终点,也不在起点,所以我一定不是ROOT.
+		assert4true(thls.ownInfo.UserID != EMPTYSTR)         //我不是ROOT.
+		assert4true(thls.ownInfo.UserID != msgData.SenderID) //我不在起点.
+		thls.handle_MsgType_ID_DataPsh_CacheAckPsh(msgData, msgConn, msgData.UpCache)
 	}
 }
 
-func (thls *businessNode) fillDataAck(dataA *txdata.DataAck) {
-	dataA.SenderID = thls.ownInfo.UserID
+func (thls *businessNode) handle_MsgType_ID_DataPsh_CacheAckPsh(dataP *txdata.DataPsh, msgConn *wsnet.WsSocket, doCache bool) {
+	//缓存,发送DataAck,发送DataPsh,
+	dataA := DataPsh2DataAck(dataP)
+	if true {
+		if dataP.RecverID == thls.ownInfo.UserID {
+			dataP.RecverID = dataP.RecvUID
+		} else {
+			assert4true(dataP.RecverID == EMPTYSTR)
+			assert4true(dataP.UpCache && doCache)
+			dataP.UpCache = false
+		}
+		dataP.SenderID = thls.ownInfo.UserID
+	}
+	assert4false(dataP.UpCache) //执行到这里时,若UpCache曾经为true,则此时已经被置为false了.
+	if doCache {
+		//feedDataPsh成功,缓存里面就有这一条数据了.
+		//feedDataPsh失败,DataAck是一条失败的消息,对端还会不断的进行同步.
+		thls.cachePsh.feedDataPsh(dataP, dataA)
+		thls.sendData(msgConn, dataA)
+		if dataA.ErrNo == 0 {
+			thls.tempSendDataPsh(dataP)
+		} else {
+			errMsg := fmt.Sprintf("DataPsh=%v, DataAck=%v", dataP, dataA)
+			thls.reportCommonErrMsg(errMsg)
+		}
+	} else {
+		//这里是纯转发,可以认为这里就是一个socket代理,发送成功则不应有任何回应,发送失败则相当于socket断开了,此时要有回应.
+		if err := thls.tempSendDataPsh(dataP); err != nil {
+			dataA.ErrNo = 1
+			dataA.ErrMsg = err.Error()
+			thls.sendData(msgConn, dataA)
+		}
+	}
+}
+
+func (thls *businessNode) tempSendDataPsh(dataP *txdata.DataPsh) (err error) {
+	//TODO:这是一个临时函数,正式使用的时候,需要做一些assert的检查.
+	if dataP.RecverID == EMPTYSTR { //要发往ROOT,所以要发往父亲的方向.
+		err = thls.sendDataEx(thls.parentInfo.conn, dataP, true)
+	} else { //从ROOT发过来的,所以要发往儿子的方向.
+		assert4true(dataP.SenderID == EMPTYSTR)
+		if connEx, isExist := thls.cacheUser.queryData(dataP.RecverID); isExist {
+			err = thls.sendDataEx(connEx.conn, dataP, false)
+		} else {
+			err = errors.New("children is offline")
+		}
+	}
+	return
 }
 */

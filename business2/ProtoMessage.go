@@ -70,22 +70,22 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err er
 		msgData = new(txdata.DisconnectedData)
 	case txdata.MsgType_ID_OnlineNotice:
 		msgData = new(txdata.OnlineNotice)
-	case txdata.MsgType_ID_ParentDataReq:
-		msgData = new(txdata.ParentDataReq)
-	case txdata.MsgType_ID_ParentDataRsp:
-		msgData = new(txdata.ParentDataRsp)
-	case txdata.MsgType_ID_EchoItem:
-		msgData = new(txdata.EchoItem)
-	case txdata.MsgType_ID_SendMailItem:
-		msgData = new(txdata.SendMailItem)
-	case txdata.MsgType_ID_ReportDataItem:
-		msgData = new(txdata.ReportDataItem)
 	case txdata.MsgType_ID_CommonErrMsg:
 		msgData = new(txdata.CommonErrMsg)
 	case txdata.MsgType_ID_QueryRecordReq:
 		msgData = new(txdata.QueryRecordReq)
 	case txdata.MsgType_ID_QueryRecordRsp:
 		msgData = new(txdata.QueryRecordRsp)
+	case txdata.MsgType_ID_ExecCmdReq:
+		msgData = new(txdata.ExecCmdReq)
+	case txdata.MsgType_ID_ExecCmdRsp:
+		msgData = new(txdata.ExecCmdRsp)
+	case txdata.MsgType_ID_EchoItem:
+		msgData = new(txdata.EchoItem)
+	case txdata.MsgType_ID_ReportDataItem:
+		msgData = new(txdata.ReportDataItem)
+	case txdata.MsgType_ID_SendMailItem:
+		msgData = new(txdata.SendMailItem)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType(%v)", msgType)
