@@ -19,78 +19,80 @@ enum MsgType {
     ID_ConnectRsp       =  7;
     ID_DisconnectedData =  8;
     ID_OnlineNotice     =  9;
-    ID_ParentDataReq    = 10;
-    ID_ParentDataRsp    = 11;
-    ID_EchoItem         = 12;
-    ID_SendMailItem     = 13;
-    ID_ReportDataItem   = 14;
-    ID_CommonErrMsg     = 15;
-    ID_QueryRecordReq   = 16;
-    ID_QueryRecordRsp   = 17;
+    ID_CommonErrMsg     = 10;
+    ID_QueryRecordReq   = 11;
+    ID_QueryRecordRsp   = 12;
+    ID_ExecCmdReq       = 13;
+    ID_ExecCmdRsp       = 14;
+    ID_EchoItem         = 15;
+    ID_ReportDataItem   = 16;
+    ID_SendMailItem     = 17;
 }
 
 //一个占位符结构体.
 message DataPlaceholder {
 }
 
-//Push
+//Psh:Push,Tx:transmit,Tt:total,
+//(空,表示根节点)
+//在整个传输中,TtSender和TtRecver可以都有值.
+//在某次传输中,TxSender和TxRecver必须有一方是空(根节点),这样可以直接判断出某次传输的方向.
+//还有就是,这样,数据必定先流向根节点,可以让根节点去重.
+//假定有场景:A-=>ROOT<=-B
+//SendUID(有值),A     SendUID(有值),B       SendUID(有值),
+//SendNo (有值),      SendNo (有值),        SendNo (零值),
+//RecvUID(有值),B     RecvUID(有值),A       RecvUID(有值),A
+//RecvNo (零值),      RecvNo (有值),        RecvNo (有值),
+//请求发送中(A=>根=>B),响应发送往ROOT(B=>根),响应回复中(根=>A),
 message DataPsh {
-    string  SenderID = 1;
-    string  RecverID = 2;//为空,表示发送到根节点.
-    string  UserID   = 3;//(UserID+SeqNo)唯一标识一个消息.
-    int64   SeqNo    = 4;//(UserID+SeqNo)唯一标识一个消息.
-    MsgType PshType  = 5;//传送的数据类型.
-    bytes   PshData  = 6;//传送的数据内容.
-    bool    UpCache  = 7;//紧邻的上游负有缓存本条数据的义务.
+    string  SenderID = 1;//(本次传输的)发送方.
+    string  RecverID = 2;//(本次传输的)接收方.(空,表示发送到根节点)
+    string  SendUID  = 3;//(整个传输的)发送方.
+    int64   SendNo   = 4;//(TtSender+TtSeqNo)唯一标识一个消息.
+    string  RecvUID  = 5;//(整个传输的)接收方.
+    int64   RecvNo   = 6;//(整个传输的)接收方.
+    MsgType PshType  = 7;//传输的数据类型.
+    bytes   PshData  = 8;//传输的数据内容.
+    bool    UpCache  = 9;//最先收到本条数据的节点,负有缓存本条数据的义务.
 }
 
 //Acknowledgement
 message DataAck {
-    string  SenderID = 1;
-    string  RecverID = 2;//为空,表示发送到根节点.
-    string  UserID   = 3;//(UserID+SeqNo)唯一标识一个消息.
-    int64   SeqNo    = 4;//(UserID+SeqNo)唯一标识一个消息.
+    string  SenderID = 1;//(本次传输的)发送方.
+    string  RecverID = 2;//(本次传输的)接收方.(空,表示发送到根节点)
+    string  SendUID  = 3;//(TtSender+TtSeqNo)唯一标识一个消息.
+    int64   SendNo   = 4;//(TtSender+TtSeqNo)唯一标识一个消息.
     MsgType AckType  = 5;//预留字段.
     bytes   AckData  = 6;//预留字段.
-    int32   ErrNo    = 7;//中途发现无法到达对方,然后收到不可达的回复.
+    int32   ErrNo    = 7;//(成功),(中途发现无法到达对方,然后收到不可达的回复),(重复发送).
     string  ErrMsg   = 8;//对ErrNo的解释.
 }
 
-//(UserID+SeqNo)唯一指定一条消息.(SeqNo=0)表示这条消息不存数据库.(0<=SeqNo)
-//(RequestID)是临时维护的递增值,-1:背景续传,0:上报模式,正:请求响应.
-//模式1:上报模式,扔出去就不管了,此时RequestID=0和SeqNo=0
-//模式2:请求响应模式,RequestID>0和SeqNo=0
-//模式3:请求响应且安全,RequestID>0和SeqNo>0
-//背景续传:RequestID=-1且SeqNo>0
 message CommonReq {
     string                    SenderID    =  1;//消息的发送者.
-    string                    CacherID    =  2;//消息的缓存者.(sender发送消息到cacher,cacher发送消息到recver)
-    string                    RecverID    =  3;//消息的接收者.
-    bool                      CrossServer =  4;
-    int64                     RequestID   =  5;//(正:超时等待,要回响应);(零:不等待,不用回复响应);(负:背景上报,要回响应)
-    int64                     SeqNo       =  6;//(正:缓存数据,发不过去要重试)(零:未缓存数据,发不过去就算了)(负:绝无可能)
-    MsgType                   ReqType     =  7;
-    bytes                     ReqData     =  8;
-    google.protobuf.Timestamp ReqTime     =  9;
-    int64                     RefNum      = 10;
+    string                    RecverID    =  2;//消息的接收者.
+    int64                     RequestID   =  4;//为0表示不需要回应这个消息(不需要发送CommonRsp消息).
+    bool                      CrossServer =  3;
+    MsgType                   ReqType     =  5;
+    bytes                     ReqData     =  6;
+    google.protobuf.Timestamp ReqTime     =  7;//预留字段.
+    int64                     RefNum      =  8;//预留字段.
 }
 
 //(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
 message CommonRsp {
     string                    SenderID    =  1;
-    string                    CacherID    =  2;
-    string                    RecverID    =  3;
-    bool                      CrossServer =  4;
-    int64                     RequestID   =  5;
-    int64                     SeqNo       =  6;
-    MsgType                   RspType     =  7;
-    bytes                     RspData     =  8;
-    google.protobuf.Timestamp RspTime     =  9;
-    int64                     RefNum      = 10;
-    bool                      FromRecver  = 11;//响应消息是远端发过来的,不是(发送到中间端,因为断线导致路途不通,然后中间端发过来的消息).该消息已被远端处理,本端不用重传了.
-    int32                     State       = 12;//在(1请求N响应)的情况下,最后一个响应的结束标志(目前把int当bool用).
-    int32                     ErrNo       = 13;
-    string                    ErrMsg      = 14;//对ErrNo的解释.
+    string                    RecverID    =  2;
+    int64                     RequestID   =  4;
+    bool                      CrossServer =  3;
+    MsgType                   RspType     =  5;
+    bytes                     RspData     =  6;
+    google.protobuf.Timestamp RspTime     =  7;//预留字段.
+    int64                     RefNum      =  8;//预留字段.
+    bool                      IsLast      =  9;//最后一条响应的标志.
+    int32                     ErrNo       = 10;
+    string                    ErrMsg      = 11;//对ErrNo的解释.
+    int32                     State       = 12;//预留字段(可以标识出来:刚发送到对端就立即返回一个接收成功的标识,响应的顺序号,最后一个响应的标识[同IsLast的含义],等)
 }
 
 message ConnectionInfo {
@@ -99,14 +101,13 @@ message ConnectionInfo {
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    bool      IsRoot    = 1;//是根节点.
-    string    UserID    = 2;//由它的直属父亲检查数据合法性,检查通过之后,中转节点不再检查.
-    string    BelongID  = 4;
-    string    Version   = 5;//版本号
-    LinkType  LinkMode  = 6;//连接方向
-    int32     ExePid    = 7;//进程ID
-    string    ExePath   = 8;//程序路径
-    string    Remark    = 9;//备注
+    string    UserID    = 1;//为空表示ROOT节点.
+    string    BelongID  = 2;//为空表示ROOT节点.
+    string    Version   = 3;//版本号
+    LinkType  LinkMode  = 4;//连接方向
+    int32     ExePid    = 5;//进程ID
+    string    ExePath   = 6;//程序路径
+    string    Remark    = 7;//备注
 }
 
 message ConnectReq {
@@ -143,24 +144,46 @@ message OnlineNotice {
     bool RootIsOnline = 1;
 }
 
-//我想拿到(直属于我的那个)父亲的(缓存)数据的请求.
-message ParentDataReq {
-    int64                     RequestID = 1;
-    google.protobuf.Timestamp ReqTime   = 2;
+message CommonErrMsg {
+    string    UserID        = 1;//发现错误的用户.
+    repeated string Pathway = 2;//消息的传送路径.(预留字段)
+    string    Message       = 3;
 }
 
-//我想拿到(直属于我的那个)父亲的(缓存)数据的响应.
-message ParentDataRsp {
-    int64                     RequestID = 1;
-    google.protobuf.Timestamp ReqTime   = 2;
-    google.protobuf.Timestamp RspTime   = 3;
-    repeated ConnectReq       Data      = 4;
+//从ROOT查询记录的请求.
+message QueryRecordReq {
+    string         UserID = 1;//要查询的用户.
+    int64          SeqNo  = 2;//要查询的编号.
+}
+
+//从ROOT查询记录的响应.
+message QueryRecordRsp {
+    string         UserID = 1;
+    int64          SeqNo  = 2;
+    repeated bytes Data   = 3;//可以用slice2msg解析.
+}
+
+//执行命令的请求.
+message ExecCmdReq {
+    string Cmd      = 1;
+}
+
+//执行命令的响应.
+message ExecCmdRsp {
+    string Reply    = 1;
+    int32  ReplyIdx = 2;
+    bool   IsLast   = 3;
 }
 
 message EchoItem {
     string LocalID  = 1;
     string RemoteID = 2;
     string Data     = 3;
+}
+
+message ReportDataItem {
+    string Topic = 1;//Data的主题.
+    string Data  = 2;
 }
 
 //发送邮件的项
@@ -173,26 +196,3 @@ message SendMailItem {
     string ContentType = 6;
     string Content     = 7;
 }
-
-message ReportDataItem {
-    string Topic = 1;//Data的主题.
-    string Data  = 2;
-}
-
-message CommonErrMsg {
-    string    UserID        = 1;//发现错误的用户.
-    repeated string Pathway = 2;//消息的传送路径.(预留字段)
-    string    Message       = 3;
-}
-
-message QueryRecordReq {
-    string UserID = 1;
-    int64  SeqNo  = 2;
-}
-
-message QueryRecordRsp {
-    string         UserID = 1;
-    int64          SeqNo  = 2;
-    repeated bytes Data   = 3;//可以用slice2msg解析.
-}
-

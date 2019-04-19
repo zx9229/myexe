@@ -6,6 +6,9 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
+	"sync/atomic"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/zx9229/myexe/txdata"
@@ -28,7 +31,11 @@ type businessNode struct {
 	rootOnline bool
 	cacheUser  *safeConnInfoMap
 	cacheSock  *safeWsSocketMap
-	//cachePsh   *safeDataPshCache
+	cachePsh   *safeDataPshCache
+	cacheExec  *safeDataPshCache
+	a2sPsh     *safeNodeReqRspCache //async2sync
+	a2sReqRsp  *safeNodeReqRspCache //async2sync
+	ownSeqNo   int64
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -53,11 +60,16 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheUser = newSafeConnInfoMap()
-	//curData.cachePsh = newSafeDataPshCache(curData.ownInfo.UserID == EMPTYSTR)
+	curData.cachePsh = newSafeDataPshCache(curData.ownInfo.UserID == EMPTYSTR)
+	curData.cacheExec = newSafeDataPshCache(true)
+	curData.a2sPsh = newSafeNodeReqRspCache()
+	curData.a2sReqRsp = newSafeNodeReqRspCache()
 	//
 	if curData.ownInfo.UserID == EMPTYSTR {
 		curData.setRootOnline(true)
 	}
+	//
+	curData.refreshSeqNo()
 	//
 	return curData
 }
@@ -124,7 +136,7 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 
 func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
 	if sock != nil {
-		sock.Send(msg2slice(data))
+		sock.Send(msg2package(data))
 	}
 }
 
@@ -133,7 +145,7 @@ func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, is
 	if sock == nil && isParentSock {
 		return errors.New("parent is offline")
 	}
-	return sock.Send(msg2slice(data))
+	return sock.Send(msg2package(data))
 }
 
 func (thls *businessNode) setRootOnline(newValue bool) {
@@ -152,7 +164,7 @@ func (thls *businessNode) reportCommonErrMsg(message string) {
 }
 
 func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msgType int) {
-	txMsgType, txMsgData, err := slice2msg(msgData)
+	txMsgType, txMsgData, err := package2msg(msgData)
 	if err != nil {
 		glog.Errorln(txMsgType, txMsgData, err)
 		return
@@ -167,6 +179,8 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
 	case txdata.MsgType_ID_OnlineNotice:
 		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
+	case txdata.MsgType_ID_CommonErrMsg:
+		thls.handle_MsgType_ID_CommonErrMsg(txMsgData.(*txdata.CommonErrMsg), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
@@ -373,7 +387,38 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 	thls.setRootOnline(msgData.RootIsOnline)
 }
 
-/*
+func (thls *businessNode) handle_MsgType_ID_CommonErrMsg(msgData *txdata.CommonErrMsg, msgConn *wsnet.WsSocket) {
+	if msgConn == thls.parentInfo.conn {
+		glog.Errorf("handle_MsgType_ID_CommonErrMsg, CommonErrMsg from parent, msgConn=%p", msgConn)
+		return
+	}
+	if thls.ownInfo.UserID != EMPTYSTR {
+		thls.sendData(thls.parentInfo.conn, msgData)
+	} else {
+		glog.Infoln("handle_MsgType_ID_CommonErrMsg", msgData)
+	}
+}
+
+func (thls *businessNode) refreshSeqNo() {
+	//9223372036854775807(int64.max)
+	//91231              |
+	//yMMddHHmmSS        |
+	//60102150405     |  |
+	//           86400000
+	//可以每隔(1天)重新获取该值.
+	//服务端如果遇到冲突的情况,应当立即报警(发邮件等)
+	//10年之内将当前表的数据迁移到历史表.
+	//                           20060102150405      86400
+	str4int64 := time.Now().Format("60102150405") + "00000000"
+	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
+	assert4true(err == nil)
+	atomic.SwapInt64(&thls.ownSeqNo, val4int64)
+}
+
+func (thls *businessNode) increaseSeqNo() int64 {
+	return atomic.AddInt64(&thls.ownSeqNo, 1)
+}
+
 func (thls *businessNode) handle_MsgType_ID_DataPsh(msgData *txdata.DataPsh, msgConn *wsnet.WsSocket) {
 	//该函数,只允许,收到数据后被回调,不允许某处主动调用它.
 	//即:只允许在onMessage里面调用该函数.
@@ -393,12 +438,12 @@ func (thls *businessNode) handle_MsgType_ID_DataPsh(msgData *txdata.DataPsh, msg
 	if msgData.RecverID == thls.ownInfo.UserID { //本次传输到达(接收者)
 		if msgData.RecvUID == thls.ownInfo.UserID { //整个传输到达(最终者)
 			//我是(接收者)和(最终者)
-			//TODO:
 			if thls.ownInfo.UserID == EMPTYSTR {
 				//TODO:
 			} else {
 				assert4true(msgData.SenderID == EMPTYSTR) //本次传输的发送者一定是ROOT.
 			}
+			thls.handle_MsgType_ID_DataPsh_Exec(msgData, msgConn) //TODO:
 		} else {
 			//我是(接收者)但不是(最终者),那么我是ROOT,此时我应当缓存和转发数据.
 			assert4true(thls.ownInfo.UserID == EMPTYSTR) //我一定是ROOT.
@@ -461,4 +506,74 @@ func (thls *businessNode) tempSendDataPsh(dataP *txdata.DataPsh) (err error) {
 	}
 	return
 }
-*/
+
+func (thls *businessNode) handle_MsgType_ID_DataPsh_Exec(msgData *txdata.DataPsh, msgConn *wsnet.WsSocket) {
+	dataA := DataPsh2DataAck(msgData)
+	thls.cacheExec.feedDataPsh(msgData, dataA)
+	thls.sendData(msgConn, dataA) //回应.
+	if dataA.ErrNo != 0 {         //只要没缓存成功,就认为没有接收到,就不处理.
+		return
+	}
+	msgObj, err := slice2msg(msgData.PshType, msgData.PshData)
+	if err != nil {
+		dstP := thls.createDataPsh4Rsp(msgData, &txdata.CommonErrMsg{Message: err.Error()})
+		tmpA := DataPsh2DataAck(dstP)
+		thls.cachePsh.feedDataPsh(dstP, tmpA)
+		assert4true(tmpA.ErrNo == 0)
+		return
+	}
+	switch msgData.PshType {
+	case txdata.MsgType_ID_EchoItem:
+		thls.tempExecute_EchoItem(msgData, msgObj.(*txdata.EchoItem))
+	default:
+	}
+}
+
+func (thls *businessNode) tempExecute_EchoItem(dataP *txdata.DataPsh, msgData *txdata.EchoItem) {
+	dataA := &txdata.DataAck{}
+	msgData.Data = msgData.Data + "(byPeer)"
+	curDst := thls.createDataPsh4Rsp(dataP, msgData)
+	thls.cachePsh.feedDataPsh(curDst, dataA)
+	assert4true(dataA.ErrNo == 0)
+	thls.tempSendDataPsh(curDst)
+}
+
+func (thls *businessNode) createDataPsh4Rsp(src *txdata.DataPsh, protoMessage ProtoMessage) (dst *txdata.DataPsh) {
+	assert4true(thls.ownInfo.UserID == src.RecverID)
+	assert4true(thls.ownInfo.UserID == src.RecvUID)
+	dst = new(txdata.DataPsh)
+	dst.SenderID = thls.ownInfo.UserID
+	if thls.ownInfo.UserID == EMPTYSTR {
+		dst.RecverID = src.SendUID
+	} else {
+		dst.RecverID = EMPTYSTR
+	}
+	dst.SendUID = src.RecvUID
+	dst.SendNo = thls.increaseSeqNo()
+	dst.RecvUID = src.SendUID
+	dst.RecvNo = src.SendNo
+	dst.PshType = CalcMessageType(protoMessage)
+	dst.PshData = msg2slice(protoMessage)
+	//dst.UpCache
+	return
+}
+
+func (thls *businessNode) xyzPshData(reqInOut *txdata.DataPsh, d time.Duration) (rspOut []*txdata.DataPsh) {
+	rspOut = make([]*txdata.DataPsh, 0)
+	if true {
+		reqInOut.SenderID = thls.ownInfo.UserID
+		reqInOut.RecverID = EMPTYSTR
+		reqInOut.SendUID = thls.ownInfo.UserID
+		reqInOut.SendNo = thls.increaseSeqNo()
+		//reqInOut.RecvUID //外部赋值.
+		reqInOut.RecvNo = 0 //reset
+		//reqInOut.PshType //外部赋值.
+		//reqInOut.PshData //外部赋值.
+		reqInOut.UpCache = false
+	}
+	tmpA := DataPsh2DataAck(reqInOut)
+	thls.cachePsh.feedDataPsh(reqInOut, tmpA)
+	if tmpA.ErrNo != 0 {
+		rspOut=append(rspOut,)
+	}
+}
