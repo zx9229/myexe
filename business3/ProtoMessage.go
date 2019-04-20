@@ -38,28 +38,41 @@ func msg2slice(msgData ProtoMessage) (dst []byte) {
 	if dst, err = proto.Marshal(msgData); err != nil {
 		glog.Fatalln(err, msgData)
 	}
+	return
+}
+
+func msg2package(msgData ProtoMessage) (dst []byte) {
+	dst = msg2slice(msgData)
 	msgType := CalcMessageIndex(msgData)
 	dst = append((*byte4type)(unsafe.Pointer(&msgType))[:2], dst...)
 	return
 }
 
-func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err error) {
+func package2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err error) {
 	// 二进制数据的前2个字节标识了后面数据的类型.
 	b4 := (*byte4type)(unsafe.Pointer(&msgType))
 	b4[0] = src[0]
 	b4[1] = src[1]
+	msgData, err = slice2msg(msgType, src[2:])
+	if err == nil {
+		assert4true(CalcMessageType(msgData) == msgType)
+	}
+	return
+}
+
+func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err error) {
 	// 需要在shell下,先创建ff函数,再执行ff函数.
 	// ff(){ sed -n '/^enum MsgType/,/}/p' "$1" | sed 's/[ \t]*\?\(ID_\)\([^ \t]\+\).*/case txdata.MsgType_\1\2: \n msgData = new(txdata.\2)/g' ; }
 	// ff  txdata.proto
 	switch msgType {
-	case txdata.MsgType_ID_DataPsh:
-		msgData = new(txdata.DataPsh)
-	case txdata.MsgType_ID_DataAck:
-		msgData = new(txdata.DataAck)
+	case txdata.MsgType_ID_MessageAck:
+		msgData = new(txdata.MessageAck)
 	case txdata.MsgType_ID_CommonReq:
 		msgData = new(txdata.CommonReq)
 	case txdata.MsgType_ID_CommonRsp:
 		msgData = new(txdata.CommonRsp)
+	case txdata.MsgType_ID_CommonErr:
+		msgData = new(txdata.CommonErr)
 	case txdata.MsgType_ID_ConnectionInfo:
 		msgData = new(txdata.ConnectionInfo)
 	case txdata.MsgType_ID_ConnectReq:
@@ -91,12 +104,10 @@ func slice2msg(src []byte) (msgType txdata.MsgType, msgData ProtoMessage, err er
 		err = fmt.Errorf("unknown txdata.MsgType(%v)", msgType)
 	}
 	if msgData != nil {
-		if err = proto.Unmarshal(src[2:], msgData); err != nil {
+		if err = proto.Unmarshal(src, msgData); err != nil {
 			msgData = nil
 			err = fmt.Errorf("Unmarshal failure(err=%v, msgType=%v)", err, msgType)
 		}
 	}
-	assert4true(CalcMessageType(msgData) == msgType)
-
 	return
 }

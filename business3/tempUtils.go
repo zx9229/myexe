@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+
+	"github.com/zx9229/myexe/txdata"
 )
 
 const (
@@ -27,4 +29,15 @@ func toConfigNode(filename string) (cfg *configNode) {
 	}
 	assert4true(err == nil)
 	return
+}
+
+func cloneUniKey(src *txdata.UniKey) *txdata.UniKey {
+	if src == nil {
+		return nil
+	}
+	return &txdata.UniKey{UserID: src.UserID, MsgNo: src.MsgNo, SeqNo: src.SeqNo}
+}
+
+func toUniSym(src *txdata.UniKey) *UniSym {
+	return &UniSym{UserID: src.UserID, MsgNo: src.MsgNo, SeqNo: src.SeqNo}
 }

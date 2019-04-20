@@ -6,8 +6,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
+	"sync/atomic"
+	"time"
 
 	"github.com/golang/glog"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
 )
@@ -23,11 +27,16 @@ type configNode struct {
 }
 
 type businessNode struct {
+	letUpCache bool //让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
 	ownInfo    txdata.ConnectionInfo
+	iAmRoot    bool //(I am root node)一经设置,不允许修改.
 	parentInfo safeFatherData
 	rootOnline bool
 	cacheUser  *safeConnInfoMap
 	cacheSock  *safeWsSocketMap
+	cacheSync  *safeSynchCache //要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
+	cacheRR    *safeNodeReqRspCache
+	ownSeqNo   int64
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -48,12 +57,18 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
 	curData.ownInfo.Remark = ""
 	//
+	curData.iAmRoot = (curData.ownInfo.UserID == EMPTYSTR)
+	//
 	curData.parentInfo.setData(nil, nil, true)
 	//
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheUser = newSafeConnInfoMap()
+	curData.cacheSync = newSafeSynchCache()
+	curData.cacheRR = newSafeNodeReqRspCache()
 	//
-	if curData.ownInfo.UserID == EMPTYSTR {
+	curData.refreshSeqNo()
+	//
+	if curData.iAmRoot {
 		curData.setRootOnline(true)
 	}
 	//
@@ -122,7 +137,7 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 
 func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
 	if sock != nil {
-		sock.Send(msg2slice(data))
+		sock.Send(msg2package(data))
 	}
 }
 
@@ -131,7 +146,35 @@ func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, is
 	if sock == nil && isParentSock {
 		return errors.New("parent is offline")
 	}
-	return sock.Send(msg2slice(data))
+	return sock.Send(msg2package(data))
+}
+
+func (thls *businessNode) sendDataEx2(data ProtoMessage, sock *wsnet.WsSocket, txToRoot bool, rID string) error {
+	if sock != nil {
+		return sock.Send(msg2package(data))
+	}
+	if txToRoot {
+		assert4false(thls.iAmRoot) //此时我一定不是ROOT,否则入参就已经填写错误了.
+		return thls.sendDataEx(thls.parentInfo.conn, data, true)
+	}
+	return thls.cacheUser.sendDataToUser(data, rID)
+}
+
+func (thls *businessNode) sendAck(key *txdata.UniKey, rID string, txToRoot bool, conn *wsnet.WsSocket) {
+	//UpCache了Req或Rsp,而发送对应的ACK,此时应发往叶子节点.
+	//ROOT缓存了数据,而发送对应的ACK,此时应发往叶子节点.
+	//Recver收到了ROOT的数据,而发送对应的ACK,此时应发往ROOT节点.
+	dataACK := &txdata.MessageAck{Key: key, SenderID: thls.ownInfo.UserID, RecverID: rID, TxToRoot: txToRoot}
+	if conn != nil {
+		thls.sendData(conn, dataACK)
+	} else {
+		if dataACK.TxToRoot {
+			assert4true(thls.ownInfo.UserID != EMPTYSTR) //我一定不能是ROOT,否则肯定传参错误了.
+			thls.sendData(thls.parentInfo.conn, dataACK)
+		} else {
+			thls.cacheUser.sendDataToUser(dataACK, dataACK.RecverID)
+		}
+	}
 }
 
 func (thls *businessNode) setRootOnline(newValue bool) {
@@ -150,7 +193,7 @@ func (thls *businessNode) reportCommonErrMsg(message string) {
 }
 
 func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msgType int) {
-	txMsgType, txMsgData, err := slice2msg(msgData)
+	txMsgType, txMsgData, err := package2msg(msgData)
 	if err != nil {
 		glog.Errorln(txMsgType, txMsgData, err)
 		return
@@ -165,6 +208,10 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
 	case txdata.MsgType_ID_OnlineNotice:
 		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
+	case txdata.MsgType_ID_CommonReq:
+		thls.handle_MsgType_ID_CommonReq(txMsgData.(*txdata.CommonReq), msgConn)
+	case txdata.MsgType_ID_CommonRsp:
+		thls.handle_MsgType_ID_CommonRsp(txMsgData.(*txdata.CommonRsp), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
@@ -369,4 +416,180 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 		return
 	}
 	thls.setRootOnline(msgData.RootIsOnline)
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
+	}
+
+	if thls.iAmRoot {
+		//TODO:留痕.
+	}
+
+	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
+		return
+	}
+
+	if msgData.UpCache || thls.iAmRoot {
+		dataAck := thls.genAck4CommonReq(msgData)
+		msgData.SenderID = thls.ownInfo.UserID
+		if thls.iAmRoot {
+			msgData.TxToRoot = !msgData.TxToRoot
+			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+		}
+		msgData.UpCache = false
+		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
+	}
+
+	if thls.iAmRoot {
+		//TODO:留痕.
+	}
+
+	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
+	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		thls.cacheRR.operateNode(toUniSym(msgData.Key), msgData, msgData.IsLast)
+		//TODO:是否需要发送Rsp的Ack?
+		//TODO:如果有续传,就删除请求的续传.
+		return
+	}
+
+	if msgData.UpCache || thls.iAmRoot {
+		dataAck := thls.genAck4CommonRsp(msgData)
+		msgData.SenderID = thls.ownInfo.UserID
+		if thls.iAmRoot {
+			msgData.TxToRoot = !msgData.TxToRoot
+			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+		}
+		msgData.UpCache = false
+		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
+func (thls *businessNode) genAck4CommonReq(dataReq *txdata.CommonReq) (dataAck *txdata.MessageAck) {
+	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
+	//(CommonReq.Key)不会被修改,所以不用clone一个副本.
+	return &txdata.MessageAck{Key: dataReq.Key, SenderID: thls.ownInfo.UserID, RecverID: dataReq.SenderID, TxToRoot: !dataReq.TxToRoot}
+}
+
+func (thls *businessNode) genAck4CommonRsp(dataRsp *txdata.CommonRsp) (dataAck *txdata.MessageAck) {
+	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
+	//(CommonRsp.Key)不会被修改,所以不用clone一个副本.
+	return &txdata.MessageAck{Key: dataRsp.Key, SenderID: thls.ownInfo.UserID, RecverID: dataRsp.SenderID, TxToRoot: !dataRsp.TxToRoot}
+}
+
+func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.CommonRsp) {
+	dataRsp = &txdata.CommonRsp{}
+	dataRsp.Key = cloneUniKey(dataReq.Key)
+	dataRsp.Key.SeqNo = seqno
+	dataRsp.SenderID = thls.ownInfo.UserID
+	dataRsp.RecverID = dataRsp.Key.UserID
+	dataRsp.TxToRoot = !dataReq.TxToRoot //TODO:好像在ROOT的时候有问题.
+	dataRsp.UpCache = false
+	dataRsp.RspType = CalcMessageType(pm)
+	dataRsp.RspData = msg2slice(pm)
+	dataRsp.RspTime, _ = ptypes.TimestampProto(time.Now())
+	dataRsp.IsLast = isLast
+	//
+	return
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
+
+	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
+	if err != nil {
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		return
+	}
+
+	switch reqData.ReqType {
+	case txdata.MsgType_ID_QueryRecordReq:
+		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
+	case txdata.MsgType_ID_ExecCmdReq:
+	case txdata.MsgType_ID_EchoItem:
+	default:
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true)
+	}
+
+	stream.doRemainder()
+}
+
+func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
+}
+
+func (thls *businessNode) refreshSeqNo() {
+	//9223372036854775807(int64.max)
+	//91231      00000000|
+	//yMMddHHmmSS        |
+	//60102150405     |  |
+	//           86400000
+	//可以每隔(1天)重新获取该值.
+	//服务端如果遇到冲突的情况,应当立即报警(发邮件等)
+	//10年之内将当前表的数据迁移到历史表.
+	//                           20060102150405      86400
+	str4int64 := time.Now().Format("60102150405") + "00000000"
+	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
+	assert4true(err == nil)
+	atomic.SwapInt64(&thls.ownSeqNo, val4int64)
+}
+
+func (thls *businessNode) increaseSeqNo() int64 {
+	return atomic.AddInt64(&thls.ownSeqNo, 1)
+}
+
+func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (slcOut []*txdata.CommonRsp) {
+	if true { //修复请求结构体的相关字段.
+		reqInOut.Key = &txdata.UniKey{UserID: thls.ownInfo.UserID, MsgNo: thls.increaseSeqNo(), SeqNo: 0}
+		reqInOut.SenderID = thls.ownInfo.UserID
+		//reqInOut.RecverID
+		reqInOut.TxToRoot = true
+		reqInOut.UpCache = false
+		//reqInOut.ReqType
+		//reqInOut.ReqData
+		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
+	}
+
+	for range FORONCE {
+		node := newNodeReqRsp()
+		node.key = *toUniSym(reqInOut.Key)
+		node.reqData = reqInOut
+		if !thls.cacheRR.insertNode(node) {
+			panic(node)
+		}
+		if d <= 0 {
+			//TODO:
+		} else {
+			if err := thls.sendDataEx(thls.parentInfo.conn, reqInOut, true); err != nil {
+				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+				thls.cacheRR.operateNode(&node.key, rspData, rspData.IsLast)
+				slcOut = node.xyz()
+				break
+			}
+			if isTimeout := node.condVar.waitFor(d); isTimeout {
+				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "timeout"}, true)
+				thls.cacheRR.operateNode(&node.key, rspData, rspData.IsLast)
+				slcOut = node.xyz()
+				break
+			}
+			slcOut = node.xyz()
+		}
+	}
+	thls.cacheRR.deleteNode(toUniSym(reqInOut.Key))
+	return
 }

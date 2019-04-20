@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"sync"
 
 	"github.com/golang/glog"
@@ -100,10 +101,24 @@ func (thls *safeConnInfoMap) sendDataToSon(data ProtoMessage) {
 	for _, val := range thls.M {
 		if len(val.Pathway) == 1 {
 			if byteSlice == nil {
-				byteSlice = msg2slice(data)
+				byteSlice = msg2package(data)
 			}
 			val.conn.Send(byteSlice)
 		}
 	}
 	thls.Unlock()
+}
+
+func (thls *safeConnInfoMap) sendDataToUser(data ProtoMessage, userID string) (err error) {
+	var isExist bool
+	var cInfoEx *connInfoEx
+
+	thls.Lock()
+	cInfoEx, isExist = thls.M[userID]
+	thls.Unlock()
+
+	if !isExist {
+		return errors.New("user if offline")
+	}
+	return cInfoEx.conn.Send(msg2package(data))
 }
