@@ -179,7 +179,7 @@ func (thls *businessNode) reportErrorMsg(message string) {
 func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msgType int) {
 	txMsgType, txMsgData, err := package2msg(msgData)
 	if err != nil {
-		glog.Errorln(txMsgType, txMsgData, err)
+		glog.Errorln("onMessage", txMsgType, txMsgData, err)
 		return
 	}
 
@@ -200,9 +200,86 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
 	case txdata.MsgType_ID_OnlineNotice:
 		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
+	case txdata.MsgType_ID_SystemReport:
+		thls.handle_MsgType_ID_SystemReport(txMsgData.(*txdata.SystemReport), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
+}
+
+func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAck, msgConn *wsnet.WsSocket) {
+	if msgData.RecverID == thls.ownInfo.UserID {
+		thls.cacheSync.deleteData(msgData.Key) //TODO:
+		return
+	}
+	if thls.iAmRoot {
+		msgData.TxToRoot = !msgData.TxToRoot
+		assert4false(msgData.TxToRoot)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
+	}
+
+	if thls.iAmRoot {
+		//TODO:留痕.
+	}
+
+	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
+		return
+	}
+
+	if msgData.UpCache || thls.iAmRoot {
+		dataAck := thls.genAck4CommonReq(msgData)
+		msgData.SenderID = thls.ownInfo.UserID
+		if thls.iAmRoot {
+			msgData.TxToRoot = !msgData.TxToRoot
+			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+		}
+		msgData.UpCache = false
+		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
+	}
+
+	if thls.iAmRoot {
+		//TODO:留痕.
+	}
+
+	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
+	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
+		//TODO:是否需要发送Rsp的Ack?
+		//TODO:如果有续传,就删除请求的续传.
+		return
+	}
+
+	if msgData.UpCache || thls.iAmRoot {
+		dataAck := thls.genAck4CommonRsp(msgData)
+		msgData.SenderID = thls.ownInfo.UserID
+		if thls.iAmRoot {
+			msgData.TxToRoot = !msgData.TxToRoot
+			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+		}
+		msgData.UpCache = false
+		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 }
 
 func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
@@ -419,79 +496,16 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 	thls.setRootOnline(msgData.RootIsOnline)
 }
 
-func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAck, msgConn *wsnet.WsSocket) {
-	if msgData.RecverID == thls.ownInfo.UserID {
-		thls.cacheSync.deleteData(msgData.Key) //TODO:
+func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemReport, msgConn *wsnet.WsSocket) {
+	if msgConn == thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
+		glog.Errorf("recv SystemReport from father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
 	if thls.iAmRoot {
-		msgData.TxToRoot = !msgData.TxToRoot
-		assert4false(msgData.TxToRoot)
+		glog.Infoln(msgData)
+	} else {
+		thls.sendData(thls.parentInfo.conn, msgData)
 	}
-	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
-}
-
-func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
-	}
-
-	if thls.iAmRoot {
-		//TODO:留痕.
-	}
-
-	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
-		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
-		return
-	}
-
-	if msgData.UpCache || thls.iAmRoot {
-		dataAck := thls.genAck4CommonReq(msgData)
-		msgData.SenderID = thls.ownInfo.UserID
-		if thls.iAmRoot {
-			msgData.TxToRoot = !msgData.TxToRoot
-			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
-		}
-		msgData.UpCache = false
-		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
-		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
-		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
-	}
-	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
-}
-
-func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
-	}
-
-	if thls.iAmRoot {
-		//TODO:留痕.
-	}
-
-	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
-	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
-		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
-		//TODO:是否需要发送Rsp的Ack?
-		//TODO:如果有续传,就删除请求的续传.
-		return
-	}
-
-	if msgData.UpCache || thls.iAmRoot {
-		dataAck := thls.genAck4CommonRsp(msgData)
-		msgData.SenderID = thls.ownInfo.UserID
-		if thls.iAmRoot {
-			msgData.TxToRoot = !msgData.TxToRoot
-			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
-		}
-		msgData.UpCache = false
-		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
-		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
-		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
-	}
-	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 }
 
 func (thls *businessNode) genAck4CommonReq(dataReq *txdata.CommonReq) (dataAck *txdata.MessageAck) {
@@ -531,8 +545,8 @@ func (thls *businessNode) refreshSeqNo() {
 	//可以每隔(1天)重新获取该值.
 	//服务端如果遇到冲突的情况,应当立即报警(发邮件等)
 	//10年之内将当前表的数据迁移到历史表.
-	//                           20060102150405      86400
-	str4int64 := time.Now().Format("60102150405") + "00000000"
+	//                              20060102150405          86400
+	str4int64 := time.Now().Format("20060102150405")[3:] + "00000000"
 	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
 	assert4true(err == nil)
 	atomic.SwapInt64(&thls.ownSeqNo, val4int64)
@@ -540,39 +554,6 @@ func (thls *businessNode) refreshSeqNo() {
 
 func (thls *businessNode) increaseSeqNo() int64 {
 	return atomic.AddInt64(&thls.ownSeqNo, 1)
-}
-
-func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
-	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
-
-	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
-	if err != nil {
-		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
-		return
-	}
-
-	switch reqData.ReqType {
-	case txdata.MsgType_ID_EchoItem:
-		thls.execute_MsgType_ID_EchoItem(objData.(*txdata.EchoItem), stream)
-	case txdata.MsgType_ID_QueryRecordReq:
-		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
-	case txdata.MsgType_ID_ExecCmdReq:
-	default:
-		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true)
-	}
-
-	stream.doRemainder()
-}
-
-func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *CommonRspWrapper) {
-	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
-	data.Data = reqData.Data + "_rsp_1"
-	stream.sendData(data, false)
-	data.Data = reqData.Data + "_rsp_2"
-	stream.sendData(data, true)
-}
-
-func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
 }
 
 func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (slcOut []*txdata.CommonRsp) {
@@ -614,4 +595,37 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 	}
 	thls.cacheRR.deleteNode(toUniSym(reqInOut.Key))
 	return
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
+
+	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
+	if err != nil {
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		return
+	}
+
+	switch reqData.ReqType {
+	case txdata.MsgType_ID_EchoItem:
+		thls.execute_MsgType_ID_EchoItem(objData.(*txdata.EchoItem), stream)
+	case txdata.MsgType_ID_QueryRecordReq:
+		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
+	case txdata.MsgType_ID_ExecCmdReq:
+	default:
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true)
+	}
+
+	stream.doRemainder()
+}
+
+func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *CommonRspWrapper) {
+	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
+	data.Data = reqData.Data + "_rsp_1"
+	stream.sendData(data, false)
+	data.Data = reqData.Data + "_rsp_2"
+	stream.sendData(data, true)
+}
+
+func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
 }

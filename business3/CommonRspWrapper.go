@@ -75,12 +75,3 @@ func (thls *CommonRspWrapper) sendData(data ProtoMessage, isLast bool) bool {
 	}
 	return thls.sendDataWithoutLock(data, isLast)
 }
-
-func xxxxxx(stream *CommonRspWrapper) {
-	//处理
-	stream.sendData(nil, false)
-	//处理
-	stream.sendData(nil, false)
-	//处理
-	stream.sendData(nil, true)
-}
