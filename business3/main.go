@@ -119,7 +119,7 @@ func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request,
 		if true {
 			reqData, secTimeout = Obj2Msg(obj)
 		}
-		sliceRsp := node.syncExecuteCommonReqRsp(reqData, time.Duration(secTimeout)*time.Second)
+		rspSlice := node.syncExecuteCommonReqRsp(reqData, time.Duration(secTimeout)*time.Second)
 
 		assert4true(ceData.ErrNo == 0)
 		assert4true(len(resultSlice) == 0)
@@ -128,10 +128,10 @@ func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request,
 			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
 			resultSlice = append(resultSlice, resultNode)
 		}
-		for _, itemRsp := range sliceRsp {
-			if resultNode.Data, err = slice2msg(itemRsp.RspType, itemRsp.RspData); err != nil {
+		for _, rspItem := range rspSlice {
+			if resultNode.Data, err = slice2msg(rspItem.RspType, rspItem.RspData); err != nil {
 				assert4true(ceData.ErrNo == 0)
-				ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", itemRsp.RspType)
+				ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", rspItem.RspType)
 				resultNode.Data = &ceData
 			}
 			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
@@ -156,12 +156,16 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 	curObj := new(struct {
 		txdata.EchoItem
 		Recver  string
+		Mode    int
+		IsLog   bool
 		Timeout int
 	})
 	obj2msg := func(obj interface{}) (req *txdata.CommonReq, sec int) {
 		theObj := obj.(*struct {
 			txdata.EchoItem
 			Recver  string
+			Mode    int
+			IsLog   bool
 			Timeout int
 		})
 		var err error
@@ -176,6 +180,8 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 			glog.Fatalln(err, obj)
 		}
 		//req.ReqTime
+		req.IsLog = theObj.IsLog
+		req.IsPush, req.IsSafe = int2mode(theObj.Mode)
 		sec = theObj.Timeout
 		return
 	}

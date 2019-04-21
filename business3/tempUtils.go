@@ -41,3 +41,13 @@ func cloneUniKey(src *txdata.UniKey) *txdata.UniKey {
 func toUniSym(src *txdata.UniKey) *UniSym {
 	return &UniSym{UserID: src.UserID, MsgNo: src.MsgNo, SeqNo: src.SeqNo}
 }
+
+func int2mode(src int) (isPush bool, isSafe bool) {
+	//0 不推送,不安全
+	//1 不推送,要安全
+	//2 要推送,不安全
+	//3 要推送,要安全
+	isSafe = ((src & 1) == 1)
+	isPush = (((src >> 1) & 1) == 1)
+	return
+}

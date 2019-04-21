@@ -576,7 +576,7 @@ func (thls *businessNode) reportErrorMsg(message string) {
 	thls.sendData(thls.parentInfo.conn, &tmpTxData)
 }
 
-func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (slcOut []*txdata.CommonRsp) {
+func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (rspSlice []*txdata.CommonRsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.Key = &txdata.UniKey{UserID: thls.ownInfo.UserID, MsgNo: thls.increaseSeqNo(), SeqNo: 0}
 		reqInOut.SenderID = thls.ownInfo.UserID
@@ -588,35 +588,53 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
 	}
 
-	for range FORONCE {
-		node := newNodeReqRsp()
-		node.key = *toUniSym(reqInOut.Key)
-		node.reqData = reqInOut
-		if !thls.cacheRR.insertNode(node) {
-			panic(node)
-		}
-
-		assert4true(thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut))
-
-		if d <= 0 {
-			//TODO:
-		} else {
-			if err := thls.sendDataEx(thls.parentInfo.conn, reqInOut, true); err != nil {
-				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
-				thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
-				slcOut = node.xyz()
-				break
-			}
-			if isTimeout := node.condVar.waitFor(d); isTimeout {
-				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "timeout"}, true)
-				thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
-				slcOut = node.xyz()
-				break
-			}
-			slcOut = node.xyz()
+	if reqInOut.IsSafe {
+		if !thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut) {
+			panic(reqInOut) //TODO:
 		}
 	}
-	thls.cacheRR.deleteNode(toUniSym(reqInOut.Key))
+
+	node := newNodeReqRsp()
+	node.key.fromUniKey(reqInOut.Key)
+	node.reqData = reqInOut
+	if !thls.cacheRR.insertNode(node) {
+		panic(node) //TODO:
+	}
+
+	var rspData *txdata.CommonRsp
+	var err error
+	for range FORONCE {
+		err = thls.sendDataEx(thls.parentInfo.conn, reqInOut, true)
+		//如果推送,等待字段无效,直接返回(等待字段没有意义).
+		//如果推送,等待字段有效,直接返回(等待字段没有意义).
+		//如果应答,等待字段无效,直接返回.
+		//如果应答,等待字段有效,视发送结果而定.
+		if reqInOut.IsPush || (d <= 0) {
+			if err != nil {
+				rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			} else {
+				rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
+			}
+			break
+		}
+		//如果应答,等待字段有效(0<d),如果安全执行( IsSafe),本次发送成功了,需要等待.
+		//如果应答,等待字段有效(0<d),如果安全执行( IsSafe),本次发送失败了,需要等待(等待期间可能续传成功).
+		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送成功了,需要等待.
+		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送失败了,直接返回.
+		if !reqInOut.IsSafe && (err != nil) {
+			rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			break
+		}
+		if isTimeout := node.condVar.waitFor(d); isTimeout {
+			rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
+			break
+		}
+	}
+	if rspData != nil {
+		thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
+	}
+	rspSlice = node.xyz()
+	//thls.cacheRR.deleteNode(&node.key)
 	return
 }
 
