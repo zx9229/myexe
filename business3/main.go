@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -25,17 +26,14 @@ func main() {
 	cs.CbReceive = globalNode.onMessage
 	cs.Init(cfgNode.ClientURL, cfgNode.ServerURL)
 
-	nodeCache := func(w http.ResponseWriter, r *http.Request) {
-		jsonContent := calcNodeCache(globalNode)
-		fmt.Fprintf(w, jsonContent)
-	}
-
-	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cache", nodeCache)
+	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cache", func(w http.ResponseWriter, r *http.Request) { handleNodeCache(globalNode, w, r) })
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) { handleEchoItem(globalNode, w, r) })
 	cs.Run()
 }
 
-func calcNodeCache(node *businessNode) (jsonContent string) {
+func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request) {
+	var jsonContent string
+	//////////////////////////////////////////////////////////////////////////
 	tmpObj := new(struct {
 		OwnInfo    *txdata.ConnectionInfo
 		ParentInfo *safeFatherData
@@ -61,8 +59,31 @@ func calcNodeCache(node *businessNode) (jsonContent string) {
 	} else {
 		jsonContent = string(byteSlice)
 	}
+	//////////////////////////////////////////////////////////////////////////
+	const templateContent = `
+<html>
+<head>
+<title>{{.MyTitle}}</title>
+</head>
+<body>
+<p id="content">{{.MyContent}}</p>
+</body>
+<script type="text/javascript">
+  var text = document.getElementById('content').innerText;//获取字符串.
+  var obje = JSON.stringify(JSON.parse(text), null, 2);//将json字符串转换成json对象.
+  document.getElementById('content').innerText = obje;
+</script>
+</html>
+`
+	pageVariables := struct {
+		MyTitle   string
+		MyContent string
+	}{MyTitle: "nodeCache", MyContent: jsonContent}
 
-	return
+	t := template.Must(template.New("name").Parse(templateContent)) //不理解[template.New("name")]的意义.
+	if err := t.Execute(w, pageVariables); err != nil {
+		glog.Fatalln(err)
+	}
 }
 
 func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonReq, int)) {

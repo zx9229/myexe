@@ -58,7 +58,7 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 	curRspData.IsLast = thls.isLast
 
 	if thls.cache != nil {
-		isOk := thls.cache.insertData(curRspData.Key, &curRspData)
+		isOk := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
 		assert4true(isOk)
 	}
 	thls.conn.Send(msg2package(&curRspData))

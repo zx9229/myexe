@@ -37,6 +37,7 @@ type businessNode struct {
 	cacheSync  *safeSynchCache //要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
 	cacheRR    *safeNodeReqRspCache
 	ownSeqNo   int64
+	chanSync   chan string
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -73,6 +74,9 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	if curData.iAmRoot {
 		curData.setRootOnline(true)
 	}
+	//
+	curData.chanSync = make(chan string, 256)
+	go curData.backgroundWork()
 	//
 	return curData
 }
@@ -228,7 +232,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 		}
 		msgData.UpCache = false
 		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
 		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
 		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 	}
@@ -261,7 +265,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 		}
 		msgData.UpCache = false
 		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData) //缓存.
+		thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
 		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
 		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 	}
@@ -397,6 +401,8 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forSon(msgData *t
 		thls.sendData(msgConn, &txdata.OnlineNotice{RootIsOnline: true})
 	}
 
+	thls.feedToChan(curData.Info.UserID)
+
 	sendToParent = true
 	return
 }
@@ -461,6 +467,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepMulti(msgData *txdata
 		sendToParent = false
 	} else {
 		sendToParent = true
+		thls.feedToChan(curData.Info.UserID)
 	}
 
 	return
@@ -480,6 +487,10 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 		return
 	}
 	thls.setRootOnline(msgData.RootIsOnline)
+
+	if thls.rootOnline {
+		thls.feedToChan("")
+	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemReport, msgConn *wsnet.WsSocket) {
@@ -628,4 +639,38 @@ func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, 
 }
 
 func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
+}
+
+func (thls *businessNode) backgroundWork() {
+	var userID string
+	var isOk bool
+	var cie *connInfoEx
+	var nodeSlice []*node4sync
+	var nodeItem *node4sync
+	for {
+		if userID, isOk = <-thls.chanSync; isOk {
+			if userID == EMPTYSTR {
+				if nodeSlice = thls.cacheSync.queryDataByTxToRoot(true); nodeSlice != nil {
+					for _, nodeItem = range nodeSlice {
+						thls.sendData(thls.parentInfo.conn, nodeItem.data)
+					}
+				}
+			} else {
+				if cie, isOk = thls.cacheUser.queryData(userID); isOk {
+					if nodeSlice = thls.cacheSync.queryData(false, userID); nodeSlice != nil {
+						for _, nodeItem = range nodeSlice {
+							thls.sendData(cie.conn, nodeItem.data)
+						}
+					}
+				}
+			}
+		} else {
+			glog.Warningf("the channel may be closed")
+			break
+		}
+	}
+}
+
+func (thls *businessNode) feedToChan(userID string) {
+	thls.chanSync <- userID
 }
