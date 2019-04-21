@@ -198,6 +198,10 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 }
 
 func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAck, msgConn *wsnet.WsSocket) {
+	if msgData.IsLog {
+		glog.Infof("handle_MsgType_ID_MessageAck, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+
 	if msgData.RecverID == thls.ownInfo.UserID {
 		thls.cacheSync.deleteData(msgData.Key) //TODO:
 		return
@@ -210,6 +214,10 @@ func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAc
 }
 
 func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	if msgData.IsLog {
+		glog.Infof("handle_MsgType_ID_CommonReq, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
 	}
@@ -223,23 +231,37 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 		return
 	}
 
-	if msgData.UpCache || thls.iAmRoot {
-		dataAck := thls.genAck4CommonReq(msgData)
-		msgData.SenderID = thls.ownInfo.UserID
-		if thls.iAmRoot {
-			msgData.TxToRoot = !msgData.TxToRoot
-			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+	if msgData.IsSafe {
+		if msgData.UpCache || thls.iAmRoot {
+			dataAck := thls.genAck4CommonReq(msgData)
+			msgData.SenderID = thls.ownInfo.UserID
+			if thls.iAmRoot {
+				msgData.TxToRoot = !msgData.TxToRoot
+				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+			}
+			msgData.UpCache = false
+			//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+			thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
+			//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 		}
-		msgData.UpCache = false
-		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
-		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
-		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 	}
-	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+
+	err := thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+
+	if !msgData.IsSafe {
+		if !msgData.IsPush {
+			tmpTxRspData := thls.genRsp4CommonReq(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+			thls.sendData(msgConn, tmpTxRspData)
+		}
+	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
+	if msgData.IsLog {
+		glog.Infof("handle_MsgType_ID_CommonRsp, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
 	}
@@ -256,19 +278,22 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 		return
 	}
 
-	if msgData.UpCache || thls.iAmRoot {
-		dataAck := thls.genAck4CommonRsp(msgData)
-		msgData.SenderID = thls.ownInfo.UserID
-		if thls.iAmRoot {
-			msgData.TxToRoot = !msgData.TxToRoot
-			assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+	if msgData.IsSafe {
+		if msgData.UpCache || thls.iAmRoot {
+			dataAck := thls.genAck4CommonRsp(msgData)
+			msgData.SenderID = thls.ownInfo.UserID
+			if thls.iAmRoot {
+				msgData.TxToRoot = !msgData.TxToRoot
+				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+			}
+			msgData.UpCache = false
+			//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
+			thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
+			//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
+			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 		}
-		msgData.UpCache = false
-		//缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
-		thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
-		//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
-		thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 	}
+
 	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 }
 
@@ -517,16 +542,20 @@ func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemR
 func (thls *businessNode) genAck4CommonReq(dataReq *txdata.CommonReq) (dataAck *txdata.MessageAck) {
 	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
 	//(CommonReq.Key)不会被修改,所以不用clone一个副本.
-	return &txdata.MessageAck{Key: dataReq.Key, SenderID: thls.ownInfo.UserID, RecverID: dataReq.SenderID, TxToRoot: !dataReq.TxToRoot}
+	assert4true(dataReq.IsSafe)
+	return &txdata.MessageAck{Key: dataReq.Key, SenderID: thls.ownInfo.UserID, RecverID: dataReq.SenderID, TxToRoot: !dataReq.TxToRoot, IsLog: dataReq.IsLog}
 }
 
 func (thls *businessNode) genAck4CommonRsp(dataRsp *txdata.CommonRsp) (dataAck *txdata.MessageAck) {
 	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
 	//(CommonRsp.Key)不会被修改,所以不用clone一个副本.
-	return &txdata.MessageAck{Key: dataRsp.Key, SenderID: thls.ownInfo.UserID, RecverID: dataRsp.SenderID, TxToRoot: !dataRsp.TxToRoot}
+	assert4true(dataRsp.IsSafe)
+	assert4false(dataRsp.IsPush)
+	return &txdata.MessageAck{Key: dataRsp.Key, SenderID: thls.ownInfo.UserID, RecverID: dataRsp.SenderID, TxToRoot: !dataRsp.TxToRoot, IsLog: dataRsp.IsLog}
 }
 
 func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.CommonRsp) {
+	assert4false(dataReq.IsPush)
 	dataRsp = &txdata.CommonRsp{}
 	dataRsp.Key = cloneUniKey(dataReq.Key)
 	dataRsp.Key.SeqNo = seqno
@@ -538,6 +567,9 @@ func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int3
 	dataRsp.RspData = msg2slice(pm)
 	dataRsp.RspTime, _ = ptypes.TimestampProto(time.Now())
 	dataRsp.IsLast = isLast
+	dataRsp.IsLog = dataReq.IsLog
+	dataRsp.IsSafe = dataReq.IsSafe
+	dataRsp.IsPush = dataReq.IsPush
 	//
 	return
 }

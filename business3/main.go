@@ -156,17 +156,17 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 	curObj := new(struct {
 		txdata.EchoItem
 		Recver  string
+		Timeout int
 		Mode    int
 		IsLog   bool
-		Timeout int
 	})
 	obj2msg := func(obj interface{}) (req *txdata.CommonReq, sec int) {
 		theObj := obj.(*struct {
 			txdata.EchoItem
 			Recver  string
+			Timeout int
 			Mode    int
 			IsLog   bool
-			Timeout int
 		})
 		var err error
 		req = &txdata.CommonReq{}

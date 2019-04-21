@@ -56,12 +56,17 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 	}
 	curRspData.RspTime, _ = ptypes.TimestampProto(time.Now())
 	curRspData.IsLast = thls.isLast
+	curRspData.IsLog = thls.reqData.IsLog
+	curRspData.IsSafe = thls.reqData.IsSafe
+	curRspData.IsPush = thls.reqData.IsPush
 
-	if thls.cache != nil {
-		isOk := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
-		assert4true(isOk)
+	if !thls.reqData.IsPush {
+		if curRspData.IsSafe {
+			isOk := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
+			assert4true(isOk)
+		}
+		thls.conn.Send(msg2package(&curRspData))
 	}
-	thls.conn.Send(msg2package(&curRspData))
 
 	return true
 }

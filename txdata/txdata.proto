@@ -36,11 +36,13 @@ message UniKey {
     int32   SeqNo  = 3;//同一消息的顺序号(Req+Rsp为同一消息,可1对n,Req为0,Rsp从1开始增加).
 }
 
+//对该消息进行确认.
 message MessageAck {
-    UniKey  Key      = 1;//对该消息进行确认.
+    UniKey  Key      = 1;
     string  SenderID = 2;//消息的发送者.
     string  RecverID = 3;//消息的接收者.
     bool    TxToRoot = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
+    bool    IsLog    = 5;//对本消息打日志.
 }
 
 //常用于CommonReq和CommonRsp的通信过程中.
@@ -58,6 +60,9 @@ message CommonReq {
     MsgType                   ReqType  = 6;
     bytes                     ReqData  = 7;
     google.protobuf.Timestamp ReqTime  = 8;//预留字段.
+    bool                      IsLog    = 9;
+    bool                      IsSafe   = 10;
+    bool                      IsPush   = 11;
 }
 
 //(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
@@ -71,6 +76,9 @@ message CommonRsp {
     bytes                     RspData  = 7;
     google.protobuf.Timestamp RspTime  = 8;//预留字段.
     bool                      IsLast   = 9;//最后一条响应的标志.
+    bool                      IsLog    = 10;
+    bool                      IsSafe   = 11;
+    bool                      IsPush   = 12;
 }
 
 message ConnectionInfo {
