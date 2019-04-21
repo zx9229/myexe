@@ -15,9 +15,9 @@ enum MsgType {
     ID_CommonRsp        =  3;
     ID_CommonErr        =  4;
     ID_ConnectionInfo   =  5;
-    ID_ConnectReq       =  6;
-    ID_ConnectRsp       =  7;
-    ID_DisconnectedData =  8;
+    ID_DisconnectedData =  6;
+    ID_ConnectReq       =  7;
+    ID_ConnectRsp       =  8;
     ID_OnlineNotice     =  9;
     ID_CommonErrMsg     = 10;
     ID_QueryRecordReq   = 11;
@@ -90,6 +90,10 @@ message ConnectionInfo {
     string    Remark    = 7;//备注
 }
 
+message DisconnectedData {
+    ConnectionInfo  Info    = 1;
+}
+
 message ConnectReq {
     ConnectionInfo  InfoReq = 1;
     repeated string Pathway = 2;//两者之间要按顺序走哪些AGENT
@@ -113,10 +117,6 @@ message ConnectRsp {
     ConnectionInfo  InfoRsp = 2;
     int32           ErrNo   = 3;
     string          ErrMsg  = 4;
-}
-
-message DisconnectedData {
-    ConnectionInfo  Info    = 1;
 }
 
 //从根节点发往叶子节点方向的通知,表达"收到通知的节点,此刻都能和root联通"

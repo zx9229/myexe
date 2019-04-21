@@ -27,9 +27,9 @@ type configNode struct {
 }
 
 type businessNode struct {
-	letUpCache bool //让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
+	letUpCache bool //(一经设置,不再修改)让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
 	ownInfo    txdata.ConnectionInfo
-	iAmRoot    bool //(I am root node)一经设置,不允许修改.
+	iAmRoot    bool //(一经设置,不再修改)(I am root node)
 	parentInfo safeFatherData
 	rootOnline bool
 	cacheUser  *safeConnInfoMap
@@ -49,6 +49,8 @@ func newBusinessNode(cfg *configNode) *businessNode {
 
 	curData := new(businessNode)
 	//
+	curData.letUpCache = false //TODO:
+	//
 	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = cfg.BelongID
 	curData.ownInfo.Version = "Version20190411"
@@ -61,8 +63,8 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	//
 	curData.parentInfo.setData(nil, nil, true)
 	//
-	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheUser = newSafeConnInfoMap()
+	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheSync = newSafeSynchCache()
 	curData.cacheRR = newSafeNodeReqRspCache()
 	//
@@ -73,6 +75,31 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	}
 	//
 	return curData
+}
+
+func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
+	if sock != nil {
+		sock.Send(msg2package(data))
+	}
+}
+
+func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, isParentSock bool) error {
+	//如果不是父代的socket那么不会出现nil的情况,此时就让它崩溃.
+	if sock == nil && isParentSock {
+		return errors.New("parent is offline")
+	}
+	return sock.Send(msg2package(data))
+}
+
+func (thls *businessNode) sendDataEx2(data ProtoMessage, sock *wsnet.WsSocket, txToRoot bool, rID string) error {
+	if sock != nil {
+		return sock.Send(msg2package(data))
+	}
+	if txToRoot {
+		assert4false(thls.iAmRoot) //此时我一定不是ROOT,否则入参就已经填写错误了.
+		return thls.sendDataEx(thls.parentInfo.conn, data, true)
+	}
+	return thls.cacheUser.sendDataToUser(data, rID)
 }
 
 func (thls *businessNode) onConnected(msgConn *wsnet.WsSocket, isAccepted bool) {
@@ -135,48 +162,6 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 	thls.cacheUser.deleteDataByConn(conn)
 }
 
-func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
-	if sock != nil {
-		sock.Send(msg2package(data))
-	}
-}
-
-func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, isParentSock bool) error {
-	//如果不是父代的socket那么不会出现nil的情况,此时就让它崩溃.
-	if sock == nil && isParentSock {
-		return errors.New("parent is offline")
-	}
-	return sock.Send(msg2package(data))
-}
-
-func (thls *businessNode) sendDataEx2(data ProtoMessage, sock *wsnet.WsSocket, txToRoot bool, rID string) error {
-	if sock != nil {
-		return sock.Send(msg2package(data))
-	}
-	if txToRoot {
-		assert4false(thls.iAmRoot) //此时我一定不是ROOT,否则入参就已经填写错误了.
-		return thls.sendDataEx(thls.parentInfo.conn, data, true)
-	}
-	return thls.cacheUser.sendDataToUser(data, rID)
-}
-
-func (thls *businessNode) sendAck(key *txdata.UniKey, rID string, txToRoot bool, conn *wsnet.WsSocket) {
-	//UpCache了Req或Rsp,而发送对应的ACK,此时应发往叶子节点.
-	//ROOT缓存了数据,而发送对应的ACK,此时应发往叶子节点.
-	//Recver收到了ROOT的数据,而发送对应的ACK,此时应发往ROOT节点.
-	dataACK := &txdata.MessageAck{Key: key, SenderID: thls.ownInfo.UserID, RecverID: rID, TxToRoot: txToRoot}
-	if conn != nil {
-		thls.sendData(conn, dataACK)
-	} else {
-		if dataACK.TxToRoot {
-			assert4true(thls.ownInfo.UserID != EMPTYSTR) //我一定不能是ROOT,否则肯定传参错误了.
-			thls.sendData(thls.parentInfo.conn, dataACK)
-		} else {
-			thls.cacheUser.sendDataToUser(dataACK, dataACK.RecverID)
-		}
-	}
-}
-
 func (thls *businessNode) setRootOnline(newValue bool) {
 	oldValue := thls.rootOnline
 	if oldValue == newValue { //我的目标是:消息无冗余无重复,很显然这里消息重复了.
@@ -202,21 +187,36 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 	//glog.Infof("onMessage, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 
 	switch txMsgType {
-	case txdata.MsgType_ID_ConnectReq:
-		thls.handle_MsgType_ID_ConnectReq(txMsgData.(*txdata.ConnectReq), msgConn)
-	case txdata.MsgType_ID_ConnectRsp:
-		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
-	case txdata.MsgType_ID_OnlineNotice:
-		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
 	case txdata.MsgType_ID_MessageAck:
 		thls.handle_MsgType_ID_MessageAck(txMsgData.(*txdata.MessageAck), msgConn)
 	case txdata.MsgType_ID_CommonReq:
 		thls.handle_MsgType_ID_CommonReq(txMsgData.(*txdata.CommonReq), msgConn)
 	case txdata.MsgType_ID_CommonRsp:
 		thls.handle_MsgType_ID_CommonRsp(txMsgData.(*txdata.CommonRsp), msgConn)
+	case txdata.MsgType_ID_DisconnectedData:
+		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
+	case txdata.MsgType_ID_ConnectReq:
+		thls.handle_MsgType_ID_ConnectReq(txMsgData.(*txdata.ConnectReq), msgConn)
+	case txdata.MsgType_ID_ConnectRsp:
+		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
+	case txdata.MsgType_ID_OnlineNotice:
+		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
+}
+
+func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
+	if msgConn == thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
+		glog.Errorf("recv DisconnectedData from father, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+	if !thls.cacheUser.deleteData(msgData.Info.UserID) {
+		//极端情况下,可能会出现:儿子和孙子连接好了,儿子和父亲连接起来了,儿子即将和父亲同步连接信息的时候,儿子和孙子连接断开了,
+		//儿子向父亲发送DisconnectedData,父亲接收了DisconnectedData,父亲无法清理缓存.
+		glog.Errorf("cache cleanup failed, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+	thls.sendData(thls.parentInfo.conn, msgData)
 }
 
 func (thls *businessNode) handle_MsgType_ID_ConnectReq(msgData *txdata.ConnectReq, msgConn *wsnet.WsSocket) {
@@ -523,30 +523,6 @@ func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int3
 	return
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
-	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
-
-	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
-	if err != nil {
-		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
-		return
-	}
-
-	switch reqData.ReqType {
-	case txdata.MsgType_ID_QueryRecordReq:
-		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
-	case txdata.MsgType_ID_ExecCmdReq:
-	case txdata.MsgType_ID_EchoItem:
-	default:
-		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true)
-	}
-
-	stream.doRemainder()
-}
-
-func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
-}
-
 func (thls *businessNode) refreshSeqNo() {
 	//9223372036854775807(int64.max)
 	//91231      00000000|
@@ -565,6 +541,39 @@ func (thls *businessNode) refreshSeqNo() {
 
 func (thls *businessNode) increaseSeqNo() int64 {
 	return atomic.AddInt64(&thls.ownSeqNo, 1)
+}
+
+func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
+
+	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
+	if err != nil {
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		return
+	}
+
+	switch reqData.ReqType {
+	case txdata.MsgType_ID_EchoItem:
+		thls.execute_MsgType_ID_EchoItem(objData.(*txdata.EchoItem), stream)
+	case txdata.MsgType_ID_QueryRecordReq:
+		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
+	case txdata.MsgType_ID_ExecCmdReq:
+	default:
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true)
+	}
+
+	stream.doRemainder()
+}
+
+func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *CommonRspWrapper) {
+	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
+	data.Data = reqData.Data + "_rsp_1"
+	stream.sendData(data, false)
+	data.Data = reqData.Data + "_rsp_2"
+	stream.sendData(data, true)
+}
+
+func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
 }
 
 func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (slcOut []*txdata.CommonRsp) {
