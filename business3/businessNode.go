@@ -443,6 +443,15 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forParent(msgData
 		thls.sendData(msgConn, &tmpTxData)
 	}
 
+	if true { //和父亲建立连接了,要把自己的缓存发送给父亲,更新父亲的缓存.
+		thls.cacheUser.Lock()
+		for _, cInfoEx := range thls.cacheUser.M {
+			tmpTxData := txdata.ConnectReq{InfoReq: &cInfoEx.Info, Pathway: append(cInfoEx.Pathway, thls.ownInfo.UserID)}
+			thls.sendData(msgConn, &tmpTxData)
+		}
+		thls.cacheUser.Unlock()
+	}
+
 	return
 }
 
