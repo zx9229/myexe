@@ -208,6 +208,8 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_ConnectRsp(txMsgData.(*txdata.ConnectRsp), msgConn)
 	case txdata.MsgType_ID_OnlineNotice:
 		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
+	case txdata.MsgType_ID_MessageAck:
+		thls.handle_MsgType_ID_MessageAck(txMsgData.(*txdata.MessageAck), msgConn)
 	case txdata.MsgType_ID_CommonReq:
 		thls.handle_MsgType_ID_CommonReq(txMsgData.(*txdata.CommonReq), msgConn)
 	case txdata.MsgType_ID_CommonRsp:
@@ -418,6 +420,18 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 	thls.setRootOnline(msgData.RootIsOnline)
 }
 
+func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAck, msgConn *wsnet.WsSocket) {
+	if msgData.RecverID == thls.ownInfo.UserID {
+		thls.cacheSync.deleteData(msgData.Key) //TODO:
+		return
+	}
+	if thls.iAmRoot {
+		msgData.TxToRoot = !msgData.TxToRoot
+		assert4false(msgData.TxToRoot)
+	}
+	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
 func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
@@ -459,7 +473,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 
 	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
 	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
-		thls.cacheRR.operateNode(toUniSym(msgData.Key), msgData, msgData.IsLast)
+		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
 		//TODO:是否需要发送Rsp的Ack?
 		//TODO:如果有续传,就删除请求的续传.
 		return
@@ -577,13 +591,13 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		} else {
 			if err := thls.sendDataEx(thls.parentInfo.conn, reqInOut, true); err != nil {
 				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
-				thls.cacheRR.operateNode(&node.key, rspData, rspData.IsLast)
+				thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
 				slcOut = node.xyz()
 				break
 			}
 			if isTimeout := node.condVar.waitFor(d); isTimeout {
 				rspData := thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "timeout"}, true)
-				thls.cacheRR.operateNode(&node.key, rspData, rspData.IsLast)
+				thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
 				slcOut = node.xyz()
 				break
 			}

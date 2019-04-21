@@ -80,7 +80,8 @@ func (thls *safeNodeReqRspCache) queryNode(sym *UniSym) (node *nodeReqRsp, isExi
 	return
 }
 
-func (thls *safeNodeReqRspCache) operateNode(sym *UniSym, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
+func (thls *safeNodeReqRspCache) operateNode(uniKey *txdata.UniKey, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
+	sym := &UniSym{UserID: uniKey.UserID, MsgNo: uniKey.MsgNo, SeqNo: 0} //从Rsp转成Req要置SeqNo为0才行.
 	assert4true(rspData != nil)
 	var node *nodeReqRsp
 	if doNotify {

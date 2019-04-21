@@ -102,6 +102,11 @@ func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request,
 
 		assert4true(ceData.ErrNo == 0)
 		assert4true(len(resultSlice) == 0)
+		if true {
+			resultNode.Data = reqData.Key
+			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+			resultSlice = append(resultSlice, resultNode)
+		}
 		for _, itemRsp := range sliceRsp {
 			if resultNode.Data, err = slice2msg(itemRsp.RspType, itemRsp.RspData); err != nil {
 				assert4true(ceData.ErrNo == 0)
