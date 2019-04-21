@@ -54,7 +54,7 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = cfg.BelongID
 	curData.ownInfo.Version = "Version20190411"
-	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero3
+	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero2
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
 	curData.ownInfo.Remark = ""
@@ -172,7 +172,7 @@ func (thls *businessNode) setRootOnline(newValue bool) {
 }
 
 func (thls *businessNode) reportCommonErrMsg(message string) {
-	tmpTxData := txdata.CommonErrMsg{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}}
+	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}}
 	tmpTxData.Message = message
 	thls.sendData(thls.parentInfo.conn, &tmpTxData)
 }

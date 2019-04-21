@@ -67,24 +67,24 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 	switch msgType {
 	case txdata.MsgType_ID_MessageAck:
 		msgData = new(txdata.MessageAck)
+	case txdata.MsgType_ID_CommonErr:
+		msgData = new(txdata.CommonErr)
 	case txdata.MsgType_ID_CommonReq:
 		msgData = new(txdata.CommonReq)
 	case txdata.MsgType_ID_CommonRsp:
 		msgData = new(txdata.CommonRsp)
-	case txdata.MsgType_ID_CommonErr:
-		msgData = new(txdata.CommonErr)
 	case txdata.MsgType_ID_ConnectionInfo:
 		msgData = new(txdata.ConnectionInfo)
+	case txdata.MsgType_ID_DisconnectedData:
+		msgData = new(txdata.DisconnectedData)
 	case txdata.MsgType_ID_ConnectReq:
 		msgData = new(txdata.ConnectReq)
 	case txdata.MsgType_ID_ConnectRsp:
 		msgData = new(txdata.ConnectRsp)
-	case txdata.MsgType_ID_DisconnectedData:
-		msgData = new(txdata.DisconnectedData)
 	case txdata.MsgType_ID_OnlineNotice:
 		msgData = new(txdata.OnlineNotice)
-	case txdata.MsgType_ID_CommonErrMsg:
-		msgData = new(txdata.CommonErrMsg)
+	case txdata.MsgType_ID_SystemReport:
+		msgData = new(txdata.SystemReport)
 	case txdata.MsgType_ID_QueryRecordReq:
 		msgData = new(txdata.QueryRecordReq)
 	case txdata.MsgType_ID_QueryRecordRsp:

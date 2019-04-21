@@ -11,15 +11,15 @@ import public "google/protobuf/timestamp.proto";
 enum MsgType {
     Zero1               =  0;//第0个本该是UniKey.
     ID_MessageAck       =  1;
-    ID_CommonReq        =  2;
-    ID_CommonRsp        =  3;
-    ID_CommonErr        =  4;
+    ID_CommonErr        =  2;
+    ID_CommonReq        =  3;
+    ID_CommonRsp        =  4;
     ID_ConnectionInfo   =  5;
     ID_DisconnectedData =  6;
     ID_ConnectReq       =  7;
     ID_ConnectRsp       =  8;
     ID_OnlineNotice     =  9;
-    ID_CommonErrMsg     = 10;
+    ID_SystemReport     = 10;
     ID_QueryRecordReq   = 11;
     ID_QueryRecordRsp   = 12;
     ID_ExecCmdReq       = 13;
@@ -37,57 +37,55 @@ message UniKey {
 }
 
 message MessageAck {
-    UniKey  Key         = 1;//对该消息进行确认.
-    string  SenderID    = 2;//消息的发送者.
-    string  RecverID    = 3;//消息的接收者.
-    bool    TxToRoot    = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
-}
-
-message CommonReq {
-    UniKey                    Key         = 1;
-    string                    SenderID    = 2;//可能因为UpCache或ROOT而中途变化.
-    string                    RecverID    = 3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot    = 4;
-    bool                      UpCache     = 5;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   ReqType     = 6;
-    bytes                     ReqData     = 7;
-    google.protobuf.Timestamp ReqTime     = 8;//预留字段.
-}
-
-//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
-message CommonRsp {
-    UniKey                    Key         =  1;
-    string                    SenderID    =  2;//中途可能变化.
-    string                    RecverID    =  3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot    =  4;
-    bool                      UpCache     =  5;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   RspType     =  6;
-    bytes                     RspData     =  7;
-    google.protobuf.Timestamp RspTime     =  8;//预留字段.
-    bool                      IsLast      =  9;//最后一条响应的标志.
-  //int32                     ErrNo       = 10;//废弃.
-  //string                    ErrMsg      = 11;//废弃.
+    UniKey  Key      = 1;//对该消息进行确认.
+    string  SenderID = 2;//消息的发送者.
+    string  RecverID = 3;//消息的接收者.
+    bool    TxToRoot = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
 }
 
 //常用于CommonReq和CommonRsp的通信过程中.
 message CommonErr {
-    int32                     ErrNo       = 1;
-    string                    ErrMsg      = 2;
+    int32                     ErrNo    = 1;
+    string                    ErrMsg   = 2;
+}
+
+message CommonReq {
+    UniKey                    Key      = 1;
+    string                    SenderID = 2;//可能因为UpCache或ROOT而中途变化.
+    string                    RecverID = 3;//一旦赋值(发送)自始至终都不会变化.
+    bool                      TxToRoot = 4;
+    bool                      UpCache  = 5;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   ReqType  = 6;
+    bytes                     ReqData  = 7;
+    google.protobuf.Timestamp ReqTime  = 8;//预留字段.
+}
+
+//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
+message CommonRsp {
+    UniKey                    Key      = 1;
+    string                    SenderID = 2;//中途可能变化.
+    string                    RecverID = 3;//一旦赋值(发送)自始至终都不会变化.
+    bool                      TxToRoot = 4;
+    bool                      UpCache  = 5;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   RspType  = 6;
+    bytes                     RspData  = 7;
+    google.protobuf.Timestamp RspTime  = 8;//预留字段.
+    bool                      IsLast   = 9;//最后一条响应的标志.
 }
 
 message ConnectionInfo {
     enum LinkType {
-        Zero3   = 0;
+        Zero2   = 0;
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    string    UserID    = 1;//为空表示ROOT节点.
-    string    BelongID  = 2;//为空表示ROOT节点.
-    string    Version   = 3;//版本号
-    LinkType  LinkMode  = 4;//连接方向
-    int32     ExePid    = 5;//进程ID
-    string    ExePath   = 6;//程序路径
-    string    Remark    = 7;//备注
+    string    UserID   = 1;//为空表示ROOT节点.
+    string    BelongID = 2;//为空表示ROOT节点.
+    string    Version  = 3;//版本号
+    LinkType  LinkMode = 4;//连接方向
+    int32     ExePid   = 5;//进程ID
+    string    ExePath  = 6;//程序路径
+    string    Remark   = 7;//备注
 }
 
 message DisconnectedData {
@@ -113,22 +111,22 @@ ParentA
 }
 
 message ConnectRsp {
-    ConnectionInfo  InfoReq = 1;
-    ConnectionInfo  InfoRsp = 2;
-    int32           ErrNo   = 3;
-    string          ErrMsg  = 4;
+    ConnectionInfo InfoReq = 1;
+    ConnectionInfo InfoRsp = 2;
+    int32          ErrNo   = 3;
+    string         ErrMsg  = 4;
 }
 
-//从根节点发往叶子节点方向的通知,表达"收到通知的节点,此刻都能和root联通"
+//从(根节点)发往(叶子节点)方向的通知,表达"收到通知的节点,此刻都能和ROOT连通"
 message OnlineNotice {
     bool RootIsOnline = 1;
 }
 
-//TODO:待改名;系统异常情况报告.
-message CommonErrMsg {
-    string    UserID        = 1;//发现错误的用户.
-    repeated string Pathway = 2;//消息的传送路径.(预留字段)
-    string    Message       = 3;
+//发往(根节点)方向的通知/报告.
+message SystemReport {
+    string          UserID  = 1;//发送该消息的用户.
+    repeated string Pathway = 2;//消息的传送路径(预留字段)
+    string          Message = 3;
 }
 
 //从ROOT查询记录的请求.
