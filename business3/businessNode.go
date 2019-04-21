@@ -162,20 +162,6 @@ func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt 
 	thls.cacheUser.deleteDataByConn(conn)
 }
 
-func (thls *businessNode) setRootOnline(newValue bool) {
-	oldValue := thls.rootOnline
-	if oldValue == newValue { //我的目标是:消息无冗余无重复,很显然这里消息重复了.
-		glog.Errorf("setRootOnline, oldValue=%v, newValue=%v", oldValue, newValue)
-	}
-	thls.rootOnline = newValue
-	thls.cacheUser.sendDataToSon(&txdata.OnlineNotice{RootIsOnline: newValue})
-}
-
-func (thls *businessNode) reportErrorMsg(message string) {
-	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}, Message: message}
-	thls.sendData(thls.parentInfo.conn, &tmpTxData)
-}
-
 func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msgType int) {
 	txMsgType, txMsgData, err := package2msg(msgData)
 	if err != nil {
@@ -554,6 +540,20 @@ func (thls *businessNode) refreshSeqNo() {
 
 func (thls *businessNode) increaseSeqNo() int64 {
 	return atomic.AddInt64(&thls.ownSeqNo, 1)
+}
+
+func (thls *businessNode) setRootOnline(newValue bool) {
+	oldValue := thls.rootOnline
+	if oldValue == newValue { //我的目标是:消息无冗余无重复,很显然这里消息重复了.
+		glog.Errorf("setRootOnline, oldValue=%v, newValue=%v", oldValue, newValue)
+	}
+	thls.rootOnline = newValue
+	thls.cacheUser.sendDataToSon(&txdata.OnlineNotice{RootIsOnline: newValue})
+}
+
+func (thls *businessNode) reportErrorMsg(message string) {
+	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}, Message: message}
+	thls.sendData(thls.parentInfo.conn, &tmpTxData)
 }
 
 func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (slcOut []*txdata.CommonRsp) {
