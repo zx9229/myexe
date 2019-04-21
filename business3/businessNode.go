@@ -245,11 +245,21 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 			//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 		}
+	} else {
+		assert4false(msgData.UpCache)
+		if thls.iAmRoot {
+			msgData.SenderID = thls.ownInfo.UserID
+			if thls.iAmRoot {
+				msgData.TxToRoot = !msgData.TxToRoot
+				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+			}
+			msgData.UpCache = false
+		}
 	}
 
 	err := thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 
-	if !msgData.IsSafe {
+	if (err != nil) && !msgData.IsSafe {
 		if !msgData.IsPush {
 			tmpTxRspData := thls.genRsp4CommonReq(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
 			thls.sendData(msgConn, tmpTxRspData)
@@ -291,6 +301,16 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 			thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData) //缓存.
 			//插入成功了,自然成功,插入失败了,说明已经存在了,其实也是接收成功了.
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+		}
+	} else {
+		assert4false(msgData.UpCache)
+		if thls.iAmRoot {
+			msgData.SenderID = thls.ownInfo.UserID
+			if thls.iAmRoot {
+				msgData.TxToRoot = !msgData.TxToRoot
+				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
+			}
+			msgData.UpCache = false
 		}
 	}
 
