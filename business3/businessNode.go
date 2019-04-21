@@ -595,6 +595,9 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		if !thls.cacheRR.insertNode(node) {
 			panic(node)
 		}
+
+		assert4true(thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut))
+
 		if d <= 0 {
 			//TODO:
 		} else {
