@@ -171,9 +171,8 @@ func (thls *businessNode) setRootOnline(newValue bool) {
 	thls.cacheUser.sendDataToSon(&txdata.OnlineNotice{RootIsOnline: newValue})
 }
 
-func (thls *businessNode) reportCommonErrMsg(message string) {
-	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}}
-	tmpTxData.Message = message
+func (thls *businessNode) reportErrorMsg(message string) {
+	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}, Message: message}
 	thls.sendData(thls.parentInfo.conn, &tmpTxData)
 }
 
@@ -302,7 +301,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forSon(msgData *t
 		glog.Errorf("ConnectReq_stepOne_forSon, UserID conflict, msgConn=%p, msgData=%v", msgConn, msgData)
 		if true { //UserID冲突,应当立即上报该情况.
 			errMsg := fmt.Sprintf("UserID conflict, msgData=%v", msgData)
-			thls.reportCommonErrMsg(errMsg)
+			thls.reportErrorMsg(errMsg)
 		}
 		rspData.ErrNo = 1
 		rspData.ErrMsg = "req.UserID is already online"
@@ -348,7 +347,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forParent(msgData
 		glog.Errorf("ConnectReq_stepOne_forParent, UserID conflict, msgConn=%p, msgData=%v", msgConn, msgData)
 		if true { //UserID冲突,应当立即上报该情况.
 			errMsg := fmt.Sprintf("UserID conflict, msgData=%v", msgData)
-			thls.reportCommonErrMsg(errMsg)
+			thls.reportErrorMsg(errMsg)
 		}
 		rspData.ErrNo = 1
 		rspData.ErrMsg = "req.UserID is already online"
@@ -394,7 +393,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepMulti(msgData *txdata
 		thls.deleteConnectionFromAll(msgConn, true)
 		if true { //UserID冲突,应当立即上报该情况.
 			errMsg := fmt.Sprintf("UserID conflict, msgData=%v", msgData)
-			thls.reportCommonErrMsg(errMsg)
+			thls.reportErrorMsg(errMsg)
 		}
 		sendToParent = false
 	} else {
