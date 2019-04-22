@@ -253,7 +253,6 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 				msgData.TxToRoot = !msgData.TxToRoot
 				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
 			}
-			msgData.UpCache = false
 		}
 	}
 
@@ -310,7 +309,6 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 				msgData.TxToRoot = !msgData.TxToRoot
 				assert4false(msgData.TxToRoot) //此时要从ROOT往叶子节点发送.
 			}
-			msgData.UpCache = false
 		}
 	}
 
@@ -582,14 +580,14 @@ func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int3
 	dataRsp.SenderID = thls.ownInfo.UserID
 	dataRsp.RecverID = dataRsp.Key.UserID
 	dataRsp.TxToRoot = !dataReq.TxToRoot //TODO:好像在ROOT的时候有问题.
-	dataRsp.UpCache = false
+	dataRsp.IsLog = dataReq.IsLog
+	dataRsp.IsSafe = dataReq.IsSafe
+	dataRsp.IsPush = dataReq.IsPush
+	dataRsp.UpCache = thls.letUpCache && dataReq.IsSafe //只有在续传模式下,才允许设置UpCache字段.
 	dataRsp.RspType = CalcMessageType(pm)
 	dataRsp.RspData = msg2slice(pm)
 	dataRsp.RspTime, _ = ptypes.TimestampProto(time.Now())
 	dataRsp.IsLast = isLast
-	dataRsp.IsLog = dataReq.IsLog
-	dataRsp.IsSafe = dataReq.IsSafe
-	dataRsp.IsPush = dataReq.IsPush
 	//
 	return
 }
@@ -634,7 +632,10 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		reqInOut.SenderID = thls.ownInfo.UserID
 		//reqInOut.RecverID
 		reqInOut.TxToRoot = true
-		reqInOut.UpCache = false
+		//reqInOut.IsLog
+		//reqInOut.IsSafe
+		//reqInOut.IsPush
+		reqInOut.UpCache = thls.letUpCache
 		//reqInOut.ReqType
 		//reqInOut.ReqData
 		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
