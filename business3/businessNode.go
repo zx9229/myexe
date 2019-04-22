@@ -593,7 +593,6 @@ func (thls *businessNode) genAck4CommonRsp(dataRsp *txdata.CommonRsp) (dataAck *
 }
 
 func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.CommonRsp) {
-	assert4false(dataReq.IsPush)
 	dataRsp = &txdata.CommonRsp{}
 	dataRsp.Key = cloneUniKey(dataReq.Key)
 	dataRsp.Key.SeqNo = seqno
