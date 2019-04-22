@@ -52,33 +52,33 @@ message CommonErr {
 }
 
 message CommonReq {
-    UniKey                    Key      = 1;
-    string                    SenderID = 2;//可能因为UpCache或ROOT而中途变化.
-    string                    RecverID = 3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot = 4;
-    bool                      UpCache  = 5;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   ReqType  = 6;
-    bytes                     ReqData  = 7;
-    google.protobuf.Timestamp ReqTime  = 8;//预留字段.
-    bool                      IsLog    = 9;
-    bool                      IsSafe   = 10;
-    bool                      IsPush   = 11;
+    UniKey                    Key      =  1;
+    string                    SenderID =  2;//可能因为UpCache或ROOT而中途变化.
+    string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
+    bool                      TxToRoot =  4;
+    bool                      IsLog    =  5;
+    bool                      IsSafe   =  6;//续传.
+    bool                      IsPush   =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   ReqType  =  9;
+    bytes                     ReqData  = 10;
+    google.protobuf.Timestamp ReqTime  = 11;//预留字段.
 }
 
 //(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
 message CommonRsp {
-    UniKey                    Key      = 1;
-    string                    SenderID = 2;//中途可能变化.
-    string                    RecverID = 3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot = 4;
-    bool                      UpCache  = 5;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   RspType  = 6;
-    bytes                     RspData  = 7;
-    google.protobuf.Timestamp RspTime  = 8;//预留字段.
-    bool                      IsLast   = 9;//最后一条响应的标志.
-    bool                      IsLog    = 10;
-    bool                      IsSafe   = 11;
-    bool                      IsPush   = 12;
+    UniKey                    Key      =  1;
+    string                    SenderID =  2;//中途可能变化.
+    string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
+    bool                      TxToRoot =  4;
+    bool                      IsLog    =  5;
+    bool                      IsSafe   =  6;
+    bool                      IsPush   =  7;
+    bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   RspType  =  9;
+    bytes                     RspData  = 10;
+    google.protobuf.Timestamp RspTime  = 11;//预留字段.
+    bool                      IsLast   = 12;//最后一条响应的标志.
 }
 
 message ConnectionInfo {
