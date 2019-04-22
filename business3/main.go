@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -17,6 +18,10 @@ import (
 )
 
 func main() {
+	init4glog()
+	flag.Parse()
+	defer glog.Flush()
+	//////////////////////////////////////////////////////////////////////////
 	glog.Infoln(os.Args)
 	cfgNode := toConfigNode(os.Args[1])
 	globalNode := newBusinessNode(cfgNode)
@@ -29,6 +34,48 @@ func main() {
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/cache", func(w http.ResponseWriter, r *http.Request) { handleNodeCache(globalNode, w, r) })
 	cs.GetSimpleHttpServer().GetHttpServeMux().HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) { handleEchoItem(globalNode, w, r) })
 	cs.Run()
+}
+
+func init4glog() {
+	//-alsologtostderr
+	//	log to standard error as well as files
+	//	日志写入标准错误和文件.
+	//-log_backtrace_at value
+	//	when logging hits line file:N, emit a stack trace
+	//-log_dir string
+	//	If non-empty, write log files in this directory
+	//	如果非空,写日志文件到此目录,而不是默认的临时目录.
+	//-logtostderr
+	//	log to standard error instead of files
+	//	日志写入标准错误而不是文件.
+	//-stderrthreshold value    (INFO/WARNING/ERROR)
+	//	logs at or above this threshold go to stderr
+	//	达到或高于此等级的日志将写入标准错误(和文件).
+	//-v value
+	//	log level for V logs
+	//-vmodule value
+	//	comma-separated list of pattern=N settings for file-filtered logging
+	//备注:
+	//Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+	//[IWEF]警告级别的首字母(INFO/WARNING/ERROR/FATAL)
+	log2dir := new(string)
+	stderrthreshold := new(string)
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	cmdLine.StringVar(log2dir, "log_dir", "", "")
+	cmdLine.StringVar(stderrthreshold, "stderrthreshold", "", "")
+	cmdLine.Parse(os.Args[1:])
+	if *log2dir != EMPTYSTR {
+		fmt.Println("init4glog", "set", "MkdirAll", *log2dir, os.MkdirAll(*log2dir, os.ModePerm))
+		fmt.Println("init4glog", "set", "alsologtostderr")
+		flag.Set("alsologtostderr", "true")
+	} else {
+		fmt.Println("init4glog", "set", "logtostderr")
+		flag.Set("logtostderr", "true")
+	}
+	if *stderrthreshold == EMPTYSTR {
+		fmt.Println("init4glog", "set", "stderrthreshold")
+		flag.Set("stderrthreshold", "INFO")
+	}
 }
 
 func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request) {
