@@ -9,7 +9,7 @@ import public "google/protobuf/timestamp.proto";
 // Linux  : grep    "^message" txdata.proto
 // Windows: findstr "^message" txdata.proto
 enum MsgType {
-    Zero1               =  0;//第0个本该是UniKey.
+    Zero1               =  0;//第0个本该是(UniKey)
     ID_MessageAck       =  1;
     ID_CommonErr        =  2;
     ID_CommonReq        =  3;
@@ -29,14 +29,14 @@ enum MsgType {
     ID_SendMailItem     = 17;
 }
 
-//一个占位符结构体.
+//唯一标识一个消息.
 message UniKey {
     string  UserID = 1;//用户名.
     int64   MsgNo  = 2;//消息号.
     int32   SeqNo  = 3;//同一消息的顺序号(Req+Rsp为同一消息,可1对n,Req为0,Rsp从1开始增加).
 }
 
-//对该消息进行确认.
+//对某消息进行确认.
 message MessageAck {
     UniKey  Key      = 1;
     string  SenderID = 2;//消息的发送者.
@@ -45,7 +45,7 @@ message MessageAck {
     bool    IsLog    = 5;//对本消息打日志.
 }
 
-//常用于CommonReq和CommonRsp的通信过程中.
+//常用于(CommonReq)和(CommonRsp)的通信过程中.
 message CommonErr {
     int32                     ErrNo    = 1;
     string                    ErrMsg   = 2;
@@ -62,10 +62,10 @@ message CommonReq {
     bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
     MsgType                   ReqType  =  9;
     bytes                     ReqData  = 10;
-    google.protobuf.Timestamp ReqTime  = 11;//预留字段.
+    google.protobuf.Timestamp ReqTime  = 11;
 }
 
-//(FromServer==true && ErrNo!=0)的一个情况举例:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便为ErrNo赋值.
+//可能出现的情况:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便可使用(CommonErr)返回具体错误.
 message CommonRsp {
     UniKey                    Key      =  1;
     string                    SenderID =  2;//中途可能变化.
@@ -77,7 +77,7 @@ message CommonRsp {
     bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
     MsgType                   RspType  =  9;
     bytes                     RspData  = 10;
-    google.protobuf.Timestamp RspTime  = 11;//预留字段.
+    google.protobuf.Timestamp RspTime  = 11;
     bool                      IsLast   = 12;//最后一条响应的标志.
 }
 
@@ -152,14 +152,12 @@ message QueryRecordRsp {
 
 //执行命令的请求.
 message ExecCmdReq {
-    string Cmd      = 1;
+    string Cmd   = 1;
 }
 
 //执行命令的响应.
 message ExecCmdRsp {
-    string Reply    = 1;
-    int32  ReplyIdx = 2;
-    bool   IsLast   = 3;
+    string Reply = 1;
 }
 
 message EchoItem {
