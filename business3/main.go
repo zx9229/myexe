@@ -78,6 +78,7 @@ func init4glog() {
 	log2dir := new(string)
 	stderrthreshold := new(string)
 	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	cmdLine.Usage = func() {}
 	cmdLine.StringVar(log2dir, "log_dir", "", "")
 	cmdLine.StringVar(stderrthreshold, "stderrthreshold", "", "")
 	cmdLine.Parse(os.Args[1:])
