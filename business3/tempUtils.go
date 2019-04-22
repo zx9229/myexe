@@ -14,20 +14,17 @@ const (
 	FORONCE = "1"
 )
 
-func toConfigNode(filename string) (cfg *configNode) {
-	var err error
+func toConfigNode(filename string) (cfg *configNode, err error) {
 	for range FORONCE {
 		var byteSlice []byte
 		if byteSlice, err = ioutil.ReadFile(filename); err != nil {
 			break
 		}
 		cfg = new(configNode)
-		err = json.Unmarshal(byteSlice, cfg)
-		if err != nil {
+		if err = json.Unmarshal(byteSlice, cfg); err != nil {
 			break
 		}
 	}
-	assert4true(err == nil)
 	return
 }
 

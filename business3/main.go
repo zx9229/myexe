@@ -19,11 +19,28 @@ import (
 
 func main() {
 	init4glog()
-	flag.Parse()
+	var cfgNode *configNode
+	//////////////////////////////////////////////////////////////////////////
+	if true {
+		var err error
+		var argHelp bool
+		var argJSON string
+		flag.BoolVar(&argHelp, "help", false, "[M] display this help and exit.")
+		flag.StringVar(&argJSON, "json", "", "[M] json configuration file.")
+		flag.Parse()
+		if argHelp {
+			flag.Usage()
+			return
+		}
+		if cfgNode, err = toConfigNode(argJSON); err != nil {
+			glog.Errorf("filename=%v, err=%v", argJSON, err)
+			return
+		}
+	}
 	defer glog.Flush()
 	//////////////////////////////////////////////////////////////////////////
 	glog.Infoln(os.Args)
-	cfgNode := toConfigNode(os.Args[1])
+	//cfgNode := toConfigNode(os.Args[1])
 	globalNode := newBusinessNode(cfgNode)
 	cs := wsnet.NewWsCliSrv()
 	cs.CbConnected = globalNode.onConnected
@@ -76,6 +93,7 @@ func init4glog() {
 		fmt.Println("init4glog", "set", "stderrthreshold")
 		flag.Set("stderrthreshold", "INFO")
 	}
+	fmt.Println("========================================")
 }
 
 func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request) {
