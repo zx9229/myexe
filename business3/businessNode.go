@@ -39,10 +39,10 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheSock  *safeWsSocketMap
 		CacheSync  *safeSynchCache
 		CacheRR    *safeNodeReqRspCache
-		OwnMsgNo   int64
+		OwnMsgNo   string //用(int64)时会出现BUG(明明int64的值在慢慢地增加,但是Marshal后的字符串中,我们可以看到,其值一直没有变化,迫于无奈,我使用了string)
 		//chanSync   chan string
-	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnMsgNo: atomic.LoadInt64(&thls.ownMsgNo)}
-	byteSlice, err = json.Marshal(tmpObj)
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
+	byteSlice, err = json.Marshal(&tmpObj)
 	return
 }
 
