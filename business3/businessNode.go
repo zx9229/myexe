@@ -39,9 +39,9 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheSock  *safeWsSocketMap
 		CacheSync  *safeSynchCache
 		CacheRR    *safeNodeReqRspCache
-		OwnSeqNo   int64
+		OwnMsgNo   int64
 		//chanSync   chan string
-	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnSeqNo: thls.ownSeqNo}
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnMsgNo: atomic.LoadInt64(&thls.ownMsgNo)}
 	byteSlice, err = json.Marshal(tmpObj)
 	return
 }
@@ -56,7 +56,7 @@ type businessNode struct {
 	cacheSock  *safeWsSocketMap
 	cacheSync  *safeSynchCache //要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
 	cacheRR    *safeNodeReqRspCache
-	ownSeqNo   int64
+	ownMsgNo   int64
 	chanSync   chan string
 }
 
@@ -247,6 +247,11 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	}
 
 	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		//TODO:缓存&&去重.
+		if msgData.IsSafe {
+			dataAck := thls.genAck4CommonReq(msgData)
+			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+		}
 		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
 		return
 	}
@@ -301,8 +306,11 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 
 	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
 	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
+		if msgData.IsSafe {
+			dataAck := thls.genAck4CommonRsp(msgData)
+			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+		}
 		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
-		//TODO:是否需要发送Rsp的Ack?
 		//TODO:如果有续传,就删除请求的续传.
 		return
 	}
@@ -624,11 +632,11 @@ func (thls *businessNode) refreshSeqNo() {
 	str4int64 := time.Now().Format("20060102150405")[3:] + "00000000"
 	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
 	assert4true(err == nil)
-	atomic.SwapInt64(&thls.ownSeqNo, val4int64)
+	atomic.SwapInt64(&thls.ownMsgNo, val4int64)
 }
 
 func (thls *businessNode) increaseSeqNo() int64 {
-	return atomic.AddInt64(&thls.ownSeqNo, 1)
+	return atomic.AddInt64(&thls.ownMsgNo, 1)
 }
 
 func (thls *businessNode) setRootOnline(newValue bool) {
