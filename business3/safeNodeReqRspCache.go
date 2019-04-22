@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/zx9229/myexe/txdata"
@@ -96,4 +98,23 @@ func (thls *safeNodeReqRspCache) operateNode(uniKey *txdata.UniKey, rspData Prot
 		}
 	}
 	return
+}
+
+//MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
+func (thls *safeNodeReqRspCache) MarshalJSON() ([]byte, error) {
+	tmpMap := make(map[string]string)
+	thls.Lock()
+	var rspLen int
+	for k, v := range thls.M {
+		if v.rspData != nil {
+			rspLen = len(v.rspData)
+		} else {
+			rspLen = 0
+		}
+		tmpK := fmt.Sprintf("(%v|%v|%v)", k.UserID, k.MsgNo, k.SeqNo)
+		tmpV := fmt.Sprintf("req=%v,rspLen=%v", CalcMessageType(v.reqData), rspLen)
+		tmpMap[tmpK] = tmpV
+	}
+	thls.Unlock()
+	return json.Marshal(tmpMap)
 }

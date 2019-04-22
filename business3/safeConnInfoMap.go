@@ -122,3 +122,11 @@ func (thls *safeConnInfoMap) sendDataToUser(data ProtoMessage, userID string) (e
 	}
 	return cInfoEx.conn.Send(msg2package(data))
 }
+
+//MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
+func (thls *safeConnInfoMap) MarshalJSON() (byteSlice []byte, err error) {
+	thls.Lock()
+	byteSlice, err = json.Marshal(thls.M)
+	thls.Unlock()
+	return
+}

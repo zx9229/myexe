@@ -37,15 +37,13 @@ func (thls *safeWsSocketMap) deleteData(k *wsnet.WsSocket) (v bool, isSuccess bo
 }
 
 //MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
-func (thls *safeWsSocketMap) MarshalJSON() ([]byte, error) {
-	//thls.Lock()
-	//defer thls.Unlock()
-	tmpObj := new(struct {
-		M map[string]bool
-	})
-	tmpObj.M = make(map[string]bool)
+func (thls *safeWsSocketMap) MarshalJSON() (byteSlice []byte, err error) {
+	thls.Lock()
+	tmpMap := make(map[string]bool)
 	for k, v := range thls.M {
-		tmpObj.M[fmt.Sprintf("%v", k)] = v
+		tmpMap[fmt.Sprintf("%v", k)] = v
 	}
-	return json.Marshal(tmpObj)
+	byteSlice, err = json.Marshal(tmpMap)
+	thls.Unlock()
+	return
 }

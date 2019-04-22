@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/zx9229/myexe/txdata"
@@ -22,10 +24,10 @@ func (thls *UniSym) fromUniKey(src *txdata.UniKey) {
 }
 
 type node4sync struct {
-	Key      UniSym
-	TxToRoot bool
-	RecverID string
-	data     ProtoMessage
+	Key      UniSym       //(一经设置,不再修改)
+	TxToRoot bool         //(一经设置,不再修改)
+	RecverID string       //(一经设置,不再修改)
+	data     ProtoMessage //(一经设置,不再修改)
 }
 
 type safeSynchCache struct {
@@ -90,4 +92,17 @@ func (thls *safeSynchCache) queryDataByTxToRoot(toR bool) (slcOut []*node4sync) 
 	}
 	thls.Unlock()
 	return
+}
+
+//MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
+func (thls *safeSynchCache) MarshalJSON() ([]byte, error) {
+	tmpMap := make(map[string]string)
+	thls.Lock()
+	for k, v := range thls.M {
+		tmpK := fmt.Sprintf("(%v|%v|%v)", k.UserID, k.MsgNo, k.SeqNo)
+		tmpV := fmt.Sprintf("(%v|%v|%v)", v.RecverID, v.TxToRoot, CalcMessageType(v.data))
+		tmpMap[tmpK] = tmpV
+	}
+	thls.Unlock()
+	return json.Marshal(tmpMap)
 }
