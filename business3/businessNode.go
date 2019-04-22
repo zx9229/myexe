@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -24,6 +25,25 @@ type configNode struct {
 	ClientURL      []url.URL
 	DataSourceName string //数据源的名字.
 	LocationName   string //数据源的时区的名字.
+}
+
+//MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
+func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
+	tmpObj := struct {
+		LetUpCache bool
+		OwnInfo    *txdata.ConnectionInfo
+		IamRoot    bool
+		ParentInfo *safeFatherData
+		RootOnline bool
+		CacheUser  *safeConnInfoMap
+		CacheSock  *safeWsSocketMap
+		CacheSync  *safeSynchCache
+		CacheRR    *safeNodeReqRspCache
+		OwnSeqNo   int64
+		//chanSync   chan string
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnSeqNo: thls.ownSeqNo}
+	byteSlice, err = json.Marshal(tmpObj)
+	return
 }
 
 type businessNode struct {

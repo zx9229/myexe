@@ -34,25 +34,8 @@ func main() {
 func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request) {
 	var jsonContent string
 	//////////////////////////////////////////////////////////////////////////
-	tmpObj := new(struct {
-		OwnInfo    *txdata.ConnectionInfo
-		ParentInfo *safeFatherData
-		RootOnline bool
-		CacheUser  *safeConnInfoMap
-		CacheSock  *safeWsSocketMap
-		CacheSync  *safeSynchCache
-		CacheRR    *safeNodeReqRspCache
-	})
-	tmpObj.OwnInfo = &node.ownInfo
-	tmpObj.ParentInfo = &node.parentInfo
-	tmpObj.RootOnline = node.rootOnline
-	tmpObj.CacheUser = node.cacheUser
-	tmpObj.CacheSock = node.cacheSock
-	tmpObj.CacheSync = node.cacheSync
-	tmpObj.CacheRR = node.cacheRR
-
-	if byteSlice, err := json.Marshal(tmpObj); err != nil {
-		glog.Fatalln(err, tmpObj)
+	if byteSlice, err := json.Marshal(node); err != nil {
+		glog.Fatalln(err, node)
 	} else {
 		jsonContent = string(byteSlice)
 	}
