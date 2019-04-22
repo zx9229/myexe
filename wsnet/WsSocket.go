@@ -21,6 +21,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -83,6 +84,7 @@ func (thls *WsSocket) Close() {
 
 //Send 可能因为断线/入参有误/等原因,返回错误.
 func (thls *WsSocket) Send(msgData []byte) error {
+	time.Sleep(time.Microsecond * 100) //TODO:待删除(为了能方便地按照时间戳查看日志,在此睡眠一会,临时代码)
 	return thls.WriteMessageSafe(websocket.BinaryMessage, msgData)
 }
 
