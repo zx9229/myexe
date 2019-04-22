@@ -33,7 +33,7 @@ func main() {
 			return
 		}
 		if cfgNode, err = toConfigNode(argJSON); err != nil {
-			glog.Errorf("filename=%v, err=%v", argJSON, err)
+			glog.Errorf("filename=[%v], err=[%v]", argJSON, err)
 			return
 		}
 	}
