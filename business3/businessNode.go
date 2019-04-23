@@ -675,8 +675,10 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 	}
 
 	if reqInOut.IsSafe {
-		if !thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut) {
-			panic(reqInOut) //TODO:
+		if isExist, isInsert := thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut); isExist || !isInsert {
+			eMsg := fmt.Sprintf("isExist=%v,isInsert=%v", isExist, isInsert)
+			rspSlice = []*txdata.CommonRsp{thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: eMsg}, true)} //TODO:
+			return
 		}
 	}
 

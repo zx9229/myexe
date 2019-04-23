@@ -40,26 +40,31 @@ func newSafeSynchCache() *safeSynchCache {
 }
 
 //insertData 入参uniKey是入参pm的一个数据成员.
-func (thls *safeSynchCache) insertData(uniKey *txdata.UniKey, toR bool, rID string, pm ProtoMessage) (isSuccess bool) {
+func (thls *safeSynchCache) insertData(uniKey *txdata.UniKey, toR bool, rID string, pm ProtoMessage) (isExist, isInsert bool) {
+	//isExist, isInsert
+	//true   , false    (已经存在了,肯定插不进去)
+	//false  , true
+	//false  , false (异常情况)
 	node := new(node4sync)
 	node.Key.fromUniKey(uniKey)
 	node.TxToRoot = toR
 	node.RecverID = rID
 	node.data = pm
 	thls.Lock()
-	if _, isSuccess = thls.M[node.Key]; !isSuccess {
+	if _, isExist = thls.M[node.Key]; !isExist {
 		thls.M[node.Key] = node
+		isInsert = true
 	}
 	thls.Unlock()
-	isSuccess = !isSuccess
+	isExist = !isExist
 	return
 }
 
-func (thls *safeSynchCache) deleteData(uniKey *txdata.UniKey) (node *node4sync, isSuccess bool) {
+func (thls *safeSynchCache) deleteData(uniKey *txdata.UniKey) (node *node4sync, isExist bool) {
 	var sym UniSym
 	sym.fromUniKey(uniKey)
 	thls.Lock()
-	if node, isSuccess = thls.M[sym]; isSuccess {
+	if node, isExist = thls.M[sym]; isExist {
 		delete(thls.M, sym)
 	}
 	thls.Unlock()

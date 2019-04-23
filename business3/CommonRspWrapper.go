@@ -36,14 +36,11 @@ func (thls *CommonRspWrapper) doRemainder() {
 }
 
 func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool) bool {
-	thls.rspIdx++
-	thls.isLast = isLast
-
 	curRspData := txdata.CommonRsp{}
 	curRspData.Key = cloneUniKey(thls.reqData.Key)
 	curRspData.SenderID = thls.reqData.RecverID
 	if curRspData.Key != nil {
-		curRspData.Key.SeqNo = thls.rspIdx
+		curRspData.Key.SeqNo = thls.rspIdx + 1
 		curRspData.RecverID = curRspData.Key.UserID //中间可能因为缓存而修改了(req.SenderID)
 	} else {
 		curRspData.RecverID = thls.reqData.SenderID
@@ -55,18 +52,23 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 		curRspData.RspData = msg2slice(data)
 	}
 	curRspData.RspTime, _ = ptypes.TimestampProto(time.Now())
-	curRspData.IsLast = thls.isLast
+	curRspData.IsLast = isLast
 	curRspData.IsLog = thls.reqData.IsLog
 	curRspData.IsSafe = thls.reqData.IsSafe
 	curRspData.IsPush = thls.reqData.IsPush
 
 	if !thls.reqData.IsPush {
 		if curRspData.IsSafe {
-			isOk := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
-			assert4true(isOk)
+			isExist, isInsert := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
+			assert4false(isExist) //一定不会存在.
+			if !isInsert {
+				return false
+			}
 		}
 		thls.conn.Send(msg2package(&curRspData))
 	}
+	thls.rspIdx = curRspData.Key.SeqNo
+	thls.isLast = curRspData.IsLast
 
 	return true
 }
