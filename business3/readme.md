@@ -7,9 +7,6 @@ msgData=Key:<UserID:"n4" MsgNo:8042223290400000001 >
 msgData=Key:<UserID:"n4" MsgNo:8042223290400000001 SeqNo:1 >
 msgData=Key:<UserID:"n4" MsgNo:8042223290400000001 SeqNo:2 >
 ```
-所以，我们应当先找到对应的Key，然后然后将所有的日志文件汇总成一个日志文件：  
-`grep -r 'Key:<UserID:"n4" MsgNo:8042223290400000001' .  > ../t1.log`  
-然后对这个日志文件，按照时间戳排序：  
-`sort -t" " -k2 t1.log > t2.log`  
-然后就可以慢慢的分析日志了。  
-`grep -r 'Key:<UserID:"n4" MsgNo:8042223290400000001' . | sort -t" " -k2`
+分析日志的命令的例子和命令如下：  
+ff  'Key:<UserID:"n4" MsgNo:8042223290400000001'  
+ff(){ grep -r --include=*.log.INFO.* "$*" . | sort -t" " -k2 ; }
