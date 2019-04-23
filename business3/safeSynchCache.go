@@ -56,7 +56,6 @@ func (thls *safeSynchCache) insertData(uniKey *txdata.UniKey, toR bool, rID stri
 		isInsert = true
 	}
 	thls.Unlock()
-	isExist = !isExist
 	return
 }
 
