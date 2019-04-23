@@ -54,7 +54,7 @@ type businessNode struct {
 	rootOnline bool
 	cacheUser  *safeConnInfoMap
 	cacheSock  *safeWsSocketMap
-	cacheSync  *safeSynchCache //要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
+	cacheSync  *safeSynchCache //(db)要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
 	cacheRR    *safeNodeReqRspCache
 	ownMsgNo   int64
 	chanSync   chan string
@@ -237,6 +237,8 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	if msgData.IsLog {
 		glog.Infof("handle_MsgType_ID_CommonReq, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
+	assert4true(msgData.Key.SeqNo == 0)
+	assert4false(msgData.UpCache && !msgData.TxToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
 
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
@@ -252,6 +254,8 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 			dataAck := thls.genAck4CommonReq(msgData)
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 		}
+		//能插入成功,表示尚未执行过此命令.
+		//已经存在了,表示已经执行过该命令了.
 		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
 		return
 	}
@@ -296,6 +300,8 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 		glog.Infof("handle_MsgType_ID_CommonRsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
+	assert4false(msgData.UpCache && !msgData.TxToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
+	assert4true(msgData.Key.SeqNo != 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
 	}
