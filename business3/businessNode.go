@@ -39,25 +39,31 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheSock  *safeWsSocketMap
 		CacheSync  *safeSynchCache
 		CacheRR    *safeNodeReqRspCache
+		ZZZXML     *safeUniSymCache
+		BAQYTDHC   *safeMemoryTmpCache
+		AQZXJG     *safeSynchCache
 		OwnMsgNo   string //用(int64)时会出现BUG(明明int64的值在慢慢地增加,但是Marshal后的字符串中,我们可以看到,其值一直没有变化,迫于无奈,我使用了string)
 		//chanSync   chan string
-	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
 	byteSlice, err = json.Marshal(&tmpObj)
 	return
 }
 
 type businessNode struct {
-	letUpCache bool //(一经设置,不再修改)让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
-	ownInfo    txdata.ConnectionInfo
-	iAmRoot    bool //(一经设置,不再修改)(I am root node)
-	parentInfo safeFatherData
-	rootOnline bool
-	cacheUser  *safeConnInfoMap
-	cacheSock  *safeWsSocketMap
-	cacheSync  *safeSynchCache //(db)要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
-	cacheRR    *safeNodeReqRspCache
-	ownMsgNo   int64
-	chanSync   chan string
+	letUpCache  bool //(一经设置,不再修改)让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
+	ownInfo     txdata.ConnectionInfo
+	iAmRoot     bool //(一经设置,不再修改)(I am root node)
+	parentInfo  safeFatherData
+	rootOnline  bool
+	cacheUser   *safeConnInfoMap
+	cacheSock   *safeWsSocketMap
+	cacheSync   *safeSynchCache //(db)要绝对的投递过去而缓存+因为UpCache而缓存,所以它绝对会在ROOT的发送侧,不会处于ROOT的对端;即,从sync里取出数据后,肯定要无脑往parent那里发.而不会往孩子那里发送.
+	cacheRR     *safeNodeReqRspCache
+	ownMsgNo    int64
+	chanSync    chan string
+	cacheZZZXML *safeUniSymCache    //(正在执行命令)的Req消息的UniSym.
+	cBAQYTDHC   *safeMemoryTmpCache //(不安全用途的缓存)(CommonReq+CommonRsp+!IsSafe)的数据缓存在这里.
+	cAQZXJG     *safeSynchCache     //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -88,6 +94,9 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheSync = newSafeSynchCache()
 	curData.cacheRR = newSafeNodeReqRspCache()
+	curData.cacheZZZXML = newSafeUniSymCache()
+	curData.cBAQYTDHC = newSafeMemoryTmpCache()
+	curData.cAQZXJG = newSafeSynchCache()
 	//
 	curData.refreshSeqNo()
 	//
@@ -237,6 +246,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	if msgData.IsLog {
 		glog.Infof("handle_MsgType_ID_CommonReq, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
+	assert4true(msgData.Key != nil)
 	assert4true(msgData.Key.SeqNo == 0)
 	assert4false(msgData.UpCache && !msgData.TxToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
 
@@ -245,14 +255,34 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	}
 
 	if thls.iAmRoot {
-		//TODO:留痕.
+		if msgData.IsSafe { //TODO:留痕.
+			if isExist, isInsert := thls.cAQZXJG.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData); !isExist && !isInsert {
+				//TODO:报警.
+			}
+		} else {
+			thls.cBAQYTDHC.insertReqData(msgData.Key, msgData)
+		}
 	}
 
 	if (!msgData.TxToRoot || thls.iAmRoot) && (msgData.RecverID == thls.ownInfo.UserID) {
 		//TODO:缓存&&去重.
 		if msgData.IsSafe {
+			//TODO:要执行命令了,结果崩溃了,然后消息丢失了,我也没办法,我不准备"程序重启之后继续执行该命令",崩了就算了.
 			dataAck := thls.genAck4CommonReq(msgData)
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+			//ROOT发出去请求消息,NODE接收后,在即将发送ACK的时候,ROOT与之断开,ACK丢失,
+			//NODE开始执行请求命令,请求命令非常耗时(约耗时1分钟),期间没有响应消息发出.
+			//数秒之后,ROOT与NODE重连成功,ROOT再次发送请求消息,NODE就会再次受到该消息.
+			//此时,应当:NODE开始执行请求的时候,需要在内存中有一个"正在执行命令的map",命令执行结束后,将其删除.
+			//RSP发送到ROOT后,应当根据RSP的主键清理掉ROOT的待同步表.
+			//TODO:即使如此,还是有可能重复执行,如果真的出现了这种理论上的情况,那么就:
+			//对于(发送叶子节点的Req消息)查询沿途的所有节点的(待同步表)如果有结果,那么就丢弃,也不发送ACK,等待RSP清理掉ROOT的缓存.
+			if !thls.cacheZZZXML.insertData(msgData.Key) {
+				return //命令正在执行中,则认为重复收到该请求,则丢弃该请求.
+			}
+			if thls.cacheSync.queryCount(msgData.Key.UserID, msgData.Key.MsgNo) != 0 {
+				return //从待同步表中能查到对应的响应,则认为该请求已经执行过了,这次为重复获取,则丢弃该请求.
+			}
 		}
 		//能插入成功,表示尚未执行过此命令.
 		//已经存在了,表示已经执行过该命令了.
@@ -300,6 +330,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 		glog.Infof("handle_MsgType_ID_CommonRsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
+	assert4true(msgData.Key != nil)
 	assert4false(msgData.UpCache && !msgData.TxToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
 	assert4true(msgData.Key.SeqNo != 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
@@ -307,7 +338,19 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 	}
 
 	if thls.iAmRoot {
-		//TODO:留痕.
+		if true {
+			//如果经过了ROOT节点,那么就删除ROOT节点的(待同步表)防止ROOT重复发送Req数据.
+			kkk := cloneUniKey(msgData.Key)
+			kkk.SeqNo = 0
+			thls.cacheSync.deleteData(kkk)
+		}
+		if msgData.IsSafe { //TODO:留痕.
+			if isExist, isInsert := thls.cAQZXJG.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData); !isExist && !isInsert {
+				//TODO:报警.
+			}
+		} else {
+			thls.cBAQYTDHC.appendRspData(msgData.Key, msgData)
+		}
 	}
 
 	//因为东西都需要在ROOT那里留痕,所以,从ROOT发过来的消息,是走完整个流程的,此时才应当被处理.
@@ -727,7 +770,7 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 }
 
 func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
-	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.letUpCache, msgConn)
+	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.cacheZZZXML, thls.letUpCache, msgConn)
 
 	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
 	if err != nil {

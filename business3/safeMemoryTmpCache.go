@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/zx9229/myexe/txdata"
@@ -46,6 +48,7 @@ func (thls *safeMemoryTmpCache) appendRspData(k *txdata.UniKey, rspData ProtoMes
 	assert4true(k.SeqNo != 0)
 	var sym UniSym
 	sym.fromUniKey(k)
+	sym.SeqNo = 0
 	var tVal *tmpVal
 	thls.Lock()
 	if tVal, isSuccess = thls.M[sym]; isSuccess {
@@ -70,4 +73,23 @@ func (thls *safeMemoryTmpCache) queryData(k *txdata.UniKey) (isSuccess bool) {
 	}
 	thls.Unlock()
 	return isSuccess
+}
+
+//MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
+func (thls *safeMemoryTmpCache) MarshalJSON() ([]byte, error) {
+	tmpMap := make(map[string]string)
+	thls.Lock()
+	var rspLen int
+	for k, v := range thls.M {
+		if v.RspSlc != nil {
+			rspLen = len(v.RspSlc)
+		} else {
+			rspLen = 0
+		}
+		tmpK := fmt.Sprintf("(%v|%v|%v)", k.UserID, k.MsgNo, k.SeqNo)
+		tmpV := fmt.Sprintf("req=%v,rspLen=%v", CalcMessageType(v.Req), rspLen)
+		tmpMap[tmpK] = tmpV
+	}
+	thls.Unlock()
+	return json.Marshal(tmpMap)
 }

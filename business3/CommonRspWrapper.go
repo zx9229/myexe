@@ -18,10 +18,11 @@ type CommonRspWrapper struct {
 	rspIdx  int32
 	reqData *txdata.CommonReq
 	cache   *safeSynchCache
+	zzzxml  *safeUniSymCache
 }
 
-func newCommonRspWrapper(req *txdata.CommonReq, cache *safeSynchCache, upCache bool, conn *wsnet.WsSocket) *CommonRspWrapper {
-	return &CommonRspWrapper{upCache: upCache, conn: conn, cache: cache, reqData: req}
+func newCommonRspWrapper(req *txdata.CommonReq, cache *safeSynchCache, zzzxml *safeUniSymCache, upCache bool, conn *wsnet.WsSocket) *CommonRspWrapper {
+	return &CommonRspWrapper{upCache: upCache, conn: conn, cache: cache, zzzxml: zzzxml, reqData: req}
 }
 
 //doRemainder 把剩余的事情做完. 执行(善后/清理)工作.
@@ -59,7 +60,8 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 
 	if !thls.reqData.IsPush {
 		if curRspData.IsSafe {
-			isExist, isInsert := thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
+			var isExist, isInsert bool
+			isExist, isInsert = thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
 			assert4false(isExist) //一定不会存在.
 			if !isInsert {
 				return false
@@ -69,6 +71,10 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 	}
 	thls.rspIdx = curRspData.Key.SeqNo
 	thls.isLast = curRspData.IsLast
+	if thls.isLast && thls.reqData.IsSafe {
+		isOk := thls.zzzxml.deleteDataByField(curRspData.Key.UserID, curRspData.Key.MsgNo)
+		assert4true(isOk)
+	}
 
 	return true
 }

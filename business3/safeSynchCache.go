@@ -84,6 +84,17 @@ func (thls *safeSynchCache) queryData(toR bool, rID string) (slcOut []*node4sync
 	return
 }
 
+func (thls *safeSynchCache) queryCount(uID string, msgNo int64) (cnt int) {
+	thls.Lock()
+	for _, node := range thls.M {
+		if node.Key.UserID == uID && node.Key.MsgNo == msgNo {
+			cnt++
+		}
+	}
+	thls.Unlock()
+	return
+}
+
 func (thls *safeSynchCache) queryDataByTxToRoot(toR bool) (slcOut []*node4sync) {
 	thls.Lock()
 	for _, node := range thls.M {
