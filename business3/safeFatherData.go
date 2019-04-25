@@ -11,7 +11,7 @@ import (
 
 type safeFatherData struct {
 	sync.Mutex
-	conn *wsnet.WsSocket
+	conn *wsnet.WsSocket //它主要为了锁socket指针的.
 	Info txdata.ConnectionInfo
 }
 

@@ -33,30 +33,28 @@ func (thls *CommonRspWrapper) doRemainder() {
 	if thls.isLast {
 		return
 	}
-	thls.sendDataWithoutLock(&txdata.CommonErr{ErrNo: 1, ErrMsg: "handler not implemented"}, true)
+	if !thls.sendDataWithoutLock(&txdata.CommonErr{ErrNo: 1, ErrMsg: "handler not implemented"}, true) {
+		//TODO:报警.
+	}
 }
 
 func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool) bool {
 	curRspData := txdata.CommonRsp{}
 	curRspData.Key = cloneUniKey(thls.reqData.Key)
+	curRspData.Key.SeqNo = thls.rspIdx + 1
 	curRspData.SenderID = thls.reqData.RecverID
-	if curRspData.Key != nil {
-		curRspData.Key.SeqNo = thls.rspIdx + 1
-		curRspData.RecverID = curRspData.Key.UserID //中间可能因为缓存而修改了(req.SenderID)
-	} else {
-		curRspData.RecverID = thls.reqData.SenderID
-	}
+	curRspData.RecverID = curRspData.Key.UserID //中间可能因为缓存而修改了(req.SenderID)
 	curRspData.TxToRoot = !thls.reqData.TxToRoot
-	curRspData.UpCache = thls.upCache
+	curRspData.IsLog = thls.reqData.IsLog
+	curRspData.IsSafe = thls.reqData.IsSafe
+	curRspData.IsPush = thls.reqData.IsPush
+	curRspData.UpCache = thls.upCache && thls.reqData.IsSafe //只有在续传模式下,才允许设置UpCache字段.
 	if data != nil {
 		curRspData.RspType = CalcMessageType(data)
 		curRspData.RspData = msg2slice(data)
 	}
 	curRspData.RspTime, _ = ptypes.TimestampProto(time.Now())
 	curRspData.IsLast = isLast
-	curRspData.IsLog = thls.reqData.IsLog
-	curRspData.IsSafe = thls.reqData.IsSafe
-	curRspData.IsPush = thls.reqData.IsPush
 
 	if !thls.reqData.IsPush {
 		if curRspData.IsSafe {
@@ -72,7 +70,7 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 	thls.rspIdx = curRspData.Key.SeqNo
 	thls.isLast = curRspData.IsLast
 	if thls.isLast && thls.reqData.IsSafe {
-		isOk := thls.zzzxml.deleteDataByField(curRspData.Key.UserID, curRspData.Key.MsgNo)
+		isOk := thls.zzzxml.deleteData(thls.reqData.Key)
 		assert4true(isOk)
 	}
 
