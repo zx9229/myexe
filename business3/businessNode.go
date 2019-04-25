@@ -310,7 +310,9 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 			if isExist, isInsert := thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData); isExist {
 				thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID) //已经存在了,就发送ACK让对方别再续传了,已经在待同步表里了,它自会同步,也不用再发送了.
 				return
-			} else if !isInsert { //不存在,又插入失败,估计硬盘满了,赶紧报警吧;(如果插入成功了,肯定要正常往下走,然后发送出去).
+			} else if isInsert { //不存在,又插入失败,估计硬盘满了,赶紧报警吧;(如果插入成功了,肯定要正常往下走,然后发送出去).
+				thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+			} else {
 				//TODO:报警.
 				return
 			}
@@ -393,7 +395,9 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 			if isExist, isInsert := thls.cacheSync.insertData(msgData.Key, msgData.TxToRoot, msgData.RecverID, msgData); isExist {
 				thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 				return
-			} else if !isInsert {
+			} else if isInsert {
+				thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
+			} else {
 				//TODO:报警
 				return
 			}
