@@ -47,12 +47,6 @@ void LoginDialog::initUI()
 void LoginDialog::setComboBox4ProgramType(QComboBox *comboBox)
 {
     comboBox->clear();
-    for (int i = static_cast<int>(txdata::ProgramType_MIN); i <= static_cast<int>(txdata::ProgramType_MAX); ++i)
-    {
-        txdata::ProgramType curType = static_cast<txdata::ProgramType>(i);
-        std::string curDesc = txdata::ProgramType_Name(curType);
-        comboBox->addItem(QString::fromStdString(curDesc), curType);
-    }
 }
 
 void LoginDialog::slotWebsocketError(QAbstractSocket::SocketError error)
@@ -84,18 +78,6 @@ void LoginDialog::slotClickedLogin()
         ui->lineEdit_url->setText(url);
     }
     m_dataExch->setURL(ui->lineEdit_url->text().trimmed());
-
-    m_dataExch->setUserKey(
-        ui->lineEdit_UserZoneName->text().trimmed(),
-        ui->lineEdit_UserNodeName->text().trimmed(),
-        static_cast<txdata::ProgramType>(ui->comboBox_UserExecType->currentData().toInt()),
-        ui->lineEdit_UserExecName->text().trimmed());
-
-    m_dataExch->setBelongKey(
-        ui->lineEdit_BelongZoneName->text().trimmed(),
-        ui->lineEdit_BelongNodeName->text().trimmed(),
-        static_cast<txdata::ProgramType>(ui->comboBox_BelongExecType->currentData().toInt()),
-        ui->lineEdit_BelongExecName->text().trimmed());
 
     m_dataExch->start();
 }

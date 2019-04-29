@@ -118,10 +118,10 @@ void DialogData::setData(const QCommonNtosReq &data)
     ui->pushButton_inner->setProperty("MsgType", DataExchanger::nameByMsgType(innerType));
     ui->pushButton_inner->setProperty("MsgJson", DataExchanger::jsonByMsgType(innerType, data.ReqData));
 
-    txdata::CommonNtosReq dataTx;
-    DataExchanger::CommonNtosReqQ2TX(data, dataTx);
-    ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
-    ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
+    //txdata::CommonNtosReq dataTx;
+    //DataExchanger::CommonNtosReqQ2TX(data, dataTx);
+    //ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
+    //ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
 }
 
 void DialogData::setData(const QCommonNtosRsp &data)
@@ -134,8 +134,8 @@ void DialogData::setData(const QCommonNtosRsp &data)
         QString jsonStr = DataExchanger::jsonByMsgType(innerType, data.RspData);
         ui->pushButton_inner->setProperty("MsgJson", jsonStr.isEmpty() ? QString(data.RspData) : jsonStr);
     }
-    txdata::CommonNtosRsp dataTx;
-    DataExchanger::CommonNtosRspQ2TX(data, dataTx);
-    ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
-    ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
+    //txdata::CommonNtosRsp dataTx;
+    //DataExchanger::CommonNtosRspQ2TX(data, dataTx);
+    //ui->pushButton_outer->setProperty("MsgType", QString::fromStdString(dataTx.GetDescriptor()->name()));
+    //ui->pushButton_outer->setProperty("MsgJson", DataExchanger::jsonByMsgObje(dataTx));
 }
