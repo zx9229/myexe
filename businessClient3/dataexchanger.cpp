@@ -173,6 +173,37 @@ void DataExchanger::handle_MessageAck(QSharedPointer<txdata::MessageAck> data)
     //TODO:
 }
 
+void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+    bool checkOk = false;
+    do
+    {
+        if (data->inforeq().userid() != m_ownInfo.belongid())
+            break;
+        if (data->pathway_size() != 1)
+            break;
+        if (data->pathway(0) != data->inforeq().userid())
+            break;
+        checkOk = true;
+    } while (false);
+    if (checkOk)
+    {
+        m_parentInfo.CopyFrom(data->inforeq());
+        emit sigReady();
+    }
+    else
+    {
+        m_ws.interrupt();
+    }
+}
+
+void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+    //TODO:
+}
+
 void DataExchanger::slotOnConnected()
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";

@@ -37,6 +37,8 @@ private:
     void initDB();
     void initOwnInfo();
     void handle_MessageAck(QSharedPointer<txdata::MessageAck> data);
+    void handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data);
+    void handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data);
 
 private slots:
     void slotOnConnected();
