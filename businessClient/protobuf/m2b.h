@@ -16,7 +16,7 @@ using GPMSGPTR = QSharedPointer<::google::protobuf::Message>;
 class m2b
 {
 public:
-    static bool msg2package(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
+    static bool msg2pkg(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
         pkgOut.clear();
         //在定义(.proto)文件的时候,就必须将其对应正确.
@@ -30,15 +30,15 @@ public:
         return true;
     }
 
-    static QByteArray msg2package(const ::google::protobuf::Message& msgIn)
+    static QByteArray msg2pkg(const ::google::protobuf::Message& msgIn)
     {
         QByteArray pkgOut;
-        bool retVal = msg2package(msgIn, pkgOut);
+        bool retVal = msg2pkg(msgIn, pkgOut);
         Q_ASSERT(retVal);
         return pkgOut;
     }
 
-    static std::string msg2slice(const ::google::protobuf::Message& src)
+    static std::string msg2bin(const ::google::protobuf::Message& src)
     {
         std::string dst;
         bool retVal = src.SerializeToString(&dst);
@@ -46,75 +46,7 @@ public:
         return dst;
     }
 
-    static bool slice2msg(const char* data, int size, ::txdata::MsgType msgType, GPMSGPTR& msgOut)
-    {
-        // 需要在shell下,先创建ff函数,再执行ff函数.
-        // ff(){ sed -n '/^enum MsgType/,/}/p' "$1" | sed 's/[ \t]*\?\(ID_\)\([^ \t]\+\).*/case ::txdata::MsgType::\1\2: \n msgOut = QSharedPointer<txdata::\2>(new txdata::\2); \n break;/g' ; }
-        // ff  txdata.proto
-        switch (msgType)
-        {
-        case ::txdata::MsgType::ID_MessageAck:
-            msgOut = QSharedPointer<txdata::MessageAck>(new txdata::MessageAck);
-            break;
-        case ::txdata::MsgType::ID_CommonErr:
-            msgOut = QSharedPointer<txdata::CommonErr>(new txdata::CommonErr);
-            break;
-        case ::txdata::MsgType::ID_CommonReq:
-            msgOut = QSharedPointer<txdata::CommonReq>(new txdata::CommonReq);
-            break;
-        case ::txdata::MsgType::ID_CommonRsp:
-            msgOut = QSharedPointer<txdata::CommonRsp>(new txdata::CommonRsp);
-            break;
-        case ::txdata::MsgType::ID_ConnectionInfo:
-            msgOut = QSharedPointer<txdata::ConnectionInfo>(new txdata::ConnectionInfo);
-            break;
-        case ::txdata::MsgType::ID_DisconnectedData:
-            msgOut = QSharedPointer<txdata::DisconnectedData>(new txdata::DisconnectedData);
-            break;
-        case ::txdata::MsgType::ID_ConnectReq:
-            msgOut = QSharedPointer<txdata::ConnectReq>(new txdata::ConnectReq);
-            break;
-        case ::txdata::MsgType::ID_ConnectRsp:
-            msgOut = QSharedPointer<txdata::ConnectRsp>(new txdata::ConnectRsp);
-            break;
-        case ::txdata::MsgType::ID_OnlineNotice:
-            msgOut = QSharedPointer<txdata::OnlineNotice>(new txdata::OnlineNotice);
-            break;
-        case ::txdata::MsgType::ID_SystemReport:
-            msgOut = QSharedPointer<txdata::SystemReport>(new txdata::SystemReport);
-            break;
-        case ::txdata::MsgType::ID_QueryRecordReq:
-            msgOut = QSharedPointer<txdata::QueryRecordReq>(new txdata::QueryRecordReq);
-            break;
-        case ::txdata::MsgType::ID_QueryRecordRsp:
-            msgOut = QSharedPointer<txdata::QueryRecordRsp>(new txdata::QueryRecordRsp);
-            break;
-        case ::txdata::MsgType::ID_ExecCmdReq:
-            msgOut = QSharedPointer<txdata::ExecCmdReq>(new txdata::ExecCmdReq);
-            break;
-        case ::txdata::MsgType::ID_ExecCmdRsp:
-            msgOut = QSharedPointer<txdata::ExecCmdRsp>(new txdata::ExecCmdRsp);
-            break;
-        case ::txdata::MsgType::ID_EchoItem:
-            msgOut = QSharedPointer<txdata::EchoItem>(new txdata::EchoItem);
-            break;
-        case ::txdata::MsgType::ID_ReportDataItem:
-            msgOut = QSharedPointer<txdata::ReportDataItem>(new txdata::ReportDataItem);
-            break;
-        case ::txdata::MsgType::ID_SendMailItem:
-            msgOut = QSharedPointer<txdata::SendMailItem>(new txdata::SendMailItem);
-            break;
-        default:
-            break;
-        }
-        if (msgOut && msgOut->ParseFromArray(data, size) == true)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    static bool package2msg(const QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
+    static bool pkg2msg(const QByteArray &pkgIn, ::txdata::MsgType& typeOut, GPMSGPTR& msgOut)
     {
         msgOut.clear();
 
@@ -122,7 +54,36 @@ public:
         char* type4 = reinterpret_cast<char*>(&typeOut);
         type4[0] = pkgData[0]; type4[1] = pkgData[1]; type4[2] = 0; type4[3] = 0;
 
-        return slice2msg(pkgData + 2, pkgIn.size() - 2, typeOut, msgOut);
+        switch (typeOut)
+        {
+        case ::txdata::MsgType::ID_ConnectedData:
+            msgOut = QSharedPointer<txdata::ConnectedData>(new txdata::ConnectedData);
+            break;
+        case ::txdata::MsgType::ID_DisconnectedData:
+            msgOut = QSharedPointer<txdata::DisconnectedData>(new txdata::DisconnectedData);
+            break;
+        case ::txdata::MsgType::ID_CommonNtosReq:
+            msgOut = QSharedPointer<txdata::CommonNtosReq>(new txdata::CommonNtosReq);
+            break;
+        case ::txdata::MsgType::ID_CommonNtosRsp:
+            msgOut = QSharedPointer<txdata::CommonNtosRsp>(new txdata::CommonNtosRsp);
+            break;
+        case ::txdata::MsgType::ID_ParentDataReq:
+            msgOut = QSharedPointer<txdata::ParentDataReq>(new txdata::ParentDataReq);
+            break;
+        case ::txdata::MsgType::ID_ParentDataRsp:
+            msgOut = QSharedPointer<txdata::ParentDataRsp>(new txdata::ParentDataRsp);
+            break;
+        default:
+            break;
+        }
+
+        if (msgOut && msgOut->ParseFromArray(pkgData + 2, pkgIn.size() - 2) == true)
+        {
+            return true;
+        }
+
+        return false;
     }
 };
 
