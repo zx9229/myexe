@@ -14,7 +14,7 @@ Item {
 
         Label {
             id: label
-            text: qsTr("Label")
+            text: qsTr("Label_0")
         }
 
         TextField {
@@ -25,7 +25,7 @@ Item {
 
         Label {
             id: label1
-            text: qsTr("Label")
+            text: qsTr("Label_1")
         }
 
         TextField {
@@ -36,7 +36,7 @@ Item {
 
         Label {
             id: label2
-            text: qsTr("Label")
+            text: qsTr("Label_2")
         }
 
         TextField {
@@ -55,9 +55,9 @@ Item {
         TextArea {
             id: textArea
             text: qsTr("Text Area")
+            Layout.columnSpan: 2
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.columnSpan: 2
             background: Rectangle {
                 radius: 2
                 border.color: "blue"
