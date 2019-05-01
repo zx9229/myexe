@@ -176,23 +176,42 @@ void DataExchanger::initOwnInfo()
 void DataExchanger::handle_MessageAck(QSharedPointer<txdata::MessageAck> data)
 {
     Q_ASSERT(data.data() != nullptr);
+    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
     //TODO:
 }
 
 void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
 {
     Q_ASSERT(data.data() != nullptr);
+    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
+
+    txdata::ConnectRsp data4send = {};
+    {
+        data4send.mutable_inforeq()->CopyFrom(data->inforeq());
+        data4send.mutable_inforsp()->CopyFrom(m_ownInfo);
+        data4send.set_errno(0);
+    }
     bool checkOk = false;
     do
     {
         if (data->inforeq().userid() != m_ownInfo.belongid())
+        {
+            data4send.set_errmsg("(req.UserID != rsp.BelongID)");
             break;
+        }
         if (data->pathway_size() != 1)
+        {
+            data4send.set_errmsg("len(req.Pathway) != 1");
             break;
+        }
         if (data->pathway(0) != data->inforeq().userid())
+        {
+            data4send.set_errmsg("req.UserID != req.Pathway[0]");
             break;
+        }
         checkOk = true;
     } while (false);
+    m_ws.sendBinaryMessage(m2b::msg2package(data4send));
     if (checkOk)
     {
         m_parentInfo.CopyFrom(data->inforeq());
@@ -207,6 +226,7 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
 void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
 {
     Q_ASSERT(data.data() != nullptr);
+    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
     //TODO:
 }
 
@@ -250,8 +270,10 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
     case txdata::MsgType::ID_DisconnectedData:
         break;
     case txdata::MsgType::ID_ConnectReq:
+        handle_ConnectReq(qSharedPointerDynamicCast<txdata::ConnectReq>(theMsg));
         break;
     case txdata::MsgType::ID_ConnectRsp:
+        handle_ConnectRsp(qSharedPointerDynamicCast<txdata::ConnectRsp>(theMsg));
         break;
     case txdata::MsgType::ID_OnlineNotice:
         break;

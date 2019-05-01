@@ -11,7 +11,7 @@ Item {
     GridLayout {
         id: gridLayout
         rows: 7
-        columns: 2
+        columns: 3
         anchors.fill: parent
 
         Label {
@@ -20,7 +20,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
         }
 
         Label {
@@ -34,15 +34,10 @@ Item {
             Layout.fillWidth: true
         }
 
-        Label {
-            id: labelUserID
-            text: qsTr("UserID")
-        }
-
-        TextField {
-            id: textFieldUserID
-            text: qsTr("Text Field")
-            Layout.fillWidth: true
+        Button {
+            id: buttonQuickFill
+            text: qsTr("速填")
+            Layout.fillWidth: false
         }
 
         Label {
@@ -53,20 +48,33 @@ Item {
         TextField {
             id: textFieldBelongID
             text: qsTr("Text Field")
+            Layout.columnSpan: 2
+            Layout.fillWidth: true
+        }
+
+        Label {
+            id: labelUserID
+            text: qsTr("UserID")
+        }
+
+        TextField {
+            id: textFieldUserID
+            text: qsTr("Text Field")
+            Layout.columnSpan: 2
             Layout.fillWidth: true
         }
 
         Button {
-            id: button
+            id: buttonSignIn
             text: qsTr("登录")
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
             Layout.fillWidth: true
         }
 
         TextArea {
             id: textAreaMessage
             text: qsTr("Text Area")
-            Layout.columnSpan: 2
+            Layout.columnSpan: 3
             Layout.fillHeight: true
             Layout.fillWidth: true
             background: Rectangle {
@@ -76,6 +84,22 @@ Item {
                 //implicitHeight: 50
                 //implicitWidth: 100
             }
+        }
+    }
+
+    Connections {
+        target: buttonQuickFill
+        onClicked: {
+            textFieldURL.text = qsTr("ws://localhost:65535/websocket")
+        }
+    }
+
+    Connections {
+        target: buttonSignIn
+        onClicked: {
+            dataExch.setURL(textFieldURL.text)
+            dataExch.setOwnInfo(textFieldUserID.text, textFieldBelongID.text)
+            dataExch.start()
         }
     }
 }
