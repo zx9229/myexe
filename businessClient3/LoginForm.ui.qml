@@ -1,6 +1,6 @@
-import QtQuick 2.4
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.3
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
 
 Item {
     id: itemitem
@@ -17,11 +17,11 @@ Item {
 
         Label {
             id: labelDT
-            text: qsTr("Label")
+            text: qsTr("DATE_TIME")
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            Layout.fillWidth: true
             Layout.columnSpan: 3
+            Layout.fillWidth: true
         }
 
         Label {
@@ -38,7 +38,6 @@ Item {
         Button {
             id: buttonQuickFill
             text: qsTr("速填")
-            Layout.fillWidth: false
         }
 
         Label {
@@ -104,3 +103,11 @@ Item {
         }
     }
 }
+
+
+
+
+/*##^## Designer {
+    D{i:1;anchors_height:100;anchors_width:100;anchors_x:91;anchors_y:77}
+}
+ ##^##*/
