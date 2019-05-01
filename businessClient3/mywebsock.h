@@ -17,6 +17,7 @@ public:
     bool start(const QUrl& url);
     void interrupt();
     void stop(bool sync = false);
+    QUrl url();
     qint64 sendBinaryMessage(const QByteArray &data);
 
 signals:

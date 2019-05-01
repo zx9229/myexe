@@ -7,6 +7,7 @@ Item {
     width: 400
     height: 400
     property alias labelDT: labelDT
+    property alias textAreaMessage: textAreaMessage
 
     GridLayout {
         id: gridLayout

@@ -1,9 +1,20 @@
 #include "dataexchanger.h"
 #include <QCoreApplication>
 #include <QSqlError>
+#include <QtCore/QMetaEnum>
 #include "m2b.h"
 #include "google/protobuf/util/json_util.h"
 // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
+
+
+enum StatusErrorType
+{
+    WebsockError = 1,
+    WebsockDisconnected = 2,
+    ConnectReqError = 3,
+    ConnectRspError = 4,
+};
+
 DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
     m_ws(parent)
@@ -219,6 +230,13 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
     }
     else
     {
+        {
+            QStringList strList;
+            strList.append("ConnectReq");
+            strList.append(QString::fromStdString(data4send.errmsg()));
+            strList.append(m_ws.url().toString());
+            emit sigStatusError(strList.join('\n'), StatusErrorType::ConnectReqError);
+        }
         m_ws.interrupt();
     }
 }
@@ -227,7 +245,14 @@ void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
 {
     Q_ASSERT(data.data() != nullptr);
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
-    //TODO:
+    if (data->errno() != 0)
+    {
+        QStringList strList;
+        strList.append("ConnectRsp");
+        strList.append(QString::fromStdString(data->errmsg()));
+        strList.append(m_ws.url().toString());
+        emit sigStatusError(strList.join('\n'), StatusErrorType::ConnectRspError);
+    }
 }
 
 void DataExchanger::slotOnConnected()
@@ -246,6 +271,12 @@ void DataExchanger::slotOnConnected()
 void DataExchanger::slotOnDisconnected()
 {
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnDisconnected";
+    {
+        QStringList strList;
+        strList.append("Disconnected");
+        strList.append(m_ws.url().toString());
+        emit sigStatusError(strList.join('\n'), StatusErrorType::WebsockDisconnected);
+    }
 }
 
 void DataExchanger::slotOnMessage(const QByteArray &message)
@@ -287,6 +318,13 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
 void DataExchanger::slotOnError(QAbstractSocket::SocketError error)
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "DataExchanger::slotOnError " << error;
+    {
+        QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketError>();
+        const char* errorValue = metaEnum.valueToKey(error);
 
-    sigWebsocketError(error);
+        QStringList strList;
+        strList.append(errorValue);
+        strList.append(m_ws.url().toString());
+        emit sigStatusError(strList.join('\n'), StatusErrorType::WebsockError);
+    }
 }

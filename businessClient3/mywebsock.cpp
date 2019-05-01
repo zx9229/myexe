@@ -34,7 +34,7 @@ bool MyWebsock::start(const QUrl& url)
 
 void MyWebsock::interrupt()
 {
-    m_ws.abort(); // 类似于"拔网线"的操作, 破坏连接, 但是不破坏重连机制.
+    m_ws.abort(); // 类似于"拔网线"的操作, 破坏(QWebSocket的)连接, 但是不破坏(MyWebsock实现的)重连机制.
 }
 
 void MyWebsock::stop(bool sync /* = false */)
@@ -47,6 +47,11 @@ void MyWebsock::stop(bool sync /* = false */)
     {
         QThread::msleep(1);
     }
+}
+
+QUrl MyWebsock::url()
+{
+    return m_url;
 }
 
 qint64 MyWebsock::sendBinaryMessage(const QByteArray &data)

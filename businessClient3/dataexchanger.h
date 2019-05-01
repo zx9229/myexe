@@ -34,6 +34,7 @@ public slots:
 signals:
     void sigReady();
     void sigWebsocketError(QAbstractSocket::SocketError error);
+    void sigStatusError(const QString& errMessage, int errType);
 
 private:
     void initDB();
