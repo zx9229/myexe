@@ -3,8 +3,10 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 Item {
+    id: itemitem
     width: 400
     height: 400
+    property alias labelDT: labelDT
 
     GridLayout {
         id: gridLayout
@@ -13,47 +15,56 @@ Item {
         anchors.fill: parent
 
         Label {
-            id: label
-            text: qsTr("Label_0")
+            id: labelDT
+            text: qsTr("Label")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            Layout.fillWidth: true
+            Layout.columnSpan: 2
+        }
+
+        Label {
+            id: labelURL
+            text: qsTr("URL")
         }
 
         TextField {
-            id: textField
+            id: textFieldURL
             text: qsTr("Text Field")
             Layout.fillWidth: true
         }
 
         Label {
-            id: label1
-            text: qsTr("Label_1")
+            id: labelUserID
+            text: qsTr("UserID")
         }
 
         TextField {
-            id: textField1
+            id: textFieldUserID
             text: qsTr("Text Field")
             Layout.fillWidth: true
         }
 
         Label {
-            id: label2
-            text: qsTr("Label_2")
+            id: labelBelongID
+            text: qsTr("BelongID")
         }
 
         TextField {
-            id: textField2
+            id: textFieldBelongID
             text: qsTr("Text Field")
             Layout.fillWidth: true
         }
 
         Button {
             id: button
-            text: qsTr("Button")
+            text: qsTr("登录")
             Layout.columnSpan: 2
             Layout.fillWidth: true
         }
 
         TextArea {
-            id: textArea
+            id: textAreaMessage
             text: qsTr("Text Area")
             Layout.columnSpan: 2
             Layout.fillHeight: true
