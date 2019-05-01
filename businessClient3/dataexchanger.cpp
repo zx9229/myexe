@@ -6,7 +6,6 @@
 #include "google/protobuf/util/json_util.h"
 // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
 
-
 enum StatusErrorType
 {
     WebsockError = 1,
@@ -194,8 +193,7 @@ void DataExchanger::handle_MessageAck(QSharedPointer<txdata::MessageAck> data)
 void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
 {
     Q_ASSERT(data.data() != nullptr);
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
-
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
     txdata::ConnectRsp data4send = {};
     {
         data4send.mutable_inforeq()->CopyFrom(data->inforeq());
@@ -244,7 +242,7 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
 void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
 {
     Q_ASSERT(data.data() != nullptr);
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
     if (data->errno() != 0)
     {
         QStringList strList;
@@ -257,8 +255,7 @@ void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
 
 void DataExchanger::slotOnConnected()
 {
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
-
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
     {
         txdata::ConnectReq data4send = {};
         data4send.mutable_inforeq()->CopyFrom(m_ownInfo);
@@ -270,7 +267,7 @@ void DataExchanger::slotOnConnected()
 
 void DataExchanger::slotOnDisconnected()
 {
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnDisconnected";
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnDisconnected";
     {
         QStringList strList;
         strList.append("Disconnected");
@@ -281,8 +278,7 @@ void DataExchanger::slotOnDisconnected()
 
 void DataExchanger::slotOnMessage(const QByteArray &message)
 {
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnMessage";
-
+    //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnMessage";
     txdata::MsgType theType = {};
     GPMSGPTR theMsg;
     if (m2b::package2msg(message, theType, theMsg) == false)
