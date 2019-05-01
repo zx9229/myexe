@@ -23,6 +23,7 @@ LoginForm {
     }
 
     Connections {
+        //因为【void sigReady();】所以可以如下书写:
         target: dataExch
         onSigReady: {
             var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
