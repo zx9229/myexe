@@ -26,7 +26,7 @@ public:
     static QString jsonToObjAndS(const QString& typeName, const QString& jsonStr, txdata::MsgType& msgType, QByteArray& serializedData);
 
     Q_INVOKABLE void setURL(const QString& url);
-    Q_INVOKABLE void setOwnInfo(const QString& userID,const QString& belongID);
+    Q_INVOKABLE void setOwnInfo(const QString& userID, const QString& belongID);
     Q_INVOKABLE bool start();
 
 public slots:
