@@ -27,12 +27,6 @@ MyWebsock& DataExchanger::ws()
     return m_ws;
 }
 
-bool DataExchanger::start()
-{
-    m_ws.stop(true);
-    return m_ws.start(m_url);
-}
-
 QString DataExchanger::jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk)
 {
     if (isOk) { *isOk = true; }
@@ -149,7 +143,19 @@ QString DataExchanger::jsonToObjAndS(const QString &typeName, const QString &jso
 
 void DataExchanger::setURL(const QString &url)
 {
-    m_url = url;
+    m_url = url;  // 例如【ws://localhost:65535/websocket】.
+}
+
+void DataExchanger::setOwnInfo(const QString &userID, const QString &belongID)
+{
+    m_ownInfo.set_userid(userID.toStdString());
+    m_ownInfo.set_belongid(belongID.toStdString());
+}
+
+bool DataExchanger::start()
+{
+    m_ws.stop(true);
+    return m_ws.start(m_url);
 }
 
 void DataExchanger::initDB()

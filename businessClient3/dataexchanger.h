@@ -1,6 +1,7 @@
 #ifndef DATAEXCHANGER_H
 #define DATAEXCHANGER_H
-
+//Exposing Attributes of C++ Types to QML
+//https://doc.qt.io/qt-5/qtqml-cppintegration-exposecppattributes.html
 #include "mywebsock.h"
 #include <QObject>
 #include <QSharedPointer>
@@ -17,7 +18,6 @@ public:
 
 public:
     MyWebsock& ws();
-    bool start();
 
     static QString jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk = nullptr);
     static QString nameByMsgType(txdata::MsgType msgType, int flag = 0, bool *isOk = nullptr);
@@ -25,7 +25,9 @@ public:
     static bool    calcObjByName(const QString& typeName, QSharedPointer<google::protobuf::Message>& objOut);
     static QString jsonToObjAndS(const QString& typeName, const QString& jsonStr, txdata::MsgType& msgType, QByteArray& serializedData);
 
-    void setURL(const QString& url);
+    Q_INVOKABLE void setURL(const QString& url);
+    Q_INVOKABLE void setOwnInfo(const QString& userID,const QString& belongID);
+    Q_INVOKABLE bool start();
 
 public slots:
 
