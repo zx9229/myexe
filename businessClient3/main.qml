@@ -9,5 +9,6 @@ Window {
     color: "silver"
     Login {
         anchors.fill: parent
+        visible: true
     }
 }

@@ -8,12 +8,15 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "dataexchanger.h"
+#include "mysqltablemodel.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+
+    MySqlTableModel::doQmlRegisterType();
 
     DataExchanger dataExch;
 

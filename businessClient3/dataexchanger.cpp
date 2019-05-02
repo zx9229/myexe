@@ -24,7 +24,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     connect(&m_ws, &MyWebsock::sigError, this, &DataExchanger::slotOnError);
 
     initOwnInfo();
-    initDB();
+    //initDB();
 }
 
 DataExchanger::~DataExchanger()

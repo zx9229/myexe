@@ -33,6 +33,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     dataexchanger.h \
+    mysqltablemodel.h \
     mywebsock.h \
     protobuf/m2b.h \
     protobuf/txdata.pb.h
