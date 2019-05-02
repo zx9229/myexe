@@ -86,14 +86,14 @@ public:
 class ConnInfoEx
 {
 public:
-    QString     UserID;//PK
-    QString     BelongID;
-    QString     Version;
-    int32_t     LinkMode;
-    int32_t     ExePid;
-    QString     ExePath;
-    QString     Remark;
-    QStringList Pathway;
+    QString UserID;//PK
+    QString BelongID;
+    QString Version;
+    int32_t LinkMode;
+    int32_t ExePid;
+    QString ExePath;
+    QString Remark;
+    QString Pathway;
 public:
     ConnInfoEx()
     {
@@ -111,12 +111,12 @@ public:
             "CREATE TABLE IF NOT EXISTS %1 (\
             UserID   TEXT    NOT NULL PRIMARY KEY ,\
             BelongID TEXT    NOT NULL ,\
-            Version  TEXT    NOT NULL ,\
-            LinkMode INTEGER NOT NULL ,\
-            ExePid   INTEGER NOT NULL ,\
-            ExePath  TEXT    NOT NULL ,\
-            Remark   TEXT    NOT NULL ,\
-            Pathway  TEXT    NOT NULL  "
+            Version  TEXT        NULL ,\
+            LinkMode INTEGER     NULL ,\
+            ExePid   INTEGER     NULL ,\
+            ExePath  TEXT        NULL ,\
+            Remark   TEXT        NULL ,\
+            Pathway  TEXT        NULL )"
         ).QString::arg(static_table_name());
         return  sql;
     }
@@ -154,7 +154,7 @@ public:
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
         return isOk;
     }
-    bool update_data(QSqlQuery& query, QString& whereCond)
+    bool update_data(QSqlQuery& query, const QString& whereCond)
     {
         bool isOk = false;
         //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1=:$1"\);}】.
@@ -185,7 +185,7 @@ public:
         //
         return query.exec();
     }
-    static bool select_data(QSqlQuery& query, QString& whereCond, QList<ConnInfoEx>& dataOut)
+    static bool select_data(QSqlQuery& query, const QString& whereCond, QList<ConnInfoEx>& dataOut)
     {
         //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【fromQVariant\(curData.$1,query.value\("$1"\)\);】.
         QString sqlStr = QObject::tr("SELECT * FROM %1").QString::arg(static_table_name());
@@ -204,7 +204,7 @@ public:
             fromQVariant(curData.Pathway, query.value("Pathway"));
             dataOut.append(curData);
         }
-        return  true;
+        return true;
     }
 };
 Q_DECLARE_METATYPE(ConnInfoEx);
