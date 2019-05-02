@@ -2,11 +2,11 @@
 #define DATAEXCHANGER_H
 //Exposing Attributes of C++ Types to QML
 //https://doc.qt.io/qt-5/qtqml-cppintegration-exposecppattributes.html
-#include "mywebsock.h"
 #include <QObject>
 #include <QSharedPointer>
 #include <QSqlQuery>
 #include"protobuf/m2b.h"
+#include "mywebsock.h"
 
 class DataExchanger : public QObject
 {

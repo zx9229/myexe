@@ -1,10 +1,11 @@
+// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
 #include "dataexchanger.h"
 #include <QCoreApplication>
 #include <QSqlError>
 #include <QtCore/QMetaEnum>
 #include "m2b.h"
 #include "google/protobuf/util/json_util.h"
-// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
+#include "sqlstruct.h"
 
 enum StatusErrorType
 {
@@ -24,7 +25,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     connect(&m_ws, &MyWebsock::sigError, this, &DataExchanger::slotOnError);
 
     initOwnInfo();
-    //initDB();
+    initDB();
 }
 
 DataExchanger::~DataExchanger()
@@ -172,6 +173,20 @@ void DataExchanger::initDB()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(false ? (":memory:") : ("_zx_test.db"));
+    bool isOk = false;
+    isOk = m_db.open();
+    Q_ASSERT(isOk);
+    QSqlQuery sqlQuery;
+    if (true) {
+        isOk = m_db.transaction();
+        Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(KeyValue::static_create_sql());
+        Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(ConnInfoEx::static_create_sql());
+        Q_ASSERT(isOk);
+        isOk = m_db.commit();
+        Q_ASSERT(isOk);
+    }
 }
 
 void DataExchanger::initOwnInfo()
