@@ -36,7 +36,8 @@ HEADERS += \
     mysqltablemodel.h \
     mywebsock.h \
     protobuf/m2b.h \
-    protobuf/txdata.pb.h
+    protobuf/txdata.pb.h \
+    sqlstruct.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter

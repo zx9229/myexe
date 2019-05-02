@@ -5,7 +5,6 @@
 #include <QtCore/QMetaEnum>
 #include "m2b.h"
 #include "google/protobuf/util/json_util.h"
-#include "sqlstruct.h"
 
 enum StatusErrorType
 {

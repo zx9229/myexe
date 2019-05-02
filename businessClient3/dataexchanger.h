@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include"protobuf/m2b.h"
 #include "mywebsock.h"
+#include "sqlstruct.h"
 
 class DataExchanger : public QObject
 {
