@@ -13,7 +13,7 @@ class MySqlTableModel : public QSqlTableModel
     Q_PROPERTY(QString selectStatement READ getSelectStatement WRITE setSelectStatement NOTIFY selectStatementChanged)
 
 public:
-    explicit MySqlTableModel(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase()) : QSqlTableModel (parent, db)
+    explicit MySqlTableModel(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase()) : QSqlTableModel(parent, db)
     {
     }
 
@@ -41,7 +41,7 @@ public slots:
     virtual bool select() override
     {
         bool bRet = QSqlTableModel::select();
-        if(bRet) {
+        if (bRet) {
             while (canFetchMore()) {
                 fetchMore();
             }
