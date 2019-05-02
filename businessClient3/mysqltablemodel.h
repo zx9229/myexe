@@ -61,3 +61,64 @@ private:
 };
 
 #endif // MYSQLTABLEMODEL_H
+
+/*
+void JustForTest()
+{
+    const char* QT_SQL_DEFAULT_CONNECTION = "qt_sql_default_connection";
+    QSqlDatabase db;
+    if (db.contains(QT_SQL_DEFAULT_CONNECTION))
+    {
+        db = QSqlDatabase::database(QT_SQL_DEFAULT_CONNECTION);
+        qDebug() << "database" << QT_SQL_DEFAULT_CONNECTION;
+    }
+    else
+    {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName("_just4test.sqlite.db");
+        qDebug() << "addDatabase" << "setDatabaseName";
+    }
+    Q_ASSERT(db.open());
+    QSqlQuery sqlQuery;
+    sqlQuery.exec(QObject::tr("CREATE TABLE IF NOT EXISTS student (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)"));
+    sqlQuery.exec(QObject::tr("INSERT INTO student VALUES (3,'张三',23)"));
+    sqlQuery.exec(QObject::tr("INSERT INTO student VALUES (4,'李四',24)"));
+    sqlQuery.exec(QObject::tr("INSERT INTO student VALUES (5,'王五',25)"));
+}
+*/
+
+/*
+//文件JustForTest.qml的内容:
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
+import MySqlTableModel 0.1
+Item {
+    ColumnLayout {
+        anchors.fill: parent
+        Button {
+            Layout.fillWidth: true
+            text: qsTr("刷新")
+            onClicked: mstm.select()
+        }
+        TableView {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            columnSpacing: 1
+            rowSpacing: 1
+            clip: true
+            model: MySqlTableModel {
+                id: mstm
+                selectStatement: "SELECT * FROM student"
+            }
+            delegate: Rectangle {
+                implicitHeight: 50
+                implicitWidth: 100
+                Text {
+                    text: display
+                }
+            }
+        }
+    }
+}
+*/
