@@ -16,4 +16,4 @@ protoc  --proto_path=./  txdata.proto  --cpp_out=../businessClient/protobuf/
 
 现在的命令:  
 protoc  --proto_path=./  --proto_path=../businessClient/protobuf/protobuf-3.6.1/src/  txdata.proto  --go_out=plugins=grpc:./  
-protoc  --proto_path=./  --proto_path=../businessClient/protobuf/protobuf-3.6.1/src/  txdata.proto  --cpp_out=../businessClient/protobuf/  
+protoc  --proto_path=./  --proto_path=../businessClient/protobuf/protobuf-3.6.1/src/  txdata.proto  --cpp_out=../businessClient3/protobuf/  

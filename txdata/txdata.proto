@@ -27,6 +27,8 @@ enum MsgType {
     ID_EchoItem         = 15;
     ID_ReportDataItem   = 16;
     ID_SendMailItem     = 17;
+    ID_QryConnInfoReq   = 18;
+    ID_QryConnInfoRsp   = 19;
 }
 
 //唯一标识一个消息.
@@ -180,4 +182,12 @@ message SendMailItem {
     string Subject     = 5;
     string ContentType = 6;
     string Content     = 7;
+}
+
+message QryConnInfoReq {
+}
+
+message QryConnInfoRsp {
+    string                  UserID = 1;//查询了哪个用户.
+    map<string, ConnectReq> Cache  = 2;//该用户的缓存.
 }
