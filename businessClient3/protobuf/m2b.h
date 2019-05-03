@@ -16,17 +16,21 @@ using GPMSGPTR = QSharedPointer<::google::protobuf::Message>;
 class m2b
 {
 public:
+    static ::txdata::MsgType CalcMessageType(const ::google::protobuf::Message& msgIn)
+    {
+        return static_cast<::txdata::MsgType>(msgIn.GetDescriptor()->index());
+    }
     static bool msg2package(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
         pkgOut.clear();
         //在定义(.proto)文件的时候,就必须将其对应正确.
-        ::txdata::MsgType msgType = static_cast<::txdata::MsgType>(msgIn.GetDescriptor()->index());
+        ::txdata::MsgType msgType = CalcMessageType(msgIn);
         //令(int i = 1)则assert(reinterpret_cast<char*>(&i)[0] == 1)
         pkgOut.append(reinterpret_cast<char*>(&msgType), 2);
         std::string tmpData;
         if (msgIn.SerializeToString(&tmpData) == false)
             return false;
-        pkgOut.append(tmpData.data(), tmpData.size());
+        pkgOut.append(tmpData.data(), static_cast<int>(tmpData.size()));
         return true;
     }
 
@@ -53,17 +57,23 @@ public:
         // ff  txdata.proto
         switch (msgType)
         {
-        case ::txdata::MsgType::ID_MessageAck:
-            msgOut = QSharedPointer<txdata::MessageAck>(new txdata::MessageAck);
-            break;
         case ::txdata::MsgType::ID_CommonErr:
             msgOut = QSharedPointer<txdata::CommonErr>(new txdata::CommonErr);
             break;
-        case ::txdata::MsgType::ID_CommonReq:
-            msgOut = QSharedPointer<txdata::CommonReq>(new txdata::CommonReq);
+        case ::txdata::MsgType::ID_Common2Ack:
+            msgOut = QSharedPointer<txdata::Common2Ack>(new txdata::Common2Ack);
             break;
-        case ::txdata::MsgType::ID_CommonRsp:
-            msgOut = QSharedPointer<txdata::CommonRsp>(new txdata::CommonRsp);
+        case ::txdata::MsgType::ID_Common2Req:
+            msgOut = QSharedPointer<txdata::Common2Req>(new txdata::Common2Req);
+            break;
+        case ::txdata::MsgType::ID_Common2Rsp:
+            msgOut = QSharedPointer<txdata::Common2Rsp>(new txdata::Common2Rsp);
+            break;
+        case ::txdata::MsgType::ID_Common1Req:
+            msgOut = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
+            break;
+        case ::txdata::MsgType::ID_Common1Rsp:
+            msgOut = QSharedPointer<txdata::Common1Rsp>(new txdata::Common1Rsp);
             break;
         case ::txdata::MsgType::ID_ConnectionInfo:
             msgOut = QSharedPointer<txdata::ConnectionInfo>(new txdata::ConnectionInfo);
@@ -82,6 +92,12 @@ public:
             break;
         case ::txdata::MsgType::ID_SystemReport:
             msgOut = QSharedPointer<txdata::SystemReport>(new txdata::SystemReport);
+            break;
+        case ::txdata::MsgType::ID_QryConnInfoReq:
+            msgOut = QSharedPointer<txdata::QryConnInfoReq>(new txdata::QryConnInfoReq);
+            break;
+        case ::txdata::MsgType::ID_QryConnInfoRsp:
+            msgOut = QSharedPointer<txdata::QryConnInfoRsp>(new txdata::QryConnInfoRsp);
             break;
         case ::txdata::MsgType::ID_QueryRecordReq:
             msgOut = QSharedPointer<txdata::QueryRecordReq>(new txdata::QueryRecordReq);
