@@ -65,14 +65,14 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 	// ff(){ sed -n '/^enum MsgType/,/}/p' "$1" | sed 's/[ \t]*\?\(ID_\)\([^ \t]\+\).*/case txdata.MsgType_\1\2: \n msgData = new(txdata.\2)/g' ; }
 	// ff  txdata.proto
 	switch msgType {
-	case txdata.MsgType_ID_MessageAck:
-		msgData = new(txdata.MessageAck)
+	case txdata.MsgType_ID_Common2Ack:
+		msgData = new(txdata.Common2Ack)
 	case txdata.MsgType_ID_CommonErr:
 		msgData = new(txdata.CommonErr)
-	case txdata.MsgType_ID_CommonReq:
-		msgData = new(txdata.CommonReq)
-	case txdata.MsgType_ID_CommonRsp:
-		msgData = new(txdata.CommonRsp)
+	case txdata.MsgType_ID_Common2Req:
+		msgData = new(txdata.Common2Req)
+	case txdata.MsgType_ID_Common2Rsp:
+		msgData = new(txdata.Common2Rsp)
 	case txdata.MsgType_ID_ConnectionInfo:
 		msgData = new(txdata.ConnectionInfo)
 	case txdata.MsgType_ID_DisconnectedData:

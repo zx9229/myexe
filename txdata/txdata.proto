@@ -10,10 +10,10 @@ import public "google/protobuf/timestamp.proto";
 // Windows: findstr "^message" txdata.proto
 enum MsgType {
     Zero1               =  0;//第0个本该是(UniKey)
-    ID_MessageAck       =  1;
+    ID_Common2Ack       =  1;
     ID_CommonErr        =  2;
-    ID_CommonReq        =  3;
-    ID_CommonRsp        =  4;
+    ID_Common2Req        =  3;
+    ID_Common2Rsp        =  4;
     ID_ConnectionInfo   =  5;
     ID_DisconnectedData =  6;
     ID_ConnectReq       =  7;
@@ -39,7 +39,7 @@ message UniKey {
 }
 
 //对某消息进行确认.
-message MessageAck {
+message Common2Ack {
     UniKey  Key      = 1;
     string  SenderID = 2;//消息的发送者.
     string  RecverID = 3;//消息的接收者.
@@ -47,13 +47,13 @@ message MessageAck {
     bool    IsLog    = 5;//对本消息打日志.
 }
 
-//常用于(CommonReq)和(CommonRsp)的通信过程中.
+//常用于(Common2Req)和(Common2Rsp)的通信过程中.
 message CommonErr {
     int32                     ErrNo    = 1;
     string                    ErrMsg   = 2;
 }
 
-message CommonReq {
+message Common2Req {
     UniKey                    Key      =  1;
     string                    SenderID =  2;//可能因为UpCache或ROOT而中途变化.
     string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
@@ -68,7 +68,7 @@ message CommonReq {
 }
 
 //可能出现的情况:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便可使用(CommonErr)返回具体错误.
-message CommonRsp {
+message Common2Rsp {
     UniKey                    Key      =  1;
     string                    SenderID =  2;//中途可能变化.
     string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.

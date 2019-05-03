@@ -62,7 +62,7 @@ type businessNode struct {
 	ownMsgNo    int64
 	chanSync    chan string         //哪个UserID连通了,就投递过来一个信号.
 	cacheZZZXML *safeUniSymCache    //(正在执行命令)的Req消息的UniSym.给续传模式的命令使用,因为只有它们可能续传.
-	cBAQYTDHC   *safeMemoryTmpCache //(ROOT模式有用)(不安全用途的缓存)(CommonReq+CommonRsp+!IsSafe)的数据缓存在这里.
+	cBAQYTDHC   *safeMemoryTmpCache //(ROOT模式有用)(不安全用途的缓存)(Common2Req+Common2Rsp+!IsSafe)的数据缓存在这里.
 	cAQZXJG     *safeSynchCache     //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
 }
 
@@ -206,12 +206,12 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 	//glog.Infof("onMessage, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 
 	switch txMsgType {
-	case txdata.MsgType_ID_MessageAck:
-		thls.handle_MsgType_ID_MessageAck(txMsgData.(*txdata.MessageAck), msgConn)
-	case txdata.MsgType_ID_CommonReq:
-		thls.handle_MsgType_ID_CommonReq(txMsgData.(*txdata.CommonReq), msgConn)
-	case txdata.MsgType_ID_CommonRsp:
-		thls.handle_MsgType_ID_CommonRsp(txMsgData.(*txdata.CommonRsp), msgConn)
+	case txdata.MsgType_ID_Common2Ack:
+		thls.handle_MsgType_ID_Common2Ack(txMsgData.(*txdata.Common2Ack), msgConn)
+	case txdata.MsgType_ID_Common2Req:
+		thls.handle_MsgType_ID_Common2Req(txMsgData.(*txdata.Common2Req), msgConn)
+	case txdata.MsgType_ID_Common2Rsp:
+		thls.handle_MsgType_ID_Common2Rsp(txMsgData.(*txdata.Common2Rsp), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
 	case txdata.MsgType_ID_ConnectReq:
@@ -227,9 +227,9 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 	}
 }
 
-func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAck, msgConn *wsnet.WsSocket) {
+func (thls *businessNode) handle_MsgType_ID_Common2Ack(msgData *txdata.Common2Ack, msgConn *wsnet.WsSocket) {
 	if msgData.IsLog {
-		glog.Infof("handle_MsgType_ID_MessageAck, msgConn=%p, msgData=%v", msgConn, msgData)
+		glog.Infof("handle_MsgType_ID_Common2Ack, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
 	assert4true(msgData.Key != nil)
@@ -248,9 +248,9 @@ func (thls *businessNode) handle_MsgType_ID_MessageAck(msgData *txdata.MessageAc
 	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
+func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Req, msgConn *wsnet.WsSocket) {
 	if msgData.IsLog {
-		glog.Infof("handle_MsgType_ID_CommonReq, msgConn=%p, msgData=%v", msgConn, msgData)
+		glog.Infof("handle_MsgType_ID_Common2Req, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
 	assert4true(msgData.Key != nil)
@@ -276,7 +276,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 		//能插入成功,表示尚未执行过此命令;已经存在了,表示已经执行过该命令了.
 		if msgData.IsSafe {
 			//TODO:要执行命令了,结果崩溃了,然后消息丢失了,我也没办法,我不准备"程序重启之后继续执行该命令",崩了就算了.
-			dataAck := thls.genAck4CommonReq(msgData)
+			dataAck := thls.genAck4Common2Req(msgData)
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 			//ROOT发出去请求消息,NODE接收后,在即将发送ACK的时候,ROOT与之断开,ACK丢失,
 			//NODE开始执行请求命令,请求命令非常耗时(约耗时1分钟),期间没有响应消息发出.
@@ -293,13 +293,13 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 				return //从待同步表中能查到对应的响应,则认为该请求已经执行过了,这次为重复获取,则丢弃该请求.
 			}
 		}
-		thls.handle_MsgType_ID_CommonReq_exec(msgData, msgConn)
+		thls.handle_MsgType_ID_Common2Req_exec(msgData, msgConn)
 		return
 	}
 
 	if msgData.IsSafe {
 		if msgData.UpCache || thls.iAmRoot {
-			dataAck := thls.genAck4CommonReq(msgData)
+			dataAck := thls.genAck4Common2Req(msgData)
 			msgData.SenderID = thls.ownInfo.UserID //缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
 			if thls.iAmRoot {
 				msgData.TxToRoot = !msgData.TxToRoot
@@ -328,7 +328,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	err := thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
 
 	if (err != nil) && !msgData.IsSafe && !msgData.IsPush {
-		tmpTxRspData := thls.genRsp4CommonReq(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		tmpTxRspData := thls.genRsp4Common2Req(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
 		if thls.iAmRoot {
 			//如果我是ROOT,那么原始的Req消息肯定是TxToRoot,在ROOT转发失败,要回复的Rsp消息肯定要发往叶子节点.
 			tmpTxRspData.TxToRoot = !tmpTxRspData.TxToRoot
@@ -338,9 +338,9 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq(msgData *txdata.CommonReq,
 	}
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp, msgConn *wsnet.WsSocket) {
+func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rsp, msgConn *wsnet.WsSocket) {
 	if msgData.IsLog {
-		glog.Infof("handle_MsgType_ID_CommonRsp, msgConn=%p, msgData=%v", msgConn, msgData)
+		glog.Infof("handle_MsgType_ID_Common2Rsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
 	assert4true(msgData.Key != nil)
@@ -377,7 +377,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
 		//TODO:应当添加响应的回调函数,供外部使用.
 		if msgData.IsSafe { //应当所有的操作都处理完了,再回应ACK.
-			dataAck := thls.genAck4CommonRsp(msgData)
+			dataAck := thls.genAck4Common2Rsp(msgData)
 			thls.sendDataEx2(dataAck, msgConn, dataAck.TxToRoot, dataAck.RecverID)
 		}
 		return
@@ -385,7 +385,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonRsp(msgData *txdata.CommonRsp,
 
 	if msgData.IsSafe {
 		if msgData.UpCache || thls.iAmRoot {
-			dataAck := thls.genAck4CommonRsp(msgData)
+			dataAck := thls.genAck4Common2Rsp(msgData)
 			msgData.SenderID = thls.ownInfo.UserID //缓存,可能是在内存中缓存起来,也可能插入数据库,所以这里需要先修改数据,再进行缓存.
 			if thls.iAmRoot {
 				msgData.TxToRoot = !msgData.TxToRoot
@@ -659,23 +659,23 @@ func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemR
 	}
 }
 
-func (thls *businessNode) genAck4CommonReq(dataReq *txdata.CommonReq) (dataAck *txdata.MessageAck) {
+func (thls *businessNode) genAck4Common2Req(dataReq *txdata.Common2Req) (dataAck *txdata.Common2Ack) {
 	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
-	//(CommonReq.Key)不会被修改,所以不用clone一个副本.
+	//(Common2Req.Key)不会被修改,所以不用clone一个副本.
 	assert4true(dataReq.IsSafe)
-	return &txdata.MessageAck{Key: dataReq.Key, SenderID: thls.ownInfo.UserID, RecverID: dataReq.SenderID, TxToRoot: !dataReq.TxToRoot, IsLog: dataReq.IsLog}
+	return &txdata.Common2Ack{Key: dataReq.Key, SenderID: thls.ownInfo.UserID, RecverID: dataReq.SenderID, TxToRoot: !dataReq.TxToRoot, IsLog: dataReq.IsLog}
 }
 
-func (thls *businessNode) genAck4CommonRsp(dataRsp *txdata.CommonRsp) (dataAck *txdata.MessageAck) {
+func (thls *businessNode) genAck4Common2Rsp(dataRsp *txdata.Common2Rsp) (dataAck *txdata.Common2Ack) {
 	//一定要"刚从socket里面接收过来,未经任何修改,然后立即调用该函数"
-	//(CommonRsp.Key)不会被修改,所以不用clone一个副本.
+	//(Common2Rsp.Key)不会被修改,所以不用clone一个副本.
 	assert4true(dataRsp.IsSafe)
 	assert4false(dataRsp.IsPush)
-	return &txdata.MessageAck{Key: dataRsp.Key, SenderID: thls.ownInfo.UserID, RecverID: dataRsp.SenderID, TxToRoot: !dataRsp.TxToRoot, IsLog: dataRsp.IsLog}
+	return &txdata.Common2Ack{Key: dataRsp.Key, SenderID: thls.ownInfo.UserID, RecverID: dataRsp.SenderID, TxToRoot: !dataRsp.TxToRoot, IsLog: dataRsp.IsLog}
 }
 
-func (thls *businessNode) genRsp4CommonReq(dataReq *txdata.CommonReq, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.CommonRsp) {
-	dataRsp = &txdata.CommonRsp{}
+func (thls *businessNode) genRsp4Common2Req(dataReq *txdata.Common2Req, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.Common2Rsp) {
+	dataRsp = &txdata.Common2Rsp{}
 	dataRsp.Key = cloneUniKey(dataReq.Key)
 	dataRsp.Key.SeqNo = seqno
 	dataRsp.SenderID = thls.ownInfo.UserID
@@ -728,7 +728,7 @@ func (thls *businessNode) reportErrorMsg(message string) {
 	thls.sendData(thls.parentInfo.conn, &tmpTxData)
 }
 
-func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d time.Duration) (rspSlice []*txdata.CommonRsp) {
+func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, d time.Duration) (rspSlice []*txdata.Common2Rsp) {
 	if true { //修复请求结构体的相关字段.
 		reqInOut.Key = &txdata.UniKey{UserID: thls.ownInfo.UserID, MsgNo: thls.increaseSeqNo(), SeqNo: 0}
 		reqInOut.SenderID = thls.ownInfo.UserID
@@ -746,7 +746,7 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 	if reqInOut.IsSafe {
 		if isExist, isInsert := thls.cacheSync.insertData(reqInOut.Key, reqInOut.TxToRoot, reqInOut.RecverID, reqInOut); isExist || !isInsert {
 			eMsg := fmt.Sprintf("isExist=%v,isInsert=%v", isExist, isInsert)
-			rspSlice = []*txdata.CommonRsp{thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: eMsg}, true)} //TODO:
+			rspSlice = []*txdata.Common2Rsp{thls.genRsp4Common2Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: eMsg}, true)} //TODO:
 			return
 		}
 	}
@@ -758,7 +758,7 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		panic(node) //TODO:
 	}
 
-	var rspData *txdata.CommonRsp
+	var rspData *txdata.Common2Rsp
 	var err error
 	for range FORONCE {
 		err = thls.sendDataEx(thls.parentInfo.conn, reqInOut, true)
@@ -768,9 +768,9 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		//如果应答,等待字段有效,视发送结果而定.
 		if reqInOut.IsPush || (d <= 0) {
 			if err != nil {
-				rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+				rspData = thls.genRsp4Common2Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
 			} else {
-				rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
+				rspData = thls.genRsp4Common2Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
 			}
 			break
 		}
@@ -779,11 +779,11 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送成功了,需要等待.
 		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送失败了,直接返回.
 		if !reqInOut.IsSafe && (err != nil) {
-			rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			rspData = thls.genRsp4Common2Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
 			break
 		}
 		if isTimeout := node.condVar.waitFor(d); isTimeout {
-			rspData = thls.genRsp4CommonReq(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
+			rspData = thls.genRsp4Common2Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
 			break
 		}
 	}
@@ -795,8 +795,8 @@ func (thls *businessNode) syncExecuteCommonReqRsp(reqInOut *txdata.CommonReq, d 
 	return
 }
 
-func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.CommonReq, msgConn *wsnet.WsSocket) {
-	stream := newCommonRspWrapper(reqData, thls.cacheSync, thls.cacheZZZXML, thls.letUpCache, msgConn)
+func (thls *businessNode) handle_MsgType_ID_Common2Req_exec(reqData *txdata.Common2Req, msgConn *wsnet.WsSocket) {
+	stream := newCommon2RspWrapper(reqData, thls.cacheSync, thls.cacheZZZXML, thls.letUpCache, msgConn)
 
 	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
 	if err != nil {
@@ -823,7 +823,7 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.Commo
 	stream.doRemainder()
 }
 
-func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *CommonRspWrapper) {
+func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *Common2RspWrapper) {
 	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
 	data.Data = reqData.Data + "_rsp_1"
 	stream.sendData(data, false)
@@ -831,10 +831,10 @@ func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, 
 	stream.sendData(data, true)
 }
 
-func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
+func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *Common2RspWrapper) {
 }
 
-func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream *CommonRspWrapper) {
+func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream *Common2RspWrapper) {
 	data := &txdata.QryConnInfoRsp{UserID: thls.ownInfo.UserID, Cache: thls.cacheUser.tmpF1()}
 	stream.sendData(data, true)
 }

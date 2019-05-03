@@ -9,24 +9,24 @@ import (
 	"github.com/zx9229/myexe/wsnet"
 )
 
-//CommonRspWrapper omit
-type CommonRspWrapper struct {
+//Common2RspWrapper omit
+type Common2RspWrapper struct {
 	sync.Mutex
 	upCache bool
 	conn    *wsnet.WsSocket
 	isLast  bool
 	rspIdx  int32
-	reqData *txdata.CommonReq
+	reqData *txdata.Common2Req
 	cache   *safeSynchCache
 	zzzxml  *safeUniSymCache
 }
 
-func newCommonRspWrapper(req *txdata.CommonReq, cache *safeSynchCache, zzzxml *safeUniSymCache, upCache bool, conn *wsnet.WsSocket) *CommonRspWrapper {
-	return &CommonRspWrapper{upCache: upCache, conn: conn, cache: cache, zzzxml: zzzxml, reqData: req}
+func newCommon2RspWrapper(req *txdata.Common2Req, cache *safeSynchCache, zzzxml *safeUniSymCache, upCache bool, conn *wsnet.WsSocket) *Common2RspWrapper {
+	return &Common2RspWrapper{upCache: upCache, conn: conn, cache: cache, zzzxml: zzzxml, reqData: req}
 }
 
 //doRemainder 把剩余的事情做完. 执行(善后/清理)工作.
-func (thls *CommonRspWrapper) doRemainder() {
+func (thls *Common2RspWrapper) doRemainder() {
 	//执行(善后/清理)工作
 	thls.Lock()
 	defer thls.Unlock()
@@ -38,8 +38,8 @@ func (thls *CommonRspWrapper) doRemainder() {
 	}
 }
 
-func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool) bool {
-	curRspData := txdata.CommonRsp{}
+func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool) bool {
+	curRspData := txdata.Common2Rsp{}
 	curRspData.Key = cloneUniKey(thls.reqData.Key)
 	curRspData.Key.SeqNo = thls.rspIdx + 1
 	curRspData.SenderID = thls.reqData.RecverID
@@ -77,7 +77,7 @@ func (thls *CommonRspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool
 	return true
 }
 
-func (thls *CommonRspWrapper) sendData(data ProtoMessage, isLast bool) bool {
+func (thls *Common2RspWrapper) sendData(data ProtoMessage, isLast bool) bool {
 	thls.Lock()
 	defer thls.Unlock()
 	if thls.isLast {

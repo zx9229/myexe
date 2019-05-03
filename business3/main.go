@@ -132,7 +132,7 @@ func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.CommonReq, int)) {
+func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common2Req, int)) {
 	var err error
 	var byteSlice []byte
 
@@ -160,12 +160,12 @@ func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request,
 			break
 		}
 
-		var reqData *txdata.CommonReq
+		var reqData *txdata.Common2Req
 		var secTimeout int
 		if true {
 			reqData, secTimeout = Obj2Msg(obj)
 		}
-		rspSlice := node.syncExecuteCommonReqRsp(reqData, time.Duration(secTimeout)*time.Second)
+		rspSlice := node.syncExecuteCommon2ReqRsp(reqData, time.Duration(secTimeout)*time.Second)
 
 		assert4true(ceData.ErrNo == 0)
 		assert4true(len(resultSlice) == 0)
@@ -206,7 +206,7 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 		Mode    int
 		IsLog   bool
 	})
-	obj2msg := func(obj interface{}) (req *txdata.CommonReq, sec int) {
+	obj2msg := func(obj interface{}) (req *txdata.Common2Req, sec int) {
 		theObj := obj.(*struct {
 			txdata.EchoItem
 			Recver  string
@@ -215,7 +215,7 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 			IsLog   bool
 		})
 		var err error
-		req = &txdata.CommonReq{}
+		req = &txdata.Common2Req{}
 		//req.Key
 		//req.SenderID
 		req.RecverID = theObj.Recver

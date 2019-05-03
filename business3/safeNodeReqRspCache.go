@@ -35,12 +35,12 @@ func (thls *nodeReqRsp) appendRspData(msg ProtoMessage) {
 	thls.Unlock()
 }
 
-func (thls *nodeReqRsp) xyz() (slcOut []*txdata.CommonRsp) {
+func (thls *nodeReqRsp) xyz() (slcOut []*txdata.Common2Rsp) {
 	thls.Lock()
 	if thls.rspData != nil {
-		slcOut = make([]*txdata.CommonRsp, 0)
+		slcOut = make([]*txdata.Common2Rsp, 0)
 		for _, node := range thls.rspData {
-			slcOut = append(slcOut, node.(*txdata.CommonRsp))
+			slcOut = append(slcOut, node.(*txdata.Common2Rsp))
 		}
 	}
 	thls.Unlock()
