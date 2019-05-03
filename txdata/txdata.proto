@@ -10,25 +10,27 @@ import public "google/protobuf/timestamp.proto";
 // Windows: findstr "^message" txdata.proto
 enum MsgType {
     Zero1               =  0;//第0个本该是(UniKey)
-    ID_Common2Ack       =  1;
-    ID_CommonErr        =  2;
-    ID_Common2Req        =  3;
-    ID_Common2Rsp        =  4;
-    ID_ConnectionInfo   =  5;
-    ID_DisconnectedData =  6;
-    ID_ConnectReq       =  7;
-    ID_ConnectRsp       =  8;
-    ID_OnlineNotice     =  9;
-    ID_SystemReport     = 10;
-    ID_QueryRecordReq   = 11;
-    ID_QueryRecordRsp   = 12;
-    ID_ExecCmdReq       = 13;
-    ID_ExecCmdRsp       = 14;
-    ID_EchoItem         = 15;
-    ID_ReportDataItem   = 16;
-    ID_SendMailItem     = 17;
-    ID_QryConnInfoReq   = 18;
-    ID_QryConnInfoRsp   = 19;
+    ID_CommonErr        =  1;
+    ID_Common2Ack       =  2;
+    ID_Common2Req       =  3;
+    ID_Common2Rsp       =  4;
+    ID_Common1Req       =  5;
+    ID_Common1Rsp       =  6;
+    ID_ConnectionInfo   =  7;
+    ID_DisconnectedData =  8;
+    ID_ConnectReq       =  9;
+    ID_ConnectRsp       = 10;
+    ID_OnlineNotice     = 11;
+    ID_SystemReport     = 12;
+    ID_QryConnInfoReq   = 13;
+    ID_QryConnInfoRsp   = 14;
+    ID_QueryRecordReq   = 15;
+    ID_QueryRecordRsp   = 16;
+    ID_ExecCmdReq       = 17;
+    ID_ExecCmdRsp       = 18;
+    ID_EchoItem         = 19;
+    ID_ReportDataItem   = 20;
+    ID_SendMailItem     = 21;
 }
 
 //唯一标识一个消息.
@@ -38,6 +40,12 @@ message UniKey {
     int32   SeqNo  = 3;//同一消息的顺序号(Req+Rsp为同一消息,可1对n,Req为0,Rsp从1开始增加).
 }
 
+//常用于(Common2Req)和(Common2Rsp)的通信过程中.
+message CommonErr {
+    int32                     ErrNo    = 1;
+    string                    ErrMsg   = 2;
+}
+
 //对某消息进行确认.
 message Common2Ack {
     UniKey  Key      = 1;
@@ -45,12 +53,6 @@ message Common2Ack {
     string  RecverID = 3;//消息的接收者.
     bool    TxToRoot = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
     bool    IsLog    = 5;//对本消息打日志.
-}
-
-//常用于(Common2Req)和(Common2Rsp)的通信过程中.
-message CommonErr {
-    int32                     ErrNo    = 1;
-    string                    ErrMsg   = 2;
 }
 
 message Common2Req {
@@ -81,6 +83,31 @@ message Common2Rsp {
     bytes                     RspData  = 10;
     google.protobuf.Timestamp RspTime  = 11;
     bool                      IsLast   = 12;//最后一条响应的标志.
+}
+
+message Common1Req {
+    int64                     RequestID =  1;
+    string                    SenderID  =  2;
+    string                    RecverID  =  3;
+    bool                      TxToRoot  =  4;//指代传输的方向.
+    bool                      IsLog     =  5;
+    bool                      IsPush    =  6;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    MsgType                   ReqType   =  7;
+    bytes                     ReqData   =  8;
+    google.protobuf.Timestamp ReqTime   =  9;
+}
+
+message Common1Rsp {
+    int64                     RequestID =  1;
+    string                    SenderID  =  2;
+    string                    RecverID  =  3;
+    bool                      TxToRoot  =  4;
+    bool                      IsLog     =  5;
+    bool                      IsPush    =  6;
+    MsgType                   RspType   =  7;
+    bytes                     RspData   =  8;
+    google.protobuf.Timestamp RspTime   =  9;
+    bool                      IsLast    = 10;//最后一条响应的标志.
 }
 
 message ConnectionInfo {
@@ -139,6 +166,14 @@ message SystemReport {
     string          Message = 3;
 }
 
+message QryConnInfoReq {
+}
+
+message QryConnInfoRsp {
+    string                  UserID = 1;//查询了哪个用户.
+    map<string, ConnectReq> Cache  = 2;//该用户的缓存.
+}
+
 //从ROOT查询记录的请求.
 message QueryRecordReq {
     string         UserID = 1;//要查询的用户.
@@ -182,12 +217,4 @@ message SendMailItem {
     string Subject     = 5;
     string ContentType = 6;
     string Content     = 7;
-}
-
-message QryConnInfoReq {
-}
-
-message QryConnInfoRsp {
-    string                  UserID = 1;//查询了哪个用户.
-    map<string, ConnectReq> Cache  = 2;//该用户的缓存.
 }
