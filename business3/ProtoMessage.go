@@ -65,14 +65,18 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 	// ff(){ sed -n '/^enum MsgType/,/}/p' "$1" | sed 's/[ \t]*\?\(ID_\)\([^ \t]\+\).*/case txdata.MsgType_\1\2: \n msgData = new(txdata.\2)/g' ; }
 	// ff  txdata.proto
 	switch msgType {
-	case txdata.MsgType_ID_Common2Ack:
-		msgData = new(txdata.Common2Ack)
 	case txdata.MsgType_ID_CommonErr:
 		msgData = new(txdata.CommonErr)
+	case txdata.MsgType_ID_Common2Ack:
+		msgData = new(txdata.Common2Ack)
 	case txdata.MsgType_ID_Common2Req:
 		msgData = new(txdata.Common2Req)
 	case txdata.MsgType_ID_Common2Rsp:
 		msgData = new(txdata.Common2Rsp)
+	case txdata.MsgType_ID_Common1Req:
+		msgData = new(txdata.Common1Req)
+	case txdata.MsgType_ID_Common1Rsp:
+		msgData = new(txdata.Common1Rsp)
 	case txdata.MsgType_ID_ConnectionInfo:
 		msgData = new(txdata.ConnectionInfo)
 	case txdata.MsgType_ID_DisconnectedData:
@@ -85,6 +89,10 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 		msgData = new(txdata.OnlineNotice)
 	case txdata.MsgType_ID_SystemReport:
 		msgData = new(txdata.SystemReport)
+	case txdata.MsgType_ID_QryConnInfoReq:
+		msgData = new(txdata.QryConnInfoReq)
+	case txdata.MsgType_ID_QryConnInfoRsp:
+		msgData = new(txdata.QryConnInfoRsp)
 	case txdata.MsgType_ID_QueryRecordReq:
 		msgData = new(txdata.QueryRecordReq)
 	case txdata.MsgType_ID_QueryRecordRsp:
