@@ -812,6 +812,8 @@ func (thls *businessNode) handle_MsgType_ID_CommonReq_exec(reqData *txdata.Commo
 	case txdata.MsgType_ID_QueryRecordReq:
 		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
 	case txdata.MsgType_ID_ExecCmdReq:
+	case txdata.MsgType_ID_QryConnInfoReq:
+		thls.execute_MsgType_ID_QryConnInfoReq(objData.(*txdata.QryConnInfoReq), stream)
 	default:
 		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
 			//TODO:报警.
@@ -830,6 +832,11 @@ func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, 
 }
 
 func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *CommonRspWrapper) {
+}
+
+func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream *CommonRspWrapper) {
+	data := &txdata.QryConnInfoRsp{UserID: thls.ownInfo.UserID, Cache: thls.cacheUser.tmpF1()}
+	stream.sendData(data, true)
 }
 
 func (thls *businessNode) backgroundWork() {

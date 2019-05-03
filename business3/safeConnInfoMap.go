@@ -130,3 +130,13 @@ func (thls *safeConnInfoMap) MarshalJSON() (byteSlice []byte, err error) {
 	thls.Unlock()
 	return
 }
+
+func (thls *safeConnInfoMap) tmpF1() (data map[string]*txdata.ConnectReq) {
+	data = make(map[string]*txdata.ConnectReq)
+	thls.Lock()
+	for k, v := range thls.M {
+		data[k] = &txdata.ConnectReq{InfoReq: &v.Info, Pathway: v.Pathway}
+	}
+	thls.Unlock()
+	return
+}
