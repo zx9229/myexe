@@ -132,7 +132,7 @@ func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common2Req, int)) {
+func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common2Req, int)) {
 	var err error
 	var byteSlice []byte
 
@@ -231,5 +231,5 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 		sec = theObj.Timeout
 		return
 	}
-	handleCommonFun(node, w, r, curObj, obj2msg)
+	handleCommon2Fun(node, w, r, curObj, obj2msg)
 }
