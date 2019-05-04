@@ -16,19 +16,24 @@ using GPMSGPTR = QSharedPointer<::google::protobuf::Message>;
 class m2b
 {
 public:
-    static ::txdata::MsgType CalcMessageType(const ::google::protobuf::Message& msgIn)
+    static ::txdata::MsgType CalcMsgType(const ::google::protobuf::Message& msgIn)
     {
         return static_cast<::txdata::MsgType>(msgIn.GetDescriptor()->index());
     }
-    static QString CalcMessageTypeName(const ::google::protobuf::Message& msgIn)
+    static QString CalcMsgTypeName(const ::google::protobuf::Message& msgIn)
     {
-        QString::fromStdString(::txdata::MsgType_Name(CalcMessageType(msgIn)));
+        return QString::fromStdString(::txdata::MsgType_Name(CalcMsgType(msgIn)));
+    }
+    static QString MsgTypeName2MsgClassName(const QString& msgTypeName)
+    {
+        static QString ID_("ID_");
+        return msgTypeName.startsWith(ID_) ? msgTypeName.mid(ID_.size()) : msgTypeName;
     }
     static bool msg2package(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
         pkgOut.clear();
         //在定义(.proto)文件的时候,就必须将其对应正确.
-        ::txdata::MsgType msgType = CalcMessageType(msgIn);
+        ::txdata::MsgType msgType = CalcMsgType(msgIn);
         //令(int i = 1)则assert(reinterpret_cast<char*>(&i)[0] == 1)
         pkgOut.append(reinterpret_cast<char*>(&msgType), 2);
         std::string tmpData;
