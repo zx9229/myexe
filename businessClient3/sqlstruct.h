@@ -120,7 +120,7 @@ public:
         ).QString::arg(static_table_name());
         return  sql;
     }
-    bool insert_data(QSqlQuery& query, int64_t* lastInsertId = nullptr)
+    bool insert_data(QSqlQuery& query, bool insertNotReplace, int64_t* lastInsertId = nullptr)
     {
         //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
         bool isOk = false;
@@ -137,7 +137,7 @@ public:
         if (Valid(this->Remark)) { cols.append("Remark"); }
         if (Valid(this->Pathway)) { cols.append("Pathway"); }
         //
-        QString sqlStr = QObject::tr("INSERT INTO %1 (%2) VALUES (%3)").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        QString sqlStr = QObject::tr("INSERT %1 INTO %2 (%3) VALUES (%4)").arg(insertNotReplace ? "" : "OR REPLACE").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
         isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
         //
@@ -205,6 +205,12 @@ public:
             dataOut.append(curData);
         }
         return true;
+    }
+    static bool delete_data(QSqlQuery& query, const QString& whereCond)
+    {
+        QString sqlStr = QObject::tr("DELETE FROM %1").arg(static_table_name());
+        if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
+        return query.exec(sqlStr);
     }
 };
 Q_DECLARE_METATYPE(ConnInfoEx);
