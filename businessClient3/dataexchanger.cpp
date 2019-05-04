@@ -1,6 +1,7 @@
 // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
 #include "dataexchanger.h"
 #include <QCoreApplication>
+#include <QSqlQuery>
 #include <QSqlError>
 #include <QtCore/QMetaEnum>
 #include "m2b.h"
@@ -144,11 +145,20 @@ QString DataExchanger::jsonToObjAndS(const QString &typeName, const QString &jso
             message = "serialize object fail";
             break;
         }
-        serializedData.append(binData.data(), binData.size());
+        serializedData.append(binData.data(), static_cast<int>(binData.size()));
         msgType = static_cast<txdata::MsgType>(curObj->GetDescriptor()->index());
     } while (false);
     //
     return message;
+}
+
+void DataExchanger::qdt2gpt(::google::protobuf::Timestamp &gptDst, const QDateTime &qdtSrc)
+{
+    if (qdtSrc.isValid())
+    {
+        gptDst.set_seconds(qdtSrc.offsetFromUtc());
+        gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
+    }
 }
 
 void DataExchanger::setURL(const QString &url)
@@ -166,6 +176,34 @@ bool DataExchanger::start()
 {
     m_ws.stop(true);
     return m_ws.start(m_url);
+}
+
+QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2)
+{
+    QString message;
+
+    GPMSGPTR msgData;
+    message = toC1C2(typeName, jsonText, rID, isLog, isSafe, isPush, isUpCache, isC1NotC2, msgData);
+    if (!message.isEmpty())
+        return message;
+
+    if (isC1NotC2)
+    {
+        message = sendCommon1Req(qSharedPointerDynamicCast<txdata::Common1Req>(msgData));
+    }
+    else
+    {
+        message = sendCommon2Req(qSharedPointerDynamicCast<txdata::Common2Req>(msgData));
+    }
+    return message;
+}
+
+QString DataExchanger::QryConnInfoReq(const QString &userId)
+{
+    txdata::QryConnInfoReq tmpData;
+    QString typeName = m2b::CalcMessageTypeName(tmpData);
+    QString jsonText = jsonByMsgObje(tmpData, nullptr);
+    return demoFun(typeName, jsonText, userId, false, false, false, false, true);
 }
 
 void DataExchanger::initDB()
@@ -197,11 +235,112 @@ void DataExchanger::initOwnInfo()
     m_ownInfo.set_remark("");
 }
 
-void DataExchanger::handle_MessageAck(QSharedPointer<txdata::MessageAck> data)
+QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR &msgOut)
+{
+    QString message;
+
+    txdata::MsgType curType = txdata::MsgType::Zero1;
+    QByteArray curData;
+    message = jsonToObjAndS(typeName, jsonText, curType, curData);
+    if (!message.isEmpty())
+        return message;
+
+    int64_t reqId = 0;
+    int64_t msgNo = 1;
+    int32_t seqNo = 0;
+
+    if (isC1NotC2)
+    {
+        QSharedPointer<txdata::Common1Req> c1req = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
+        c1req->set_requestid(reqId);//TODO:
+        c1req->set_senderid(this->m_ownInfo.userid());
+        c1req->set_recverid(rID.toStdString());
+        c1req->set_txtoroot(true);
+        c1req->set_islog(isLog);
+        c1req->set_ispush(isPush);
+        c1req->set_reqtype(curType);
+        c1req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
+        qdt2gpt(*(c1req->mutable_reqtime()), QDateTime::currentDateTime());
+        msgOut = c1req;
+    }
+    else
+    {
+        QSharedPointer<txdata::Common2Req> c2req = QSharedPointer<txdata::Common2Req>(new txdata::Common2Req);
+        c2req->mutable_key()->set_userid(m_ownInfo.userid());
+        c2req->mutable_key()->set_msgno(msgNo);
+        c2req->mutable_key()->set_seqno(seqNo);
+        c2req->set_senderid(m_ownInfo.userid());
+        c2req->set_recverid(rID.toStdString());
+        c2req->set_txtoroot(true);
+        c2req->set_islog(isLog);
+        c2req->set_issafe(isSafe);
+        c2req->set_ispush(isPush);
+        c2req->set_upcache(isUpCache);
+        c2req->set_reqtype(curType);
+        c2req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
+        qdt2gpt(*(c2req->mutable_reqtime()), QDateTime::currentDateTime());
+        msgOut = c2req;
+    }
+
+    return message;
+}
+
+QString DataExchanger::sendCommon1Req(QSharedPointer<txdata::Common1Req> data)
+{
+    qint64 sendBytes = m_ws.sendBinaryMessage(m2b::msg2package(*data));
+    //一个字节都没发出去,肯定就发送失败了.
+    return (0 == sendBytes) ? "send failed" : "";
+}
+
+QString DataExchanger::sendCommon2Req(QSharedPointer<txdata::Common2Req> data)
+{
+    if (data->issafe())
+    {
+        bool isOk = m_cacheSync.insertData(data->key(), data->txtoroot(), data->recverid(), data);
+        Q_ASSERT(isOk);
+    }
+    qint64 sendBytes = m_ws.sendBinaryMessage(m2b::msg2package(*data));
+    //一个字节都没发出去,肯定就发送失败了.
+    return (0 == sendBytes) ? "send failed" : "";
+}
+
+void DataExchanger::handle_Common2Ack(QSharedPointer<txdata::Common2Ack> data)
 {
     Q_ASSERT(data.data() != nullptr);
     qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << QString::fromStdString(data->GetTypeName());
     //TODO:
+}
+
+void DataExchanger::handle_Common2Rsp(QSharedPointer<txdata::Common2Rsp> msgData)
+{
+    Q_ASSERT(msgData.data() != nullptr);
+    if (msgData->islog())
+    {
+        qDebug() << QString::fromStdString(msgData->DebugString());
+    }
+}
+
+void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData)
+{
+    Q_ASSERT(msgData.data() != nullptr);
+    if (msgData->islog())
+    {
+        qDebug() << QString::fromStdString(msgData->DebugString());
+    }
+    GPMSGPTR curData;
+    if (!m2b::slice2msg(msgData->rspdata(), msgData->rsptype(), curData))
+    {
+        qDebug() << "handle_Common1Rsp," << "slice2msg fail," << msgData->rsptype();
+        return;
+    }
+    Q_ASSERT(msgData->rsptype() == m2b::CalcMessageType(*curData));
+    switch (msgData->rsptype()) {
+    case txdata::ID_QryConnInfoRsp:
+        deal_QryConnInfoRsp(qSharedPointerDynamicCast<txdata::QryConnInfoRsp>(curData));
+        break;
+    default:
+        break;
+    }
 }
 
 void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
@@ -267,6 +406,28 @@ void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
     }
 }
 
+void DataExchanger::deal_QryConnInfoRsp(QSharedPointer<txdata::QryConnInfoRsp> msgData)
+{
+    Q_ASSERT(msgData.data() != nullptr);
+    QSqlQuery sqlQuery;
+    ConnInfoEx::delete_data(sqlQuery, "");
+    for (auto&p : msgData->cache())
+    {
+        const txdata::ConnectReq& curData = p.second;
+        ConnInfoEx cie;
+        cie.UserID = QString::fromStdString(curData.inforeq().userid());
+        cie.BelongID = QString::fromStdString(curData.inforeq().belongid());
+        cie.Version = QString::fromStdString(curData.inforeq().version());
+        cie.ExePid = curData.inforeq().exepid();
+        cie.ExePath = QString::fromStdString(curData.inforeq().exepath());
+        cie.Remark = QString::fromStdString(curData.inforeq().remark());
+        QStringList pathway;
+        for (int i = 0; i < curData.pathway_size(); i++) { pathway.append(QString::fromStdString(curData.pathway().Get(i))); }
+        cie.Pathway = pathway.join("->");
+        cie.insert_data(sqlQuery, false);
+    }
+}
+
 void DataExchanger::slotOnConnected()
 {
     //qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "slotOnConnected";
@@ -301,12 +462,16 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
         return;
     }
     switch (theType) {
-    case txdata::MsgType::ID_MessageAck:
-        handle_MessageAck(qSharedPointerDynamicCast<txdata::MessageAck>(theMsg));
+    case txdata::MsgType::ID_Common2Ack:
+        handle_MessageAck(qSharedPointerDynamicCast<txdata::Common2Ack>(theMsg));
         break;
-    case txdata::MsgType::ID_CommonReq:
+    case txdata::MsgType::ID_Common2Req:
         break;
-    case txdata::MsgType::ID_CommonRsp:
+    case txdata::MsgType::ID_Common2Rsp:
+        handle_Common2Rsp(qSharedPointerDynamicCast<txdata::Common2Rsp>(theMsg));
+        break;
+    case txdata::MsgType::ID_Common1Rsp:
+        handle_Common1Rsp(qSharedPointerDynamicCast<txdata::Common1Rsp>(theMsg));
         break;
     case txdata::MsgType::ID_DisconnectedData:
         break;
