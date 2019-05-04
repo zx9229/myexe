@@ -421,6 +421,10 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 }
 
 func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Req, msgConn *wsnet.WsSocket) {
+	if msgData.IsLog {
+		glog.Infof("handle_MsgType_ID_Common1Req, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
 	}
@@ -453,6 +457,10 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 }
 
 func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rsp, msgConn *wsnet.WsSocket) {
+	if msgData.IsLog {
+		glog.Infof("handle_MsgType_ID_Common1Rsp, msgConn=%p, msgData=%v", msgConn, msgData)
+	}
+
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.TxToRoot)
 	}
