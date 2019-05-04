@@ -8,7 +8,7 @@ import (
 	"github.com/zx9229/myexe/txdata"
 )
 
-type nodeReqRsp struct {
+type nodeC2ReqRsp struct {
 	sync.Mutex
 	condVar *myCondVariable
 	key     UniSym
@@ -16,16 +16,16 @@ type nodeReqRsp struct {
 	rspData []ProtoMessage
 }
 
-func newNodeReqRsp() *nodeReqRsp {
-	//return &nodeReqRsp{condVar: newMyCondVariable(), rspData: make([]ProtoMessage, 0)}
-	return &nodeReqRsp{condVar: newMyCondVariable()}
+func newNodeC2ReqRsp() *nodeC2ReqRsp {
+	//return &nodeC2ReqRsp{condVar: newMyCondVariable(), rspData: make([]ProtoMessage, 0)}
+	return &nodeC2ReqRsp{condVar: newMyCondVariable()}
 }
 
-func (thls *nodeReqRsp) setReqData(msg ProtoMessage) {
+func (thls *nodeC2ReqRsp) setReqData(msg ProtoMessage) {
 	thls.reqData = msg
 }
 
-func (thls *nodeReqRsp) appendRspData(msg ProtoMessage) {
+func (thls *nodeC2ReqRsp) appendRspData(msg ProtoMessage) {
 	assert4true(msg != nil)
 	thls.Lock()
 	if thls.rspData == nil {
@@ -35,7 +35,7 @@ func (thls *nodeReqRsp) appendRspData(msg ProtoMessage) {
 	thls.Unlock()
 }
 
-func (thls *nodeReqRsp) xyz() (slcOut []*txdata.Common2Rsp) {
+func (thls *nodeC2ReqRsp) xyz() (slcOut []*txdata.Common2Rsp) {
 	thls.Lock()
 	if thls.rspData != nil {
 		slcOut = make([]*txdata.Common2Rsp, 0)
@@ -47,16 +47,16 @@ func (thls *nodeReqRsp) xyz() (slcOut []*txdata.Common2Rsp) {
 	return
 }
 
-type safeNodeReqRspCache struct {
+type safeNodeC2ReqRspCache struct {
 	sync.Mutex
-	M map[UniSym]*nodeReqRsp
+	M map[UniSym]*nodeC2ReqRsp
 }
 
-func newSafeNodeReqRspCache() *safeNodeReqRspCache {
-	return &safeNodeReqRspCache{M: make(map[UniSym]*nodeReqRsp)}
+func newSafeNodeC2ReqRspCache() *safeNodeC2ReqRspCache {
+	return &safeNodeC2ReqRspCache{M: make(map[UniSym]*nodeC2ReqRsp)}
 }
 
-func (thls *safeNodeReqRspCache) insertNode(node *nodeReqRsp) (isSuccess bool) {
+func (thls *safeNodeC2ReqRspCache) insertNode(node *nodeC2ReqRsp) (isSuccess bool) {
 	thls.Lock()
 	if _, isSuccess = thls.M[node.key]; !isSuccess {
 		thls.M[node.key] = node
@@ -66,7 +66,7 @@ func (thls *safeNodeReqRspCache) insertNode(node *nodeReqRsp) (isSuccess bool) {
 	return
 }
 
-func (thls *safeNodeReqRspCache) deleteNode(sym *UniSym) (node *nodeReqRsp, isExist bool) {
+func (thls *safeNodeC2ReqRspCache) deleteNode(sym *UniSym) (node *nodeC2ReqRsp, isExist bool) {
 	thls.Lock()
 	if node, isExist = thls.M[*sym]; isExist {
 		delete(thls.M, *sym)
@@ -75,17 +75,17 @@ func (thls *safeNodeReqRspCache) deleteNode(sym *UniSym) (node *nodeReqRsp, isEx
 	return
 }
 
-func (thls *safeNodeReqRspCache) queryNode(sym *UniSym) (node *nodeReqRsp, isExist bool) {
+func (thls *safeNodeC2ReqRspCache) queryNode(sym *UniSym) (node *nodeC2ReqRsp, isExist bool) {
 	thls.Lock()
 	node, isExist = thls.M[*sym]
 	thls.Unlock()
 	return
 }
 
-func (thls *safeNodeReqRspCache) operateNode(uniKey *txdata.UniKey, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
+func (thls *safeNodeC2ReqRspCache) operateNode(uniKey *txdata.UniKey, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
 	sym := &UniSym{UserID: uniKey.UserID, MsgNo: uniKey.MsgNo, SeqNo: 0} //从Rsp转成Req要置SeqNo为0才行.
 	assert4true(rspData != nil)
-	var node *nodeReqRsp
+	var node *nodeC2ReqRsp
 	if doNotify {
 		node, isSuccess = thls.deleteNode(sym)
 	} else {
@@ -101,7 +101,7 @@ func (thls *safeNodeReqRspCache) operateNode(uniKey *txdata.UniKey, rspData Prot
 }
 
 //MarshalJSON 为了能通过[json.Marshal(obj)]而编写的函数.
-func (thls *safeNodeReqRspCache) MarshalJSON() ([]byte, error) {
+func (thls *safeNodeC2ReqRspCache) MarshalJSON() ([]byte, error) {
 	tmpMap := make(map[string]string)
 	thls.Lock()
 	var rspLen int
