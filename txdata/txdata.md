@@ -10,6 +10,9 @@
 已经执行过 go get -u -v google.golang.org/grpc  
 已经执行过 go get -u -v github.com/golang/protobuf/protoc-gen-go  
 
+在本目录编译程序的命令:  
+PUSHD ..\business3\  &&  go build  &&  POPD  
+
 曾经的命令:  
 protoc  --proto_path=./  txdata.proto  --go_out=plugins=grpc:./  
 protoc  --proto_path=./  txdata.proto  --cpp_out=../businessClient/protobuf/  
