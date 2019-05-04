@@ -5,7 +5,7 @@
 如果编译出错了, 请搜索第一个【errno() const】并修改成类似下面的内容, 仅修改第一个就可以了:
 #ifdef errno
 #undef errno
-::google::protobuf::int32 errno() const;
+  ::google::protobuf::int32 errno() const;
 #endif
 */
 #include "txdata.pb.h"
@@ -19,6 +19,10 @@ public:
     static ::txdata::MsgType CalcMessageType(const ::google::protobuf::Message& msgIn)
     {
         return static_cast<::txdata::MsgType>(msgIn.GetDescriptor()->index());
+    }
+    static QString CalcMessageTypeName(const ::google::protobuf::Message& msgIn)
+    {
+        QString::fromStdString(::txdata::MsgType_Name(CalcMessageType(msgIn)));
     }
     static bool msg2package(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
@@ -48,6 +52,11 @@ public:
         bool retVal = src.SerializeToString(&dst);
         Q_ASSERT(retVal);
         return dst;
+    }
+
+    static bool slice2msg(const std::string& data, ::txdata::MsgType msgType, GPMSGPTR& msgOut)
+    {
+        return slice2msg(data.data(), static_cast<int>(data.size()), msgType, msgOut);
     }
 
     static bool slice2msg(const char* data, int size, ::txdata::MsgType msgType, GPMSGPTR& msgOut)
