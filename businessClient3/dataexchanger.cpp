@@ -110,9 +110,10 @@ QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &
 
 bool DataExchanger::calcObjByName(const QString &typeName, QSharedPointer<google::protobuf::Message> &objOut)
 {
+    QString msgClassName = m2b::MsgTypeName2MsgClassName(typeName);
     objOut.clear();
     // https://blog.csdn.net/riopho/article/details/80372510
-    const google::protobuf::Descriptor* desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(typeName.toStdString());
+    const google::protobuf::Descriptor* desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(msgClassName.toStdString());
     if (nullptr == desc) { return false; }
     // desc->index();
     google::protobuf::Message* mesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New();
@@ -201,7 +202,7 @@ QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText,
 QString DataExchanger::QryConnInfoReq(const QString &userId)
 {
     txdata::QryConnInfoReq tmpData;
-    QString typeName = m2b::CalcMessageTypeName(tmpData);
+    QString typeName = m2b::CalcMsgTypeName(tmpData);
     QString jsonText = jsonByMsgObje(tmpData, nullptr);
     return demoFun(typeName, jsonText, userId, false, false, false, false, true);
 }
@@ -287,6 +288,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
 
 QString DataExchanger::sendCommon1Req(QSharedPointer<txdata::Common1Req> data)
 {
+    //data->set_islog(true);
     qint64 sendBytes = m_ws.sendBinaryMessage(m2b::msg2package(*data));
     //一个字节都没发出去,肯定就发送失败了.
     return (0 == sendBytes) ? "send failed" : "";
@@ -333,7 +335,7 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         qDebug() << "handle_Common1Rsp," << "slice2msg fail," << msgData->rsptype();
         return;
     }
-    Q_ASSERT(msgData->rsptype() == m2b::CalcMessageType(*curData));
+    Q_ASSERT(msgData->rsptype() == m2b::CalcMsgType(*curData));
     switch (msgData->rsptype()) {
     case txdata::ID_QryConnInfoRsp:
         deal_QryConnInfoRsp(qSharedPointerDynamicCast<txdata::QryConnInfoRsp>(curData));
@@ -378,6 +380,8 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
     {
         m_parentInfo.CopyFrom(data->inforeq());
         emit sigReady();
+        QString mesg = this->QryConnInfoReq("");
+        qDebug()<<"QryConnInfoReq with"<<mesg;
     }
     else
     {
@@ -463,7 +467,7 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
     }
     switch (theType) {
     case txdata::MsgType::ID_Common2Ack:
-        handle_MessageAck(qSharedPointerDynamicCast<txdata::Common2Ack>(theMsg));
+        handle_Common2Ack(qSharedPointerDynamicCast<txdata::Common2Ack>(theMsg));
         break;
     case txdata::MsgType::ID_Common2Req:
         break;
