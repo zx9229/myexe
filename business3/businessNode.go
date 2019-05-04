@@ -38,13 +38,14 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheUser  *safeConnInfoMap
 		CacheSock  *safeWsSocketMap
 		CacheSync  *safeSynchCache
-		CacheRR    *safeNodeReqRspCache
+		CacheC2RR  *safeNodeC2ReqRspCache
+		cacheC1RR  *safeNodeC1ReqRspCache
 		ZZZXML     *safeUniSymCache
 		BAQYTDHC   *safeMemoryTmpCache
 		AQZXJG     *safeSynchCache
 		OwnMsgNo   string //用(int64)时会出现BUG(明明int64的值在慢慢地增加,但是Marshal后的字符串中,我们可以看到,其值一直没有变化,迫于无奈,我使用了string)
 		//chanSync   chan string
-	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheRR: thls.cacheRR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheC2RR: thls.cacheC2RR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
 	byteSlice, err = json.Marshal(&tmpObj)
 	return
 }
@@ -57,8 +58,9 @@ type businessNode struct {
 	rootOnline  bool
 	cacheUser   *safeConnInfoMap
 	cacheSock   *safeWsSocketMap
-	cacheSync   *safeSynchCache      //(db)要绝对的投递过去而缓存+因为UpCache而缓存.
-	cacheRR     *safeNodeReqRspCache //异步转同步,让请求和响应对应起来.
+	cacheSync   *safeSynchCache        //(db)要绝对的投递过去而缓存+因为UpCache而缓存.
+	cacheC2RR   *safeNodeC2ReqRspCache //异步转同步,让请求和响应对应起来.
+	cacheC1RR   *safeNodeC1ReqRspCache
 	ownMsgNo    int64
 	chanSync    chan string         //哪个UserID连通了,就投递过来一个信号.
 	cacheZZZXML *safeUniSymCache    //(正在执行命令)的Req消息的UniSym.给续传模式的命令使用,因为只有它们可能续传.
@@ -97,7 +99,8 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.cacheUser = newSafeConnInfoMap()
 	curData.cacheSock = newSafeWsSocketMap()
 	curData.cacheSync = newSafeSynchCache()
-	curData.cacheRR = newSafeNodeReqRspCache()
+	curData.cacheC2RR = newSafeNodeC2ReqRspCache()
+	curData.cacheC1RR = newSafeNodeC1ReqRspCache()
 	curData.cacheZZZXML = newSafeUniSymCache()
 	curData.cBAQYTDHC = newSafeMemoryTmpCache()
 	curData.cAQZXJG = newSafeSynchCache()
@@ -212,6 +215,10 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_Common2Req(txMsgData.(*txdata.Common2Req), msgConn)
 	case txdata.MsgType_ID_Common2Rsp:
 		thls.handle_MsgType_ID_Common2Rsp(txMsgData.(*txdata.Common2Rsp), msgConn)
+	case txdata.MsgType_ID_Common1Req:
+		thls.handle_MsgType_ID_Common1Req(txMsgData.(*txdata.Common1Req), msgConn)
+	case txdata.MsgType_ID_Common1Rsp:
+		thls.handle_MsgType_ID_Common1Rsp(txMsgData.(*txdata.Common1Rsp), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
 	case txdata.MsgType_ID_ConnectReq:
@@ -374,7 +381,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 			kkk.SeqNo = 0
 			thls.cacheSync.deleteData(kkk)
 		}
-		thls.cacheRR.operateNode(msgData.Key, msgData, msgData.IsLast)
+		thls.cacheC2RR.operateNode(msgData.Key, msgData, msgData.IsLast)
 		//TODO:应当添加响应的回调函数,供外部使用.
 		if msgData.IsSafe { //应当所有的操作都处理完了,再回应ACK.
 			dataAck := thls.genAck4Common2Rsp(msgData)
@@ -411,6 +418,64 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 	}
 
 	thls.sendDataEx2(msgData, nil, msgData.TxToRoot, msgData.RecverID)
+}
+
+func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Req, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot) //如果是(儿子)发过来的数据,那么(TxToRoot)必为真.
+	}
+
+	if msgData.RecverID == thls.ownInfo.UserID {
+		thls.handle_MsgType_ID_Common1Req_exec(msgData, msgConn)
+		return
+	}
+
+	originalTxToRoot := msgData.TxToRoot
+
+	var err error
+	if connEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
+		msgData.TxToRoot = false //我即将发送给自己的子节点,所以不是发往根节点的方向.
+		err = thls.sendDataEx(connEx.conn, msgData, false)
+	} else {
+		if msgData.TxToRoot {
+			err = thls.sendDataEx(thls.parentInfo.conn, msgData, true)
+		} else {
+			//一旦(!TxToRoot)则说明该消息已经在某一个节点找到了RecverID,然后扭头(!TxToRoot)发往目标节点,在奔往目标节点的过程中,目标节点离线了.
+			//此时目标节点不可达了,因此,直接发送响应即可.
+			err = errors.New("node is offline")
+		}
+	}
+	if (err != nil) && (!msgData.IsPush) {
+		msgData.TxToRoot = originalTxToRoot
+		tmpTxRspData := thls.genRsp4Common1Req(msgData, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		thls.sendData(msgConn, tmpTxRspData) //TODO:打印日志.
+	}
+}
+
+func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rsp, msgConn *wsnet.WsSocket) {
+	if pconn := thls.parentInfo.conn; pconn != nil {
+		assert4true((msgConn != pconn) == msgData.TxToRoot)
+	}
+	if msgData.RecverID == thls.ownInfo.UserID {
+		thls.cacheC1RR.operateNode(msgData.RequestID, msgData, msgData.IsLast)
+		//TODO:回调函数.
+		return
+	}
+
+	var err error
+	if connEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
+		msgData.TxToRoot = false
+		err = thls.sendDataEx(connEx.conn, msgData, false)
+	} else {
+		if msgData.TxToRoot {
+			err = thls.sendDataEx(thls.parentInfo.conn, msgData, true)
+		} else {
+			err = errors.New("node is offline")
+		}
+	}
+	if err != nil {
+		glog.Infof("handle_MsgType_ID_Common1Rsp,err=%v,msgConn=%p,msgData=%v", err, msgConn, msgData)
+	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
@@ -693,6 +758,22 @@ func (thls *businessNode) genRsp4Common2Req(dataReq *txdata.Common2Req, seqno in
 	return
 }
 
+func (thls *businessNode) genRsp4Common1Req(dataReq *txdata.Common1Req, pm ProtoMessage, isLast bool) (dataRsp *txdata.Common1Rsp) {
+	dataRsp = &txdata.Common1Rsp{}
+	dataRsp.RequestID = dataReq.RequestID
+	dataRsp.SenderID = thls.ownInfo.UserID
+	dataRsp.RecverID = dataReq.SenderID
+	dataRsp.TxToRoot = !dataReq.TxToRoot
+	dataRsp.IsLog = dataReq.IsLog
+	dataRsp.IsPush = dataReq.IsPush
+	dataRsp.RspType = CalcMessageType(pm)
+	dataRsp.RspData = msg2slice(pm)
+	dataRsp.RspTime, _ = ptypes.TimestampProto(time.Now())
+	dataRsp.IsLast = isLast
+	//
+	return
+}
+
 func (thls *businessNode) refreshSeqNo() {
 	//9223372036854775807(int64.max)
 	//91231      00000000|
@@ -751,10 +832,10 @@ func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, 
 		}
 	}
 
-	node := newNodeReqRsp()
+	node := newNodeC2ReqRsp()
 	node.key.fromUniKey(reqInOut.Key)
 	node.reqData = reqInOut
-	if !thls.cacheRR.insertNode(node) {
+	if !thls.cacheC2RR.insertNode(node) {
 		panic(node) //TODO:
 	}
 
@@ -788,10 +869,65 @@ func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, 
 		}
 	}
 	if rspData != nil {
-		thls.cacheRR.operateNode(rspData.Key, rspData, rspData.IsLast)
+		thls.cacheC2RR.operateNode(rspData.Key, rspData, rspData.IsLast)
 	}
 	rspSlice = node.xyz()
-	//thls.cacheRR.deleteNode(&node.key)
+	//thls.cacheC2RR.deleteNode(&node.key)
+	return
+}
+
+func (thls *businessNode) syncExecuteCommon1ReqRsp(reqInOut *txdata.Common1Req, d time.Duration) (rspSlice []*txdata.Common1Rsp) {
+	if true { //修复请求结构体的相关字段.
+		reqInOut.RequestID = thls.increaseSeqNo()
+		reqInOut.SenderID = thls.ownInfo.UserID
+		//reqInOut.RecverID
+		reqInOut.TxToRoot = true
+		//reqInOut.IsLog
+		//reqInOut.IsPush
+		//reqInOut.ReqType
+		//reqInOut.ReqData
+		reqInOut.ReqTime, _ = ptypes.TimestampProto(time.Now())
+	}
+
+	node := newNodeC1ReqRsp()
+	node.RequestID = reqInOut.RequestID
+	node.reqData = reqInOut
+	if !thls.cacheC1RR.insertNode(node) {
+		panic(node) //TODO:
+	}
+
+	var rspData *txdata.Common1Rsp
+	var err error
+	for range FORONCE {
+		err = thls.sendDataEx(thls.parentInfo.conn, reqInOut, true)
+		//如果推送,等待字段无效,直接返回(等待字段没有意义).
+		//如果推送,等待字段有效,直接返回(等待字段没有意义).
+		//如果应答,等待字段无效,直接返回.
+		//如果应答,等待字段有效,视发送结果而定.
+		if reqInOut.IsPush || (d <= 0) {
+			if err != nil {
+				rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			} else {
+				rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
+			}
+			break
+		}
+		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送成功了,需要等待.
+		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送失败了,直接返回.
+		if err != nil {
+			rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			break
+		}
+		if isTimeout := node.condVar.waitFor(d); isTimeout {
+			rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
+			break
+		}
+	}
+	if rspData != nil {
+		thls.cacheC1RR.operateNode(rspData.RequestID, rspData, rspData.IsLast)
+	}
+	rspSlice = node.xyz()
+	//thls.cacheC2RR.deleteNode(&node.key)
 	return
 }
 
@@ -823,7 +959,35 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req_exec(reqData *txdata.Comm
 	stream.doRemainder()
 }
 
-func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream *Common2RspWrapper) {
+func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Common1Req, msgConn *wsnet.WsSocket) {
+	stream := newCommon1RspWrapper(reqData, msgConn)
+
+	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
+	if err != nil {
+		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true) {
+			//TODO:报警.
+		}
+		return
+	}
+
+	switch reqData.ReqType {
+	case txdata.MsgType_ID_EchoItem:
+		thls.execute_MsgType_ID_EchoItem(objData.(*txdata.EchoItem), stream)
+	case txdata.MsgType_ID_QueryRecordReq:
+		thls.execute_MsgType_ID_QueryRecordReq(objData.(*txdata.QueryRecordReq), stream)
+	case txdata.MsgType_ID_ExecCmdReq:
+	case txdata.MsgType_ID_QryConnInfoReq:
+		thls.execute_MsgType_ID_QryConnInfoReq(objData.(*txdata.QryConnInfoReq), stream)
+	default:
+		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
+			//TODO:报警.
+		}
+	}
+
+	stream.doRemainder()
+}
+
+func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream CommonRspWrapper) {
 	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
 	data.Data = reqData.Data + "_rsp_1"
 	stream.sendData(data, false)
@@ -831,10 +995,10 @@ func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, 
 	stream.sendData(data, true)
 }
 
-func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream *Common2RspWrapper) {
+func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream CommonRspWrapper) {
 }
 
-func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream *Common2RspWrapper) {
+func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream CommonRspWrapper) {
 	data := &txdata.QryConnInfoRsp{UserID: thls.ownInfo.UserID, Cache: thls.cacheUser.tmpF1()}
 	stream.sendData(data, true)
 }

@@ -132,7 +132,7 @@ func handleNodeCache(node *businessNode, w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common2Req, int)) {
+func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common1Req, *txdata.Common2Req, int)) {
 	var err error
 	var byteSlice []byte
 
@@ -163,7 +163,8 @@ func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 		var reqData *txdata.Common2Req
 		var secTimeout int
 		if true {
-			reqData, secTimeout = Obj2Msg(obj)
+			_, reqData, secTimeout = Obj2Msg(obj)
+			assert4true(reqData != nil)
 		}
 		rspSlice := node.syncExecuteCommon2ReqRsp(reqData, time.Duration(secTimeout)*time.Second)
 
@@ -198,6 +199,106 @@ func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 	fmt.Fprintf(w, string(byteSlice))
 }
 
+func handleCommon1Fun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common1Req, *txdata.Common2Req, int)) {
+	var err error
+	var byteSlice []byte
+
+	resultSlice := make([]struct {
+		Name string
+		Data ProtoMessage
+	}, 0)
+	resultNode := struct {
+		Name string
+		Data ProtoMessage
+	}{}
+
+	ceData := txdata.CommonErr{}
+
+	for range FORONCE {
+		if byteSlice, err = ioutil.ReadAll(r.Body); err != nil {
+			ceData.ErrNo = 1
+			ceData.ErrMsg = fmt.Sprintf("read Request with err = %v", err)
+			break
+		}
+		r.Body.Close()
+		if err = json.Unmarshal(byteSlice, obj); err != nil {
+			ceData.ErrNo = 1
+			ceData.ErrMsg = fmt.Sprintf("Unmarshal Request with err = %v", err)
+			break
+		}
+
+		var reqData *txdata.Common1Req
+		var secTimeout int
+		if true {
+			reqData, _, secTimeout = Obj2Msg(obj)
+			assert4false(reqData != nil)
+		}
+		rspSlice := node.syncExecuteCommon1ReqRsp(reqData, time.Duration(secTimeout)*time.Second)
+
+		assert4true(ceData.ErrNo == 0)
+		assert4true(len(resultSlice) == 0)
+		if true {
+			resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: reqData.RequestID, SeqNo: 0}
+			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+			resultSlice = append(resultSlice, resultNode)
+		}
+		for _, rspItem := range rspSlice {
+			if resultNode.Data, err = slice2msg(rspItem.RspType, rspItem.RspData); err != nil {
+				assert4true(ceData.ErrNo == 0)
+				ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", rspItem.RspType)
+				resultNode.Data = &ceData
+			}
+			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+			resultSlice = append(resultSlice, resultNode)
+		}
+	}
+	if ceData.ErrNo != 0 {
+		resultNode.Data = &ceData
+		resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+		assert4true(len(resultSlice) == 0)
+		resultSlice = append(resultSlice, resultNode)
+	}
+
+	if byteSlice, err = json.Marshal(resultSlice); err != nil {
+		glog.Fatalln(err)
+	}
+
+	fmt.Fprintf(w, string(byteSlice))
+}
+
+func toC1C2(rID string, pm ProtoMessage, isLog bool, mode int, isC1NotC2 bool) (c1req *txdata.Common1Req, c2req *txdata.Common2Req) {
+	var err error
+	if isC1NotC2 {
+		c1req = &txdata.Common1Req{}
+		//c1req.RequestID
+		//c1req.SenderID
+		c1req.RecverID = rID
+		//c1req.TxToRoot
+		c1req.IsLog = isLog
+		c1req.IsPush, _ = int2mode(mode)
+		c1req.ReqType = CalcMessageType(pm)
+		if c1req.ReqData, err = proto.Marshal(pm); err != nil {
+			glog.Fatalln(err, pm)
+		}
+		//c1req.ReqTime
+	} else {
+		c2req = &txdata.Common2Req{}
+		//c2req.Key
+		//c2req.SenderID
+		c2req.RecverID = rID
+		//c2req.TxToRoot
+		c2req.IsLog = isLog
+		c2req.IsPush, c2req.IsSafe = int2mode(mode)
+		//c2req.UpCache
+		c2req.ReqType = CalcMessageType(pm)
+		if c2req.ReqData, err = proto.Marshal(pm); err != nil {
+			glog.Fatalln(err, pm)
+		}
+		//c2req.ReqTime
+	}
+	return
+}
+
 func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) {
 	curObj := new(struct {
 		txdata.EchoItem
@@ -205,31 +306,24 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 		Timeout int
 		Mode    int
 		IsLog   bool
+		IsC2    bool
 	})
-	obj2msg := func(obj interface{}) (req *txdata.Common2Req, sec int) {
+	obj2msg := func(obj interface{}) (c1req *txdata.Common1Req, c2req *txdata.Common2Req, sec int) {
 		theObj := obj.(*struct {
 			txdata.EchoItem
 			Recver  string
 			Timeout int
 			Mode    int
 			IsLog   bool
+			IsC2    bool
 		})
-		var err error
-		req = &txdata.Common2Req{}
-		//req.Key
-		//req.SenderID
-		req.RecverID = theObj.Recver
-		//req.TxToRoot
-		//req.UpCache
-		req.ReqType = CalcMessageType(&theObj.EchoItem)
-		if req.ReqData, err = proto.Marshal(&theObj.EchoItem); err != nil {
-			glog.Fatalln(err, obj)
-		}
-		//req.ReqTime
-		req.IsLog = theObj.IsLog
-		req.IsPush, req.IsSafe = int2mode(theObj.Mode)
+		c1req, c2req = toC1C2(theObj.Recver, &theObj.EchoItem, theObj.IsLog, theObj.Mode, !theObj.IsC2)
 		sec = theObj.Timeout
 		return
 	}
-	handleCommon2Fun(node, w, r, curObj, obj2msg)
+	if curObj.IsC2 {
+		handleCommon2Fun(node, w, r, curObj, obj2msg)
+	} else {
+		handleCommon1Fun(node, w, r, curObj, obj2msg)
+	}
 }
