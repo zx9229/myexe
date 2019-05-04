@@ -39,13 +39,13 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheSock  *safeWsSocketMap
 		CacheSync  *safeSynchCache
 		CacheC2RR  *safeNodeC2ReqRspCache
-		cacheC1RR  *safeNodeC1ReqRspCache
+		CacheC1RR  *safeNodeC1ReqRspCache
 		ZZZXML     *safeUniSymCache
 		BAQYTDHC   *safeMemoryTmpCache
 		AQZXJG     *safeSynchCache
 		OwnMsgNo   string //用(int64)时会出现BUG(明明int64的值在慢慢地增加,但是Marshal后的字符串中,我们可以看到,其值一直没有变化,迫于无奈,我使用了string)
 		//chanSync   chan string
-	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheC2RR: thls.cacheC2RR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
+	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheC2RR: thls.cacheC2RR, CacheC1RR: thls.cacheC1RR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
 	byteSlice, err = json.Marshal(&tmpObj)
 	return
 }
