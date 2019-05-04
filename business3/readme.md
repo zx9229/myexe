@@ -8,7 +8,7 @@
 然后异常的Node向ROOT报警，人工介入处理，处理完成后，ROOT广播一个“某Node连接成功/某Node在线了/等”的消息，
 然后其他Node就认为这个Node又在线了，然后接着续传，然后一切就正常了。
 ```
-curl -d '{ "Timeout":999 , "Recver":"n3" , "Data":"[echo]" , "Mode":1, "IsLog":true }'    http://127.0.0.1:40078/echo
+curl -d '{ "Timeout":999 , "Recver":"n3" , "Data":"[echo]" , "Mode":1, "IsLog":true, "IsC2":false }'    http://127.0.0.1:40078/echo
 ```
 在日志中，我们应当按照Key进行检索。日志中的Key一般如下所示：
 ```
