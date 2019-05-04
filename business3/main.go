@@ -231,7 +231,7 @@ func handleCommon1Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 		var secTimeout int
 		if true {
 			reqData, _, secTimeout = Obj2Msg(obj)
-			assert4false(reqData != nil)
+			assert4true(reqData != nil)
 		}
 		rspSlice := node.syncExecuteCommon1ReqRsp(reqData, time.Duration(secTimeout)*time.Second)
 
