@@ -75,6 +75,17 @@ public:
 
     Q_INVOKABLE QStringList nameList() const
     {
+        //function refreshColumn(objTableView, lstFieldName) {
+        //    for(var i = objTableView.columnCount-1; i >= 0; i--)
+        //    {
+        //        objTableView.removeColumn(i)
+        //    }
+        //    for(i = 0; i < lstFieldName.length; i++)
+        //    {
+        //        var qmlStr = "import QtQuick 2.4; import QtQuick.Controls 1.4; TableViewColumn { width: 100; role: \""+lstFieldName[i]+"\"; title: \""+lstFieldName[i]+"\" }"
+        //        objTableView.addColumn(Qt.createQmlObject(qmlStr, objTableView, "dynamicSnippet1"))
+        //    }
+        //}
         QStringList fieldNameList;
         QSqlRecord rec = this->record();//having only the field names.
         for (int i = 0; i<rec.count(); i++)
