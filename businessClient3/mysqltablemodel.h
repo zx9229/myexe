@@ -49,23 +49,39 @@ public:
 
     QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const override
     {
-        return QSqlTableModel::data(idx, role);
+        if (Qt::UserRole <= role)
+        {
+            int col = role - Qt::UserRole;
+            QModelIndex newIdx = idx.siblingAtColumn(col);
+            return QSqlTableModel::data(newIdx, Qt::DisplayRole);
+        }
+        else
+        {
+            return QSqlTableModel::data(idx, role);
+        }
     }
 
     QHash<int, QByteArray> roleNames() const override
     {
-        return QSqlTableModel::roleNames();
+        //return QSqlTableModel::roleNames();
+        QHash<int, QByteArray> roleNameHash;
+        QStringList fieldNameList = this->nameList();
+        for (int i = 0; i<fieldNameList.size(); i++)
+        {
+            roleNameHash[Qt::UserRole + i] = fieldNameList[i].toLatin1();
+        }
+        return roleNameHash;
     }
 
     Q_INVOKABLE QStringList nameList() const
     {
-        QStringList strList;
-        QSqlRecord rec = this->record();
+        QStringList fieldNameList;
+        QSqlRecord rec = this->record();//having only the field names.
         for (int i = 0; i<rec.count(); i++)
         {
-            strList.append(rec.field(i).name());
+            fieldNameList.append(rec.field(i).name());
         }
-        return strList;
+        return fieldNameList;
     }
 
 signals:
