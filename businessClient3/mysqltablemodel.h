@@ -6,6 +6,8 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 #include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSqlField>
 
 class MySqlTableModel : public QSqlTableModel
 {
@@ -58,11 +60,11 @@ public:
     Q_INVOKABLE QStringList nameList() const
     {
         QStringList strList;
-        for (QByteArray&val : this->roleNames())
+        QSqlRecord rec = this->record();
+        for (int i = 0; i<rec.count(); i++)
         {
-            strList.append(QString(val));
+            strList.append(rec.field(i).name());
         }
-        qDebug() << strList;
         return strList;
     }
 
