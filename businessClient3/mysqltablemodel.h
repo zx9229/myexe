@@ -31,7 +31,39 @@ public:
     void setSelectStatement(const QString& statement)
     {
         m_selectStatement = statement;
+        this->select();
         emit selectStatementChanged();
+    }
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override
+    {
+        return QSqlTableModel::rowCount(parent);
+    }
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override
+    {
+        return QSqlTableModel::columnCount(parent);
+    }
+
+    QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const override
+    {
+        return QSqlTableModel::data(idx, role);
+    }
+
+    QHash<int, QByteArray> roleNames() const override
+    {
+        return QSqlTableModel::roleNames();
+    }
+
+    Q_INVOKABLE QStringList nameList() const
+    {
+        QStringList strList;
+        for (QByteArray&val : this->roleNames())
+        {
+            strList.append(QString(val));
+        }
+        qDebug() << strList;
+        return strList;
     }
 
 signals:
