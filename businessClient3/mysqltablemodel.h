@@ -84,6 +84,52 @@ public:
         return fieldNameList;
     }
 
+    Q_INVOKABLE QStringList tmpQmlList(QObject* objTableView)
+    {
+        QStringList qmlList;
+        QStringList fieldNameList = this->nameList();
+        for (int i = 0; i<fieldNameList.size(); i++) {
+            QString sss;
+            sss += QString(R"(import QtQuick 2.4;)");
+            sss += QString(R"(import QtQuick.Controls 1.4;)");
+            sss += QString(R"(TableViewColumn { width : 100 ; role : "%1" ; title : "%1" } )").arg(fieldNameList[i]);
+            qmlList.append(sss);
+        }
+        return qmlList;
+        do
+        {
+            bool isOk = false;
+            QVariant columnCount = objTableView->property("columnCount");
+            if (!columnCount.isValid()) { break; }
+            for (int i = columnCount.toInt() - 1; i >= 0; i--)
+            {
+                QVariant returnedValue;
+                QVariant idx = i;
+                isOk = QMetaObject::invokeMethod(objTableView, "removeColumn", Q_RETURN_ARG(QVariant, returnedValue), Q_ARG(QVariant, idx));
+                if (!isOk) { break; }
+            }
+            QStringList fieldNameList = this->nameList();
+            QVariant vObjTableView;
+            vObjTableView.setValue(objTableView);
+            QVariant dynamicSnippet1 = "dynamicSnippet1";
+            for (int i = 0; i<fieldNameList.size(); i++) {
+                QString sss;
+                sss += QString(R"(import QtQuick 2.4;)");
+                sss += QString(R"(import QtQuick.Controls 1.4;)");
+                sss += QString(R"(TableViewColumn { width : 100 ; role : "%1" ; title : "%1" } )").arg(fieldNameList[i]);
+                QVariant vQmlObj;
+                //Qt.createQmlObject(sss,tView,"dynamicSnippet1")
+                isOk = QMetaObject::invokeMethod(nullptr, "createQmlObject", Q_RETURN_ARG(QVariant, vQmlObj), Q_ARG(QVariant, QVariant(sss)), Q_ARG(QVariant, vObjTableView), Q_ARG(QVariant, dynamicSnippet1));
+                if (!isOk) { break; }
+                if (!vQmlObj.isValid()) { break; }
+                QVariant returnedValue;
+                isOk = QMetaObject::invokeMethod(objTableView, "addColumn", Q_RETURN_ARG(QVariant, returnedValue), Q_ARG(QVariant, vQmlObj));
+                if (!isOk) { break; }
+            }
+        } while (false);
+        return qmlList;
+    }
+
 signals:
     void selectStatementChanged();
 
