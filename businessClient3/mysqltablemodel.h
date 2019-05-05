@@ -95,6 +95,11 @@ public:
         return fieldNameList;
     }
 
+    Q_INVOKABLE QVariant qryData(int rowIdx, int colIdx) const
+    {
+        return QSqlTableModel::data(index(rowIdx, colIdx), Qt::DisplayRole);
+    }
+
     Q_INVOKABLE QStringList tmpQmlList(QObject* objTableView)
     {
         QStringList qmlList;
