@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>Login.qml</file>
         <file>LoginForm.ui.qml</file>
+        <file>NodeTempInfo.qml</file>
     </qresource>
 </RCC>

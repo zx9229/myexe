@@ -37,6 +37,7 @@ HEADERS += \
     mywebsock.h \
     protobuf/m2b.h \
     protobuf/txdata.pb.h \
+    safesynchcache.h \
     sqlstruct.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])

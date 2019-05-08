@@ -21,3 +21,17 @@ emit sigUpdatePflPos(pid);
 QML使用Sqlite数据库
 https://blog.csdn.net/clinuxf/article/details/80169331
 ===============================================================================
+TableView - Qt Blog
+https://blog.qt.io/blog/2018/08/29/tableview/
+===============================================================================
+TableView QML Type | Qt Quick 5.12.3
+https://doc.qt.io/qt-5.12/qml-qtquick-tableview.html
+===============================================================================
+05-Dec-2018 09:55    2018-12-05
+===============================================================================
+Using C++ Models with Qt Quick Views | Qt Quick 5.12.3
+https://doc.qt.io/qt-5/qtquick-modelviewsdata-cppmodels.html
+===============================================================================
+Qt Quick Controls - Table View Example | Qt Quick Controls 5.9
+https://doc-snapshots.qt.io/qt5-5.9/qtquickcontrols-tableview-example.html
+===============================================================================

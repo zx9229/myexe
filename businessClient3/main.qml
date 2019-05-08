@@ -1,14 +1,19 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
+import QtQuick 2.4
+import QtQuick.Window 2.10
 
 Window {
     visible: true
-    width: 640
-    height: 480
-    title: qsTr("Hello World")
+    width: 800
+    height: 400
+    title: qsTr("MyHelloWorld")
     color: "silver"
-    Login {
+    Loader{
+        id:pageLoader
         anchors.fill: parent
-        visible: true
+        source: "Login.qml"
+    }
+    Connections {
+        target: dataExch
+        onSigReady: pageLoader.source="NodeTempInfo.qml"
     }
 }
