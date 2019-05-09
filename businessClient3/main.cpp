@@ -25,13 +25,9 @@ int main(int argc, char *argv[])
         //注意: 此处的"dataExch"必须小写字母开头，QML才能访问C++对象的函数与属性.
         engine.rootContext()->setContextProperty("dataExch", &dataExch);
     }
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-        &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    if (engine.rootObjects().isEmpty())
+        return -1;
 
     return app.exec();
 }
