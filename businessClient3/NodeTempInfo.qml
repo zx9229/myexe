@@ -16,11 +16,11 @@ Item {
                     }
                     for(i = 0; i < lstFieldName.length; i++)
                     {
-                        var qmlStr = "import QtQuick 2.4; import QtQuick.Controls 1.4; TableViewColumn { width: 100; role: \""+lstFieldName[i]+"\"; title: \""+lstFieldName[i]+"\" }"
+                        var qmlStr = "import QtQuick 2.0; import QtQuick.Controls 1.6; TableViewColumn { width: 100; role: \""+lstFieldName[i]+"\"; title: \""+lstFieldName[i]+"\" }"
                         objTableView.addColumn(Qt.createQmlObject(qmlStr, objTableView, "dynamicSnippet1"))
                     }
                 }
-                refreshColumn(tView,mstm.nameList())
+                refreshColumn(tView, mstm.nameList())
             }
         }
 
@@ -52,6 +52,9 @@ Item {
                 id: mstm
                 selectStatement: "SELECT * FROM ConnInfoEx"
             }
+            onClicked: console.log("onClicked", row)
+            onDoubleClicked: console.log("onDoubleClicked", row)
+            onPressAndHold: console.log("onPressAndHold", row, mstm.qryData(row, 0))
         }
     }
 }
