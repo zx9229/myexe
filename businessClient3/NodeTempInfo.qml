@@ -1,13 +1,13 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.4
+import QtQuick.Controls 1.6
+import QtQuick.Layouts 1.3
 import MySqlTableModel 0.1
-import QtQuick.Layouts 1.11
 
 Item {
-    ColumnLayout{
+    ColumnLayout {
         anchors.fill: parent
         Button{
-            onClicked:{
+            onClicked: {
                 mstm.select()
                 function refreshColumn(objTableView, lstFieldName) {
                     for(var i = objTableView.columnCount-1; i >= 0; i--)
@@ -52,12 +52,6 @@ Item {
                 id: mstm
                 selectStatement: "SELECT * FROM ConnInfoEx"
             }
-            //rowDelegate: Rectangle{
-            //    height: 40
-            //}
-            onClicked: console.log("onClicked",row)
-            onDoubleClicked: console.log("onDoubleClicked",row)
-            onPressAndHold: console.log("onPressAndHold",row, mstm.qryData(row,0))
         }
     }
 }
