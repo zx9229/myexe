@@ -1,6 +1,6 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.11
+import QtQuick 2.4
+import QtQuick.Controls 1.6
+import QtQuick.Layouts 1.3
 
 Item {
     id: itemitem
@@ -18,10 +18,10 @@ Item {
         Label {
             id: labelDT
             text: qsTr("DATE_TIME")
-            verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            Layout.columnSpan: 3
+            verticalAlignment: Text.AlignVCenter
             Layout.fillWidth: true
+            Layout.columnSpan: 3
         }
 
         Label {
@@ -31,8 +31,8 @@ Item {
 
         TextField {
             id: textFieldURL
-            text: qsTr("Text Field")
             Layout.fillWidth: true
+            placeholderText: qsTr("Text Field")
         }
 
         Button {
@@ -47,9 +47,9 @@ Item {
 
         TextField {
             id: textFieldBelongID
-            text: qsTr("Text Field")
-            Layout.columnSpan: 2
             Layout.fillWidth: true
+            Layout.columnSpan: 2
+            placeholderText: qsTr("Text Field")
         }
 
         Label {
@@ -59,16 +59,16 @@ Item {
 
         TextField {
             id: textFieldUserID
-            text: qsTr("Text Field")
-            Layout.columnSpan: 2
             Layout.fillWidth: true
+            Layout.columnSpan: 2
+            placeholderText: qsTr("Text Field")
         }
 
         Button {
             id: buttonSignIn
             text: qsTr("登录")
-            Layout.columnSpan: 3
             Layout.fillWidth: true
+            Layout.columnSpan: 3
         }
 
         TextArea {
@@ -77,13 +77,6 @@ Item {
             Layout.columnSpan: 3
             Layout.fillHeight: true
             Layout.fillWidth: true
-            background: Rectangle {
-                radius: 2
-                border.color: "blue"
-                border.width: 2
-                //implicitHeight: 50
-                //implicitWidth: 100
-            }
         }
     }
 
@@ -104,3 +97,8 @@ Item {
     }
 }
 
+
+/*##^## Designer {
+    D{i:1;anchors_height:100;anchors_width:100;anchors_x:107;anchors_y:81}
+}
+ ##^##*/

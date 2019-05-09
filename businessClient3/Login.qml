@@ -1,4 +1,4 @@
-import QtQuick 2.11
+import QtQuick 2.4
 
 LoginForm {
     id: loginForm
