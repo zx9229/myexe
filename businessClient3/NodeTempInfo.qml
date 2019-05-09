@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.6
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
 import MySqlTableModel 0.1
 
