@@ -17,13 +17,11 @@ namespace {
     inline bool Valid(float& data) { return FLT_MAX != data; }
     inline bool Valid(double& data) { return DBL_MAX != data; }
     inline bool Valid(QString& data) { return !data.isNull(); }
-    inline bool Valid(QStringList& /*data*/) { return true; }
     inline bool Valid(QByteArray& data) { return !data.isNull(); }
     inline bool Valid(QDateTime& data) { return data.isValid(); }
     inline void fromQVariant(int32_t& dst, const QVariant& src) { dst = src.toInt(nullptr); }
     inline void fromQVariant(int64_t& dst, const QVariant& src) { dst = src.toLongLong(nullptr); }
     inline void fromQVariant(QString& dst, const QVariant& src) { dst = src.toString(); }
-    inline void fromQVariant(QStringList& dst, const QVariant& src) { dst = src.toStringList(); }
     inline void fromQVariant(QByteArray& dst, const QVariant& src) { dst = src.toByteArray(); }
     inline void fromQVariant(QDateTime& dst, const QVariant& src) { dst = QDateTime::fromString(src.toString(), Qt::ISODateWithMs); }
 }
@@ -219,27 +217,27 @@ Q_DECLARE_METATYPE(ConnInfoEx);
 class CommonData
 {
 public:
-    int32_t   RspCnt;  //与Req对应的Rsp的Cnt.
-    int32_t   MsgType; //Common2Req,Common2Rsp,Common1Req,Common1Rsp
-    QString   MsgTypeTxt;//MsgType的文本.
-    QString   PeerID;//对端(参考python3的[help(socket.socket.getpeername)]).
-    QString   UserID;//本端.
-    int64_t   MsgNo;
-    int32_t   SeqNo;
-    QString   SenderID;
-    QString   RecverID;
-    bool      ToRoot;
-    bool      IsLog;
-    bool      IsSafe;
-    bool      IsPush;
-    bool      UpCache;
-    int32_t   TxType;//通信的对象的类型.
-    QString   TxTypeTxt;
-    QByteArray   TxData;//通信的对象经pb序列化后的二进制数据.
-    QString   TxDataTxt;//通信的对象转换成json字符串.
-    QDateTime TxTime;
-    QDateTime InsertTime;//插入时刻(插入之后,不再修改它).
-    bool      IsLast;
+    int32_t    RspCnt;    //与Req对应的Rsp的Cnt.
+    int32_t    MsgType;   //Common2Req,Common2Rsp,Common1Req,Common1Rsp
+    QString    MsgTypeTxt;//MsgType的文本.
+    QString    PeerID;//对端(参考python3的[help(socket.socket.getpeername)]).
+    QString    UserID;//本端.
+    int64_t    MsgNo;
+    int32_t    SeqNo;
+    QString    SenderID;
+    QString    RecverID;
+    bool       ToRoot;
+    bool       IsLog;
+    bool       IsSafe;
+    bool       IsPush;
+    bool       UpCache;
+    int32_t    TxType;//通信的对象的类型.
+    QString    TxTypeTxt;
+    QByteArray TxData;//通信的对象经pb序列化后的二进制数据.
+    QString    TxDataTxt;//通信的对象转换成json字符串.
+    QDateTime  TxTime;
+    QDateTime  InsertTime;//插入时刻(插入之后,不再修改它).
+    bool       IsLast;
 public:
     CommonData()
     {
