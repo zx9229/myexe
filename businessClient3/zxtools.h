@@ -8,6 +8,11 @@ class zxtools
 public:
     static void qdt2gpt(::google::protobuf::Timestamp& gptDst, const QDateTime& qdtSrc)
     {
+        //因为 iVal = 5; 即[dst = src], 估计因为这个原因, 标准库里的一些函数也采用了这个布局, 比如strcpy函数:
+        //char * strcpy(char * _Dest,const char * _Source);
+        //boost库也大多使用该布局, 比如split:
+        //inline SequenceSequenceT& split(SequenceSequenceT& Result, RangeT& Input, PredicateT Pred, token_compress_mode_type eCompress=token_compress_off);
+        //所以这里也(尽量)采用这种方式.
         gptDst.set_seconds(qdtSrc.offsetFromUtc());
         gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
     }
