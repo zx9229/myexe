@@ -41,6 +41,19 @@ public:
         dst->InsertTime = QDateTime::currentDateTime();
         dst->IsLast = false;
     }
+    static void CommonData2Common1Req(txdata::Common1Req* dst, const CommonData* src)
+    {
+        dst->set_msgno(src->MsgNo);
+        dst->set_seqno(src->SeqNo);
+        dst->set_senderid(src->SenderID.toStdString());
+        dst->set_recverid(src->RecverID.toStdString());
+        dst->set_txtoroot(src->TxToRoot);
+        dst->set_islog(src->IsLog);
+        dst->set_ispush(src->IsPush);
+        dst->set_reqtype(static_cast<txdata::MsgType>(src->InnerType));
+        dst->set_reqdata(src->InnerData.toStdString());
+        qdt2gpt(*dst->mutable_reqtime(), src->InnerTime);
+    }
     static void Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* src)
     {
         dst->RspCnt = 0;
@@ -61,6 +74,20 @@ public:
         gpt2qdt(dst->InnerTime, src->rsptime());
         dst->InsertTime = QDateTime::currentDateTime();
         dst->IsLast = src->islast();
+    }
+    static void CommonData2Common1Rsp(txdata::Common1Rsp* dst, const CommonData* src)
+    {
+        dst->set_msgno(src->MsgNo);
+        dst->set_seqno(src->SeqNo);
+        dst->set_senderid(src->SenderID.toStdString());
+        dst->set_recverid(src->RecverID.toStdString());
+        dst->set_txtoroot(src->TxToRoot);
+        dst->set_islog(src->IsLog);
+        dst->set_ispush(src->IsPush);
+        dst->set_rsptype(static_cast<txdata::MsgType>(src->InnerType));
+        dst->set_rspdata(src->InnerData.toStdString());
+        qdt2gpt(*dst->mutable_rsptime(), src->InnerTime);
+        dst->set_islast(src->IsLast);
     }
 };
 
