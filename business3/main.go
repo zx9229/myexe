@@ -273,7 +273,7 @@ func toC1C2(rID string, pm ProtoMessage, isLog bool, mode int, isC1NotC2 bool) (
 		//c1req.RequestID
 		//c1req.SenderID
 		c1req.RecverID = rID
-		//c1req.TxToRoot
+		//c1req.ToRoot
 		c1req.IsLog = isLog
 		c1req.IsPush, _ = int2mode(mode)
 		c1req.ReqType = CalcMessageType(pm)
@@ -286,7 +286,7 @@ func toC1C2(rID string, pm ProtoMessage, isLog bool, mode int, isC1NotC2 bool) (
 		//c2req.Key
 		//c2req.SenderID
 		c2req.RecverID = rID
-		//c2req.TxToRoot
+		//c2req.ToRoot
 		c2req.IsLog = isLog
 		c2req.IsPush, c2req.IsSafe = int2mode(mode)
 		//c2req.UpCache

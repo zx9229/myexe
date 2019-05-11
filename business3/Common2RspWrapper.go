@@ -44,7 +44,7 @@ func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	curRspData.Key.SeqNo = thls.rspIdx + 1
 	curRspData.SenderID = thls.reqData.RecverID
 	curRspData.RecverID = curRspData.Key.UserID //中间可能因为缓存而修改了(req.SenderID)
-	curRspData.TxToRoot = !thls.reqData.TxToRoot
+	curRspData.ToRoot = !thls.reqData.ToRoot
 	curRspData.IsLog = thls.reqData.IsLog
 	curRspData.IsSafe = thls.reqData.IsSafe
 	curRspData.IsPush = thls.reqData.IsPush
@@ -59,7 +59,7 @@ func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	if !thls.reqData.IsPush {
 		if curRspData.IsSafe {
 			var isExist, isInsert bool
-			isExist, isInsert = thls.cache.insertData(curRspData.Key, curRspData.TxToRoot, curRspData.RecverID, &curRspData)
+			isExist, isInsert = thls.cache.insertData(curRspData.Key, curRspData.ToRoot, curRspData.RecverID, &curRspData)
 			assert4false(isExist) //一定不会存在.
 			if !isInsert {
 				return false

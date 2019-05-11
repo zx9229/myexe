@@ -25,7 +25,7 @@ func (thls *UniSym) fromUniKey(src *txdata.UniKey) {
 
 type node4sync struct {
 	Key      UniSym       //(一经设置,不再修改)
-	TxToRoot bool         //(一经设置,不再修改)
+	ToRoot   bool         //(一经设置,不再修改)
 	RecverID string       //(一经设置,不再修改)
 	data     ProtoMessage //(一经设置,不再修改)
 }
@@ -47,7 +47,7 @@ func (thls *safeSynchCache) insertData(uniKey *txdata.UniKey, toR bool, rID stri
 	//false  , false (异常情况)
 	node := new(node4sync)
 	node.Key.fromUniKey(uniKey)
-	node.TxToRoot = toR
+	node.ToRoot = toR
 	node.RecverID = rID
 	node.data = pm
 	thls.Lock()
@@ -73,7 +73,7 @@ func (thls *safeSynchCache) deleteData(uniKey *txdata.UniKey) (node *node4sync, 
 func (thls *safeSynchCache) queryData(toR bool, rID string) (slcOut []*node4sync) {
 	thls.Lock()
 	for _, node := range thls.M {
-		if node.TxToRoot == toR && node.RecverID == rID {
+		if node.ToRoot == toR && node.RecverID == rID {
 			if slcOut == nil {
 				slcOut = make([]*node4sync, 0)
 			}
@@ -95,10 +95,10 @@ func (thls *safeSynchCache) queryCount(uID string, msgNo int64) (cnt int) {
 	return
 }
 
-func (thls *safeSynchCache) queryDataByTxToRoot(toR bool) (slcOut []*node4sync) {
+func (thls *safeSynchCache) queryDataByToRoot(toR bool) (slcOut []*node4sync) {
 	thls.Lock()
 	for _, node := range thls.M {
-		if node.TxToRoot == toR {
+		if node.ToRoot == toR {
 			if slcOut == nil {
 				slcOut = make([]*node4sync, 0)
 			}
@@ -115,7 +115,7 @@ func (thls *safeSynchCache) MarshalJSON() ([]byte, error) {
 	thls.Lock()
 	for k, v := range thls.M {
 		tmpK := fmt.Sprintf("(%v|%v|%v)", k.UserID, k.MsgNo, k.SeqNo)
-		tmpV := fmt.Sprintf("(%v|%v|%v)", v.RecverID, v.TxToRoot, CalcMessageType(v.data))
+		tmpV := fmt.Sprintf("(%v|%v|%v)", v.RecverID, v.ToRoot, CalcMessageType(v.data))
 		tmpMap[tmpK] = tmpV
 	}
 	thls.Unlock()

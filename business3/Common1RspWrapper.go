@@ -46,7 +46,7 @@ func (thls *Common1RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	curRspData.SeqNo = thls.rspIdx + 1
 	curRspData.SenderID = thls.reqData.RecverID
 	curRspData.RecverID = thls.reqData.SenderID
-	curRspData.TxToRoot = !thls.reqData.TxToRoot
+	curRspData.ToRoot = !thls.reqData.ToRoot
 	curRspData.IsLog = thls.reqData.IsLog
 	curRspData.IsPush = thls.reqData.IsPush
 	if data != nil {
