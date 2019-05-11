@@ -51,7 +51,7 @@ message Common2Ack {
     UniKey  Key      = 1;
     string  SenderID = 2;//消息的发送者.
     string  RecverID = 3;//消息的接收者.
-    bool    TxToRoot = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
+    bool    ToRoot   = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
     bool    IsLog    = 5;//对本消息打日志.
 }
 
@@ -59,7 +59,7 @@ message Common2Req {
     UniKey                    Key      =  1;
     string                    SenderID =  2;//可能因为UpCache或ROOT而中途变化.
     string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot =  4;
+    bool                      ToRoot   =  4;
     bool                      IsLog    =  5;
     bool                      IsSafe   =  6;//续传.
     bool                      IsPush   =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
@@ -74,7 +74,7 @@ message Common2Rsp {
     UniKey                    Key      =  1;
     string                    SenderID =  2;//中途可能变化.
     string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      TxToRoot =  4;
+    bool                      ToRoot   =  4;
     bool                      IsLog    =  5;
     bool                      IsSafe   =  6;
     bool                      IsPush   =  7;
@@ -90,7 +90,7 @@ message Common1Req {
     int32                     SeqNo     =  2;
     string                    SenderID  =  3;
     string                    RecverID  =  4;
-    bool                      TxToRoot  =  5;//指代传输的方向.
+    bool                      ToRoot    =  5;//指代传输的方向.
     bool                      IsLog     =  6;
     bool                      IsPush    =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
     MsgType                   ReqType   =  8;
@@ -103,7 +103,7 @@ message Common1Rsp {
     int32                     SeqNo     =  2;
     string                    SenderID  =  3;
     string                    RecverID  =  4;
-    bool                      TxToRoot  =  5;
+    bool                      ToRoot    =  5;
     bool                      IsLog     =  6;
     bool                      IsPush    =  7;
     MsgType                   RspType   =  8;
