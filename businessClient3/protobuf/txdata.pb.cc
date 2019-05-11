@@ -572,7 +572,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, requestid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, msgno_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, seqno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, recverid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, txtoroot_),
@@ -586,7 +587,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, requestid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, msgno_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, seqno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, recverid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, txtoroot_),
@@ -727,23 +729,23 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 25, -1, sizeof(::txdata::Common2Req)},
   { 41, -1, sizeof(::txdata::Common2Rsp)},
   { 58, -1, sizeof(::txdata::Common1Req)},
-  { 72, -1, sizeof(::txdata::Common1Rsp)},
-  { 87, -1, sizeof(::txdata::ConnectionInfo)},
-  { 99, -1, sizeof(::txdata::DisconnectedData)},
-  { 105, -1, sizeof(::txdata::ConnectReq)},
-  { 112, -1, sizeof(::txdata::ConnectRsp)},
-  { 121, -1, sizeof(::txdata::OnlineNotice)},
-  { 127, -1, sizeof(::txdata::SystemReport)},
-  { 135, -1, sizeof(::txdata::QryConnInfoReq)},
-  { 140, 147, sizeof(::txdata::QryConnInfoRsp_CacheEntry_DoNotUse)},
-  { 149, -1, sizeof(::txdata::QryConnInfoRsp)},
-  { 156, -1, sizeof(::txdata::QueryRecordReq)},
-  { 163, -1, sizeof(::txdata::QueryRecordRsp)},
-  { 171, -1, sizeof(::txdata::ExecCmdReq)},
-  { 177, -1, sizeof(::txdata::ExecCmdRsp)},
-  { 183, -1, sizeof(::txdata::EchoItem)},
-  { 191, -1, sizeof(::txdata::ReportDataItem)},
-  { 198, -1, sizeof(::txdata::SendMailItem)},
+  { 73, -1, sizeof(::txdata::Common1Rsp)},
+  { 89, -1, sizeof(::txdata::ConnectionInfo)},
+  { 101, -1, sizeof(::txdata::DisconnectedData)},
+  { 107, -1, sizeof(::txdata::ConnectReq)},
+  { 114, -1, sizeof(::txdata::ConnectRsp)},
+  { 123, -1, sizeof(::txdata::OnlineNotice)},
+  { 129, -1, sizeof(::txdata::SystemReport)},
+  { 137, -1, sizeof(::txdata::QryConnInfoReq)},
+  { 142, 149, sizeof(::txdata::QryConnInfoRsp_CacheEntry_DoNotUse)},
+  { 151, -1, sizeof(::txdata::QryConnInfoRsp)},
+  { 158, -1, sizeof(::txdata::QueryRecordReq)},
+  { 165, -1, sizeof(::txdata::QueryRecordRsp)},
+  { 173, -1, sizeof(::txdata::ExecCmdReq)},
+  { 179, -1, sizeof(::txdata::ExecCmdRsp)},
+  { 185, -1, sizeof(::txdata::EchoItem)},
+  { 193, -1, sizeof(::txdata::ReportDataItem)},
+  { 200, -1, sizeof(::txdata::SendMailItem)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -813,61 +815,62 @@ void AddDescriptorsImpl() {
       "e\030\010 \001(\010\022 \n\007RspType\030\t \001(\0162\017.txdata.MsgTyp"
       "e\022\017\n\007RspData\030\n \001(\014\022+\n\007RspTime\030\013 \001(\0132\032.go"
       "ogle.protobuf.Timestamp\022\016\n\006IsLast\030\014 \001(\010\""
-      "\324\001\n\nCommon1Req\022\021\n\tRequestID\030\001 \001(\003\022\020\n\010Sen"
-      "derID\030\002 \001(\t\022\020\n\010RecverID\030\003 \001(\t\022\020\n\010TxToRoo"
-      "t\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n\006IsPush\030\006 \001(\010\022 "
-      "\n\007ReqType\030\007 \001(\0162\017.txdata.MsgType\022\017\n\007ReqD"
-      "ata\030\010 \001(\014\022+\n\007ReqTime\030\t \001(\0132\032.google.prot"
-      "obuf.Timestamp\"\344\001\n\nCommon1Rsp\022\021\n\tRequest"
-      "ID\030\001 \001(\003\022\020\n\010SenderID\030\002 \001(\t\022\020\n\010RecverID\030\003"
-      " \001(\t\022\020\n\010TxToRoot\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n"
-      "\006IsPush\030\006 \001(\010\022 \n\007RspType\030\007 \001(\0162\017.txdata."
-      "MsgType\022\017\n\007RspData\030\010 \001(\014\022+\n\007RspTime\030\t \001("
-      "\0132\032.google.protobuf.Timestamp\022\016\n\006IsLast\030"
-      "\n \001(\010\"\327\001\n\016ConnectionInfo\022\016\n\006UserID\030\001 \001(\t"
-      "\022\020\n\010BelongID\030\002 \001(\t\022\017\n\007Version\030\003 \001(\t\0221\n\010L"
-      "inkMode\030\004 \001(\0162\037.txdata.ConnectionInfo.Li"
-      "nkType\022\016\n\006ExePid\030\005 \001(\005\022\017\n\007ExePath\030\006 \001(\t\022"
-      "\016\n\006Remark\030\007 \001(\t\".\n\010LinkType\022\t\n\005Zero2\020\000\022\013"
-      "\n\007CONNECT\020\001\022\n\n\006ACCEPT\020\002\"8\n\020DisconnectedD"
-      "ata\022$\n\004Info\030\001 \001(\0132\026.txdata.ConnectionInf"
-      "o\"F\n\nConnectReq\022\'\n\007InfoReq\030\001 \001(\0132\026.txdat"
-      "a.ConnectionInfo\022\017\n\007Pathway\030\002 \003(\t\"}\n\nCon"
-      "nectRsp\022\'\n\007InfoReq\030\001 \001(\0132\026.txdata.Connec"
-      "tionInfo\022\'\n\007InfoRsp\030\002 \001(\0132\026.txdata.Conne"
-      "ctionInfo\022\r\n\005ErrNo\030\003 \001(\005\022\016\n\006ErrMsg\030\004 \001(\t"
-      "\"$\n\014OnlineNotice\022\024\n\014RootIsOnline\030\001 \001(\010\"@"
-      "\n\014SystemReport\022\016\n\006UserID\030\001 \001(\t\022\017\n\007Pathwa"
-      "y\030\002 \003(\t\022\017\n\007Message\030\003 \001(\t\"\020\n\016QryConnInfoR"
-      "eq\"\224\001\n\016QryConnInfoRsp\022\016\n\006UserID\030\001 \001(\t\0220\n"
-      "\005Cache\030\002 \003(\0132!.txdata.QryConnInfoRsp.Cac"
-      "heEntry\032@\n\nCacheEntry\022\013\n\003key\030\001 \001(\t\022!\n\005va"
-      "lue\030\002 \001(\0132\022.txdata.ConnectReq:\0028\001\"/\n\016Que"
-      "ryRecordReq\022\016\n\006UserID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001"
-      "(\003\"=\n\016QueryRecordRsp\022\016\n\006UserID\030\001 \001(\t\022\r\n\005"
-      "SeqNo\030\002 \001(\003\022\014\n\004Data\030\003 \003(\014\"\031\n\nExecCmdReq\022"
-      "\013\n\003Cmd\030\001 \001(\t\"\033\n\nExecCmdRsp\022\r\n\005Reply\030\001 \001("
-      "\t\";\n\010EchoItem\022\017\n\007LocalID\030\001 \001(\t\022\020\n\010Remote"
-      "ID\030\002 \001(\t\022\014\n\004Data\030\003 \001(\t\"-\n\016ReportDataItem"
-      "\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Data\030\002 \001(\t\"\207\001\n\014SendMa"
-      "ilItem\022\020\n\010Username\030\001 \001(\t\022\020\n\010Password\030\002 \001"
-      "(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To\030\004 \001(\t\022\017\n\007Subj"
-      "ect\030\005 \001(\t\022\023\n\013ContentType\030\006 \001(\t\022\017\n\007Conten"
-      "t\030\007 \001(\t*\304\003\n\007MsgType\022\t\n\005Zero1\020\000\022\020\n\014ID_Com"
-      "monErr\020\001\022\021\n\rID_Common2Ack\020\002\022\021\n\rID_Common"
-      "2Req\020\003\022\021\n\rID_Common2Rsp\020\004\022\021\n\rID_Common1R"
-      "eq\020\005\022\021\n\rID_Common1Rsp\020\006\022\025\n\021ID_Connection"
-      "Info\020\007\022\027\n\023ID_DisconnectedData\020\010\022\021\n\rID_Co"
-      "nnectReq\020\t\022\021\n\rID_ConnectRsp\020\n\022\023\n\017ID_Onli"
-      "neNotice\020\013\022\023\n\017ID_SystemReport\020\014\022\025\n\021ID_Qr"
-      "yConnInfoReq\020\r\022\025\n\021ID_QryConnInfoRsp\020\016\022\025\n"
-      "\021ID_QueryRecordReq\020\017\022\025\n\021ID_QueryRecordRs"
-      "p\020\020\022\021\n\rID_ExecCmdReq\020\021\022\021\n\rID_ExecCmdRsp\020"
-      "\022\022\017\n\013ID_EchoItem\020\023\022\025\n\021ID_ReportDataItem\020"
-      "\024\022\023\n\017ID_SendMailItem\020\025P\000b\006proto3"
+      "\337\001\n\nCommon1Req\022\r\n\005MsgNo\030\001 \001(\003\022\r\n\005SeqNo\030\002"
+      " \001(\005\022\020\n\010SenderID\030\003 \001(\t\022\020\n\010RecverID\030\004 \001(\t"
+      "\022\020\n\010TxToRoot\030\005 \001(\010\022\r\n\005IsLog\030\006 \001(\010\022\016\n\006IsP"
+      "ush\030\007 \001(\010\022 \n\007ReqType\030\010 \001(\0162\017.txdata.MsgT"
+      "ype\022\017\n\007ReqData\030\t \001(\014\022+\n\007ReqTime\030\n \001(\0132\032."
+      "google.protobuf.Timestamp\"\357\001\n\nCommon1Rsp"
+      "\022\r\n\005MsgNo\030\001 \001(\003\022\r\n\005SeqNo\030\002 \001(\005\022\020\n\010Sender"
+      "ID\030\003 \001(\t\022\020\n\010RecverID\030\004 \001(\t\022\020\n\010TxToRoot\030\005"
+      " \001(\010\022\r\n\005IsLog\030\006 \001(\010\022\016\n\006IsPush\030\007 \001(\010\022 \n\007R"
+      "spType\030\010 \001(\0162\017.txdata.MsgType\022\017\n\007RspData"
+      "\030\t \001(\014\022+\n\007RspTime\030\n \001(\0132\032.google.protobu"
+      "f.Timestamp\022\016\n\006IsLast\030\013 \001(\010\"\327\001\n\016Connecti"
+      "onInfo\022\016\n\006UserID\030\001 \001(\t\022\020\n\010BelongID\030\002 \001(\t"
+      "\022\017\n\007Version\030\003 \001(\t\0221\n\010LinkMode\030\004 \001(\0162\037.tx"
+      "data.ConnectionInfo.LinkType\022\016\n\006ExePid\030\005"
+      " \001(\005\022\017\n\007ExePath\030\006 \001(\t\022\016\n\006Remark\030\007 \001(\t\".\n"
+      "\010LinkType\022\t\n\005Zero2\020\000\022\013\n\007CONNECT\020\001\022\n\n\006ACC"
+      "EPT\020\002\"8\n\020DisconnectedData\022$\n\004Info\030\001 \001(\0132"
+      "\026.txdata.ConnectionInfo\"F\n\nConnectReq\022\'\n"
+      "\007InfoReq\030\001 \001(\0132\026.txdata.ConnectionInfo\022\017"
+      "\n\007Pathway\030\002 \003(\t\"}\n\nConnectRsp\022\'\n\007InfoReq"
+      "\030\001 \001(\0132\026.txdata.ConnectionInfo\022\'\n\007InfoRs"
+      "p\030\002 \001(\0132\026.txdata.ConnectionInfo\022\r\n\005ErrNo"
+      "\030\003 \001(\005\022\016\n\006ErrMsg\030\004 \001(\t\"$\n\014OnlineNotice\022\024"
+      "\n\014RootIsOnline\030\001 \001(\010\"@\n\014SystemReport\022\016\n\006"
+      "UserID\030\001 \001(\t\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Message"
+      "\030\003 \001(\t\"\020\n\016QryConnInfoReq\"\224\001\n\016QryConnInfo"
+      "Rsp\022\016\n\006UserID\030\001 \001(\t\0220\n\005Cache\030\002 \003(\0132!.txd"
+      "ata.QryConnInfoRsp.CacheEntry\032@\n\nCacheEn"
+      "try\022\013\n\003key\030\001 \001(\t\022!\n\005value\030\002 \001(\0132\022.txdata"
+      ".ConnectReq:\0028\001\"/\n\016QueryRecordReq\022\016\n\006Use"
+      "rID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001(\003\"=\n\016QueryRecordR"
+      "sp\022\016\n\006UserID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001(\003\022\014\n\004Dat"
+      "a\030\003 \003(\014\"\031\n\nExecCmdReq\022\013\n\003Cmd\030\001 \001(\t\"\033\n\nEx"
+      "ecCmdRsp\022\r\n\005Reply\030\001 \001(\t\";\n\010EchoItem\022\017\n\007L"
+      "ocalID\030\001 \001(\t\022\020\n\010RemoteID\030\002 \001(\t\022\014\n\004Data\030\003"
+      " \001(\t\"-\n\016ReportDataItem\022\r\n\005Topic\030\001 \001(\t\022\014\n"
+      "\004Data\030\002 \001(\t\"\207\001\n\014SendMailItem\022\020\n\010Username"
+      "\030\001 \001(\t\022\020\n\010Password\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001"
+      "(\t\022\n\n\002To\030\004 \001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013Conte"
+      "ntType\030\006 \001(\t\022\017\n\007Content\030\007 \001(\t*\304\003\n\007MsgTyp"
+      "e\022\t\n\005Zero1\020\000\022\020\n\014ID_CommonErr\020\001\022\021\n\rID_Com"
+      "mon2Ack\020\002\022\021\n\rID_Common2Req\020\003\022\021\n\rID_Commo"
+      "n2Rsp\020\004\022\021\n\rID_Common1Req\020\005\022\021\n\rID_Common1"
+      "Rsp\020\006\022\025\n\021ID_ConnectionInfo\020\007\022\027\n\023ID_Disco"
+      "nnectedData\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\rID_C"
+      "onnectRsp\020\n\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017ID_S"
+      "ystemReport\020\014\022\025\n\021ID_QryConnInfoReq\020\r\022\025\n\021"
+      "ID_QryConnInfoRsp\020\016\022\025\n\021ID_QueryRecordReq"
+      "\020\017\022\025\n\021ID_QueryRecordRsp\020\020\022\021\n\rID_ExecCmdR"
+      "eq\020\021\022\021\n\rID_ExecCmdRsp\020\022\022\017\n\013ID_EchoItem\020\023"
+      "\022\025\n\021ID_ReportDataItem\020\024\022\023\n\017ID_SendMailIt"
+      "em\020\025P\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 2872);
+      descriptor, 2894);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -3354,7 +3357,8 @@ void Common1Req::clear_reqtime() {
   reqtime_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Common1Req::kRequestIDFieldNumber;
+const int Common1Req::kMsgNoFieldNumber;
+const int Common1Req::kSeqNoFieldNumber;
 const int Common1Req::kSenderIDFieldNumber;
 const int Common1Req::kRecverIDFieldNumber;
 const int Common1Req::kTxToRootFieldNumber;
@@ -3393,9 +3397,9 @@ Common1Req::Common1Req(const Common1Req& from)
   } else {
     reqtime_ = NULL;
   }
-  ::memcpy(&requestid_, &from.requestid_,
+  ::memcpy(&msgno_, &from.msgno_,
     static_cast<size_t>(reinterpret_cast<char*>(&reqtype_) -
-    reinterpret_cast<char*>(&requestid_)) + sizeof(reqtype_));
+    reinterpret_cast<char*>(&msgno_)) + sizeof(reqtype_));
   // @@protoc_insertion_point(copy_constructor:txdata.Common1Req)
 }
 
@@ -3447,9 +3451,9 @@ void Common1Req::Clear() {
     delete reqtime_;
   }
   reqtime_ = NULL;
-  ::memset(&requestid_, 0, static_cast<size_t>(
+  ::memset(&msgno_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&reqtype_) -
-      reinterpret_cast<char*>(&requestid_)) + sizeof(reqtype_));
+      reinterpret_cast<char*>(&msgno_)) + sizeof(reqtype_));
   _internal_metadata_.Clear();
 }
 
@@ -3463,24 +3467,38 @@ bool Common1Req::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int64 RequestID = 1;
+      // int64 MsgNo = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &requestid_)));
+                 input, &msgno_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // string SenderID = 2;
+      // int32 SeqNo = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &seqno_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string SenderID = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_senderid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -3493,10 +3511,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // string RecverID = 3;
-      case 3: {
+      // string RecverID = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_recverid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -3509,10 +3527,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 4;
-      case 4: {
+      // bool TxToRoot = 5;
+      case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -3523,10 +3541,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bool IsLog = 5;
-      case 5: {
+      // bool IsLog = 6;
+      case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -3537,10 +3555,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bool IsPush = 6;
-      case 6: {
+      // bool IsPush = 7;
+      case 7: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -3551,10 +3569,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // .txdata.MsgType ReqType = 7;
-      case 7: {
+      // .txdata.MsgType ReqType = 8;
+      case 8: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -3566,10 +3584,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bytes ReqData = 8;
-      case 8: {
+      // bytes ReqData = 9;
+      case 9: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(66u /* 66 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(74u /* 74 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_reqdata()));
         } else {
@@ -3578,10 +3596,10 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Timestamp ReqTime = 9;
-      case 9: {
+      // .google.protobuf.Timestamp ReqTime = 10;
+      case 10: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(74u /* 74 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(82u /* 82 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_reqtime()));
         } else {
@@ -3616,62 +3634,67 @@ void Common1Req::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->requestid(), output);
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->msgno(), output);
   }
 
-  // string SenderID = 2;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->seqno(), output);
+  }
+
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->senderid().data(), static_cast<int>(this->senderid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "txdata.Common1Req.SenderID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->senderid(), output);
+      3, this->senderid(), output);
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->recverid().data(), static_cast<int>(this->recverid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "txdata.Common1Req.RecverID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->recverid(), output);
+      4, this->recverid(), output);
   }
 
-  // bool TxToRoot = 4;
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->txtoroot(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->txtoroot(), output);
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->islog(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->islog(), output);
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->ispush(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(7, this->ispush(), output);
   }
 
-  // .txdata.MsgType ReqType = 7;
+  // .txdata.MsgType ReqType = 8;
   if (this->reqtype() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      7, this->reqtype(), output);
+      8, this->reqtype(), output);
   }
 
-  // bytes ReqData = 8;
+  // bytes ReqData = 9;
   if (this->reqdata().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      8, this->reqdata(), output);
+      9, this->reqdata(), output);
   }
 
-  // .google.protobuf.Timestamp ReqTime = 9;
+  // .google.protobuf.Timestamp ReqTime = 10;
   if (this->has_reqtime()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      9, this->_internal_reqtime(), output);
+      10, this->_internal_reqtime(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -3688,12 +3711,17 @@ void Common1Req::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->requestid(), target);
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->msgno(), target);
   }
 
-  // string SenderID = 2;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->seqno(), target);
+  }
+
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->senderid().data(), static_cast<int>(this->senderid().length()),
@@ -3701,10 +3729,10 @@ void Common1Req::SerializeWithCachedSizes(
       "txdata.Common1Req.SenderID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->senderid(), target);
+        3, this->senderid(), target);
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->recverid().data(), static_cast<int>(this->recverid().length()),
@@ -3712,42 +3740,42 @@ void Common1Req::SerializeWithCachedSizes(
       "txdata.Common1Req.RecverID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->recverid(), target);
+        4, this->recverid(), target);
   }
 
-  // bool TxToRoot = 4;
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->txtoroot(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->txtoroot(), target);
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->islog(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->islog(), target);
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->ispush(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(7, this->ispush(), target);
   }
 
-  // .txdata.MsgType ReqType = 7;
+  // .txdata.MsgType ReqType = 8;
   if (this->reqtype() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      7, this->reqtype(), target);
+      8, this->reqtype(), target);
   }
 
-  // bytes ReqData = 8;
+  // bytes ReqData = 9;
   if (this->reqdata().size() > 0) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        8, this->reqdata(), target);
+        9, this->reqdata(), target);
   }
 
-  // .google.protobuf.Timestamp ReqTime = 9;
+  // .google.protobuf.Timestamp ReqTime = 10;
   if (this->has_reqtime()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        9, this->_internal_reqtime(), deterministic, target);
+        10, this->_internal_reqtime(), deterministic, target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -3767,57 +3795,64 @@ size_t Common1Req::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string SenderID = 2;
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->senderid());
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->recverid());
   }
 
-  // bytes ReqData = 8;
+  // bytes ReqData = 9;
   if (this->reqdata().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::BytesSize(
         this->reqdata());
   }
 
-  // .google.protobuf.Timestamp ReqTime = 9;
+  // .google.protobuf.Timestamp ReqTime = 10;
   if (this->has_reqtime()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *reqtime_);
   }
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->requestid());
+        this->msgno());
   }
 
-  // bool TxToRoot = 4;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->seqno());
+  }
+
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
     total_size += 1 + 1;
   }
 
-  // .txdata.MsgType ReqType = 7;
+  // .txdata.MsgType ReqType = 8;
   if (this->reqtype() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->reqtype());
@@ -3865,8 +3900,11 @@ void Common1Req::MergeFrom(const Common1Req& from) {
   if (from.has_reqtime()) {
     mutable_reqtime()->::google::protobuf::Timestamp::MergeFrom(from.reqtime());
   }
-  if (from.requestid() != 0) {
-    set_requestid(from.requestid());
+  if (from.msgno() != 0) {
+    set_msgno(from.msgno());
+  }
+  if (from.seqno() != 0) {
+    set_seqno(from.seqno());
   }
   if (from.txtoroot() != 0) {
     set_txtoroot(from.txtoroot());
@@ -3913,7 +3951,8 @@ void Common1Req::InternalSwap(Common1Req* other) {
   reqdata_.Swap(&other->reqdata_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(reqtime_, other->reqtime_);
-  swap(requestid_, other->requestid_);
+  swap(msgno_, other->msgno_);
+  swap(seqno_, other->seqno_);
   swap(txtoroot_, other->txtoroot_);
   swap(islog_, other->islog_);
   swap(ispush_, other->ispush_);
@@ -3940,7 +3979,8 @@ void Common1Rsp::clear_rsptime() {
   rsptime_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Common1Rsp::kRequestIDFieldNumber;
+const int Common1Rsp::kMsgNoFieldNumber;
+const int Common1Rsp::kSeqNoFieldNumber;
 const int Common1Rsp::kSenderIDFieldNumber;
 const int Common1Rsp::kRecverIDFieldNumber;
 const int Common1Rsp::kTxToRootFieldNumber;
@@ -3980,9 +4020,9 @@ Common1Rsp::Common1Rsp(const Common1Rsp& from)
   } else {
     rsptime_ = NULL;
   }
-  ::memcpy(&requestid_, &from.requestid_,
+  ::memcpy(&msgno_, &from.msgno_,
     static_cast<size_t>(reinterpret_cast<char*>(&rsptype_) -
-    reinterpret_cast<char*>(&requestid_)) + sizeof(rsptype_));
+    reinterpret_cast<char*>(&msgno_)) + sizeof(rsptype_));
   // @@protoc_insertion_point(copy_constructor:txdata.Common1Rsp)
 }
 
@@ -4034,9 +4074,9 @@ void Common1Rsp::Clear() {
     delete rsptime_;
   }
   rsptime_ = NULL;
-  ::memset(&requestid_, 0, static_cast<size_t>(
+  ::memset(&msgno_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&rsptype_) -
-      reinterpret_cast<char*>(&requestid_)) + sizeof(rsptype_));
+      reinterpret_cast<char*>(&msgno_)) + sizeof(rsptype_));
   _internal_metadata_.Clear();
 }
 
@@ -4050,24 +4090,38 @@ bool Common1Rsp::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int64 RequestID = 1;
+      // int64 MsgNo = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &requestid_)));
+                 input, &msgno_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // string SenderID = 2;
+      // int32 SeqNo = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &seqno_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string SenderID = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_senderid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -4080,10 +4134,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // string RecverID = 3;
-      case 3: {
+      // string RecverID = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_recverid()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -4096,10 +4150,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 4;
-      case 4: {
+      // bool TxToRoot = 5;
+      case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -4110,10 +4164,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool IsLog = 5;
-      case 5: {
+      // bool IsLog = 6;
+      case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -4124,10 +4178,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool IsPush = 6;
-      case 6: {
+      // bool IsPush = 7;
+      case 7: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -4138,10 +4192,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // .txdata.MsgType RspType = 7;
-      case 7: {
+      // .txdata.MsgType RspType = 8;
+      case 8: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -4153,10 +4207,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bytes RspData = 8;
-      case 8: {
+      // bytes RspData = 9;
+      case 9: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(66u /* 66 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(74u /* 74 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_rspdata()));
         } else {
@@ -4165,10 +4219,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Timestamp RspTime = 9;
-      case 9: {
+      // .google.protobuf.Timestamp RspTime = 10;
+      case 10: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(74u /* 74 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(82u /* 82 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_rsptime()));
         } else {
@@ -4177,10 +4231,10 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool IsLast = 10;
-      case 10: {
+      // bool IsLast = 11;
+      case 11: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(80u /* 80 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(88u /* 88 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -4217,67 +4271,72 @@ void Common1Rsp::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->requestid(), output);
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->msgno(), output);
   }
 
-  // string SenderID = 2;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->seqno(), output);
+  }
+
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->senderid().data(), static_cast<int>(this->senderid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "txdata.Common1Rsp.SenderID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->senderid(), output);
+      3, this->senderid(), output);
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->recverid().data(), static_cast<int>(this->recverid().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "txdata.Common1Rsp.RecverID");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->recverid(), output);
+      4, this->recverid(), output);
   }
 
-  // bool TxToRoot = 4;
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->txtoroot(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->txtoroot(), output);
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->islog(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->islog(), output);
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->ispush(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(7, this->ispush(), output);
   }
 
-  // .txdata.MsgType RspType = 7;
+  // .txdata.MsgType RspType = 8;
   if (this->rsptype() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      7, this->rsptype(), output);
+      8, this->rsptype(), output);
   }
 
-  // bytes RspData = 8;
+  // bytes RspData = 9;
   if (this->rspdata().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      8, this->rspdata(), output);
+      9, this->rspdata(), output);
   }
 
-  // .google.protobuf.Timestamp RspTime = 9;
+  // .google.protobuf.Timestamp RspTime = 10;
   if (this->has_rsptime()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      9, this->_internal_rsptime(), output);
+      10, this->_internal_rsptime(), output);
   }
 
-  // bool IsLast = 10;
+  // bool IsLast = 11;
   if (this->islast() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(10, this->islast(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(11, this->islast(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -4294,12 +4353,17 @@ void Common1Rsp::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->requestid(), target);
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->msgno(), target);
   }
 
-  // string SenderID = 2;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->seqno(), target);
+  }
+
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->senderid().data(), static_cast<int>(this->senderid().length()),
@@ -4307,10 +4371,10 @@ void Common1Rsp::SerializeWithCachedSizes(
       "txdata.Common1Rsp.SenderID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->senderid(), target);
+        3, this->senderid(), target);
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->recverid().data(), static_cast<int>(this->recverid().length()),
@@ -4318,47 +4382,47 @@ void Common1Rsp::SerializeWithCachedSizes(
       "txdata.Common1Rsp.RecverID");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->recverid(), target);
+        4, this->recverid(), target);
   }
 
-  // bool TxToRoot = 4;
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->txtoroot(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->txtoroot(), target);
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->islog(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->islog(), target);
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->ispush(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(7, this->ispush(), target);
   }
 
-  // .txdata.MsgType RspType = 7;
+  // .txdata.MsgType RspType = 8;
   if (this->rsptype() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      7, this->rsptype(), target);
+      8, this->rsptype(), target);
   }
 
-  // bytes RspData = 8;
+  // bytes RspData = 9;
   if (this->rspdata().size() > 0) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        8, this->rspdata(), target);
+        9, this->rspdata(), target);
   }
 
-  // .google.protobuf.Timestamp RspTime = 9;
+  // .google.protobuf.Timestamp RspTime = 10;
   if (this->has_rsptime()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        9, this->_internal_rsptime(), deterministic, target);
+        10, this->_internal_rsptime(), deterministic, target);
   }
 
-  // bool IsLast = 10;
+  // bool IsLast = 11;
   if (this->islast() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(10, this->islast(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(11, this->islast(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -4378,62 +4442,69 @@ size_t Common1Rsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string SenderID = 2;
+  // string SenderID = 3;
   if (this->senderid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->senderid());
   }
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   if (this->recverid().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->recverid());
   }
 
-  // bytes RspData = 8;
+  // bytes RspData = 9;
   if (this->rspdata().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::BytesSize(
         this->rspdata());
   }
 
-  // .google.protobuf.Timestamp RspTime = 9;
+  // .google.protobuf.Timestamp RspTime = 10;
   if (this->has_rsptime()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *rsptime_);
   }
 
-  // int64 RequestID = 1;
-  if (this->requestid() != 0) {
+  // int64 MsgNo = 1;
+  if (this->msgno() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->requestid());
+        this->msgno());
   }
 
-  // bool TxToRoot = 4;
+  // int32 SeqNo = 2;
+  if (this->seqno() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->seqno());
+  }
+
+  // bool TxToRoot = 5;
   if (this->txtoroot() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   if (this->islog() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   if (this->ispush() != 0) {
     total_size += 1 + 1;
   }
 
-  // bool IsLast = 10;
+  // bool IsLast = 11;
   if (this->islast() != 0) {
     total_size += 1 + 1;
   }
 
-  // .txdata.MsgType RspType = 7;
+  // .txdata.MsgType RspType = 8;
   if (this->rsptype() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->rsptype());
@@ -4481,8 +4552,11 @@ void Common1Rsp::MergeFrom(const Common1Rsp& from) {
   if (from.has_rsptime()) {
     mutable_rsptime()->::google::protobuf::Timestamp::MergeFrom(from.rsptime());
   }
-  if (from.requestid() != 0) {
-    set_requestid(from.requestid());
+  if (from.msgno() != 0) {
+    set_msgno(from.msgno());
+  }
+  if (from.seqno() != 0) {
+    set_seqno(from.seqno());
   }
   if (from.txtoroot() != 0) {
     set_txtoroot(from.txtoroot());
@@ -4532,7 +4606,8 @@ void Common1Rsp::InternalSwap(Common1Rsp* other) {
   rspdata_.Swap(&other->rspdata_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(rsptime_, other->rsptime_);
-  swap(requestid_, other->requestid_);
+  swap(msgno_, other->msgno_);
+  swap(seqno_, other->seqno_);
   swap(txtoroot_, other->txtoroot_);
   swap(islog_, other->islog_);
   swap(ispush_, other->ispush_);

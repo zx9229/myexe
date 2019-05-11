@@ -253,7 +253,8 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
     if (isC1NotC2)
     {
         QSharedPointer<txdata::Common1Req> c1req = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
-        c1req->set_requestid(reqId);//TODO:
+        c1req->set_msgno(reqId);//TODO:
+        c1req->set_seqno(0);//TODO:
         c1req->set_senderid(this->m_ownInfo.userid());
         c1req->set_recverid(rID.toStdString());
         c1req->set_txtoroot(true);

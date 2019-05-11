@@ -1126,9 +1126,9 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
 
   // accessors -------------------------------------------------------
 
-  // string SenderID = 2;
+  // string SenderID = 3;
   void clear_senderid();
-  static const int kSenderIDFieldNumber = 2;
+  static const int kSenderIDFieldNumber = 3;
   const ::std::string& senderid() const;
   void set_senderid(const ::std::string& value);
   #if LANG_CXX11
@@ -1140,9 +1140,9 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_senderid();
   void set_allocated_senderid(::std::string* senderid);
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   void clear_recverid();
-  static const int kRecverIDFieldNumber = 3;
+  static const int kRecverIDFieldNumber = 4;
   const ::std::string& recverid() const;
   void set_recverid(const ::std::string& value);
   #if LANG_CXX11
@@ -1154,9 +1154,9 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_recverid();
   void set_allocated_recverid(::std::string* recverid);
 
-  // bytes ReqData = 8;
+  // bytes ReqData = 9;
   void clear_reqdata();
-  static const int kReqDataFieldNumber = 8;
+  static const int kReqDataFieldNumber = 9;
   const ::std::string& reqdata() const;
   void set_reqdata(const ::std::string& value);
   #if LANG_CXX11
@@ -1168,10 +1168,10 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_reqdata();
   void set_allocated_reqdata(::std::string* reqdata);
 
-  // .google.protobuf.Timestamp ReqTime = 9;
+  // .google.protobuf.Timestamp ReqTime = 10;
   bool has_reqtime() const;
   void clear_reqtime();
-  static const int kReqTimeFieldNumber = 9;
+  static const int kReqTimeFieldNumber = 10;
   private:
   const ::google::protobuf::Timestamp& _internal_reqtime() const;
   public:
@@ -1180,33 +1180,39 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* mutable_reqtime();
   void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
 
-  // int64 RequestID = 1;
-  void clear_requestid();
-  static const int kRequestIDFieldNumber = 1;
-  ::google::protobuf::int64 requestid() const;
-  void set_requestid(::google::protobuf::int64 value);
+  // int64 MsgNo = 1;
+  void clear_msgno();
+  static const int kMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 msgno() const;
+  void set_msgno(::google::protobuf::int64 value);
 
-  // bool TxToRoot = 4;
+  // int32 SeqNo = 2;
+  void clear_seqno();
+  static const int kSeqNoFieldNumber = 2;
+  ::google::protobuf::int32 seqno() const;
+  void set_seqno(::google::protobuf::int32 value);
+
+  // bool TxToRoot = 5;
   void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 4;
+  static const int kTxToRootFieldNumber = 5;
   bool txtoroot() const;
   void set_txtoroot(bool value);
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   void clear_islog();
-  static const int kIsLogFieldNumber = 5;
+  static const int kIsLogFieldNumber = 6;
   bool islog() const;
   void set_islog(bool value);
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   void clear_ispush();
-  static const int kIsPushFieldNumber = 6;
+  static const int kIsPushFieldNumber = 7;
   bool ispush() const;
   void set_ispush(bool value);
 
-  // .txdata.MsgType ReqType = 7;
+  // .txdata.MsgType ReqType = 8;
   void clear_reqtype();
-  static const int kReqTypeFieldNumber = 7;
+  static const int kReqTypeFieldNumber = 8;
   ::txdata::MsgType reqtype() const;
   void set_reqtype(::txdata::MsgType value);
 
@@ -1218,7 +1224,8 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::internal::ArenaStringPtr recverid_;
   ::google::protobuf::internal::ArenaStringPtr reqdata_;
   ::google::protobuf::Timestamp* reqtime_;
-  ::google::protobuf::int64 requestid_;
+  ::google::protobuf::int64 msgno_;
+  ::google::protobuf::int32 seqno_;
   bool txtoroot_;
   bool islog_;
   bool ispush_;
@@ -1315,9 +1322,9 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
 
   // accessors -------------------------------------------------------
 
-  // string SenderID = 2;
+  // string SenderID = 3;
   void clear_senderid();
-  static const int kSenderIDFieldNumber = 2;
+  static const int kSenderIDFieldNumber = 3;
   const ::std::string& senderid() const;
   void set_senderid(const ::std::string& value);
   #if LANG_CXX11
@@ -1329,9 +1336,9 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_senderid();
   void set_allocated_senderid(::std::string* senderid);
 
-  // string RecverID = 3;
+  // string RecverID = 4;
   void clear_recverid();
-  static const int kRecverIDFieldNumber = 3;
+  static const int kRecverIDFieldNumber = 4;
   const ::std::string& recverid() const;
   void set_recverid(const ::std::string& value);
   #if LANG_CXX11
@@ -1343,9 +1350,9 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_recverid();
   void set_allocated_recverid(::std::string* recverid);
 
-  // bytes RspData = 8;
+  // bytes RspData = 9;
   void clear_rspdata();
-  static const int kRspDataFieldNumber = 8;
+  static const int kRspDataFieldNumber = 9;
   const ::std::string& rspdata() const;
   void set_rspdata(const ::std::string& value);
   #if LANG_CXX11
@@ -1357,10 +1364,10 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::std::string* release_rspdata();
   void set_allocated_rspdata(::std::string* rspdata);
 
-  // .google.protobuf.Timestamp RspTime = 9;
+  // .google.protobuf.Timestamp RspTime = 10;
   bool has_rsptime() const;
   void clear_rsptime();
-  static const int kRspTimeFieldNumber = 9;
+  static const int kRspTimeFieldNumber = 10;
   private:
   const ::google::protobuf::Timestamp& _internal_rsptime() const;
   public:
@@ -1369,39 +1376,45 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* mutable_rsptime();
   void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
 
-  // int64 RequestID = 1;
-  void clear_requestid();
-  static const int kRequestIDFieldNumber = 1;
-  ::google::protobuf::int64 requestid() const;
-  void set_requestid(::google::protobuf::int64 value);
+  // int64 MsgNo = 1;
+  void clear_msgno();
+  static const int kMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 msgno() const;
+  void set_msgno(::google::protobuf::int64 value);
 
-  // bool TxToRoot = 4;
+  // int32 SeqNo = 2;
+  void clear_seqno();
+  static const int kSeqNoFieldNumber = 2;
+  ::google::protobuf::int32 seqno() const;
+  void set_seqno(::google::protobuf::int32 value);
+
+  // bool TxToRoot = 5;
   void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 4;
+  static const int kTxToRootFieldNumber = 5;
   bool txtoroot() const;
   void set_txtoroot(bool value);
 
-  // bool IsLog = 5;
+  // bool IsLog = 6;
   void clear_islog();
-  static const int kIsLogFieldNumber = 5;
+  static const int kIsLogFieldNumber = 6;
   bool islog() const;
   void set_islog(bool value);
 
-  // bool IsPush = 6;
+  // bool IsPush = 7;
   void clear_ispush();
-  static const int kIsPushFieldNumber = 6;
+  static const int kIsPushFieldNumber = 7;
   bool ispush() const;
   void set_ispush(bool value);
 
-  // bool IsLast = 10;
+  // bool IsLast = 11;
   void clear_islast();
-  static const int kIsLastFieldNumber = 10;
+  static const int kIsLastFieldNumber = 11;
   bool islast() const;
   void set_islast(bool value);
 
-  // .txdata.MsgType RspType = 7;
+  // .txdata.MsgType RspType = 8;
   void clear_rsptype();
-  static const int kRspTypeFieldNumber = 7;
+  static const int kRspTypeFieldNumber = 8;
   ::txdata::MsgType rsptype() const;
   void set_rsptype(::txdata::MsgType value);
 
@@ -1413,7 +1426,8 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::internal::ArenaStringPtr recverid_;
   ::google::protobuf::internal::ArenaStringPtr rspdata_;
   ::google::protobuf::Timestamp* rsptime_;
-  ::google::protobuf::int64 requestid_;
+  ::google::protobuf::int64 msgno_;
+  ::google::protobuf::int32 seqno_;
   bool txtoroot_;
   bool islog_;
   bool ispush_;
@@ -4538,21 +4552,35 @@ inline void Common2Rsp::set_islast(bool value) {
 
 // Common1Req
 
-// int64 RequestID = 1;
-inline void Common1Req::clear_requestid() {
-  requestid_ = GOOGLE_LONGLONG(0);
+// int64 MsgNo = 1;
+inline void Common1Req::clear_msgno() {
+  msgno_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Common1Req::requestid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.RequestID)
-  return requestid_;
+inline ::google::protobuf::int64 Common1Req::msgno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.MsgNo)
+  return msgno_;
 }
-inline void Common1Req::set_requestid(::google::protobuf::int64 value) {
+inline void Common1Req::set_msgno(::google::protobuf::int64 value) {
   
-  requestid_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.RequestID)
+  msgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.MsgNo)
 }
 
-// string SenderID = 2;
+// int32 SeqNo = 2;
+inline void Common1Req::clear_seqno() {
+  seqno_ = 0;
+}
+inline ::google::protobuf::int32 Common1Req::seqno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.SeqNo)
+  return seqno_;
+}
+inline void Common1Req::set_seqno(::google::protobuf::int32 value) {
+  
+  seqno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.SeqNo)
+}
+
+// string SenderID = 3;
 inline void Common1Req::clear_senderid() {
   senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4605,7 +4633,7 @@ inline void Common1Req::set_allocated_senderid(::std::string* senderid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.SenderID)
 }
 
-// string RecverID = 3;
+// string RecverID = 4;
 inline void Common1Req::clear_recverid() {
   recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4658,7 +4686,7 @@ inline void Common1Req::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.RecverID)
 }
 
-// bool TxToRoot = 4;
+// bool TxToRoot = 5;
 inline void Common1Req::clear_txtoroot() {
   txtoroot_ = false;
 }
@@ -4672,7 +4700,7 @@ inline void Common1Req::set_txtoroot(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Req.TxToRoot)
 }
 
-// bool IsLog = 5;
+// bool IsLog = 6;
 inline void Common1Req::clear_islog() {
   islog_ = false;
 }
@@ -4686,7 +4714,7 @@ inline void Common1Req::set_islog(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Req.IsLog)
 }
 
-// bool IsPush = 6;
+// bool IsPush = 7;
 inline void Common1Req::clear_ispush() {
   ispush_ = false;
 }
@@ -4700,7 +4728,7 @@ inline void Common1Req::set_ispush(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Req.IsPush)
 }
 
-// .txdata.MsgType ReqType = 7;
+// .txdata.MsgType ReqType = 8;
 inline void Common1Req::clear_reqtype() {
   reqtype_ = 0;
 }
@@ -4714,7 +4742,7 @@ inline void Common1Req::set_reqtype(::txdata::MsgType value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Req.ReqType)
 }
 
-// bytes ReqData = 8;
+// bytes ReqData = 9;
 inline void Common1Req::clear_reqdata() {
   reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4767,7 +4795,7 @@ inline void Common1Req::set_allocated_reqdata(::std::string* reqdata) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.ReqData)
 }
 
-// .google.protobuf.Timestamp ReqTime = 9;
+// .google.protobuf.Timestamp ReqTime = 10;
 inline bool Common1Req::has_reqtime() const {
   return this != internal_default_instance() && reqtime_ != NULL;
 }
@@ -4820,21 +4848,35 @@ inline void Common1Req::set_allocated_reqtime(::google::protobuf::Timestamp* req
 
 // Common1Rsp
 
-// int64 RequestID = 1;
-inline void Common1Rsp::clear_requestid() {
-  requestid_ = GOOGLE_LONGLONG(0);
+// int64 MsgNo = 1;
+inline void Common1Rsp::clear_msgno() {
+  msgno_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Common1Rsp::requestid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RequestID)
-  return requestid_;
+inline ::google::protobuf::int64 Common1Rsp::msgno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.MsgNo)
+  return msgno_;
 }
-inline void Common1Rsp::set_requestid(::google::protobuf::int64 value) {
+inline void Common1Rsp::set_msgno(::google::protobuf::int64 value) {
   
-  requestid_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RequestID)
+  msgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.MsgNo)
 }
 
-// string SenderID = 2;
+// int32 SeqNo = 2;
+inline void Common1Rsp::clear_seqno() {
+  seqno_ = 0;
+}
+inline ::google::protobuf::int32 Common1Rsp::seqno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.SeqNo)
+  return seqno_;
+}
+inline void Common1Rsp::set_seqno(::google::protobuf::int32 value) {
+  
+  seqno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.SeqNo)
+}
+
+// string SenderID = 3;
 inline void Common1Rsp::clear_senderid() {
   senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4887,7 +4929,7 @@ inline void Common1Rsp::set_allocated_senderid(::std::string* senderid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.SenderID)
 }
 
-// string RecverID = 3;
+// string RecverID = 4;
 inline void Common1Rsp::clear_recverid() {
   recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4940,7 +4982,7 @@ inline void Common1Rsp::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RecverID)
 }
 
-// bool TxToRoot = 4;
+// bool TxToRoot = 5;
 inline void Common1Rsp::clear_txtoroot() {
   txtoroot_ = false;
 }
@@ -4954,7 +4996,7 @@ inline void Common1Rsp::set_txtoroot(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Rsp.TxToRoot)
 }
 
-// bool IsLog = 5;
+// bool IsLog = 6;
 inline void Common1Rsp::clear_islog() {
   islog_ = false;
 }
@@ -4968,7 +5010,7 @@ inline void Common1Rsp::set_islog(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsLog)
 }
 
-// bool IsPush = 6;
+// bool IsPush = 7;
 inline void Common1Rsp::clear_ispush() {
   ispush_ = false;
 }
@@ -4982,7 +5024,7 @@ inline void Common1Rsp::set_ispush(bool value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsPush)
 }
 
-// .txdata.MsgType RspType = 7;
+// .txdata.MsgType RspType = 8;
 inline void Common1Rsp::clear_rsptype() {
   rsptype_ = 0;
 }
@@ -4996,7 +5038,7 @@ inline void Common1Rsp::set_rsptype(::txdata::MsgType value) {
   // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RspType)
 }
 
-// bytes RspData = 8;
+// bytes RspData = 9;
 inline void Common1Rsp::clear_rspdata() {
   rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -5049,7 +5091,7 @@ inline void Common1Rsp::set_allocated_rspdata(::std::string* rspdata) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspData)
 }
 
-// .google.protobuf.Timestamp RspTime = 9;
+// .google.protobuf.Timestamp RspTime = 10;
 inline bool Common1Rsp::has_rsptime() const {
   return this != internal_default_instance() && rsptime_ != NULL;
 }
@@ -5098,7 +5140,7 @@ inline void Common1Rsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsp
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspTime)
 }
 
-// bool IsLast = 10;
+// bool IsLast = 11;
 inline void Common1Rsp::clear_islast() {
   islast_ = false;
 }
