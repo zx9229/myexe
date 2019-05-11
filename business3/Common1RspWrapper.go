@@ -19,6 +19,7 @@ type Common1RspWrapper struct {
 	sync.Mutex
 	conn    *wsnet.WsSocket
 	isLast  bool
+	rspIdx  int32
 	reqData *txdata.Common1Req
 }
 
@@ -41,7 +42,8 @@ func (thls *Common1RspWrapper) doRemainder() {
 
 func (thls *Common1RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast bool) bool {
 	curRspData := txdata.Common1Rsp{}
-	curRspData.RequestID = thls.reqData.RequestID
+	curRspData.MsgNo = thls.reqData.MsgNo
+	curRspData.SeqNo = thls.rspIdx + 1
 	curRspData.SenderID = thls.reqData.RecverID
 	curRspData.RecverID = thls.reqData.SenderID
 	curRspData.TxToRoot = !thls.reqData.TxToRoot
@@ -57,6 +59,7 @@ func (thls *Common1RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	if !thls.reqData.IsPush {
 		thls.conn.Send(msg2package(&curRspData))
 	}
+	thls.rspIdx = curRspData.SeqNo
 	thls.isLast = curRspData.IsLast
 
 	return true

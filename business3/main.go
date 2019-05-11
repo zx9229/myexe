@@ -238,7 +238,7 @@ func handleCommon1Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 		assert4true(ceData.ErrNo == 0)
 		assert4true(len(resultSlice) == 0)
 		if true {
-			resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: reqData.RequestID, SeqNo: 0}
+			resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: reqData.MsgNo, SeqNo: 0}
 			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
 			resultSlice = append(resultSlice, resultNode)
 		}

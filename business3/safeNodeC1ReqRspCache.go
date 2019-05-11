@@ -10,10 +10,10 @@ import (
 
 type nodeC1ReqRsp struct {
 	sync.Mutex
-	condVar   *myCondVariable
-	RequestID int64
-	reqData   ProtoMessage
-	rspData   []ProtoMessage
+	condVar *myCondVariable
+	MsgNo   int64
+	reqData ProtoMessage
+	rspData []ProtoMessage
 }
 
 func newNodeC1ReqRsp() *nodeC1ReqRsp {
@@ -57,37 +57,37 @@ func newSafeNodeC1ReqRspCache() *safeNodeC1ReqRspCache {
 
 func (thls *safeNodeC1ReqRspCache) insertNode(node *nodeC1ReqRsp) (isSuccess bool) {
 	thls.Lock()
-	if _, isSuccess = thls.M[node.RequestID]; !isSuccess {
-		thls.M[node.RequestID] = node
+	if _, isSuccess = thls.M[node.MsgNo]; !isSuccess {
+		thls.M[node.MsgNo] = node
 	}
 	thls.Unlock()
 	isSuccess = !isSuccess
 	return
 }
 
-func (thls *safeNodeC1ReqRspCache) deleteNode(reqID int64) (node *nodeC1ReqRsp, isExist bool) {
+func (thls *safeNodeC1ReqRspCache) deleteNode(msgNo int64) (node *nodeC1ReqRsp, isExist bool) {
 	thls.Lock()
-	if node, isExist = thls.M[reqID]; isExist {
-		delete(thls.M, reqID)
+	if node, isExist = thls.M[msgNo]; isExist {
+		delete(thls.M, msgNo)
 	}
 	thls.Unlock()
 	return
 }
 
-func (thls *safeNodeC1ReqRspCache) queryNode(reqID int64) (node *nodeC1ReqRsp, isExist bool) {
+func (thls *safeNodeC1ReqRspCache) queryNode(msgNo int64) (node *nodeC1ReqRsp, isExist bool) {
 	thls.Lock()
-	node, isExist = thls.M[reqID]
+	node, isExist = thls.M[msgNo]
 	thls.Unlock()
 	return
 }
 
-func (thls *safeNodeC1ReqRspCache) operateNode(reqID int64, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
+func (thls *safeNodeC1ReqRspCache) operateNode(msgNo int64, rspData ProtoMessage, doNotify bool) (isSuccess bool) {
 	assert4true(rspData != nil)
 	var node *nodeC1ReqRsp
 	if doNotify {
-		node, isSuccess = thls.deleteNode(reqID)
+		node, isSuccess = thls.deleteNode(msgNo)
 	} else {
-		node, isSuccess = thls.queryNode(reqID)
+		node, isSuccess = thls.queryNode(msgNo)
 	}
 	if isSuccess {
 		node.appendRspData(rspData)

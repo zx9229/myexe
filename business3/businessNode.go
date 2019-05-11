@@ -441,7 +441,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 		msgData.TxToRoot = false //我即将发送给自己的子节点,所以不是发往根节点的方向.
 		err = thls.sendDataEx(connEx.conn, msgData, false)
 	} else {
-		if msgData.TxToRoot {
+		if !thls.iAmRoot && msgData.TxToRoot {
 			err = thls.sendDataEx(thls.parentInfo.conn, msgData, true)
 		} else {
 			//一旦(!TxToRoot)则说明该消息已经在某一个节点找到了RecverID,然后扭头(!TxToRoot)发往目标节点,在奔往目标节点的过程中,目标节点离线了.
@@ -451,7 +451,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 	}
 	if (err != nil) && (!msgData.IsPush) {
 		msgData.TxToRoot = originalTxToRoot
-		tmpTxRspData := thls.genRsp4Common1Req(msgData, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
+		tmpTxRspData := thls.genRsp4Common1Req(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
 		thls.sendData(msgConn, tmpTxRspData) //TODO:打印日志.
 	}
 }
@@ -465,7 +465,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 		assert4true((msgConn != pconn) == msgData.TxToRoot)
 	}
 	if msgData.RecverID == thls.ownInfo.UserID {
-		thls.cacheC1RR.operateNode(msgData.RequestID, msgData, msgData.IsLast)
+		thls.cacheC1RR.operateNode(msgData.MsgNo, msgData, msgData.IsLast)
 		//TODO:回调函数.
 		return
 	}
@@ -766,9 +766,10 @@ func (thls *businessNode) genRsp4Common2Req(dataReq *txdata.Common2Req, seqno in
 	return
 }
 
-func (thls *businessNode) genRsp4Common1Req(dataReq *txdata.Common1Req, pm ProtoMessage, isLast bool) (dataRsp *txdata.Common1Rsp) {
+func (thls *businessNode) genRsp4Common1Req(dataReq *txdata.Common1Req, seqno int32, pm ProtoMessage, isLast bool) (dataRsp *txdata.Common1Rsp) {
 	dataRsp = &txdata.Common1Rsp{}
-	dataRsp.RequestID = dataReq.RequestID
+	dataRsp.MsgNo = dataReq.MsgNo
+	dataRsp.SeqNo = seqno
 	dataRsp.SenderID = thls.ownInfo.UserID
 	dataRsp.RecverID = dataReq.SenderID
 	dataRsp.TxToRoot = !dataReq.TxToRoot
@@ -886,7 +887,8 @@ func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, 
 
 func (thls *businessNode) syncExecuteCommon1ReqRsp(reqInOut *txdata.Common1Req, d time.Duration) (rspSlice []*txdata.Common1Rsp) {
 	if true { //修复请求结构体的相关字段.
-		reqInOut.RequestID = thls.increaseSeqNo()
+		reqInOut.MsgNo = thls.increaseSeqNo()
+		reqInOut.SeqNo = 0
 		reqInOut.SenderID = thls.ownInfo.UserID
 		//reqInOut.RecverID
 		reqInOut.TxToRoot = true
@@ -898,7 +900,7 @@ func (thls *businessNode) syncExecuteCommon1ReqRsp(reqInOut *txdata.Common1Req, 
 	}
 
 	node := newNodeC1ReqRsp()
-	node.RequestID = reqInOut.RequestID
+	node.MsgNo = reqInOut.MsgNo
 	node.reqData = reqInOut
 	if !thls.cacheC1RR.insertNode(node) {
 		panic(node) //TODO:
@@ -914,25 +916,25 @@ func (thls *businessNode) syncExecuteCommon1ReqRsp(reqInOut *txdata.Common1Req, 
 		//如果应答,等待字段有效,视发送结果而定.
 		if reqInOut.IsPush || (d <= 0) {
 			if err != nil {
-				rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+				rspData = thls.genRsp4Common1Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
 			} else {
-				rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
+				rspData = thls.genRsp4Common1Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 0, ErrMsg: "(simulate)SUCCESS"}, true)
 			}
 			break
 		}
 		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送成功了,需要等待.
 		//如果应答,等待字段有效(0<d),若非安全执行(!IsSafe),本次发送失败了,直接返回.
 		if err != nil {
-			rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
+			rspData = thls.genRsp4Common1Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)" + err.Error()}, true)
 			break
 		}
 		if isTimeout := node.condVar.waitFor(d); isTimeout {
-			rspData = thls.genRsp4Common1Req(reqInOut, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
+			rspData = thls.genRsp4Common1Req(reqInOut, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: "(simulate)timeout"}, true)
 			break
 		}
 	}
 	if rspData != nil {
-		thls.cacheC1RR.operateNode(rspData.RequestID, rspData, rspData.IsLast)
+		thls.cacheC1RR.operateNode(rspData.MsgNo, rspData, rspData.IsLast)
 	}
 	rspSlice = node.xyz()
 	//thls.cacheC2RR.deleteNode(&node.key)

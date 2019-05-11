@@ -86,28 +86,30 @@ message Common2Rsp {
 }
 
 message Common1Req {
-    int64                     RequestID =  1;
-    string                    SenderID  =  2;
-    string                    RecverID  =  3;
-    bool                      TxToRoot  =  4;//指代传输的方向.
-    bool                      IsLog     =  5;
-    bool                      IsPush    =  6;//上报(把请求发送到目的地就行了,不需要返回响应包).
-    MsgType                   ReqType   =  7;
-    bytes                     ReqData   =  8;
-    google.protobuf.Timestamp ReqTime   =  9;
+    int64                     MsgNo     =  1;
+    int32                     SeqNo     =  2;
+    string                    SenderID  =  3;
+    string                    RecverID  =  4;
+    bool                      TxToRoot  =  5;//指代传输的方向.
+    bool                      IsLog     =  6;
+    bool                      IsPush    =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    MsgType                   ReqType   =  8;
+    bytes                     ReqData   =  9;
+    google.protobuf.Timestamp ReqTime   = 10;
 }
 
 message Common1Rsp {
-    int64                     RequestID =  1;
-    string                    SenderID  =  2;
-    string                    RecverID  =  3;
-    bool                      TxToRoot  =  4;
-    bool                      IsLog     =  5;
-    bool                      IsPush    =  6;
-    MsgType                   RspType   =  7;
-    bytes                     RspData   =  8;
-    google.protobuf.Timestamp RspTime   =  9;
-    bool                      IsLast    = 10;//最后一条响应的标志.
+    int64                     MsgNo     =  1;
+    int32                     SeqNo     =  2;
+    string                    SenderID  =  3;
+    string                    RecverID  =  4;
+    bool                      TxToRoot  =  5;
+    bool                      IsLog     =  6;
+    bool                      IsPush    =  7;
+    MsgType                   RspType   =  8;
+    bytes                     RspData   =  9;
+    google.protobuf.Timestamp RspTime   = 10;
+    bool                      IsLast    = 11;//最后一条响应的标志.
 }
 
 message ConnectionInfo {
