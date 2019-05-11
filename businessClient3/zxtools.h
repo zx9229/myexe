@@ -24,7 +24,7 @@ public:
     {
         dst->RspCnt = 0;
         dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
-        dst->MsgTypeTxt=QString::fromStdString(::txdata::MsgType_Name(static_cast<txdata::MsgType>(dst->MsgType)));
+        dst->MsgTypeTxt = QString::fromStdString(::txdata::MsgType_Name(static_cast<txdata::MsgType>(dst->MsgType)));
         dst->PeerID = QString::fromStdString(src->recverid());
         dst->UserID = QString::fromStdString(src->senderid());
         dst->MsgNo = src->msgno();
@@ -37,7 +37,7 @@ public:
         dst->IsPush = src->ispush();
         dst->UpCache = false;
         dst->TxType = static_cast<int32_t>(src->reqtype());
-        dst->TxTypeTxt=QString::fromStdString(::txdata::MsgType_Name(src->reqtype()));
+        dst->TxTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->reqtype()));
         dst->TxData = QString::fromStdString(src->reqdata());
         dst->TxDataTxt.clear();//TODO:
         gpt2qdt(dst->TxTime, src->reqtime());
@@ -73,7 +73,7 @@ public:
         dst->IsPush = src->ispush();
         dst->UpCache = false;
         dst->TxType = static_cast<int32_t>(src->rsptype());
-        dst->TxTypeTxt= QString::fromStdString(::txdata::MsgType_Name(src->rsptype()));
+        dst->TxTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->rsptype()));
         dst->TxData = QString::fromStdString(src->rspdata());
         dst->TxDataTxt.clear();
         gpt2qdt(dst->TxTime, src->rsptime());
