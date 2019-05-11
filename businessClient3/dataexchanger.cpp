@@ -1,4 +1,3 @@
-// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp
 #include "dataexchanger.h"
 #include <QCoreApplication>
 #include <QSqlQuery>

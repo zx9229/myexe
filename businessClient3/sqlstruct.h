@@ -235,7 +235,7 @@ public:
     bool      UpCache;
     int32_t   TxType;//通信的对象的类型.
     QString   TxTypeTxt;
-    QString   TxData;//通信的对象经pb序列化后的二进制数据.
+    QByteArray   TxData;//通信的对象经pb序列化后的二进制数据.
     QString   TxDataTxt;//通信的对象转换成json字符串.
     QDateTime TxTime;
     QDateTime InsertTime;//插入时刻(插入之后,不再修改它).

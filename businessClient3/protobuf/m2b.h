@@ -66,6 +66,7 @@ public:
 
     static bool slice2msg(const char* data, int size, ::txdata::MsgType msgType, GPMSGPTR& msgOut)
     {
+        msgOut.clear();
         // 需要在shell下,先创建ff函数,再执行ff函数.
         // ff(){ sed -n '/^enum MsgType/,/}/p' "$1" | sed 's/[ \t]*\?\(ID_\)\([^ \t]\+\).*/case ::txdata::MsgType::\1\2: \n msgOut = QSharedPointer<txdata::\2>(new txdata::\2); \n break;/g' ; }
         // ff  txdata.proto
