@@ -182,11 +182,19 @@ QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText,
 
     if (isC1NotC2)
     {
-        message = sendCommon1Req(qSharedPointerDynamicCast<txdata::Common1Req>(msgData));
+        QSharedPointer<txdata::Common1Req> c1data = qSharedPointerDynamicCast<txdata::Common1Req>(msgData);
+        {
+            CommonData tmpData;
+            zxtools::Common1Req2CommonData(&tmpData, c1data.get());
+            QSqlQuery sqlQuery;
+            tmpData.insert_data(sqlQuery, true, nullptr);
+        }
+        message = sendCommon1Req(c1data);
     }
     else
     {
-        message = sendCommon2Req(qSharedPointerDynamicCast<txdata::Common2Req>(msgData));
+        QSharedPointer<txdata::Common2Req> c2data = qSharedPointerDynamicCast<txdata::Common2Req>(msgData);
+        message = sendCommon2Req(c2data);
     }
     return message;
 }
