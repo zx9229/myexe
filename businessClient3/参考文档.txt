@@ -35,3 +35,16 @@ https://doc.qt.io/qt-5/qtquick-modelviewsdata-cppmodels.html
 Qt Quick Controls - Table View Example | Qt Quick Controls 5.9
 https://doc-snapshots.qt.io/qt5-5.9/qtquickcontrols-tableview-example.html
 ===============================================================================
+QML仿微信聊天界面-消息气泡自适应
+https://blog.csdn.net/Feeling_C/article/details/85109479
+===============================================================================
+基于Qt的类QQ气泡聊天的界面开发
+https://www.cnblogs.com/bhlsheji/articles/5157264.aspx
+基于QML模拟QQ群聊窗口
+https://blog.csdn.net/esonpo/article/details/23344207
+===============================================================================
+qml实现的聊天界面
+https://blog.csdn.net/qq_16383977/article/details/79719728
+【Qml+Qt】聊天机器人
+http://www.qtcn.org/bbs/read-htm-tid-62920.html
+===============================================================================

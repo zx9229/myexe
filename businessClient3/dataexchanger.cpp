@@ -259,7 +259,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c1req->set_seqno(0);//TODO:
         c1req->set_senderid(this->m_ownInfo.userid());
         c1req->set_recverid(rID.toStdString());
-        c1req->set_txtoroot(true);
+        c1req->set_toroot(true);
         c1req->set_islog(isLog);
         c1req->set_ispush(isPush);
         c1req->set_reqtype(curType);
@@ -275,7 +275,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c2req->mutable_key()->set_seqno(seqNo);
         c2req->set_senderid(m_ownInfo.userid());
         c2req->set_recverid(rID.toStdString());
-        c2req->set_txtoroot(true);
+        c2req->set_toroot(true);
         c2req->set_islog(isLog);
         c2req->set_issafe(isSafe);
         c2req->set_ispush(isPush);
@@ -301,7 +301,7 @@ QString DataExchanger::sendCommon2Req(QSharedPointer<txdata::Common2Req> data)
 {
     if (data->issafe())
     {
-        bool isOk = m_cacheSync.insertData(data->key(), data->txtoroot(), data->recverid(), data);
+        bool isOk = m_cacheSync.insertData(data->key(), data->toroot(), data->recverid(), data);
         Q_ASSERT(isOk);
     }
     qint64 sendBytes = m_ws.sendBinaryMessage(m2b::msg2package(*data));

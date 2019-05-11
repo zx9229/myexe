@@ -24,20 +24,23 @@ public:
     {
         dst->RspCnt = 0;
         dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
-        dst->TargetID = QString::fromStdString(src->recverid());
+        dst->MsgTypeTxt=QString::fromStdString(::txdata::MsgType_Name(static_cast<txdata::MsgType>(dst->MsgType)));
+        dst->PeerID = QString::fromStdString(src->recverid());
         dst->UserID = QString::fromStdString(src->senderid());
         dst->MsgNo = src->msgno();
         dst->SeqNo = src->seqno();
         dst->SenderID = QString::fromStdString(src->senderid());
         dst->RecverID = QString::fromStdString(src->recverid());
-        dst->TxToRoot = src->txtoroot();
+        dst->ToRoot = src->toroot();
         dst->IsLog = src->islog();
         dst->IsSafe = false;
         dst->IsPush = src->ispush();
         dst->UpCache = false;
-        dst->InnerType = static_cast<int32_t>(src->reqtype());
-        dst->InnerData = QString::fromStdString(src->reqdata());
-        gpt2qdt(dst->InnerTime, src->reqtime());
+        dst->TxType = static_cast<int32_t>(src->reqtype());
+        dst->TxTypeTxt=QString::fromStdString(::txdata::MsgType_Name(src->reqtype()));
+        dst->TxData = QString::fromStdString(src->reqdata());
+        dst->TxDataTxt.clear();//TODO:
+        gpt2qdt(dst->TxTime, src->reqtime());
         dst->InsertTime = QDateTime::currentDateTime();
         dst->IsLast = false;
     }
@@ -47,31 +50,33 @@ public:
         dst->set_seqno(src->SeqNo);
         dst->set_senderid(src->SenderID.toStdString());
         dst->set_recverid(src->RecverID.toStdString());
-        dst->set_txtoroot(src->TxToRoot);
+        dst->set_toroot(src->ToRoot);
         dst->set_islog(src->IsLog);
         dst->set_ispush(src->IsPush);
-        dst->set_reqtype(static_cast<txdata::MsgType>(src->InnerType));
-        dst->set_reqdata(src->InnerData.toStdString());
-        qdt2gpt(*dst->mutable_reqtime(), src->InnerTime);
+        dst->set_reqtype(static_cast<txdata::MsgType>(src->TxType));
+        dst->set_reqdata(src->TxData.toStdString());
+        qdt2gpt(*dst->mutable_reqtime(), src->TxTime);
     }
     static void Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* src)
     {
         dst->RspCnt = 0;
         dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
-        dst->TargetID = QString::fromStdString(src->senderid());
+        dst->PeerID = QString::fromStdString(src->senderid());
         dst->UserID = QString::fromStdString(src->recverid());
         dst->MsgNo = src->msgno();
         dst->SeqNo = src->seqno();
         dst->SenderID = QString::fromStdString(src->senderid());
         dst->RecverID = QString::fromStdString(src->recverid());
-        dst->TxToRoot = src->txtoroot();
+        dst->ToRoot = src->toroot();
         dst->IsLog = src->islog();
         dst->IsSafe = false;
         dst->IsPush = src->ispush();
         dst->UpCache = false;
-        dst->InnerType = static_cast<int32_t>(src->rsptype());
-        dst->InnerData = QString::fromStdString(src->rspdata());
-        gpt2qdt(dst->InnerTime, src->rsptime());
+        dst->TxType = static_cast<int32_t>(src->rsptype());
+        dst->TxTypeTxt= QString::fromStdString(::txdata::MsgType_Name(src->rsptype()));
+        dst->TxData = QString::fromStdString(src->rspdata());
+        dst->TxDataTxt.clear();
+        gpt2qdt(dst->TxTime, src->rsptime());
         dst->InsertTime = QDateTime::currentDateTime();
         dst->IsLast = src->islast();
     }
@@ -81,12 +86,12 @@ public:
         dst->set_seqno(src->SeqNo);
         dst->set_senderid(src->SenderID.toStdString());
         dst->set_recverid(src->RecverID.toStdString());
-        dst->set_txtoroot(src->TxToRoot);
+        dst->set_toroot(src->ToRoot);
         dst->set_islog(src->IsLog);
         dst->set_ispush(src->IsPush);
-        dst->set_rsptype(static_cast<txdata::MsgType>(src->InnerType));
-        dst->set_rspdata(src->InnerData.toStdString());
-        qdt2gpt(*dst->mutable_rsptime(), src->InnerTime);
+        dst->set_rsptype(static_cast<txdata::MsgType>(src->TxType));
+        dst->set_rspdata(src->TxData.toStdString());
+        qdt2gpt(*dst->mutable_rsptime(), src->TxTime);
         dst->set_islast(src->IsLast);
     }
 };

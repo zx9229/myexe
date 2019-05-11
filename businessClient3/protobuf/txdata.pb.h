@@ -588,11 +588,11 @@ class Common2Ack : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::txdata::UniKey* mutable_key();
   void set_allocated_key(::txdata::UniKey* key);
 
-  // bool TxToRoot = 4;
-  void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 4;
-  bool txtoroot() const;
-  void set_txtoroot(bool value);
+  // bool ToRoot = 4;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 4;
+  bool toroot() const;
+  void set_toroot(bool value);
 
   // bool IsLog = 5;
   void clear_islog();
@@ -607,7 +607,7 @@ class Common2Ack : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::internal::ArenaStringPtr senderid_;
   ::google::protobuf::internal::ArenaStringPtr recverid_;
   ::txdata::UniKey* key_;
-  bool txtoroot_;
+  bool toroot_;
   bool islog_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
@@ -767,11 +767,11 @@ class Common2Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* mutable_reqtime();
   void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
 
-  // bool TxToRoot = 4;
-  void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 4;
-  bool txtoroot() const;
-  void set_txtoroot(bool value);
+  // bool ToRoot = 4;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 4;
+  bool toroot() const;
+  void set_toroot(bool value);
 
   // bool IsLog = 5;
   void clear_islog();
@@ -812,7 +812,7 @@ class Common2Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::internal::ArenaStringPtr reqdata_;
   ::txdata::UniKey* key_;
   ::google::protobuf::Timestamp* reqtime_;
-  bool txtoroot_;
+  bool toroot_;
   bool islog_;
   bool issafe_;
   bool ispush_;
@@ -976,11 +976,11 @@ class Common2Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* mutable_rsptime();
   void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
 
-  // bool TxToRoot = 4;
-  void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 4;
-  bool txtoroot() const;
-  void set_txtoroot(bool value);
+  // bool ToRoot = 4;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 4;
+  bool toroot() const;
+  void set_toroot(bool value);
 
   // bool IsLog = 5;
   void clear_islog();
@@ -1027,7 +1027,7 @@ class Common2Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::internal::ArenaStringPtr rspdata_;
   ::txdata::UniKey* key_;
   ::google::protobuf::Timestamp* rsptime_;
-  bool txtoroot_;
+  bool toroot_;
   bool islog_;
   bool issafe_;
   bool ispush_;
@@ -1192,11 +1192,11 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::int32 seqno() const;
   void set_seqno(::google::protobuf::int32 value);
 
-  // bool TxToRoot = 5;
-  void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 5;
-  bool txtoroot() const;
-  void set_txtoroot(bool value);
+  // bool ToRoot = 5;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 5;
+  bool toroot() const;
+  void set_toroot(bool value);
 
   // bool IsLog = 6;
   void clear_islog();
@@ -1226,7 +1226,7 @@ class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* reqtime_;
   ::google::protobuf::int64 msgno_;
   ::google::protobuf::int32 seqno_;
-  bool txtoroot_;
+  bool toroot_;
   bool islog_;
   bool ispush_;
   int reqtype_;
@@ -1388,11 +1388,11 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::int32 seqno() const;
   void set_seqno(::google::protobuf::int32 value);
 
-  // bool TxToRoot = 5;
-  void clear_txtoroot();
-  static const int kTxToRootFieldNumber = 5;
-  bool txtoroot() const;
-  void set_txtoroot(bool value);
+  // bool ToRoot = 5;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 5;
+  bool toroot() const;
+  void set_toroot(bool value);
 
   // bool IsLog = 6;
   void clear_islog();
@@ -1428,7 +1428,7 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::Timestamp* rsptime_;
   ::google::protobuf::int64 msgno_;
   ::google::protobuf::int32 seqno_;
-  bool txtoroot_;
+  bool toroot_;
   bool islog_;
   bool ispush_;
   bool islast_;
@@ -3806,18 +3806,18 @@ inline void Common2Ack::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common2Ack.RecverID)
 }
 
-// bool TxToRoot = 4;
-inline void Common2Ack::clear_txtoroot() {
-  txtoroot_ = false;
+// bool ToRoot = 4;
+inline void Common2Ack::clear_toroot() {
+  toroot_ = false;
 }
-inline bool Common2Ack::txtoroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Ack.TxToRoot)
-  return txtoroot_;
+inline bool Common2Ack::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Ack.ToRoot)
+  return toroot_;
 }
-inline void Common2Ack::set_txtoroot(bool value) {
+inline void Common2Ack::set_toroot(bool value) {
   
-  txtoroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Ack.TxToRoot)
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Ack.ToRoot)
 }
 
 // bool IsLog = 5;
@@ -3998,18 +3998,18 @@ inline void Common2Req::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.RecverID)
 }
 
-// bool TxToRoot = 4;
-inline void Common2Req::clear_txtoroot() {
-  txtoroot_ = false;
+// bool ToRoot = 4;
+inline void Common2Req::clear_toroot() {
+  toroot_ = false;
 }
-inline bool Common2Req::txtoroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.TxToRoot)
-  return txtoroot_;
+inline bool Common2Req::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.ToRoot)
+  return toroot_;
 }
-inline void Common2Req::set_txtoroot(bool value) {
+inline void Common2Req::set_toroot(bool value) {
   
-  txtoroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.TxToRoot)
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.ToRoot)
 }
 
 // bool IsLog = 5;
@@ -4348,18 +4348,18 @@ inline void Common2Rsp::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RecverID)
 }
 
-// bool TxToRoot = 4;
-inline void Common2Rsp::clear_txtoroot() {
-  txtoroot_ = false;
+// bool ToRoot = 4;
+inline void Common2Rsp::clear_toroot() {
+  toroot_ = false;
 }
-inline bool Common2Rsp::txtoroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.TxToRoot)
-  return txtoroot_;
+inline bool Common2Rsp::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.ToRoot)
+  return toroot_;
 }
-inline void Common2Rsp::set_txtoroot(bool value) {
+inline void Common2Rsp::set_toroot(bool value) {
   
-  txtoroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.TxToRoot)
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.ToRoot)
 }
 
 // bool IsLog = 5;
@@ -4686,18 +4686,18 @@ inline void Common1Req::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.RecverID)
 }
 
-// bool TxToRoot = 5;
-inline void Common1Req::clear_txtoroot() {
-  txtoroot_ = false;
+// bool ToRoot = 5;
+inline void Common1Req::clear_toroot() {
+  toroot_ = false;
 }
-inline bool Common1Req::txtoroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.TxToRoot)
-  return txtoroot_;
+inline bool Common1Req::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.ToRoot)
+  return toroot_;
 }
-inline void Common1Req::set_txtoroot(bool value) {
+inline void Common1Req::set_toroot(bool value) {
   
-  txtoroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.TxToRoot)
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.ToRoot)
 }
 
 // bool IsLog = 6;
@@ -4982,18 +4982,18 @@ inline void Common1Rsp::set_allocated_recverid(::std::string* recverid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RecverID)
 }
 
-// bool TxToRoot = 5;
-inline void Common1Rsp::clear_txtoroot() {
-  txtoroot_ = false;
+// bool ToRoot = 5;
+inline void Common1Rsp::clear_toroot() {
+  toroot_ = false;
 }
-inline bool Common1Rsp::txtoroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.TxToRoot)
-  return txtoroot_;
+inline bool Common1Rsp::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.ToRoot)
+  return toroot_;
 }
-inline void Common1Rsp::set_txtoroot(bool value) {
+inline void Common1Rsp::set_toroot(bool value) {
   
-  txtoroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.TxToRoot)
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.ToRoot)
 }
 
 // bool IsLog = 6;

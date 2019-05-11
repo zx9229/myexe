@@ -532,7 +532,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, key_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, recverid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, txtoroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, toroot_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Ack, islog_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, _internal_metadata_),
@@ -542,7 +542,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, key_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, recverid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, txtoroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, toroot_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, islog_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, issafe_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Req, ispush_),
@@ -558,7 +558,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, key_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, recverid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, txtoroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, toroot_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, islog_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, issafe_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common2Rsp, ispush_),
@@ -576,7 +576,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, seqno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, recverid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, txtoroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, toroot_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, islog_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, ispush_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Req, reqtype_),
@@ -591,7 +591,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, seqno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, senderid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, recverid_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, txtoroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, toroot_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, islog_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, ispush_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::Common1Rsp, rsptype_),
@@ -798,79 +798,79 @@ void AddDescriptorsImpl() {
       "\n\014txdata.proto\022\006txdata\032\037google/protobuf/"
       "timestamp.proto\"6\n\006UniKey\022\016\n\006UserID\030\001 \001("
       "\t\022\r\n\005MsgNo\030\002 \001(\003\022\r\n\005SeqNo\030\003 \001(\005\"*\n\tCommo"
-      "nErr\022\r\n\005ErrNo\030\001 \001(\005\022\016\n\006ErrMsg\030\002 \001(\t\"n\n\nC"
+      "nErr\022\r\n\005ErrNo\030\001 \001(\005\022\016\n\006ErrMsg\030\002 \001(\t\"l\n\nC"
       "ommon2Ack\022\033\n\003Key\030\001 \001(\0132\016.txdata.UniKey\022\020"
-      "\n\010SenderID\030\002 \001(\t\022\020\n\010RecverID\030\003 \001(\t\022\020\n\010Tx"
-      "ToRoot\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\"\377\001\n\nCommon2R"
-      "eq\022\033\n\003Key\030\001 \001(\0132\016.txdata.UniKey\022\020\n\010Sende"
-      "rID\030\002 \001(\t\022\020\n\010RecverID\030\003 \001(\t\022\020\n\010TxToRoot\030"
-      "\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n\006IsSafe\030\006 \001(\010\022\016\n\006"
-      "IsPush\030\007 \001(\010\022\017\n\007UpCache\030\010 \001(\010\022 \n\007ReqType"
-      "\030\t \001(\0162\017.txdata.MsgType\022\017\n\007ReqData\030\n \001(\014"
-      "\022+\n\007ReqTime\030\013 \001(\0132\032.google.protobuf.Time"
-      "stamp\"\217\002\n\nCommon2Rsp\022\033\n\003Key\030\001 \001(\0132\016.txda"
-      "ta.UniKey\022\020\n\010SenderID\030\002 \001(\t\022\020\n\010RecverID\030"
-      "\003 \001(\t\022\020\n\010TxToRoot\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016"
-      "\n\006IsSafe\030\006 \001(\010\022\016\n\006IsPush\030\007 \001(\010\022\017\n\007UpCach"
-      "e\030\010 \001(\010\022 \n\007RspType\030\t \001(\0162\017.txdata.MsgTyp"
-      "e\022\017\n\007RspData\030\n \001(\014\022+\n\007RspTime\030\013 \001(\0132\032.go"
-      "ogle.protobuf.Timestamp\022\016\n\006IsLast\030\014 \001(\010\""
-      "\337\001\n\nCommon1Req\022\r\n\005MsgNo\030\001 \001(\003\022\r\n\005SeqNo\030\002"
-      " \001(\005\022\020\n\010SenderID\030\003 \001(\t\022\020\n\010RecverID\030\004 \001(\t"
-      "\022\020\n\010TxToRoot\030\005 \001(\010\022\r\n\005IsLog\030\006 \001(\010\022\016\n\006IsP"
-      "ush\030\007 \001(\010\022 \n\007ReqType\030\010 \001(\0162\017.txdata.MsgT"
-      "ype\022\017\n\007ReqData\030\t \001(\014\022+\n\007ReqTime\030\n \001(\0132\032."
-      "google.protobuf.Timestamp\"\357\001\n\nCommon1Rsp"
-      "\022\r\n\005MsgNo\030\001 \001(\003\022\r\n\005SeqNo\030\002 \001(\005\022\020\n\010Sender"
-      "ID\030\003 \001(\t\022\020\n\010RecverID\030\004 \001(\t\022\020\n\010TxToRoot\030\005"
-      " \001(\010\022\r\n\005IsLog\030\006 \001(\010\022\016\n\006IsPush\030\007 \001(\010\022 \n\007R"
-      "spType\030\010 \001(\0162\017.txdata.MsgType\022\017\n\007RspData"
-      "\030\t \001(\014\022+\n\007RspTime\030\n \001(\0132\032.google.protobu"
-      "f.Timestamp\022\016\n\006IsLast\030\013 \001(\010\"\327\001\n\016Connecti"
-      "onInfo\022\016\n\006UserID\030\001 \001(\t\022\020\n\010BelongID\030\002 \001(\t"
-      "\022\017\n\007Version\030\003 \001(\t\0221\n\010LinkMode\030\004 \001(\0162\037.tx"
-      "data.ConnectionInfo.LinkType\022\016\n\006ExePid\030\005"
-      " \001(\005\022\017\n\007ExePath\030\006 \001(\t\022\016\n\006Remark\030\007 \001(\t\".\n"
-      "\010LinkType\022\t\n\005Zero2\020\000\022\013\n\007CONNECT\020\001\022\n\n\006ACC"
-      "EPT\020\002\"8\n\020DisconnectedData\022$\n\004Info\030\001 \001(\0132"
-      "\026.txdata.ConnectionInfo\"F\n\nConnectReq\022\'\n"
-      "\007InfoReq\030\001 \001(\0132\026.txdata.ConnectionInfo\022\017"
-      "\n\007Pathway\030\002 \003(\t\"}\n\nConnectRsp\022\'\n\007InfoReq"
-      "\030\001 \001(\0132\026.txdata.ConnectionInfo\022\'\n\007InfoRs"
-      "p\030\002 \001(\0132\026.txdata.ConnectionInfo\022\r\n\005ErrNo"
-      "\030\003 \001(\005\022\016\n\006ErrMsg\030\004 \001(\t\"$\n\014OnlineNotice\022\024"
-      "\n\014RootIsOnline\030\001 \001(\010\"@\n\014SystemReport\022\016\n\006"
-      "UserID\030\001 \001(\t\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Message"
-      "\030\003 \001(\t\"\020\n\016QryConnInfoReq\"\224\001\n\016QryConnInfo"
-      "Rsp\022\016\n\006UserID\030\001 \001(\t\0220\n\005Cache\030\002 \003(\0132!.txd"
-      "ata.QryConnInfoRsp.CacheEntry\032@\n\nCacheEn"
-      "try\022\013\n\003key\030\001 \001(\t\022!\n\005value\030\002 \001(\0132\022.txdata"
-      ".ConnectReq:\0028\001\"/\n\016QueryRecordReq\022\016\n\006Use"
-      "rID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001(\003\"=\n\016QueryRecordR"
-      "sp\022\016\n\006UserID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001(\003\022\014\n\004Dat"
-      "a\030\003 \003(\014\"\031\n\nExecCmdReq\022\013\n\003Cmd\030\001 \001(\t\"\033\n\nEx"
-      "ecCmdRsp\022\r\n\005Reply\030\001 \001(\t\";\n\010EchoItem\022\017\n\007L"
-      "ocalID\030\001 \001(\t\022\020\n\010RemoteID\030\002 \001(\t\022\014\n\004Data\030\003"
-      " \001(\t\"-\n\016ReportDataItem\022\r\n\005Topic\030\001 \001(\t\022\014\n"
-      "\004Data\030\002 \001(\t\"\207\001\n\014SendMailItem\022\020\n\010Username"
-      "\030\001 \001(\t\022\020\n\010Password\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001"
-      "(\t\022\n\n\002To\030\004 \001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013Conte"
-      "ntType\030\006 \001(\t\022\017\n\007Content\030\007 \001(\t*\304\003\n\007MsgTyp"
-      "e\022\t\n\005Zero1\020\000\022\020\n\014ID_CommonErr\020\001\022\021\n\rID_Com"
-      "mon2Ack\020\002\022\021\n\rID_Common2Req\020\003\022\021\n\rID_Commo"
-      "n2Rsp\020\004\022\021\n\rID_Common1Req\020\005\022\021\n\rID_Common1"
-      "Rsp\020\006\022\025\n\021ID_ConnectionInfo\020\007\022\027\n\023ID_Disco"
-      "nnectedData\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\rID_C"
-      "onnectRsp\020\n\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017ID_S"
-      "ystemReport\020\014\022\025\n\021ID_QryConnInfoReq\020\r\022\025\n\021"
-      "ID_QryConnInfoRsp\020\016\022\025\n\021ID_QueryRecordReq"
-      "\020\017\022\025\n\021ID_QueryRecordRsp\020\020\022\021\n\rID_ExecCmdR"
-      "eq\020\021\022\021\n\rID_ExecCmdRsp\020\022\022\017\n\013ID_EchoItem\020\023"
-      "\022\025\n\021ID_ReportDataItem\020\024\022\023\n\017ID_SendMailIt"
-      "em\020\025P\000b\006proto3"
+      "\n\010SenderID\030\002 \001(\t\022\020\n\010RecverID\030\003 \001(\t\022\016\n\006To"
+      "Root\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\"\375\001\n\nCommon2Req"
+      "\022\033\n\003Key\030\001 \001(\0132\016.txdata.UniKey\022\020\n\010SenderI"
+      "D\030\002 \001(\t\022\020\n\010RecverID\030\003 \001(\t\022\016\n\006ToRoot\030\004 \001("
+      "\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n\006IsSafe\030\006 \001(\010\022\016\n\006IsPu"
+      "sh\030\007 \001(\010\022\017\n\007UpCache\030\010 \001(\010\022 \n\007ReqType\030\t \001"
+      "(\0162\017.txdata.MsgType\022\017\n\007ReqData\030\n \001(\014\022+\n\007"
+      "ReqTime\030\013 \001(\0132\032.google.protobuf.Timestam"
+      "p\"\215\002\n\nCommon2Rsp\022\033\n\003Key\030\001 \001(\0132\016.txdata.U"
+      "niKey\022\020\n\010SenderID\030\002 \001(\t\022\020\n\010RecverID\030\003 \001("
+      "\t\022\016\n\006ToRoot\030\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n\006IsSa"
+      "fe\030\006 \001(\010\022\016\n\006IsPush\030\007 \001(\010\022\017\n\007UpCache\030\010 \001("
+      "\010\022 \n\007RspType\030\t \001(\0162\017.txdata.MsgType\022\017\n\007R"
+      "spData\030\n \001(\014\022+\n\007RspTime\030\013 \001(\0132\032.google.p"
+      "rotobuf.Timestamp\022\016\n\006IsLast\030\014 \001(\010\"\335\001\n\nCo"
+      "mmon1Req\022\r\n\005MsgNo\030\001 \001(\003\022\r\n\005SeqNo\030\002 \001(\005\022\020"
+      "\n\010SenderID\030\003 \001(\t\022\020\n\010RecverID\030\004 \001(\t\022\016\n\006To"
+      "Root\030\005 \001(\010\022\r\n\005IsLog\030\006 \001(\010\022\016\n\006IsPush\030\007 \001("
+      "\010\022 \n\007ReqType\030\010 \001(\0162\017.txdata.MsgType\022\017\n\007R"
+      "eqData\030\t \001(\014\022+\n\007ReqTime\030\n \001(\0132\032.google.p"
+      "rotobuf.Timestamp\"\355\001\n\nCommon1Rsp\022\r\n\005MsgN"
+      "o\030\001 \001(\003\022\r\n\005SeqNo\030\002 \001(\005\022\020\n\010SenderID\030\003 \001(\t"
+      "\022\020\n\010RecverID\030\004 \001(\t\022\016\n\006ToRoot\030\005 \001(\010\022\r\n\005Is"
+      "Log\030\006 \001(\010\022\016\n\006IsPush\030\007 \001(\010\022 \n\007RspType\030\010 \001"
+      "(\0162\017.txdata.MsgType\022\017\n\007RspData\030\t \001(\014\022+\n\007"
+      "RspTime\030\n \001(\0132\032.google.protobuf.Timestam"
+      "p\022\016\n\006IsLast\030\013 \001(\010\"\327\001\n\016ConnectionInfo\022\016\n\006"
+      "UserID\030\001 \001(\t\022\020\n\010BelongID\030\002 \001(\t\022\017\n\007Versio"
+      "n\030\003 \001(\t\0221\n\010LinkMode\030\004 \001(\0162\037.txdata.Conne"
+      "ctionInfo.LinkType\022\016\n\006ExePid\030\005 \001(\005\022\017\n\007Ex"
+      "ePath\030\006 \001(\t\022\016\n\006Remark\030\007 \001(\t\".\n\010LinkType\022"
+      "\t\n\005Zero2\020\000\022\013\n\007CONNECT\020\001\022\n\n\006ACCEPT\020\002\"8\n\020D"
+      "isconnectedData\022$\n\004Info\030\001 \001(\0132\026.txdata.C"
+      "onnectionInfo\"F\n\nConnectReq\022\'\n\007InfoReq\030\001"
+      " \001(\0132\026.txdata.ConnectionInfo\022\017\n\007Pathway\030"
+      "\002 \003(\t\"}\n\nConnectRsp\022\'\n\007InfoReq\030\001 \001(\0132\026.t"
+      "xdata.ConnectionInfo\022\'\n\007InfoRsp\030\002 \001(\0132\026."
+      "txdata.ConnectionInfo\022\r\n\005ErrNo\030\003 \001(\005\022\016\n\006"
+      "ErrMsg\030\004 \001(\t\"$\n\014OnlineNotice\022\024\n\014RootIsOn"
+      "line\030\001 \001(\010\"@\n\014SystemReport\022\016\n\006UserID\030\001 \001"
+      "(\t\022\017\n\007Pathway\030\002 \003(\t\022\017\n\007Message\030\003 \001(\t\"\020\n\016"
+      "QryConnInfoReq\"\224\001\n\016QryConnInfoRsp\022\016\n\006Use"
+      "rID\030\001 \001(\t\0220\n\005Cache\030\002 \003(\0132!.txdata.QryCon"
+      "nInfoRsp.CacheEntry\032@\n\nCacheEntry\022\013\n\003key"
+      "\030\001 \001(\t\022!\n\005value\030\002 \001(\0132\022.txdata.ConnectRe"
+      "q:\0028\001\"/\n\016QueryRecordReq\022\016\n\006UserID\030\001 \001(\t\022"
+      "\r\n\005SeqNo\030\002 \001(\003\"=\n\016QueryRecordRsp\022\016\n\006User"
+      "ID\030\001 \001(\t\022\r\n\005SeqNo\030\002 \001(\003\022\014\n\004Data\030\003 \003(\014\"\031\n"
+      "\nExecCmdReq\022\013\n\003Cmd\030\001 \001(\t\"\033\n\nExecCmdRsp\022\r"
+      "\n\005Reply\030\001 \001(\t\";\n\010EchoItem\022\017\n\007LocalID\030\001 \001"
+      "(\t\022\020\n\010RemoteID\030\002 \001(\t\022\014\n\004Data\030\003 \001(\t\"-\n\016Re"
+      "portDataItem\022\r\n\005Topic\030\001 \001(\t\022\014\n\004Data\030\002 \001("
+      "\t\"\207\001\n\014SendMailItem\022\020\n\010Username\030\001 \001(\t\022\020\n\010"
+      "Password\030\002 \001(\t\022\020\n\010SmtpAddr\030\003 \001(\t\022\n\n\002To\030\004"
+      " \001(\t\022\017\n\007Subject\030\005 \001(\t\022\023\n\013ContentType\030\006 \001"
+      "(\t\022\017\n\007Content\030\007 \001(\t*\304\003\n\007MsgType\022\t\n\005Zero1"
+      "\020\000\022\020\n\014ID_CommonErr\020\001\022\021\n\rID_Common2Ack\020\002\022"
+      "\021\n\rID_Common2Req\020\003\022\021\n\rID_Common2Rsp\020\004\022\021\n"
+      "\rID_Common1Req\020\005\022\021\n\rID_Common1Rsp\020\006\022\025\n\021I"
+      "D_ConnectionInfo\020\007\022\027\n\023ID_DisconnectedDat"
+      "a\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\rID_ConnectRsp\020"
+      "\n\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017ID_SystemRepor"
+      "t\020\014\022\025\n\021ID_QryConnInfoReq\020\r\022\025\n\021ID_QryConn"
+      "InfoRsp\020\016\022\025\n\021ID_QueryRecordReq\020\017\022\025\n\021ID_Q"
+      "ueryRecordRsp\020\020\022\021\n\rID_ExecCmdReq\020\021\022\021\n\rID"
+      "_ExecCmdRsp\020\022\022\017\n\013ID_EchoItem\020\023\022\025\n\021ID_Rep"
+      "ortDataItem\020\024\022\023\n\017ID_SendMailItem\020\025P\000b\006pr"
+      "oto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 2894);
+      descriptor, 2884);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -1560,7 +1560,7 @@ void Common2Ack::InitAsDefaultInstance() {
 const int Common2Ack::kKeyFieldNumber;
 const int Common2Ack::kSenderIDFieldNumber;
 const int Common2Ack::kRecverIDFieldNumber;
-const int Common2Ack::kTxToRootFieldNumber;
+const int Common2Ack::kToRootFieldNumber;
 const int Common2Ack::kIsLogFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -1588,9 +1588,9 @@ Common2Ack::Common2Ack(const Common2Ack& from)
   } else {
     key_ = NULL;
   }
-  ::memcpy(&txtoroot_, &from.txtoroot_,
+  ::memcpy(&toroot_, &from.toroot_,
     static_cast<size_t>(reinterpret_cast<char*>(&islog_) -
-    reinterpret_cast<char*>(&txtoroot_)) + sizeof(islog_));
+    reinterpret_cast<char*>(&toroot_)) + sizeof(islog_));
   // @@protoc_insertion_point(copy_constructor:txdata.Common2Ack)
 }
 
@@ -1639,9 +1639,9 @@ void Common2Ack::Clear() {
     delete key_;
   }
   key_ = NULL;
-  ::memset(&txtoroot_, 0, static_cast<size_t>(
+  ::memset(&toroot_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&islog_) -
-      reinterpret_cast<char*>(&txtoroot_)) + sizeof(islog_));
+      reinterpret_cast<char*>(&toroot_)) + sizeof(islog_));
   _internal_metadata_.Clear();
 }
 
@@ -1699,14 +1699,14 @@ bool Common2Ack::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 4;
+      // bool ToRoot = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &txtoroot_)));
+                 input, &toroot_)));
         } else {
           goto handle_unusual;
         }
@@ -1779,9 +1779,9 @@ void Common2Ack::SerializeWithCachedSizes(
       3, this->recverid(), output);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->txtoroot(), output);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->toroot(), output);
   }
 
   // bool IsLog = 5;
@@ -1832,9 +1832,9 @@ void Common2Ack::SerializeWithCachedSizes(
         3, this->recverid(), target);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->txtoroot(), target);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->toroot(), target);
   }
 
   // bool IsLog = 5;
@@ -1880,8 +1880,8 @@ size_t Common2Ack::ByteSizeLong() const {
         *key_);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
     total_size += 1 + 1;
   }
 
@@ -1928,8 +1928,8 @@ void Common2Ack::MergeFrom(const Common2Ack& from) {
   if (from.has_key()) {
     mutable_key()->::txdata::UniKey::MergeFrom(from.key());
   }
-  if (from.txtoroot() != 0) {
-    set_txtoroot(from.txtoroot());
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
   }
   if (from.islog() != 0) {
     set_islog(from.islog());
@@ -1965,7 +1965,7 @@ void Common2Ack::InternalSwap(Common2Ack* other) {
   recverid_.Swap(&other->recverid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(key_, other->key_);
-  swap(txtoroot_, other->txtoroot_);
+  swap(toroot_, other->toroot_);
   swap(islog_, other->islog_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
@@ -1994,7 +1994,7 @@ void Common2Req::clear_reqtime() {
 const int Common2Req::kKeyFieldNumber;
 const int Common2Req::kSenderIDFieldNumber;
 const int Common2Req::kRecverIDFieldNumber;
-const int Common2Req::kTxToRootFieldNumber;
+const int Common2Req::kToRootFieldNumber;
 const int Common2Req::kIsLogFieldNumber;
 const int Common2Req::kIsSafeFieldNumber;
 const int Common2Req::kIsPushFieldNumber;
@@ -2037,9 +2037,9 @@ Common2Req::Common2Req(const Common2Req& from)
   } else {
     reqtime_ = NULL;
   }
-  ::memcpy(&txtoroot_, &from.txtoroot_,
+  ::memcpy(&toroot_, &from.toroot_,
     static_cast<size_t>(reinterpret_cast<char*>(&reqtype_) -
-    reinterpret_cast<char*>(&txtoroot_)) + sizeof(reqtype_));
+    reinterpret_cast<char*>(&toroot_)) + sizeof(reqtype_));
   // @@protoc_insertion_point(copy_constructor:txdata.Common2Req)
 }
 
@@ -2096,9 +2096,9 @@ void Common2Req::Clear() {
     delete reqtime_;
   }
   reqtime_ = NULL;
-  ::memset(&txtoroot_, 0, static_cast<size_t>(
+  ::memset(&toroot_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&reqtype_) -
-      reinterpret_cast<char*>(&txtoroot_)) + sizeof(reqtype_));
+      reinterpret_cast<char*>(&toroot_)) + sizeof(reqtype_));
   _internal_metadata_.Clear();
 }
 
@@ -2156,14 +2156,14 @@ bool Common2Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 4;
+      // bool ToRoot = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &txtoroot_)));
+                 input, &toroot_)));
         } else {
           goto handle_unusual;
         }
@@ -2317,9 +2317,9 @@ void Common2Req::SerializeWithCachedSizes(
       3, this->recverid(), output);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->txtoroot(), output);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->toroot(), output);
   }
 
   // bool IsLog = 5;
@@ -2403,9 +2403,9 @@ void Common2Req::SerializeWithCachedSizes(
         3, this->recverid(), target);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->txtoroot(), target);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->toroot(), target);
   }
 
   // bool IsLog = 5;
@@ -2500,8 +2500,8 @@ size_t Common2Req::ByteSizeLong() const {
         *reqtime_);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
     total_size += 1 + 1;
   }
 
@@ -2576,8 +2576,8 @@ void Common2Req::MergeFrom(const Common2Req& from) {
   if (from.has_reqtime()) {
     mutable_reqtime()->::google::protobuf::Timestamp::MergeFrom(from.reqtime());
   }
-  if (from.txtoroot() != 0) {
-    set_txtoroot(from.txtoroot());
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
   }
   if (from.islog() != 0) {
     set_islog(from.islog());
@@ -2628,7 +2628,7 @@ void Common2Req::InternalSwap(Common2Req* other) {
     GetArenaNoVirtual());
   swap(key_, other->key_);
   swap(reqtime_, other->reqtime_);
-  swap(txtoroot_, other->txtoroot_);
+  swap(toroot_, other->toroot_);
   swap(islog_, other->islog_);
   swap(issafe_, other->issafe_);
   swap(ispush_, other->ispush_);
@@ -2661,7 +2661,7 @@ void Common2Rsp::clear_rsptime() {
 const int Common2Rsp::kKeyFieldNumber;
 const int Common2Rsp::kSenderIDFieldNumber;
 const int Common2Rsp::kRecverIDFieldNumber;
-const int Common2Rsp::kTxToRootFieldNumber;
+const int Common2Rsp::kToRootFieldNumber;
 const int Common2Rsp::kIsLogFieldNumber;
 const int Common2Rsp::kIsSafeFieldNumber;
 const int Common2Rsp::kIsPushFieldNumber;
@@ -2705,9 +2705,9 @@ Common2Rsp::Common2Rsp(const Common2Rsp& from)
   } else {
     rsptime_ = NULL;
   }
-  ::memcpy(&txtoroot_, &from.txtoroot_,
+  ::memcpy(&toroot_, &from.toroot_,
     static_cast<size_t>(reinterpret_cast<char*>(&islast_) -
-    reinterpret_cast<char*>(&txtoroot_)) + sizeof(islast_));
+    reinterpret_cast<char*>(&toroot_)) + sizeof(islast_));
   // @@protoc_insertion_point(copy_constructor:txdata.Common2Rsp)
 }
 
@@ -2764,9 +2764,9 @@ void Common2Rsp::Clear() {
     delete rsptime_;
   }
   rsptime_ = NULL;
-  ::memset(&txtoroot_, 0, static_cast<size_t>(
+  ::memset(&toroot_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&islast_) -
-      reinterpret_cast<char*>(&txtoroot_)) + sizeof(islast_));
+      reinterpret_cast<char*>(&toroot_)) + sizeof(islast_));
   _internal_metadata_.Clear();
 }
 
@@ -2824,14 +2824,14 @@ bool Common2Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 4;
+      // bool ToRoot = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &txtoroot_)));
+                 input, &toroot_)));
         } else {
           goto handle_unusual;
         }
@@ -2999,9 +2999,9 @@ void Common2Rsp::SerializeWithCachedSizes(
       3, this->recverid(), output);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->txtoroot(), output);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->toroot(), output);
   }
 
   // bool IsLog = 5;
@@ -3090,9 +3090,9 @@ void Common2Rsp::SerializeWithCachedSizes(
         3, this->recverid(), target);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->txtoroot(), target);
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->toroot(), target);
   }
 
   // bool IsLog = 5;
@@ -3192,8 +3192,8 @@ size_t Common2Rsp::ByteSizeLong() const {
         *rsptime_);
   }
 
-  // bool TxToRoot = 4;
-  if (this->txtoroot() != 0) {
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
     total_size += 1 + 1;
   }
 
@@ -3273,8 +3273,8 @@ void Common2Rsp::MergeFrom(const Common2Rsp& from) {
   if (from.has_rsptime()) {
     mutable_rsptime()->::google::protobuf::Timestamp::MergeFrom(from.rsptime());
   }
-  if (from.txtoroot() != 0) {
-    set_txtoroot(from.txtoroot());
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
   }
   if (from.islog() != 0) {
     set_islog(from.islog());
@@ -3328,7 +3328,7 @@ void Common2Rsp::InternalSwap(Common2Rsp* other) {
     GetArenaNoVirtual());
   swap(key_, other->key_);
   swap(rsptime_, other->rsptime_);
-  swap(txtoroot_, other->txtoroot_);
+  swap(toroot_, other->toroot_);
   swap(islog_, other->islog_);
   swap(issafe_, other->issafe_);
   swap(ispush_, other->ispush_);
@@ -3361,7 +3361,7 @@ const int Common1Req::kMsgNoFieldNumber;
 const int Common1Req::kSeqNoFieldNumber;
 const int Common1Req::kSenderIDFieldNumber;
 const int Common1Req::kRecverIDFieldNumber;
-const int Common1Req::kTxToRootFieldNumber;
+const int Common1Req::kToRootFieldNumber;
 const int Common1Req::kIsLogFieldNumber;
 const int Common1Req::kIsPushFieldNumber;
 const int Common1Req::kReqTypeFieldNumber;
@@ -3527,14 +3527,14 @@ bool Common1Req::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 5;
+      // bool ToRoot = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &txtoroot_)));
+                 input, &toroot_)));
         } else {
           goto handle_unusual;
         }
@@ -3664,9 +3664,9 @@ void Common1Req::SerializeWithCachedSizes(
       4, this->recverid(), output);
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->txtoroot(), output);
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->toroot(), output);
   }
 
   // bool IsLog = 6;
@@ -3743,9 +3743,9 @@ void Common1Req::SerializeWithCachedSizes(
         4, this->recverid(), target);
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->txtoroot(), target);
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->toroot(), target);
   }
 
   // bool IsLog = 6;
@@ -3837,8 +3837,8 @@ size_t Common1Req::ByteSizeLong() const {
         this->seqno());
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
     total_size += 1 + 1;
   }
 
@@ -3906,8 +3906,8 @@ void Common1Req::MergeFrom(const Common1Req& from) {
   if (from.seqno() != 0) {
     set_seqno(from.seqno());
   }
-  if (from.txtoroot() != 0) {
-    set_txtoroot(from.txtoroot());
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
   }
   if (from.islog() != 0) {
     set_islog(from.islog());
@@ -3953,7 +3953,7 @@ void Common1Req::InternalSwap(Common1Req* other) {
   swap(reqtime_, other->reqtime_);
   swap(msgno_, other->msgno_);
   swap(seqno_, other->seqno_);
-  swap(txtoroot_, other->txtoroot_);
+  swap(toroot_, other->toroot_);
   swap(islog_, other->islog_);
   swap(ispush_, other->ispush_);
   swap(reqtype_, other->reqtype_);
@@ -3983,7 +3983,7 @@ const int Common1Rsp::kMsgNoFieldNumber;
 const int Common1Rsp::kSeqNoFieldNumber;
 const int Common1Rsp::kSenderIDFieldNumber;
 const int Common1Rsp::kRecverIDFieldNumber;
-const int Common1Rsp::kTxToRootFieldNumber;
+const int Common1Rsp::kToRootFieldNumber;
 const int Common1Rsp::kIsLogFieldNumber;
 const int Common1Rsp::kIsPushFieldNumber;
 const int Common1Rsp::kRspTypeFieldNumber;
@@ -4150,14 +4150,14 @@ bool Common1Rsp::MergePartialFromCodedStream(
         break;
       }
 
-      // bool TxToRoot = 5;
+      // bool ToRoot = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &txtoroot_)));
+                 input, &toroot_)));
         } else {
           goto handle_unusual;
         }
@@ -4301,9 +4301,9 @@ void Common1Rsp::SerializeWithCachedSizes(
       4, this->recverid(), output);
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->txtoroot(), output);
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->toroot(), output);
   }
 
   // bool IsLog = 6;
@@ -4385,9 +4385,9 @@ void Common1Rsp::SerializeWithCachedSizes(
         4, this->recverid(), target);
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->txtoroot(), target);
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->toroot(), target);
   }
 
   // bool IsLog = 6;
@@ -4484,8 +4484,8 @@ size_t Common1Rsp::ByteSizeLong() const {
         this->seqno());
   }
 
-  // bool TxToRoot = 5;
-  if (this->txtoroot() != 0) {
+  // bool ToRoot = 5;
+  if (this->toroot() != 0) {
     total_size += 1 + 1;
   }
 
@@ -4558,8 +4558,8 @@ void Common1Rsp::MergeFrom(const Common1Rsp& from) {
   if (from.seqno() != 0) {
     set_seqno(from.seqno());
   }
-  if (from.txtoroot() != 0) {
-    set_txtoroot(from.txtoroot());
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
   }
   if (from.islog() != 0) {
     set_islog(from.islog());
@@ -4608,7 +4608,7 @@ void Common1Rsp::InternalSwap(Common1Rsp* other) {
   swap(rsptime_, other->rsptime_);
   swap(msgno_, other->msgno_);
   swap(seqno_, other->seqno_);
-  swap(txtoroot_, other->txtoroot_);
+  swap(toroot_, other->toroot_);
   swap(islog_, other->islog_);
   swap(ispush_, other->ispush_);
   swap(islast_, other->islast_);

@@ -221,20 +221,23 @@ class CommonData
 public:
     int32_t   RspCnt;  //与Req对应的Rsp的Cnt.
     int32_t   MsgType; //Common2Req,Common2Rsp,Common1Req,Common1Rsp
-    QString   TargetID;//目标.
-    QString   UserID;
+    QString   MsgTypeTxt;//MsgType的文本.
+    QString   PeerID;//对端(参考python3的[help(socket.socket.getpeername)]).
+    QString   UserID;//本端.
     int64_t   MsgNo;
     int32_t   SeqNo;
     QString   SenderID;
     QString   RecverID;
-    bool      TxToRoot;
+    bool      ToRoot;
     bool      IsLog;
     bool      IsSafe;
     bool      IsPush;
     bool      UpCache;
-    int32_t   InnerType;//内部存储的对象的类型
-    QString   InnerData;
-    QDateTime InnerTime;
+    int32_t   TxType;//通信的对象的类型.
+    QString   TxTypeTxt;
+    QString   TxData;//通信的对象经pb序列化后的二进制数据.
+    QString   TxDataTxt;//通信的对象转换成json字符串.
+    QDateTime TxTime;
     QDateTime InsertTime;//插入时刻(插入之后,不再修改它).
     bool      IsLast;
 public:
@@ -244,15 +247,14 @@ public:
         this->MsgType = INT32_MAX;
         this->MsgNo = INT32_MAX;
         this->SeqNo = INT32_MAX;
-        this->TxToRoot = false;
+        this->ToRoot = false;
         this->IsLog = false;
         this->IsSafe = false;
         this->IsPush = false;
         this->UpCache = false;
-        this->InnerType = INT32_MAX;
+        this->TxType = INT32_MAX;
         this->IsLast = false;
     }
-public:
 public:
     static QString static_table_name()
     {
@@ -263,21 +265,24 @@ public:
         QString sql = QObject::tr(
             "CREATE TABLE IF NOT EXISTS %1 (\
             RspCnt     INTEGER     NULL ,\
-            MsgType    INTEGER NOT NULL ,\
-            TargetID   TEXT    NOT NULL ,\
+            MsgType    INTEGER     NULL ,\
+            MsgTypeTxt TEXT        NULL ,\
+            PeerID     TEXT    NOT NULL ,\
             UserID     TEXT    NOT NULL ,\
             MsgNo      INTEGER NOT NULL ,\
             SeqNo      INTEGER NOT NULL ,\
             SenderID   TEXT        NULL ,\
             RecverID   TEXT        NULL ,\
-            TxToRoot   INTEGER     NULL ,\
+            ToRoot     INTEGER     NULL ,\
             IsLog      INTEGER     NULL ,\
             IsSafe     INTEGER     NULL ,\
             IsPush     INTEGER     NULL ,\
             UpCache    INTEGER     NULL ,\
-            InnerType  INTEGER     NULL ,\
-            InnerData  TEXT        NULL ,\
-            InnerTime  TEXT        NULL ,\
+            TxType     INTEGER     NULL ,\
+            TxTypeTxt  TEXT        NULL ,\
+            TxData     BLOB        NULL ,\
+            TxDataTxt  TEXT        NULL ,\
+            TxTime     TEXT        NULL ,\
             InsertTime TEXT        NULL ,\
             IsLast     INTEGER     NULL )"
         ).QString::arg(static_table_name());
@@ -293,20 +298,23 @@ public:
         QStringList cols;
         if (Valid(this->RspCnt)) { cols.append("RspCnt"); }
         if (Valid(this->MsgType)) { cols.append("MsgType"); }
-        if (Valid(this->TargetID)) { cols.append("TargetID"); }
+        if (Valid(this->MsgTypeTxt)) { cols.append("MsgTypeTxt"); }
+        if (Valid(this->PeerID)) { cols.append("PeerID"); }
         if (Valid(this->UserID)) { cols.append("UserID"); }
         if (Valid(this->MsgNo)) { cols.append("MsgNo"); }
         if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
         if (Valid(this->SenderID)) { cols.append("SenderID"); }
         if (Valid(this->RecverID)) { cols.append("RecverID"); }
-        if (Valid(this->TxToRoot)) { cols.append("TxToRoot"); }
+        if (Valid(this->ToRoot)) { cols.append("ToRoot"); }
         if (Valid(this->IsLog)) { cols.append("IsLog"); }
         if (Valid(this->IsSafe)) { cols.append("IsSafe"); }
         if (Valid(this->IsPush)) { cols.append("IsPush"); }
         if (Valid(this->UpCache)) { cols.append("UpCache"); }
-        if (Valid(this->InnerType)) { cols.append("InnerType"); }
-        if (Valid(this->InnerData)) { cols.append("InnerData"); }
-        if (Valid(this->InnerTime)) { cols.append("InnerTime"); }
+        if (Valid(this->TxType)) { cols.append("TxType"); }
+        if (Valid(this->TxTypeTxt)) { cols.append("TxTypeTxt"); }
+        if (Valid(this->TxData)) { cols.append("TxData"); }
+        if (Valid(this->TxDataTxt)) { cols.append("TxDataTxt"); }
+        if (Valid(this->TxTime)) { cols.append("TxTime"); }
         if (Valid(this->InsertTime)) { cols.append("InsertTime"); }
         if (Valid(this->IsLast)) { cols.append("IsLast"); }
         //
@@ -316,20 +324,23 @@ public:
         //
         if (Valid(this->RspCnt)) { query.bindValue(":RspCnt", this->RspCnt); }
         if (Valid(this->MsgType)) { query.bindValue(":MsgType", this->MsgType); }
-        if (Valid(this->TargetID)) { query.bindValue(":TargetID", this->TargetID); }
+        if (Valid(this->MsgTypeTxt)) { query.bindValue(":MsgTypeTxt", this->MsgTypeTxt); }
+        if (Valid(this->PeerID)) { query.bindValue(":PeerID", this->PeerID); }
         if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
         if (Valid(this->MsgNo)) { query.bindValue(":MsgNo", this->MsgNo); }
         if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
         if (Valid(this->SenderID)) { query.bindValue(":SenderID", this->SenderID); }
         if (Valid(this->RecverID)) { query.bindValue(":RecverID", this->RecverID); }
-        if (Valid(this->TxToRoot)) { query.bindValue(":TxToRoot", this->TxToRoot); }
+        if (Valid(this->ToRoot)) { query.bindValue(":ToRoot", this->ToRoot); }
         if (Valid(this->IsLog)) { query.bindValue(":IsLog", this->IsLog); }
         if (Valid(this->IsSafe)) { query.bindValue(":IsSafe", this->IsSafe); }
         if (Valid(this->IsPush)) { query.bindValue(":IsPush", this->IsPush); }
         if (Valid(this->UpCache)) { query.bindValue(":UpCache", this->UpCache); }
-        if (Valid(this->InnerType)) { query.bindValue(":InnerType", this->InnerType); }
-        if (Valid(this->InnerData)) { query.bindValue(":InnerData", this->InnerData); }
-        if (Valid(this->InnerTime)) { query.bindValue(":InnerTime", this->InnerTime); }
+        if (Valid(this->TxType)) { query.bindValue(":TxType", this->TxType); }
+        if (Valid(this->TxTypeTxt)) { query.bindValue(":TxTypeTxt", this->TxTypeTxt); }
+        if (Valid(this->TxData)) { query.bindValue(":TxData", this->TxData); }
+        if (Valid(this->TxDataTxt)) { query.bindValue(":TxDataTxt", this->TxDataTxt); }
+        if (Valid(this->TxTime)) { query.bindValue(":TxTime", this->TxTime); }
         if (Valid(this->InsertTime)) { query.bindValue(":InsertTime", this->InsertTime); }
         if (Valid(this->IsLast)) { query.bindValue(":IsLast", this->IsLast); }
         //
