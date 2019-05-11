@@ -70,7 +70,7 @@ void zxtools::Common1Req2CommonData(CommonData* dst, const txdata::Common1Req* s
     dst->TxType = static_cast<int32_t>(src->reqtype());
     dst->TxTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->reqtype()));
     dst->TxData = QByteArray::fromStdString(src->reqdata());
-    dst->TxDataTxt = binary2json(src->reqtype(), dst->TxData.toStdString());
+    dst->TxDataTxt = binary2json(src->reqtype(), dst->TxData.toStdString()).trimmed();
     gpt2qdt(dst->TxTime, src->reqtime());
     dst->InsertTime = QDateTime::currentDateTime();
     dst->IsLast = false;
@@ -108,7 +108,7 @@ void zxtools::Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* s
     dst->TxType = static_cast<int32_t>(src->rsptype());
     dst->TxTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->rsptype()));
     dst->TxData = QByteArray::fromStdString(src->rspdata());
-    dst->TxDataTxt = binary2json(src->rsptype(), dst->TxData.toStdString());
+    dst->TxDataTxt = binary2json(src->rsptype(), dst->TxData.toStdString()).trimmed();
     gpt2qdt(dst->TxTime, src->rsptime());
     dst->InsertTime = QDateTime::currentDateTime();
     dst->IsLast = src->islast();
