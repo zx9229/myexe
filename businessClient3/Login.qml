@@ -8,6 +8,7 @@ LoginForm {
         running: true
         repeat: true
         onTriggered: {
+            //在 unload the currently loaded object 之后, Timer 便不再起作用了.
             var dts = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss.zzz ddd")
             loginForm.labelDT.text = dts
         }
