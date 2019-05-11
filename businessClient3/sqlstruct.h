@@ -11,12 +11,13 @@
 
 namespace {
     //使用非const的引用,可以强校验入参的类型,基本可以杜绝隐式类型转换.
+    inline bool Valid(bool& /*data*/) { return true; }
     inline bool Valid(int32_t& data) { return INT32_MAX != data; }
     inline bool Valid(int64_t& data) { return INT64_MAX != data; }
     inline bool Valid(float& data) { return FLT_MAX != data; }
     inline bool Valid(double& data) { return DBL_MAX != data; }
     inline bool Valid(QString& data) { return !data.isNull(); }
-    inline bool Valid(QStringList& data) { return true; }
+    inline bool Valid(QStringList& /*data*/) { return true; }
     inline bool Valid(QByteArray& data) { return !data.isNull(); }
     inline bool Valid(QDateTime& data) { return data.isValid(); }
     inline void fromQVariant(int32_t& dst, const QVariant& src) { dst = src.toInt(nullptr); }
@@ -214,5 +215,129 @@ public:
     }
 };
 Q_DECLARE_METATYPE(ConnInfoEx);
+
+class CommonData
+{
+public:
+    int32_t   RspCnt;  //与Req对应的Rsp的Cnt.
+    int32_t   MsgType; //Common2Req,Common2Rsp,Common1Req,Common1Rsp
+    QString   TargetID;//目标.
+    QString   UserID;
+    int64_t   MsgNo;
+    int32_t   SeqNo;
+    QString   SenderID;
+    QString   RecverID;
+    bool      TxToRoot;
+    bool      IsLog;
+    bool      IsSafe;
+    bool      IsPush;
+    bool      UpCache;
+    int32_t   InnerType;//内部存储的对象的类型
+    QString   InnerData;
+    QDateTime InnerTime;
+    QDateTime InsertTime;//插入时刻(插入之后,不再修改它).
+    bool      IsLast;
+public:
+    CommonData()
+    {
+        this->RspCnt = INT32_MAX;
+        this->MsgType = INT32_MAX;
+        this->MsgNo = INT32_MAX;
+        this->SeqNo = INT32_MAX;
+        this->TxToRoot = false;
+        this->IsLog = false;
+        this->IsSafe = false;
+        this->IsPush = false;
+        this->UpCache = false;
+        this->InnerType = INT32_MAX;
+        this->IsLast = false;
+    }
+public:
+public:
+    static QString static_table_name()
+    {
+        return "CommonData";
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            RspCnt     INTEGER     NULL ,\
+            MsgType    INTEGER NOT NULL ,\
+            TargetID   TEXT    NOT NULL ,\
+            UserID     TEXT    NOT NULL ,\
+            MsgNo      INTEGER NOT NULL ,\
+            SeqNo      INTEGER NOT NULL ,\
+            SenderID   TEXT        NULL ,\
+            RecverID   TEXT        NULL ,\
+            TxToRoot   INTEGER     NULL ,\
+            IsLog      INTEGER     NULL ,\
+            IsSafe     INTEGER     NULL ,\
+            IsPush     INTEGER     NULL ,\
+            UpCache    INTEGER     NULL ,\
+            InnerType  INTEGER     NULL ,\
+            InnerData  TEXT        NULL ,\
+            InnerTime  TEXT        NULL ,\
+            InsertTime TEXT        NULL ,\
+            IsLast     INTEGER     NULL )"
+        ).QString::arg(static_table_name());
+        return  sql;
+    }
+    bool insert_data(QSqlQuery& query, bool insertNotReplace, int64_t* lastInsertId = nullptr)
+    {
+        //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
+        bool isOk = false;
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //注意(NOT NULL)要特殊处理.
+        QStringList cols;
+        if (Valid(this->RspCnt)) { cols.append("RspCnt"); }
+        if (Valid(this->MsgType)) { cols.append("MsgType"); }
+        if (Valid(this->TargetID)) { cols.append("TargetID"); }
+        if (Valid(this->UserID)) { cols.append("UserID"); }
+        if (Valid(this->MsgNo)) { cols.append("MsgNo"); }
+        if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (Valid(this->SenderID)) { cols.append("SenderID"); }
+        if (Valid(this->RecverID)) { cols.append("RecverID"); }
+        if (Valid(this->TxToRoot)) { cols.append("TxToRoot"); }
+        if (Valid(this->IsLog)) { cols.append("IsLog"); }
+        if (Valid(this->IsSafe)) { cols.append("IsSafe"); }
+        if (Valid(this->IsPush)) { cols.append("IsPush"); }
+        if (Valid(this->UpCache)) { cols.append("UpCache"); }
+        if (Valid(this->InnerType)) { cols.append("InnerType"); }
+        if (Valid(this->InnerData)) { cols.append("InnerData"); }
+        if (Valid(this->InnerTime)) { cols.append("InnerTime"); }
+        if (Valid(this->InsertTime)) { cols.append("InsertTime"); }
+        if (Valid(this->IsLast)) { cols.append("IsLast"); }
+        //
+        QString sqlStr = QObject::tr("INSERT %1 INTO %2 (%3) VALUES (%4)").arg(insertNotReplace ? "" : "OR REPLACE").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        //
+        if (Valid(this->RspCnt)) { query.bindValue(":RspCnt", this->RspCnt); }
+        if (Valid(this->MsgType)) { query.bindValue(":MsgType", this->MsgType); }
+        if (Valid(this->TargetID)) { query.bindValue(":TargetID", this->TargetID); }
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->MsgNo)) { query.bindValue(":MsgNo", this->MsgNo); }
+        if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->SenderID)) { query.bindValue(":SenderID", this->SenderID); }
+        if (Valid(this->RecverID)) { query.bindValue(":RecverID", this->RecverID); }
+        if (Valid(this->TxToRoot)) { query.bindValue(":TxToRoot", this->TxToRoot); }
+        if (Valid(this->IsLog)) { query.bindValue(":IsLog", this->IsLog); }
+        if (Valid(this->IsSafe)) { query.bindValue(":IsSafe", this->IsSafe); }
+        if (Valid(this->IsPush)) { query.bindValue(":IsPush", this->IsPush); }
+        if (Valid(this->UpCache)) { query.bindValue(":UpCache", this->UpCache); }
+        if (Valid(this->InnerType)) { query.bindValue(":InnerType", this->InnerType); }
+        if (Valid(this->InnerData)) { query.bindValue(":InnerData", this->InnerData); }
+        if (Valid(this->InnerTime)) { query.bindValue(":InnerTime", this->InnerTime); }
+        if (Valid(this->InsertTime)) { query.bindValue(":InsertTime", this->InsertTime); }
+        if (Valid(this->IsLast)) { query.bindValue(":IsLast", this->IsLast); }
+        //
+        isOk = query.exec();
+        if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
+        return isOk;
+    }
+};
+Q_DECLARE_METATYPE(CommonData);
 
 #endif // SQL_STRUCT_H
