@@ -6,6 +6,7 @@
 #include <QtCore/QMetaEnum>
 #include "m2b.h"
 #include "google/protobuf/util/json_util.h"
+#include "zxtools.h"
 
 enum StatusErrorType
 {
@@ -153,15 +154,6 @@ QString DataExchanger::jsonToObjAndS(const QString &typeName, const QString &jso
     return message;
 }
 
-void DataExchanger::qdt2gpt(::google::protobuf::Timestamp &gptDst, const QDateTime &qdtSrc)
-{
-    if (qdtSrc.isValid())
-    {
-        gptDst.set_seconds(qdtSrc.offsetFromUtc());
-        gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
-    }
-}
-
 void DataExchanger::setURL(const QString &url)
 {
     m_url = url;  // 例如【ws://localhost:65535/websocket】.
@@ -210,7 +202,7 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
 void DataExchanger::initDB()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName(false ? (":memory:") : ("_zx_test.db"));
+    m_db.setDatabaseName(QString().isEmpty() ? ("_zx_test.db") : (":memory:"));
     bool isOk = false;
     isOk = m_db.open();
     Q_ASSERT(isOk);
@@ -221,6 +213,8 @@ void DataExchanger::initDB()
         isOk = sqlQuery.exec(KeyValue::static_create_sql());
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(ConnInfoEx::static_create_sql());
+        Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(CommonData::static_create_sql());
         Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
@@ -262,7 +256,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c1req->set_ispush(isPush);
         c1req->set_reqtype(curType);
         c1req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
-        qdt2gpt(*(c1req->mutable_reqtime()), QDateTime::currentDateTime());
+        zxtools::qdt2gpt(*(c1req->mutable_reqtime()), QDateTime::currentDateTime());
         msgOut = c1req;
     }
     else
@@ -280,7 +274,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c2req->set_upcache(isUpCache);
         c2req->set_reqtype(curType);
         c2req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
-        qdt2gpt(*(c2req->mutable_reqtime()), QDateTime::currentDateTime());
+        zxtools::qdt2gpt(*(c2req->mutable_reqtime()), QDateTime::currentDateTime());
         msgOut = c2req;
     }
 
@@ -337,6 +331,15 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         return;
     }
     Q_ASSERT(msgData->rsptype() == m2b::CalcMsgType(*curData));
+
+    if (true) {//TODO:
+        CommonData tmpData;
+        zxtools::Common1Rsp2CommonData(&tmpData, msgData.get());
+        QSqlQuery sqlQuery;
+        bool isOk = tmpData.insert_data(sqlQuery, true, nullptr);
+        Q_ASSERT(isOk);
+    }
+
     switch (msgData->rsptype()) {
     case txdata::ID_QryConnInfoRsp:
         deal_QryConnInfoRsp(qSharedPointerDynamicCast<txdata::QryConnInfoRsp>(curData));
@@ -382,7 +385,7 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
         m_parentInfo.CopyFrom(data->inforeq());
         emit sigReady();
         QString mesg = this->QryConnInfoReq("");
-        qDebug()<<"QryConnInfoReq with"<<mesg;
+        qDebug() << "QryConnInfoReq with" << mesg;
     }
     else
     {

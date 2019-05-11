@@ -10,28 +10,28 @@ public:
     int64_t MsgNo;
     int32_t SeqNo;
 public:
-    UniSym():MsgNo(0),SeqNo(0){}
+    UniSym() :MsgNo(0), SeqNo(0) {}
     void fromUniKey(const txdata::UniKey& uniKey)
     {
-        this->UserID=QString::fromStdString( uniKey.userid());
-        this->MsgNo=uniKey.msgno();
-        this->SeqNo=uniKey.seqno();
+        this->UserID = QString::fromStdString(uniKey.userid());
+        this->MsgNo = uniKey.msgno();
+        this->SeqNo = uniKey.seqno();
     }
     bool operator<(const UniSym& other)const
     {
-        if(this->UserID<other.UserID)
+        if (this->UserID < other.UserID)
         {
             return true;
         }
-        else if(this->UserID==other.UserID)
+        else if (this->UserID == other.UserID)
         {
-            if(this->MsgNo<other.MsgNo)
+            if (this->MsgNo < other.MsgNo)
             {
                 return true;
             }
-            else if(this->MsgNo==other.MsgNo)
+            else if (this->MsgNo == other.MsgNo)
             {
-                if(this->SeqNo<other.SeqNo)
+                if (this->SeqNo < other.SeqNo)
                 {
                     return true;
                 }
@@ -44,7 +44,8 @@ public:
             {
                 return false;
             }
-        }else
+        }
+        else
         {
             return false;
         }
@@ -59,7 +60,7 @@ public:
     std::string RecverID;
     GPMSGPTR    Data;
 public:
-    Node4Sync():TxToRoot(false){}
+    Node4Sync() :TxToRoot(false) {}
 };
 using Node4SyncPtr = std::shared_ptr<Node4Sync>;
 
@@ -67,21 +68,21 @@ class SafeSynchCache
 {
 private:
     std::mutex                    m_mutex;
-    std::map<UniSym,Node4SyncPtr> m_MAP;
+    std::map<UniSym, Node4SyncPtr> m_MAP;
 public:
-    bool insertData(const txdata::UniKey& uniKey,bool toR,const std::string& rID,GPMSGPTR pm)
+    bool insertData(const txdata::UniKey& uniKey, bool toR, const std::string& rID, GPMSGPTR pm)
     {
         Node4SyncPtr node = Node4SyncPtr(new Node4Sync);
         node->Key.fromUniKey(uniKey);
-        node->TxToRoot=toR;
-        node->RecverID=rID;
-        node->Data=pm;
+        node->TxToRoot = toR;
+        node->RecverID = rID;
+        node->Data = pm;
         std::lock_guard<std::mutex>lg(m_mutex);
         auto it = m_MAP.find(node->Key);
-        bool doInsert = (m_MAP.end()==it);
-        if(doInsert)
+        bool doInsert = (m_MAP.end() == it);
+        if (doInsert)
         {
-            m_MAP[node->Key]=node;
+            m_MAP[node->Key] = node;
         }
         return doInsert;
     }
@@ -91,7 +92,7 @@ public:
         uniSym.fromUniKey(uniKey);
         std::lock_guard<std::mutex>lg(m_mutex);
         auto it = m_MAP.find(uniSym);
-        return (m_MAP.end()==it)?nullptr:it->second;
+        return (m_MAP.end() == it) ? nullptr : it->second;
     }
 };
 
