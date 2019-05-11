@@ -8,11 +8,8 @@ class zxtools
 public:
     static void qdt2gpt(::google::protobuf::Timestamp& gptDst, const QDateTime& qdtSrc)
     {
-        if (qdtSrc.isValid())
-        {
-            gptDst.set_seconds(qdtSrc.offsetFromUtc());
-            gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
-        }
+        gptDst.set_seconds(qdtSrc.offsetFromUtc());
+        gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
     }
     static void gpt2qdt(QDateTime& qdtDst, const ::google::protobuf::Timestamp& gptSrc)
     {
