@@ -44,6 +44,7 @@ Page {
                         border.color: "gray"
                         border.width: 1
                         Label {
+                            anchors.centerIn: parent
                             text: MsgType==3?"C2REQ":(MsgType==4?"C2RSP":(MsgType==5?"C1REQ":MsgType==6?"C1RSP":"NULL"))
                         }
                     }
@@ -68,6 +69,7 @@ Page {
                         border.color: "gray"
                         border.width: 1
                         Label {
+                            anchors.centerIn: parent
                             text: MsgType==3?"C2REQ":(MsgType==4?"C2RSP":(MsgType==5?"C1REQ":MsgType==6?"C1RSP":"NULL"))
                         }
                     }
