@@ -3,12 +3,13 @@ import QtQuick 2.4
 LoginForm {
     id: loginForm
 
+    signal sigSignIn() //声明一个自定义的信号, https://www.jianshu.com/p/442f461ee62b
+
     Timer {
         interval: 500
         running: true
         repeat: true
         onTriggered: {
-            //在 unload the currently loaded object 之后, Timer 便不再起作用了.
             var dts = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss.zzz ddd")
             loginForm.labelDT.text = dts
         }
@@ -29,6 +30,7 @@ LoginForm {
         onSigReady: {
             var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
             loginForm.textAreaMessage.text = localDT + '\n' + "SUCCESS"
+            sigSignIn()
         }
     }
 }
