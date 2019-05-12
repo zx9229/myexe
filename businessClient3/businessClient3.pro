@@ -16,7 +16,8 @@ SOURCES += \
     dataexchanger.cpp \
     main.cpp \
     mywebsock.cpp \
-    protobuf/txdata.pb.cc
+    protobuf/txdata.pb.cc \
+    zxtools.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,7 +39,8 @@ HEADERS += \
     protobuf/m2b.h \
     protobuf/txdata.pb.h \
     safesynchcache.h \
-    sqlstruct.h
+    sqlstruct.h \
+    zxtools.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter
