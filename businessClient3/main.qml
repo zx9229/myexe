@@ -11,11 +11,24 @@ Window {
     Loader {
         id: pageLoader
         anchors.fill: parent
-        source: "Login.qml"
-    }
-
-    Connections {
-        target: dataExch
-        onSigReady: pageLoader.source = "NodeTempInfo.qml"
+        source: "qrc:/Login.qml"
+        onLoaded: {
+            if (false) {
+            } else if (source == "qrc:/Login.qml") {
+                item.sigSignIn.connect(function(){
+                    pageLoader.source = "qrc:/NodeList.qml"
+                })
+            } else if (source == "qrc:/NodeList.qml") {
+                item.sigShowNode.connect(function(PeerID){
+                    var sqlStatement = "SELECT * FROM CommonData WHERE MsgType IN(3,5) AND PeerID='%1'".arg(PeerID)
+                    pageLoader.setSource("qrc:/NodeRequest.qml", {"statement":sqlStatement})
+                })
+            } else if (source == "qrc:/NodeRequest.qml") {
+                item.sigShowReqRsp.connect(function(UserID, MsgNo){
+                    var sqlStatement = "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(UserID).arg(MsgNo)
+                    console.log(sqlStatement)
+                })
+            }
+        }
     }
 }
