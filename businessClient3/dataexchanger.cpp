@@ -392,7 +392,6 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
         m_parentInfo.CopyFrom(data->inforeq());
         emit sigReady();
         QString mesg = this->QryConnInfoReq("");
-        qDebug() << "QryConnInfoReq with" << mesg;
     }
     else
     {
