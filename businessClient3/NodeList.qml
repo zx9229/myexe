@@ -4,11 +4,13 @@ import QtQuick.Controls 2.0
 import MySqlTableModel 0.1
 
 Item {
+    signal sigShowNode(string UserID)
+
     ColumnLayout {
         anchors.fill: parent
 
         Button {
-            text: qsTr("刷新")
+            text: qsTr("刷新NodeList")
             onClicked: mstm.select()
         }
 
@@ -53,13 +55,9 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         idRect.ListView.view.currentIndex = index //https://blog.csdn.net/x356982611/article/details/53008236
-                        console.log(idRect.ListView.view.currentIndex, UserID)
-                    }
-                    onDoubleClicked: {
-                        //TODO:
                     }
                     onPressAndHold: {
-                        //TODO:
+                        sigShowNode(UserID)
                     }
                 }
             }
