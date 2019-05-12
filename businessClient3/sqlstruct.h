@@ -217,6 +217,7 @@ Q_DECLARE_METATYPE(ConnInfoEx);
 class CommonData
 {
 public:
+    bool       SendOK;    //Req发送成功.
     int32_t    RspCnt;    //与Req对应的Rsp的Cnt.
     int32_t    MsgType;   //Common2Req,Common2Rsp,Common1Req,Common1Rsp
     QString    MsgTypeTxt;//MsgType的文本.
@@ -241,6 +242,7 @@ public:
 public:
     CommonData()
     {
+        this->SendOK = false;
         this->RspCnt = INT32_MAX;
         this->MsgType = INT32_MAX;
         this->MsgNo = INT32_MAX;
@@ -262,6 +264,7 @@ public:
     {
         QString sql = QObject::tr(
             "CREATE TABLE IF NOT EXISTS %1 (\
+            SendOK     INTEGER     NULL ,\
             RspCnt     INTEGER     NULL ,\
             MsgType    INTEGER     NULL ,\
             MsgTypeTxt TEXT        NULL ,\
@@ -294,6 +297,7 @@ public:
         //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
         //注意(NOT NULL)要特殊处理.
         QStringList cols;
+        if (Valid(this->SendOK)) { cols.append("SendOK"); }
         if (Valid(this->RspCnt)) { cols.append("RspCnt"); }
         if (Valid(this->MsgType)) { cols.append("MsgType"); }
         if (Valid(this->MsgTypeTxt)) { cols.append("MsgTypeTxt"); }
@@ -320,6 +324,7 @@ public:
         isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
         //
+        if (Valid(this->SendOK)) { query.bindValue(":SendOK", this->SendOK); }
         if (Valid(this->RspCnt)) { query.bindValue(":RspCnt", this->RspCnt); }
         if (Valid(this->MsgType)) { query.bindValue(":MsgType", this->MsgType); }
         if (Valid(this->MsgTypeTxt)) { query.bindValue(":MsgTypeTxt", this->MsgTypeTxt); }

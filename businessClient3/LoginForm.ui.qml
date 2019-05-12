@@ -84,6 +84,9 @@ Item {
         target: buttonQuickFill
         onClicked: {
             textFieldURL.text = qsTr("ws://localhost:65535/websocket")
+            textFieldURL.text = qsTr("ws://192.168.3.157:40078/websocket")
+            textFieldUserID.text = qsTr("ZXCVB")
+            textFieldBelongID.text = qsTr("n4")
         }
     }
 
