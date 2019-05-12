@@ -8,6 +8,8 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         Button{
+            text: qsTr("NodeTempInfo刷新")
+            Layout.fillWidth: true
             onClicked: {
                 mstm.select()
                 function refreshColumn(objTableView, lstFieldName) {
@@ -27,7 +29,7 @@ Item {
 
         TableView {
             id: tView
-            Layout.fillWidth: true
+            Layout.fillWidth: true   //QML Item: Binding loop detected for property "width"
             Layout.fillHeight: true
             TableViewColumn {
                 role: "UserID"
