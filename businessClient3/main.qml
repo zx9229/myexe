@@ -26,7 +26,7 @@ Window {
             } else if (source == "qrc:/NodeRequest.qml") {
                 item.sigShowReqRsp.connect(function(UserID, MsgNo){
                     var sqlStatement = "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(UserID).arg(""+MsgNo)
-                    console.log(sqlStatement)
+                    pageLoader.setSource("qrc:/NodeReqRsp.qml", {"statement":sqlStatement})
                 })
             }
         }
