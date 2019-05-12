@@ -1010,6 +1010,10 @@ func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.Quer
 
 func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryConnInfoReq, stream CommonRspWrapper) {
 	data := &txdata.QryConnInfoRsp{UserID: thls.ownInfo.UserID, Cache: thls.cacheUser.tmpF1()}
+	data.Cache[thls.ownInfo.UserID] = &txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{}}
+	for _, v := range data.Cache {
+		v.Pathway = append(v.Pathway, thls.ownInfo.UserID)
+	}
 	stream.sendData(data, true)
 }
 
