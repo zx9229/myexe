@@ -65,5 +65,11 @@ Item {
             }
             ScrollBar.vertical: ScrollBar{}
         }
+
+        Rectangle{
+            Layout.fillWidth: true
+            height: 2
+            color: "gray"
+        }
     }
 }

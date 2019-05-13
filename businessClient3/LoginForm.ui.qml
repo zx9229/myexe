@@ -41,6 +41,30 @@ Item {
         }
 
         Label {
+            id: labelHost
+            text: qsTr("Host")
+        }
+
+        TextField {
+            id: textFieldHost
+            Layout.fillWidth: true
+            Layout.columnSpan: 2
+            placeholderText: qsTr("Text Field")
+        }
+
+        Label {
+            id: labelPort
+            text: qsTr("Port")
+        }
+
+        TextField {
+            id: textFieldPort
+            Layout.fillWidth: true
+            Layout.columnSpan: 2
+            placeholderText: qsTr("Text Field")
+        }
+
+        Label {
             id: labelBelongID
             text: qsTr("BelongID")
         }
@@ -84,7 +108,10 @@ Item {
         target: buttonQuickFill
         onClicked: {
             textFieldURL.text = qsTr("ws://localhost:65535/websocket")
-            textFieldURL.text = qsTr("ws://192.168.3.157:40078/websocket")
+            textFieldHost.text = qsTr("192.168.3.157")
+            textFieldPort.text = qsTr("40078")
+            textFieldURL.text = "ws://%1:%2/websocket".arg(
+                        textFieldHost.text).arg(textFieldPort.text)
             textFieldUserID.text = qsTr("ZXCVB")
             textFieldBelongID.text = qsTr("n4")
         }
