@@ -20,7 +20,6 @@ Page {
             Layout.fillWidth: true
             model: MySqlTableModel {
                 id: mstm
-                selectStatement: ""
             }
             delegate: Column {
                 property bool isReq: (3==MsgType)||(5==MsgType)
@@ -28,7 +27,7 @@ Page {
                 anchors.right: isReq ? parent.right : undefined
                 Label {
                     id: txt1
-                    text: "%1 %2 %3".arg(InsertTime).arg(IsLast).arg(RspCnt)
+                    text: "%1 (%2) %3".arg(InsertTime).arg(IsLast).arg(RspCnt)
                     color: "gray"
                     anchors.right: isReq ? parent.right : undefined
                 }

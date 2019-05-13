@@ -22,7 +22,6 @@ Item {
             Layout.fillWidth: true
             model: MySqlTableModel {
                 id:mstm
-                selectStatement: ""
             }
             delegate: Column {
                 id: idColumn
