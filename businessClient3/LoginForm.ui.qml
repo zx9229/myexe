@@ -50,6 +50,9 @@ Item {
             Layout.fillWidth: true
             Layout.columnSpan: 2
             placeholderText: qsTr("Text Field")
+            validator: RegExpValidator {
+                regExp: /[^`~!@#$%^&*()_=+\[\]{}\\|;:'",<>/?]+/
+            }
         }
 
         Label {
@@ -62,6 +65,10 @@ Item {
             Layout.fillWidth: true
             Layout.columnSpan: 2
             placeholderText: qsTr("Text Field")
+            validator: IntValidator {
+                bottom: 0
+                top: 65535
+            }
         }
 
         Label {
