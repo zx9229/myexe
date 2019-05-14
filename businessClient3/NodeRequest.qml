@@ -1,9 +1,11 @@
-import QtQuick 2.0
+import QtQuick 2.11
 import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.4
+import QtQuick.Controls 1.4 as Controls1
+import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
-Item {
+Pane {
     signal sigShowReqRsp(string UserID, var MsgNo)//The var type is a generic property type that can refer to any data type.
 
     property alias statement: mstm.selectStatement
@@ -70,6 +72,75 @@ Item {
             Layout.fillWidth: true
             height: 2
             color: "gray"
+        }
+
+        Pane {
+            Layout.fillWidth: true
+            ColumnLayout {
+                GroupBox {
+                    Row {
+                        Controls1.CheckBox {
+                            id:cbIsLog
+                            text: qsTr("IsLog")
+                            checked: false
+                        }
+                        Controls1.CheckBox {
+                            id:cbIsSafe
+                            text: qsTr("IsSafe")
+                            checked: false
+                        }
+                        Controls1.CheckBox {
+                            id:cbIsPush
+                            text: qsTr("IsPush")
+                            checked: false
+                        }
+                        Controls1.CheckBox {
+                            id:cbIsUpCache
+                            text: qsTr("UpCache")
+                            checked: false
+                        }
+                    }
+                }
+                GroupBox {
+                    RowLayout {
+                        Controls1.RadioButton {
+                            id:rbC1REQ
+                            text: qsTr("C1Req")
+                            checked: true
+                        }
+                        Controls1.RadioButton {
+                            text: qsTr("C2Req")
+                        }
+                    }
+                }
+                Controls1.ComboBox {
+                    id:idComboBox
+                    Layout.fillWidth: true
+                    model: dataExch.getTxMsgTypeNameList()
+                }
+                Button {
+                    text: qsTr("填充示例JSON")
+                    onClicked: {
+                        idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
+                    }
+                }
+                Button {
+                    text: qsTr("发送")
+                    onClicked: {
+                        var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,"",cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1REQ.checked)
+                        ToolTip.show("SUCCESS:"+message, 5000)
+                    }
+                }
+                TextArea {
+                    id: idTextArea
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    background: Rectangle {
+                        border.width: 2
+                        border.color: "blue"
+                    }
+                }
+            }
         }
     }
 }

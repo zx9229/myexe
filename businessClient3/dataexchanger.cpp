@@ -206,6 +206,29 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
     return demoFun(typeName, jsonText, userId, false, false, false, false, true);
 }
 
+QStringList DataExchanger::getTxMsgTypeNameList()
+{
+    QStringList typeNameList;
+    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EchoItem));
+    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
+    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
+    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SendMailItem));
+    return  typeNameList;
+}
+
+QString DataExchanger::jsonExample(const QString& typeName)
+{
+    txdata::MsgType msgType;
+    txdata::MsgType_Parse(typeName.toStdString(),&msgType);
+    if(msgType==txdata::MsgType::ID_EchoItem)
+    {
+        txdata::EchoItem egObj;
+        egObj.set_data("data");
+        return jsonByMsgObje(egObj);
+    }
+    return "";
+}
+
 void DataExchanger::initDB()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");

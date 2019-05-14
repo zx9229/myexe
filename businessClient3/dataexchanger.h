@@ -32,8 +32,8 @@ public:
     Q_INVOKABLE bool start();
     Q_INVOKABLE QString demoFun(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2);
     Q_INVOKABLE QString QryConnInfoReq(const QString& userId);
-
-public slots:
+    Q_INVOKABLE QStringList getTxMsgTypeNameList();
+    Q_INVOKABLE QString jsonExample(const QString& typeName);
 
 signals:
     void sigReady();
