@@ -1,6 +1,7 @@
 import QtQuick 2.4
-import QtQuick.Controls 1.6
 import QtQuick.Layouts 1.3
+import QtQuick.Controls 1.6
+import QtQuick.Controls.Styles 1.4
 
 Item {
     id: itemitem
@@ -32,7 +33,12 @@ Item {
         TextField {
             id: textFieldURL
             Layout.fillWidth: true
-            placeholderText: qsTr("Text Field")
+            readOnly: true
+            style: TextFieldStyle {
+                background: Rectangle {
+                    color: "lightgray"
+                }
+            }
         }
 
         Button {
@@ -49,7 +55,7 @@ Item {
             id: textFieldHost
             Layout.fillWidth: true
             Layout.columnSpan: 2
-            placeholderText: qsTr("Text Field")
+            placeholderText: qsTr("主机")
             validator: RegExpValidator {
                 regExp: /[^`~!@#$%^&*()_=+\[\]{}\\|;:'",<>/?]+/
             }
@@ -64,7 +70,7 @@ Item {
             id: textFieldPort
             Layout.fillWidth: true
             Layout.columnSpan: 2
-            placeholderText: qsTr("Text Field")
+            placeholderText: qsTr("端口")
             validator: IntValidator {
                 bottom: 0
                 top: 65535
@@ -80,7 +86,7 @@ Item {
             id: textFieldBelongID
             Layout.fillWidth: true
             Layout.columnSpan: 2
-            placeholderText: qsTr("Text Field")
+            placeholderText: qsTr("父节点的名字")
         }
 
         Label {
@@ -92,7 +98,7 @@ Item {
             id: textFieldUserID
             Layout.fillWidth: true
             Layout.columnSpan: 2
-            placeholderText: qsTr("Text Field")
+            placeholderText: qsTr("本节点的名字")
         }
 
         Button {
@@ -130,6 +136,22 @@ Item {
             dataExch.setURL(textFieldURL.text)
             dataExch.setOwnInfo(textFieldUserID.text, textFieldBelongID.text)
             dataExch.start()
+        }
+    }
+
+    Connections {
+        target: textFieldHost
+        onEditingFinished: {
+            textFieldURL.text = "ws://%1:%2/websocket".arg(
+                        textFieldHost.text).arg(textFieldPort.text)
+        }
+    }
+
+    Connections {
+        target: textFieldPort
+        onEditingFinished: {
+            textFieldURL.text = "ws://%1:%2/websocket".arg(
+                        textFieldHost.text).arg(textFieldPort.text)
         }
     }
 }
