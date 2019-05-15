@@ -24,11 +24,6 @@ public:
     {
         return QString::fromStdString(::txdata::MsgType_Name(CalcMsgType(msgIn)));
     }
-    static QString MsgTypeName2MsgClassName(const QString& msgTypeName)
-    {
-        const static QString ID_("ID_");
-        return msgTypeName.startsWith(ID_) ? ("txdata." + msgTypeName.mid(ID_.size())) : msgTypeName;
-    }
     static bool msg2package(const ::google::protobuf::Message& msgIn, QByteArray& pkgOut)
     {
         pkgOut.clear();
