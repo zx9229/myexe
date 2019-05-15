@@ -81,6 +81,23 @@ public:
             results.append(result);
         }
     }
+    static QString select_data(QSqlQuery& query, const QString& Key, bool* isExists = nullptr)
+    {
+        QString Value;
+        QString sqlStr = QObject::tr("SELECT Value FROM %1 WHERE Key=:Key").arg(static_table_name());
+        bool isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        query.bindValue(":Key", Key);
+        isOk = query.exec();
+        Q_ASSERT(isOk);
+        if (query.next())
+        {
+            if (isExists) { *isExists = true; }
+            Value = query.value("Value").toString();
+        }
+        while (query.next()) { Q_ASSERT(false); }//肯定走不到这里.
+        return Value;
+    }
 };
 
 class ConnInfoEx
