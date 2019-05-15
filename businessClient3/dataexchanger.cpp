@@ -18,7 +18,7 @@ enum StatusErrorType
 DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
     m_ws(parent),
-    m_MsgNo("Key", QString())
+    m_MsgNo("MsgNo", QString())
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
@@ -150,8 +150,11 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
+    }
+    if (true) {
         m_MsgNo.refresh_data(sqlQuery);
-        m_MsgNo.insert_data(sqlQuery, false);
+        isOk = m_MsgNo.insert_data(sqlQuery, false);
+        Q_ASSERT(isOk);
     }
 }
 

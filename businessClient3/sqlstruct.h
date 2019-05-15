@@ -80,7 +80,7 @@ public:
         isOk = query.exec();
         Q_ASSERT(isOk);
         isOk = query.next();
-        this->Value = isOk ? query.value("Value").toString() : QString();
+        this->Value = isOk ? query.value("Value").toString() : QString("");//QString()时insert失败.
         Q_ASSERT(query.next() == false);
         return isOk;
     }
