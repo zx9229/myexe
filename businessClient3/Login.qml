@@ -3,7 +3,7 @@ import QtQuick 2.4
 LoginForm {
     id: loginForm
 
-    signal sigSignIn() //声明一个自定义的信号, https://www.jianshu.com/p/442f461ee62b
+    signal sigShowNodeList() //声明一个自定义的信号, https://www.jianshu.com/p/442f461ee62b
 
     Timer {
         interval: 500
@@ -30,7 +30,7 @@ LoginForm {
         onSigReady: {
             var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
             loginForm.textAreaMessage.text = localDT + '\n' + "SUCCESS"
-            sigSignIn()
+            sigShowNodeList()
         }
     }
 }

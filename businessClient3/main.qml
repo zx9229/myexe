@@ -3,8 +3,8 @@ import QtQuick.Window 2.11
 
 Window {
     visible: true
-    width: 640
-    height: 480
+    width: 324
+    height: 702
     title: qsTr("MyHelloWorld")
     color: "silver"
 
@@ -15,18 +15,23 @@ Window {
         onLoaded: {
             if (false) {
             } else if (source == "qrc:/Login.qml") {
-                item.sigSignIn.connect(function(){
+                item.sigShowNodeList.connect(function(){
                     pageLoader.source = "qrc:/NodeList.qml"
                 })
             } else if (source == "qrc:/NodeList.qml") {
-                item.sigShowNode.connect(function(PeerID){
-                    var sqlStatement = "SELECT * FROM CommonData WHERE MsgType IN(3,5) AND PeerID='%1'".arg(PeerID)
-                    pageLoader.setSource("qrc:/NodeRequest.qml", {"statement":sqlStatement})
+                item.sigShowNodeRequest.connect(function(PeerID){
+                    pageLoader.setSource("qrc:/NodeRequest.qml", {"peerid":PeerID})
                 })
             } else if (source == "qrc:/NodeRequest.qml") {
-                item.sigShowReqRsp.connect(function(UserID, MsgNo){
-                    var sqlStatement = "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(UserID).arg(MsgNo.toString())
-                    pageLoader.setSource("qrc:/NodeReqRsp.qml", {"statement":sqlStatement})
+                item.sigShowNodeList.connect(function(){
+                    pageLoader.source = "qrc:/NodeList.qml"
+                })
+                item.sigShowNodeReqRsp.connect(function(UserID, MsgNo){
+                    pageLoader.setSource("qrc:/NodeReqRsp.qml", {"peerid":item.peerid, "userid":UserID, "msgno":MsgNo.toString()})
+                })
+            } else if (source == "qrc:/NodeReqRsp.qml") {
+                item.sigShowNodeRequest.connect(function(PeerID){
+                    pageLoader.setSource("qrc:/NodeRequest.qml", {"peerid":PeerID})
                 })
             }
         }

@@ -6,16 +6,23 @@ import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
 Pane {
-    signal sigShowReqRsp(string UserID, var MsgNo)//The var type is a generic property type that can refer to any data type.
-
-    property alias statement: mstm.selectStatement
+    signal sigShowNodeList()
+    signal sigShowNodeReqRsp(string UserID, var MsgNo)//The var type is a generic property type that can refer to any data type.
+    //property alias statement: mstm.selectStatement
+    property string peerid
 
     ColumnLayout {
         anchors.fill: parent
 
-        Button {
-            text: qsTr("刷新NodeRequest")
-            onClicked: mstm.select()
+        RowLayout {
+            Button {
+                text: qsTr("<[返回]")
+                onClicked: sigShowNodeList()
+            }
+            Button {
+                text: qsTr("刷新NodeRequest")
+                onClicked: mstm.select()
+            }
         }
 
         ListView {
@@ -24,6 +31,7 @@ Pane {
             Layout.fillWidth: true
             model: MySqlTableModel {
                 id:mstm
+                selectStatement: "SELECT * FROM CommonData WHERE MsgType IN(3,5) AND PeerID='%1'".arg(peerid)
             }
             delegate: Column {
                 id: idColumn
@@ -53,7 +61,7 @@ Pane {
                             idColumn.ListView.view.currentIndex = index
                         }
                         onPressAndHold: {
-                            sigShowReqRsp(UserID, MsgNo)
+                            sigShowNodeReqRsp(UserID, MsgNo)
                         }
                     }
                 }
@@ -86,61 +94,65 @@ Pane {
                     Row {
                         Controls1.CheckBox {
                             id: cbIsLog
-                            text: qsTr("IsLog")
+                            text: qsTr("Log")
                             checked: false
                         }
                         Controls1.CheckBox {
                             id: cbIsSafe
-                            text: qsTr("IsSafe")
+                            text: qsTr("Safe")
                             checked: false
                         }
                         Controls1.CheckBox {
                             id: cbIsPush
-                            text: qsTr("IsPush")
+                            text: qsTr("Push")
                             checked: false
                         }
                         Controls1.CheckBox {
-                            id: cbUpCache
+                            id: cbIsUpCache
                             text: qsTr("UpCache")
                             checked: false
                         }
                         Controls1.CheckBox {
-                            id: cbToDB
-                            text: qsTr("ToDB")
+                            id: cbForceToDB
+                            text: qsTr("DB")
                             checked: false
                         }
                     }
                 }
-                GroupBox {
-                    RowLayout {
-                        Controls1.RadioButton {
-                            id:rbC1REQ
-                            text: qsTr("C1Req")
-                            checked: true
+                RowLayout {
+                    GroupBox {
+                        RowLayout {
+                            Controls1.RadioButton {
+                                id:rbC1REQ
+                                text: qsTr("C1Q")
+                                checked: true
+                            }
+                            Controls1.RadioButton {
+                                text: qsTr("C2Q")
+                            }
                         }
-                        Controls1.RadioButton {
-                            text: qsTr("C2Req")
+                    }
+                    Button {
+                        text: qsTr("填充示例JSON")
+                        onClicked: {
+                            idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
+                        }
+                    }
+                    Button {
+                        text: qsTr("发送")
+                        onClicked: {
+                            var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1REQ.checked,cbForceToDB.checked)
+                            ToolTip.show("SUCCESS:"+message, 5000)
                         }
                     }
                 }
+
                 Controls1.ComboBox {
                     id:idComboBox
                     Layout.fillWidth: true
                     model: dataExch.getTxMsgTypeNameList()
                 }
-                Button {
-                    text: qsTr("填充示例JSON")
-                    onClicked: {
-                        idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
-                    }
-                }
-                Button {
-                    text: qsTr("发送")
-                    onClicked: {
-                        var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,"",cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbUpCache.checked,rbC1REQ.checked)
-                        ToolTip.show("SUCCESS:"+message, 5000)
-                    }
-                }
+
                 TextArea {
                     id: idTextArea
                     Layout.fillWidth: true

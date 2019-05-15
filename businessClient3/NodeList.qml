@@ -4,7 +4,7 @@ import QtQuick.Controls 2.0
 import MySqlTableModel 0.1
 
 Item {
-    signal sigShowNode(string UserID)
+    signal sigShowNodeRequest(string UserID)
 
     ColumnLayout {
         anchors.fill: parent
@@ -57,7 +57,7 @@ Item {
                         idRect.ListView.view.currentIndex = index //https://blog.csdn.net/x356982611/article/details/53008236
                     }
                     onPressAndHold: {
-                        sigShowNode(UserID)
+                        sigShowNodeRequest(UserID)
                     }
                 }
             }

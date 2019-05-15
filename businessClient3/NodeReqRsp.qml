@@ -5,13 +5,24 @@ import MySqlTableModel 0.1
 
 //Item {
 Page {
-    property alias statement: mstm.selectStatement
+    signal sigShowNodeRequest(string UserID)
+    //property alias statement: mstm.selectStatement
+    property string peerid
+    property string userid
+    property string msgno
 
     ColumnLayout {
         anchors.fill: parent
 
-        Button {
-            text: qsTr("刷新NodeReqRsp")
+        RowLayout {
+            Button {
+                text: qsTr("<[返回]")
+                onClicked: sigShowNodeRequest(peerid)
+            }
+
+            Button {
+                text: qsTr("刷新NodeReqRsp")
+            }
         }
 
         ListView {
@@ -20,6 +31,7 @@ Page {
             Layout.fillWidth: true
             model: MySqlTableModel {
                 id: mstm
+                selectStatement: "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(userid).arg(msgno)
             }
             delegate: Column {
                 property bool isReq: (3==MsgType)||(5==MsgType)
