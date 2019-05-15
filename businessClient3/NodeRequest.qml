@@ -89,7 +89,7 @@ Item {
             }
         }
 
-        Pane {
+        Item {
             id: paneSend
             visible: false
             Layout.fillWidth: true
