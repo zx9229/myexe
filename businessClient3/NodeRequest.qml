@@ -5,7 +5,7 @@ import QtQuick.Controls 1.4 as Controls1
 import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
-Pane {
+Item {
     signal sigShowNodeList()
     signal sigShowNodeReqRsp(string UserID, var MsgNo)//The var type is a generic property type that can refer to any data type.
     //property alias statement: mstm.selectStatement
@@ -46,6 +46,7 @@ Pane {
                     radius: 5
                     height: messageText.implicitHeight + 24
                     width: Math.min(messageText.implicitWidth + 24,listView.width)
+                    color: "lightsteelblue"
                     TextEdit {
                         id: messageText
                         text: TxDataTxt

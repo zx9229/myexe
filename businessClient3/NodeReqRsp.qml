@@ -3,8 +3,7 @@ import QtQuick.Controls 2.4 //(Page QML Type)
 import QtQuick.Layouts 1.3
 import MySqlTableModel 0.1
 
-//Item {
-Page {
+Item {
     signal sigShowNodeRequest(string UserID)
     //property alias statement: mstm.selectStatement
     property string peerid
@@ -65,6 +64,7 @@ Page {
                         id: idRect
                         height: messageText.implicitHeight + 24
                         width: Math.min(messageText.implicitWidth + 24, listView.width - (isReq ? avatarRight.width : avatarLeft.width) - messageRow.spacing)
+                        color: "lightsteelblue"
                         TextEdit {
                             id: messageText
                             text: TxDataTxt
