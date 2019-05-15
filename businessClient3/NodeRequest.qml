@@ -68,35 +68,45 @@ Pane {
             ScrollBar.vertical: ScrollBar{}
         }
 
-        Rectangle{
+        Button {
             Layout.fillWidth: true
-            height: 2
-            color: "gray"
+            text: qsTr("显示发送面板")
+            onClicked: {
+                paneSend.visible = !paneSend.visible
+                text = paneSend.visible ? qsTr("隐藏发送面板") : qsTr("显示发送面板")
+            }
         }
 
         Pane {
+            id: paneSend
+            visible: false
             Layout.fillWidth: true
             ColumnLayout {
                 GroupBox {
                     Row {
                         Controls1.CheckBox {
-                            id:cbIsLog
+                            id: cbIsLog
                             text: qsTr("IsLog")
                             checked: false
                         }
                         Controls1.CheckBox {
-                            id:cbIsSafe
+                            id: cbIsSafe
                             text: qsTr("IsSafe")
                             checked: false
                         }
                         Controls1.CheckBox {
-                            id:cbIsPush
+                            id: cbIsPush
                             text: qsTr("IsPush")
                             checked: false
                         }
                         Controls1.CheckBox {
-                            id:cbIsUpCache
+                            id: cbUpCache
                             text: qsTr("UpCache")
+                            checked: false
+                        }
+                        Controls1.CheckBox {
+                            id: cbToDB
+                            text: qsTr("ToDB")
                             checked: false
                         }
                     }
@@ -127,7 +137,7 @@ Pane {
                 Button {
                     text: qsTr("发送")
                     onClicked: {
-                        var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,"",cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1REQ.checked)
+                        var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,"",cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbUpCache.checked,rbC1REQ.checked)
                         ToolTip.show("SUCCESS:"+message, 5000)
                     }
                 }
