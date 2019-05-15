@@ -122,33 +122,35 @@ Pane {
                 RowLayout {
                     GroupBox {
                         RowLayout {
+                            Controls1.ExclusiveGroup { id: common1Req_common2Req }
                             Controls1.RadioButton {
-                                id:rbC1REQ
-                                text: qsTr("C1Q")
+                                exclusiveGroup: common1Req_common2Req
+                                id: rbC1Req
+                                text: qsTr("C1Req")
                                 checked: true
                             }
                             Controls1.RadioButton {
-                                text: qsTr("C2Q")
+                                exclusiveGroup: common1Req_common2Req
+                                id: rbC2Req
+                                text: qsTr("C2Req")
                             }
                         }
                     }
                     Button {
                         text: qsTr("填充示例JSON")
-                        onClicked: {
-                            idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
-                        }
+                        onClicked: idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
                     }
                     Button {
                         text: qsTr("发送")
                         onClicked: {
-                            var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1REQ.checked,cbForceToDB.checked)
-                            ToolTip.show("SUCCESS:"+message, 5000)
+                            var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbForceToDB.checked)
+                            ToolTip.show("send: "+message, 5000)
                         }
                     }
                 }
 
                 Controls1.ComboBox {
-                    id:idComboBox
+                    id: idComboBox
                     Layout.fillWidth: true
                     model: dataExch.getTxMsgTypeNameList()
                 }
