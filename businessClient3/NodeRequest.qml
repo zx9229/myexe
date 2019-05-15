@@ -72,7 +72,7 @@ Pane {
                     when: idColumn.ListView.isCurrentItem
                     PropertyChanges {
                         target: idRect
-                        color: "green"
+                        color: "tan"
                     }
                 }
             }

@@ -47,7 +47,7 @@ Item {
                     when: idRect.ListView.isCurrentItem
                     PropertyChanges {
                         target: idRect
-                        color: "green"
+                        color: "tan"
                     }
                 }
 
