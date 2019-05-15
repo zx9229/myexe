@@ -50,7 +50,7 @@ QString zxtools::object2json(const google::protobuf::Message &msgObj, bool *isOk
         jsonStr.clear();
         if (isOk) { *isOk = false; }
     }
-    return QString::fromStdString(jsonStr);
+    return QString::fromStdString(jsonStr).trimmed();
 }
 
 QString zxtools::binary2json(txdata::MsgType msgType, const std::string& binData, bool *isOk)
