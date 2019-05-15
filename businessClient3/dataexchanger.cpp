@@ -151,6 +151,7 @@ void DataExchanger::initDB()
         isOk = m_db.commit();
         Q_ASSERT(isOk);
         m_MsgNo.refresh_data(sqlQuery);
+        m_MsgNo.insert_data(sqlQuery, false);
     }
 }
 
