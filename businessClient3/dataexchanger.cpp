@@ -60,8 +60,9 @@ QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText,
 {
     QString message;
 
+    int64_t msgNo = m_MsgNo.Value.toLongLong() + 1;
     GPMSGPTR msgData;
-    message = toC1C2(typeName, jsonText, rID, isLog, isSafe, isPush, isUpCache, isC1NotC2, msgData);
+    message = toC1C2(msgNo, typeName, jsonText, rID, isLog, isSafe, isPush, isUpCache, isC1NotC2, msgData);
     if (!message.isEmpty())
         return message;
 
@@ -92,6 +93,8 @@ QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText,
     {
         QSqlQuery sqlQuery;
         tmpCommonData.insert_data(sqlQuery, true, nullptr);
+        m_MsgNo.Value.setNum(msgNo);
+        m_MsgNo.update_data(sqlQuery);
     }
 
     return message;
@@ -147,6 +150,7 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
+        m_MsgNo.refresh_data(sqlQuery);
     }
 }
 
@@ -159,7 +163,7 @@ void DataExchanger::initOwnInfo()
     m_ownInfo.set_remark("");
 }
 
-QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR &msgOut)
+QString DataExchanger::toC1C2(int64_t msgNo, const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR &msgOut)
 {
     QString message;
 
@@ -171,15 +175,11 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
     if (!message.isEmpty())
         return message;
 
-    int64_t reqId = 0;
-    int64_t msgNo = 1;
-    int32_t seqNo = 0;
-
     if (isC1NotC2)
     {
         QSharedPointer<txdata::Common1Req> c1req = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
-        c1req->set_msgno(reqId);//TODO:
-        c1req->set_seqno(0);//TODO:
+        c1req->set_msgno(msgNo);
+        c1req->set_seqno(0);
         c1req->set_senderid(this->m_ownInfo.userid());
         c1req->set_recverid(rID.toStdString());
         c1req->set_toroot(true);
@@ -195,7 +195,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         QSharedPointer<txdata::Common2Req> c2req = QSharedPointer<txdata::Common2Req>(new txdata::Common2Req);
         c2req->mutable_key()->set_userid(m_ownInfo.userid());
         c2req->mutable_key()->set_msgno(msgNo);
-        c2req->mutable_key()->set_seqno(seqNo);
+        c2req->mutable_key()->set_seqno(0);
         c2req->set_senderid(m_ownInfo.userid());
         c2req->set_recverid(rID.toStdString());
         c2req->set_toroot(true);

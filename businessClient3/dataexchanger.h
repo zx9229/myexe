@@ -37,7 +37,7 @@ signals:
 private:
     void initDB();
     void initOwnInfo();
-    QString toC1C2(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR& msgOut);
+    QString toC1C2(int64_t msgNo, const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR& msgOut);
     QString sendCommon1Req(QSharedPointer<txdata::Common1Req> data);
     QString sendCommon2Req(QSharedPointer<txdata::Common2Req> data);
     void handle_Common2Ack(QSharedPointer<txdata::Common2Ack> data);

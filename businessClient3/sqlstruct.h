@@ -33,6 +33,7 @@ public:
     QString Key;
     QString Value;
 public:
+    KeyValue() {}
     KeyValue(const QString& k, const QString& v) :Key(k), Value(v) {}
 public:
     static QString static_table_name()
@@ -68,6 +69,20 @@ public:
         query.bindValue(":Key", this->Key);
         query.bindValue(":Value", this->Value);
         return query.exec();
+    }
+    bool refresh_data(QSqlQuery& query)
+    {
+        bool isOk = false;
+        QString sqlStr = QObject::tr("SELECT Value FROM %1 WHERE Key=:Key").arg(static_table_name());
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        query.bindValue(":Key", this->Key);
+        isOk = query.exec();
+        Q_ASSERT(isOk);
+        isOk = query.next();
+        this->Value = isOk ? query.value("Value").toString() : QString();
+        Q_ASSERT(query.next() == false);
+        return isOk;
     }
     static void select_data(QSqlQuery& query, QList<KeyValue>& results)
     {
