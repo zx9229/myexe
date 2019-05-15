@@ -267,7 +267,7 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         QSqlQuery sqlQuery;
         bool isOk = tmpData.insert_data(sqlQuery, true, nullptr);
         Q_ASSERT(isOk);
-        isOk = tmpData.increaseRspCnt(sqlQuery);
+        isOk = tmpData.updateRequestData(sqlQuery);
         Q_ASSERT(isOk);
     }
 

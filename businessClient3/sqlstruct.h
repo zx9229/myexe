@@ -352,11 +352,13 @@ public:
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
         return isOk;
     }
-    bool increaseRspCnt(QSqlQuery& query)
+    bool updateRequestData(QSqlQuery& query)
     {
-        QString sqlStr = QString("UPDATE %1 SET RspCnt=RspCnt+1 WHERE UserID=:UserID AND MsgNo=:MsgNo AND SeqNo=0").arg(static_table_name());
+        if (Valid(this->SeqNo) && (this->SeqNo == 0)) { return false; }
+        QString sqlStr = QString("UPDATE %1 SET RspCnt=RspCnt+1, IsLast=MAX(IsLast,:IsLast) WHERE UserID=:UserID AND MsgNo=:MsgNo AND SeqNo=0").arg(static_table_name());
         bool isOk = query.prepare(sqlStr);
         Q_ASSERT(isOk);
+        query.bindValue(":IsLast", this->IsLast);
         query.bindValue(":UserID", this->UserID);
         query.bindValue(":MsgNo", this->MsgNo);
         isOk = query.exec();
