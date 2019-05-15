@@ -19,9 +19,9 @@ Page {
                 text: qsTr("<[返回]")
                 onClicked: sigShowNodeRequest(peerid)
             }
-
             Button {
                 text: qsTr("刷新NodeReqRsp")
+                onClicked: mstm.select()
             }
         }
 
@@ -49,12 +49,13 @@ Page {
                     anchors.right: isReq ? parent.right : undefined
                     Rectangle {
                         id: avatarLeft
-                        height: 32
-                        width: height
+                        width: labelAL.implicitWidth + 4
+                        height: width
                         visible: !isReq
                         border.color: "gray"
                         border.width: 1
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
+                            id: labelAL
                             anchors.centerIn: parent
                             text: MsgType==3?"C2Q":(MsgType==4?"C2A":(MsgType==5?"C1Q":MsgType==6?"C1A":"NIL"))
                         }
@@ -74,12 +75,13 @@ Page {
                     }
                     Rectangle {
                         id: avatarRight
-                        height: 32
-                        width: height
+                        width: labelAR.implicitWidth + 4
+                        height: width
                         visible: isReq
                         border.color: "gray"
                         border.width: 1
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
+                            id: labelAR
                             anchors.centerIn: parent
                             text: MsgType==3?"C2Q":(MsgType==4?"C2A":(MsgType==5?"C1Q":MsgType==6?"C1A":"NIL"))
                         }

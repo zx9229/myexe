@@ -39,7 +39,7 @@ Pane {
                 height: txt1.implicitHeight + messageText.implicitHeight + 10
                 Label {
                     id: txt1
-                    text: "%1 %2 %3 %4".arg(InsertTime).arg(TxTypeTxt).arg(RspCnt).arg(IsLast)
+                    text: "%1 %2 (%3) %4".arg(InsertTime).arg(TxTypeTxt).arg(IsLast).arg(RspCnt)
                 }
                 Rectangle {
                     id: idRect
