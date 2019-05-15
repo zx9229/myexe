@@ -6,7 +6,7 @@ Window {
     width: 324
     height: 702
     title: qsTr("MyHelloWorld")
-    color: "lightgray"
+    color: "silver"
 
     Loader {
         id: pageLoader

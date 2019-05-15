@@ -120,7 +120,7 @@ QStringList DataExchanger::getTxMsgTypeNameList()
 
 QString DataExchanger::jsonExample(const QString& typeName)
 {
-    txdata::MsgType msgType;
+    txdata::MsgType msgType = txdata::MsgType::Zero1;
     txdata::MsgType_Parse(typeName.toStdString(), &msgType);
     if (msgType == txdata::MsgType::ID_EchoItem)
     {

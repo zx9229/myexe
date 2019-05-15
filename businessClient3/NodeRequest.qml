@@ -89,10 +89,14 @@ Item {
             }
         }
 
-        Item {
+        Pane {
             id: paneSend
             visible: false
             Layout.fillWidth: true
+            background: Rectangle {
+                color: "silver"
+            }
+
             ColumnLayout {
                 GroupBox {
                     Row {

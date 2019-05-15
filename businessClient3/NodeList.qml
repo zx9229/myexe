@@ -31,6 +31,7 @@ Item {
                 radius: 5
                 border.color: "gray"
                 border.width: 1
+                color: "lightsteelblue"
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     Label {
