@@ -38,121 +38,6 @@ MyWebsock& DataExchanger::ws()
     return m_ws;
 }
 
-QString DataExchanger::jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk)
-{
-    if (isOk) { *isOk = true; }
-    google::protobuf::util::JsonOptions jsonOpt;
-    if (true) {
-        jsonOpt.add_whitespace = true;
-        jsonOpt.always_print_primitive_fields = true;
-        jsonOpt.preserve_proto_field_names = true;
-    }
-    std::string jsonStr;
-    if (google::protobuf::util::MessageToJsonString(msgObj, &jsonStr, jsonOpt) != google::protobuf::util::Status::OK)
-    {
-        jsonStr.clear();
-        if (isOk) { *isOk = false; }
-    }
-    return QString::fromStdString(jsonStr);
-}
-
-QString DataExchanger::nameByMsgType(txdata::MsgType msgType, int flag, bool* isOk)
-{
-    //flag=0  结果类似(txdata.ConnectionInfo)
-    //flag=1  结果类似(ConnectionInfo)
-    if (isOk) { *isOk = false; }
-    QString retName;
-    do
-    {
-        if (txdata::MsgType_IsValid(msgType) == false)
-            break;
-        std::string name = txdata::MsgType_Name(msgType);
-        const std::string HEAD("ID_");
-        std::size_t pos = name.find(HEAD);
-        if (std::string::npos == pos)
-            break;
-        name = name.substr(HEAD.size() + pos);
-        if (flag == 0)
-            retName = "txdata." + QString::fromStdString(name);
-        else if (flag == 1)
-            retName = QString::fromStdString(name);
-        else
-            break;
-        if (isOk) { *isOk = true; }
-    } while (false);
-    return retName;
-}
-
-QString DataExchanger::jsonByMsgType(txdata::MsgType msgType, const QByteArray &serializedData, bool *isOk)
-{
-    QString jsonStr;
-
-    std::string name = nameByMsgType(msgType, 0, isOk).toStdString();
-    if (name.empty())
-        return jsonStr;
-
-    const google::protobuf::Descriptor* curDesc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-    if (nullptr == curDesc)
-        return jsonStr;
-    google::protobuf::Message* curMesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(curDesc)->New();
-    if (nullptr == curMesg)
-        return jsonStr;
-
-    QSharedPointer<google::protobuf::Message> guard(curMesg);
-
-    if (curMesg->ParseFromArray(serializedData.constData(), serializedData.size()) == false)
-        return jsonStr;
-
-    jsonStr = jsonByMsgObje(*curMesg, isOk);
-
-    return jsonStr;
-}
-
-bool DataExchanger::calcObjByName(const QString &typeName, QSharedPointer<google::protobuf::Message> &objOut)
-{
-    QString msgClassName = m2b::MsgTypeName2MsgClassName(typeName);
-    objOut.clear();
-    // https://blog.csdn.net/riopho/article/details/80372510
-    const google::protobuf::Descriptor* desc = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(msgClassName.toStdString());
-    if (nullptr == desc) { return false; }
-    // desc->index();
-    google::protobuf::Message* mesg = google::protobuf::MessageFactory::generated_factory()->GetPrototype(desc)->New();
-    objOut.reset(mesg);
-    return (mesg ? true : false);
-}
-
-QString DataExchanger::jsonToObjAndS(const QString &typeName, const QString &jsonStr, txdata::MsgType &msgType, QByteArray &serializedData)
-{
-    QString message;
-    //
-    msgType = txdata::MsgType::Zero1;
-    serializedData.clear();
-    do
-    {
-        QSharedPointer<google::protobuf::Message> curObj;
-        if (calcObjByName(typeName, curObj) == false)
-        {
-            message = "calc object by name fail";
-            break;
-        }
-        if (google::protobuf::util::JsonStringToMessage(jsonStr.toStdString(), curObj.data()) != google::protobuf::util::Status::OK)
-        {
-            message = "fill object by json fail";
-            break;
-        }
-        std::string binData;
-        if (curObj->SerializeToString(&binData) == false)
-        {
-            message = "serialize object fail";
-            break;
-        }
-        serializedData.append(binData.data(), static_cast<int>(binData.size()));
-        msgType = static_cast<txdata::MsgType>(curObj->GetDescriptor()->index());
-    } while (false);
-    //
-    return message;
-}
-
 void DataExchanger::setURL(const QString &url)
 {
     m_url = url;  // 例如【ws://localhost:65535/websocket】.
@@ -170,7 +55,7 @@ bool DataExchanger::start()
     return m_ws.start(m_url);
 }
 
-QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2)
+QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool forceToDB)
 {
     QString message;
 
@@ -179,22 +64,35 @@ QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText,
     if (!message.isEmpty())
         return message;
 
+    CommonData tmpCommonData;
+
     if (isC1NotC2)
     {
         QSharedPointer<txdata::Common1Req> c1data = qSharedPointerDynamicCast<txdata::Common1Req>(msgData);
-        {
-            CommonData tmpData;
-            zxtools::Common1Req2CommonData(&tmpData, c1data.get());
-            QSqlQuery sqlQuery;
-            tmpData.insert_data(sqlQuery, true, nullptr);
-        }
         message = sendCommon1Req(c1data);
+        if (message.isEmpty() || forceToDB)
+        {
+            zxtools::Common1Req2CommonData(&tmpCommonData, c1data.get());
+            tmpCommonData.SendOK = message.isEmpty();
+        }
     }
     else
     {
         QSharedPointer<txdata::Common2Req> c2data = qSharedPointerDynamicCast<txdata::Common2Req>(msgData);
         message = sendCommon2Req(c2data);
+        if (message.isEmpty() || forceToDB)
+        {
+            zxtools::Common2Req2CommonData(&tmpCommonData, c2data.get());
+            tmpCommonData.SendOK = message.isEmpty();
+        }
     }
+
+    if (message.isEmpty() || forceToDB)
+    {
+        QSqlQuery sqlQuery;
+        tmpCommonData.insert_data(sqlQuery, true, nullptr);
+    }
+
     return message;
 }
 
@@ -202,29 +100,29 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
 {
     txdata::QryConnInfoReq tmpData;
     QString typeName = m2b::CalcMsgTypeName(tmpData);
-    QString jsonText = jsonByMsgObje(tmpData, nullptr);
-    return demoFun(typeName, jsonText, userId, false, false, false, false, true);
+    QString jsonText = zxtools::object2json(tmpData, nullptr);
+    return demoFun(typeName, jsonText, userId, false, false, false, false, true, false);
 }
 
 QStringList DataExchanger::getTxMsgTypeNameList()
 {
     QStringList typeNameList;
-    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EchoItem));
-    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
-    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
-    typeNameList<<QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SendMailItem));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EchoItem));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SendMailItem));
     return  typeNameList;
 }
 
 QString DataExchanger::jsonExample(const QString& typeName)
 {
     txdata::MsgType msgType;
-    txdata::MsgType_Parse(typeName.toStdString(),&msgType);
-    if(msgType==txdata::MsgType::ID_EchoItem)
+    txdata::MsgType_Parse(typeName.toStdString(), &msgType);
+    if (msgType == txdata::MsgType::ID_EchoItem)
     {
         txdata::EchoItem egObj;
         egObj.set_data("data");
-        return jsonByMsgObje(egObj);
+        return zxtools::object2json(egObj);
     }
     return "";
 }
@@ -265,8 +163,8 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
     QString message;
 
     txdata::MsgType curType = txdata::MsgType::Zero1;
-    QByteArray curData;
-    message = jsonToObjAndS(typeName, jsonText, curType, curData);
+    std::string binData;
+    message = zxtools::json2binary(typeName, jsonText, curType, binData);
     if (!message.isEmpty())
         return message;
 
@@ -285,7 +183,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c1req->set_islog(isLog);
         c1req->set_ispush(isPush);
         c1req->set_reqtype(curType);
-        c1req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
+        c1req->set_reqdata(binData);
         zxtools::qdt2gpt(*(c1req->mutable_reqtime()), QDateTime::currentDateTime());
         msgOut = c1req;
     }
@@ -303,7 +201,7 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
         c2req->set_ispush(isPush);
         c2req->set_upcache(isUpCache);
         c2req->set_reqtype(curType);
-        c2req->set_reqdata(curData.constData(), static_cast<size_t>(curData.size()));
+        c2req->set_reqdata(binData);
         zxtools::qdt2gpt(*(c2req->mutable_reqtime()), QDateTime::currentDateTime());
         msgOut = c2req;
     }
@@ -313,7 +211,6 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
 
 QString DataExchanger::sendCommon1Req(QSharedPointer<txdata::Common1Req> data)
 {
-    //data->set_islog(true);
     qint64 sendBytes = m_ws.sendBinaryMessage(m2b::msg2package(*data));
     //一个字节都没发出去,肯定就发送失败了.
     return (0 == sendBytes) ? "send failed" : "";

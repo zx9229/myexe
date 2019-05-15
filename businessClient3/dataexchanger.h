@@ -21,16 +21,10 @@ public:
 public:
     MyWebsock& ws();
 
-    static QString jsonByMsgObje(const google::protobuf::Message &msgObj, bool *isOk = nullptr);
-    static QString nameByMsgType(txdata::MsgType msgType, int flag = 0, bool *isOk = nullptr);
-    static QString jsonByMsgType(txdata::MsgType msgType, const QByteArray& serializedData, bool *isOk = nullptr);
-    static bool    calcObjByName(const QString& typeName, QSharedPointer<google::protobuf::Message>& objOut);
-    static QString jsonToObjAndS(const QString& typeName, const QString& jsonStr, txdata::MsgType& msgType, QByteArray& serializedData);
-
     Q_INVOKABLE void setURL(const QString& url);
     Q_INVOKABLE void setOwnInfo(const QString& userID, const QString& belongID);
     Q_INVOKABLE bool start();
-    Q_INVOKABLE QString demoFun(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2);
+    Q_INVOKABLE QString demoFun(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool forceToDB);
     Q_INVOKABLE QString QryConnInfoReq(const QString& userId);
     Q_INVOKABLE QStringList getTxMsgTypeNameList();
     Q_INVOKABLE QString jsonExample(const QString& typeName);
