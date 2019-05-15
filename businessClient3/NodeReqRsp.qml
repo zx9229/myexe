@@ -34,6 +34,7 @@ Page {
                 selectStatement: "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(userid).arg(msgno)
             }
             delegate: Column {
+                id: idColumn
                 property bool isReq: (3==MsgType)||(5==MsgType)
                 spacing: 6
                 anchors.right: isReq ? parent.right : undefined
@@ -61,16 +62,26 @@ Page {
                         }
                     }
                     Rectangle {
+                        id: idRect
                         height: messageText.implicitHeight + 24
                         width: Math.min(messageText.implicitWidth + 24, listView.width - (isReq ? avatarRight.width : avatarLeft.width) - messageRow.spacing)
-                        color: isReq ? "lightgrey":"steelblue"
-                        Label {
+                        TextEdit {
                             id: messageText
                             text: TxDataTxt
-                            color: isReq ? "black":"white"
                             anchors.fill: parent
                             anchors.margins: 12
                             wrapMode: Label.Wrap
+                            readOnly: true
+                            selectByMouse: false
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                idColumn.ListView.view.currentIndex = index
+                            }
+                            onDoubleClicked: {
+                                messageText.selectByMouse = !messageText.selectByMouse
+                            }
                         }
                     }
                     Rectangle {
@@ -85,6 +96,13 @@ Page {
                             anchors.centerIn: parent
                             text: MsgType==3?"C2Q":(MsgType==4?"C2A":(MsgType==5?"C1Q":MsgType==6?"C1A":"NIL"))
                         }
+                    }
+                }
+                states: State {
+                    when: idColumn.ListView.isCurrentItem
+                    PropertyChanges {
+                        target: idRect
+                        color: "green"
                     }
                 }
             }

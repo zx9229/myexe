@@ -53,12 +53,15 @@ Pane {
                         anchors.margins: 12
                         wrapMode: Label.Wrap
                         readOnly: true
-                        selectByMouse: true
+                        selectByMouse: false
                     }
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
                             idColumn.ListView.view.currentIndex = index
+                        }
+                        onDoubleClicked: {
+                            messageText.selectByMouse = !messageText.selectByMouse
                         }
                         onPressAndHold: {
                             sigShowNodeReqRsp(UserID, MsgNo)
