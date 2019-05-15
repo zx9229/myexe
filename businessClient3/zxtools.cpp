@@ -77,6 +77,10 @@ GPMSGPTR zxtools::json2object(const QString& msgTypeName, const QString& jsonTex
             break;
         QString curMsgClassName = MsgTypeName2MsgClassName(msgTypeName);
         curObject = name2object(curMsgClassName.toStdString());
+        if (nullptr == curObject)
+            break;
+        if (google::protobuf::util::JsonStringToMessage(jsonText.toStdString(), curObject.data()) != google::protobuf::util::Status::OK)
+            break;
     } while (false);
     if (msgType) { *msgType = curMsgType; }
     return curObject;
@@ -89,8 +93,6 @@ bool zxtools::json2binary(const QString& msgTypeName, const QString& jsonText, t
     {
         GPMSGPTR msgObj = json2object(msgTypeName, jsonText, &msgType);
         if (nullptr == msgObj)
-            break;
-        if (google::protobuf::util::JsonStringToMessage(jsonText.toStdString(), msgObj.data()) != google::protobuf::util::Status::OK)
             break;
         if (msgObj->SerializeToString(&binData) == false)
             break;
@@ -200,4 +202,28 @@ void zxtools::Common2Req2CommonData(CommonData* dst, const txdata::Common2Req* s
     gpt2qdt(dst->TxTime, src->reqtime());
     dst->InsertTime = QDateTime::currentDateTime();
     dst->IsLast = false;
+}
+
+void zxtools::Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* src)
+{
+    dst->RspCnt = 0;
+    dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
+    dst->PeerID = QString::fromStdString(src->senderid());
+    dst->UserID = QString::fromStdString(src->key().userid());
+    dst->MsgNo = src->key().msgno();
+    dst->SeqNo = src->key().seqno();
+    dst->SenderID = QString::fromStdString(src->senderid());
+    dst->RecverID = QString::fromStdString(src->recverid());
+    dst->ToRoot = src->toroot();
+    dst->IsLog = src->islog();
+    dst->IsSafe = src->issafe();
+    dst->IsPush = src->ispush();
+    dst->UpCache = src->upcache();
+    dst->TxType = static_cast<int32_t>(src->rsptype());
+    dst->TxTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->rsptype()));
+    dst->TxData = QByteArray::fromStdString(src->rspdata());
+    dst->TxDataTxt = binary2json(src->rsptype(), dst->TxData.toStdString()).trimmed();
+    gpt2qdt(dst->TxTime, src->rsptime());
+    dst->InsertTime = QDateTime::currentDateTime();
+    dst->IsLast = src->islast();
 }

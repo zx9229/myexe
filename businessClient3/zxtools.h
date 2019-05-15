@@ -19,6 +19,7 @@ public:
     static void Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* src);
     static void CommonData2Common1Rsp(txdata::Common1Rsp* dst, const CommonData* src);
     static void Common2Req2CommonData(CommonData* dst, const txdata::Common2Req* src);
+    static void Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* src);
 };
 
 #endif // ZXTOOLS_H

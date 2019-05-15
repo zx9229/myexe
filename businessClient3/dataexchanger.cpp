@@ -101,7 +101,7 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
     txdata::QryConnInfoReq tmpData;
     QString typeName = m2b::CalcMsgTypeName(tmpData);
     QString jsonText = zxtools::object2json(tmpData, nullptr);
-    return demoFun(typeName, jsonText, userId, false, false, false, false, true, false);
+    return demoFun(typeName, jsonText, userId, false, false, false, false, true, true);
 }
 
 QStringList DataExchanger::getTxMsgTypeNameList()
@@ -162,9 +162,11 @@ QString DataExchanger::toC1C2(const QString &typeName, const QString &jsonText, 
 {
     QString message;
 
-    txdata::MsgType curType = txdata::MsgType::Zero1;
     std::string binData;
-    message = zxtools::json2binary(typeName, jsonText, curType, binData);
+    txdata::MsgType curType = txdata::MsgType::Zero1;
+    if (zxtools::json2binary(typeName, jsonText, curType, binData) == false)
+        message = "serialized data failed";
+
     if (!message.isEmpty())
         return message;
 
@@ -264,6 +266,8 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         zxtools::Common1Rsp2CommonData(&tmpData, msgData.get());
         QSqlQuery sqlQuery;
         bool isOk = tmpData.insert_data(sqlQuery, true, nullptr);
+        Q_ASSERT(isOk);
+        isOk = tmpData.increaseRspCnt(sqlQuery);
         Q_ASSERT(isOk);
     }
 

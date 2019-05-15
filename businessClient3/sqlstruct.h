@@ -8,6 +8,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QSqlQuery>
+#include <QDebug>
 
 namespace {
     //使用非const的引用,可以强校验入参的类型,基本可以杜绝隐式类型转换.
@@ -349,6 +350,16 @@ public:
         //
         isOk = query.exec();
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
+        return isOk;
+    }
+    bool increaseRspCnt(QSqlQuery& query)
+    {
+        QString sqlStr = QString("UPDATE %1 SET RspCnt=RspCnt+1 WHERE UserID=:UserID AND MsgNo=:MsgNo AND SeqNo=0").arg(static_table_name());
+        bool isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        query.bindValue(":UserID", this->UserID);
+        query.bindValue(":MsgNo", this->MsgNo);
+        isOk = query.exec();
         return isOk;
     }
 };
