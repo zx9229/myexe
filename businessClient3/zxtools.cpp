@@ -144,6 +144,7 @@ void zxtools::Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* s
 {
     dst->RspCnt = 0;
     dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
+    dst->MsgTypeTxt = QString::fromStdString(::txdata::MsgType_Name(static_cast<txdata::MsgType>(dst->MsgType)));
     dst->PeerID = QString::fromStdString(src->senderid());
     dst->UserID = QString::fromStdString(src->recverid());
     dst->MsgNo = src->msgno();
@@ -208,6 +209,7 @@ void zxtools::Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* s
 {
     dst->RspCnt = 0;
     dst->MsgType = static_cast<int32_t>(m2b::CalcMsgType(*src));
+    dst->MsgTypeTxt = QString::fromStdString(::txdata::MsgType_Name(static_cast<txdata::MsgType>(dst->MsgType)));
     dst->PeerID = QString::fromStdString(src->senderid());
     dst->UserID = QString::fromStdString(src->key().userid());
     dst->MsgNo = src->key().msgno();
