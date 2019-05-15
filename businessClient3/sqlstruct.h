@@ -33,6 +33,8 @@ public:
     QString Key;
     QString Value;
 public:
+    KeyValue(const QString& k, const QString& v) :Key(k), Value(v) {}
+public:
     static QString static_table_name()
     {
         return "KeyValue";

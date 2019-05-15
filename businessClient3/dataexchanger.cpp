@@ -17,7 +17,8 @@ enum StatusErrorType
 
 DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
-    m_ws(parent)
+    m_ws(parent),
+    m_MsgNo("Key", QString())
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);

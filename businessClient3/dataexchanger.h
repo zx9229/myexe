@@ -61,7 +61,7 @@ private:
     txdata::ConnectionInfo m_parentInfo;
 
     QSqlDatabase m_db;
-    int64_t m_MsgNo;
+    KeyValue     m_MsgNo;
 
     SafeSynchCache m_cacheSync;
 };
