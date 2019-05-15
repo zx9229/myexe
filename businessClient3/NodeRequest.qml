@@ -109,6 +109,7 @@ Item {
                             id: cbIsSafe
                             text: qsTr("Safe")
                             checked: false
+                            visible: false
                         }
                         Controls1.CheckBox {
                             id: cbIsPush
@@ -119,6 +120,7 @@ Item {
                             id: cbIsUpCache
                             text: qsTr("UpCache")
                             checked: false
+                            visible: false
                         }
                         Controls1.CheckBox {
                             id: cbForceToDB
@@ -136,11 +138,23 @@ Item {
                                 id: rbC1Req
                                 text: qsTr("C1Req")
                                 checked: true
+                                onClicked: {
+                                    cbIsSafe.checked = false
+                                    cbIsSafe.visible = !rbC1Req.checked
+                                    cbIsUpCache.checked = false
+                                    cbIsUpCache.visible = !rbC1Req.checked
+                                }
                             }
                             Controls1.RadioButton {
                                 exclusiveGroup: common1Req_common2Req
                                 id: rbC2Req
                                 text: qsTr("C2Req")
+                                onClicked: {
+                                    cbIsSafe.checked = false
+                                    cbIsSafe.visible = !rbC1Req.checked
+                                    cbIsUpCache.checked = false
+                                    cbIsUpCache.visible = !rbC1Req.checked
+                                }
                             }
                         }
                     }
