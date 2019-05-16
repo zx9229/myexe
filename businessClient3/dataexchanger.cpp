@@ -290,6 +290,7 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         Q_ASSERT(isOk);
         isOk = tmpData.updateRequestData(sqlQuery);
         Q_ASSERT(isOk);
+        emit sigTableChanged(tmpData.static_table_name());
     }
 
     switch (msgData->rsptype()) {
@@ -385,6 +386,7 @@ void DataExchanger::deal_QryConnInfoRsp(QSharedPointer<txdata::QryConnInfoRsp> m
         cie.Pathway = pathway.join("->");
         cie.insert_data(sqlQuery, false);
     }
+    emit sigTableChanged(ConnInfoEx::static_table_name());
 }
 
 void DataExchanger::slotOnConnected()

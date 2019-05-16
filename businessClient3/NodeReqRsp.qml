@@ -112,4 +112,14 @@ Item {
             }
         }
     }
+
+    Connections {
+        target: dataExch
+        onSigTableChanged: {
+            if (tableName === "CommonData") {
+                mstm.select()
+                verScrollBar.setPosition(1.0)
+            }
+        }
+    }
 }

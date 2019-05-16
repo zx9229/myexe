@@ -66,6 +66,15 @@ Item {
             ScrollBar.vertical: ScrollBar {}
         }
     }
+
+    Connections {
+        target: dataExch
+        onSigTableChanged: {
+            if (tableName === "ConnInfoEx") {
+                mstm.select()
+            }
+        }
+    }
 }
 
 /*##^## Designer {

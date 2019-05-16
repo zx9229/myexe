@@ -35,6 +35,7 @@ signals:
     void sigReady();
     void sigWebsocketError(QAbstractSocket::SocketError error);
     void sigStatusError(const QString& errMessage, int errType);
+    void sigTableChanged(const QString &tableName);
 
 private:
     void initDB();
