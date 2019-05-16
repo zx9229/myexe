@@ -49,7 +49,6 @@ Item {
         TextField {
             id: textFieldHost
             Layout.fillWidth: true
-            Layout.columnSpan: 1
             placeholderText: qsTr("主机")
             validator: RegExpValidator {
                 regExp: /[^`~!@#$%^&*()_=+\[\]{}\\|;:'",<>/?]+/
@@ -64,7 +63,6 @@ Item {
         TextField {
             id: textFieldPort
             Layout.fillWidth: true
-            Layout.columnSpan: 1
             placeholderText: qsTr("端口")
             validator: IntValidator {
                 bottom: 0
@@ -80,7 +78,6 @@ Item {
         TextField {
             id: textFieldBelongID
             Layout.fillWidth: true
-            Layout.columnSpan: 1
             placeholderText: qsTr("父节点的名字")
         }
 
@@ -92,7 +89,6 @@ Item {
         TextField {
             id: textFieldUserID
             Layout.fillWidth: true
-            Layout.columnSpan: 1
             placeholderText: qsTr("本节点的名字")
         }
 
