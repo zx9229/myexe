@@ -26,12 +26,12 @@ Item {
 
             delegate: Rectangle {
                 id: idRect
-                width: listView.width
-                height: txt1.implicitHeight + txt2.implicitHeight + 20
                 radius: 5
+                color: "lightgray"
                 border.color: "gray"
                 border.width: 1
-                color: "lightsteelblue"
+                width: listView.width
+                height: txt1.implicitHeight + txt2.implicitHeight + 20
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     Label {

@@ -62,9 +62,10 @@ Item {
                     }
                     Rectangle {
                         id: idRect
+                        radius: 5
+                        color: "lightgray"
                         height: messageText.implicitHeight + 24
                         width: Math.min(messageText.implicitWidth + 24, listView.width - (isReq ? avatarRight.width : avatarLeft.width) - messageRow.spacing)
-                        color: "lightsteelblue"
                         TextEdit {
                             id: messageText
                             text: TxDataTxt
