@@ -71,7 +71,7 @@ Item {
                             text: TxDataTxt
                             anchors.fill: parent
                             anchors.margins: 12
-                            wrapMode: Label.Wrap
+                            wrapMode: TextEdit.Wrap
                             readOnly: true
                             selectByMouse: false
                         }
