@@ -80,7 +80,10 @@ GPMSGPTR zxtools::json2object(const QString& msgTypeName, const QString& jsonTex
         if (nullptr == curObject)
             break;
         if (google::protobuf::util::JsonStringToMessage(jsonText.toStdString(), curObject.data()) != google::protobuf::util::Status::OK)
+        {
+            curObject.clear();
             break;
+        }
     } while (false);
     if (msgType) { *msgType = curMsgType; }
     return curObject;
