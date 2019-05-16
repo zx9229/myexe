@@ -39,6 +39,20 @@ MyWebsock& DataExchanger::ws()
     return m_ws;
 }
 
+QString DataExchanger::loadValue(const QString& key)
+{
+    QSqlQuery sqlQuery;
+    KeyValue kv(key, QString());
+    return kv.refresh_data(sqlQuery) ? kv.Value : QString();
+}
+
+bool DataExchanger::saveValue(const QString& key, const QString& value)
+{
+    QSqlQuery sqlQuery;
+    KeyValue kv(key, value);
+    return kv.insert_data(sqlQuery, false);
+}
+
 void DataExchanger::setURL(const QString &url)
 {
     m_url = url;  // 例如【ws://localhost:65535/websocket】.

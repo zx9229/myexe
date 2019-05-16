@@ -21,6 +21,8 @@ public:
 public:
     MyWebsock& ws();
 
+    Q_INVOKABLE QString loadValue(const QString& key);
+    Q_INVOKABLE bool saveValue(const QString& key, const QString& value);
     Q_INVOKABLE void setURL(const QString& url);
     Q_INVOKABLE void setOwnInfo(const QString& userID, const QString& belongID);
     Q_INVOKABLE bool start();

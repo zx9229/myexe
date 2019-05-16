@@ -13,7 +13,7 @@ Item {
     GridLayout {
         id: gridLayout
         rows: 7
-        columns: 3
+        columns: 2
         anchors.fill: parent
 
         Label {
@@ -22,7 +22,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             Layout.fillWidth: true
-            Layout.columnSpan: 3
+            Layout.columnSpan: 2
         }
 
         Label {
@@ -41,11 +41,6 @@ Item {
             }
         }
 
-        Button {
-            id: buttonQuickFill
-            text: qsTr("速填")
-        }
-
         Label {
             id: labelHost
             text: qsTr("Host")
@@ -54,7 +49,7 @@ Item {
         TextField {
             id: textFieldHost
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 1
             placeholderText: qsTr("主机")
             validator: RegExpValidator {
                 regExp: /[^`~!@#$%^&*()_=+\[\]{}\\|;:'",<>/?]+/
@@ -69,7 +64,7 @@ Item {
         TextField {
             id: textFieldPort
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 1
             placeholderText: qsTr("端口")
             validator: IntValidator {
                 bottom: 0
@@ -85,7 +80,7 @@ Item {
         TextField {
             id: textFieldBelongID
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 1
             placeholderText: qsTr("父节点的名字")
         }
 
@@ -97,36 +92,41 @@ Item {
         TextField {
             id: textFieldUserID
             Layout.fillWidth: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 1
             placeholderText: qsTr("本节点的名字")
+        }
+
+        RowLayout {
+            id: rowLayout
+            Layout.fillWidth: true
+            Layout.columnSpan: 2
+
+            Button {
+                id: buttonSaveConf
+                text: qsTr("保存配置")
+                Layout.fillWidth: true
+            }
+
+            Button {
+                id: buttonLoadConf
+                text: qsTr("载入配置")
+                Layout.fillWidth: true
+            }
         }
 
         Button {
             id: buttonSignIn
             text: qsTr("登录")
             Layout.fillWidth: true
-            Layout.columnSpan: 3
+            Layout.columnSpan: 2
         }
 
         TextArea {
             id: textAreaMessage
             text: qsTr("Text Area")
-            Layout.columnSpan: 3
+            Layout.columnSpan: 2
             Layout.fillHeight: true
             Layout.fillWidth: true
-        }
-    }
-
-    Connections {
-        target: buttonQuickFill
-        onClicked: {
-            textFieldURL.text = qsTr("ws://localhost:65535/websocket")
-            textFieldHost.text = qsTr("192.168.3.157")
-            textFieldPort.text = qsTr("40078")
-            textFieldURL.text = "ws://%1:%2/websocket".arg(
-                        textFieldHost.text).arg(textFieldPort.text)
-            textFieldUserID.text = qsTr("ZXCVB")
-            textFieldBelongID.text = qsTr("n4")
         }
     }
 
@@ -150,6 +150,34 @@ Item {
     Connections {
         target: textFieldPort
         onEditingFinished: {
+            textFieldURL.text = "ws://%1:%2/websocket".arg(
+                        textFieldHost.text).arg(textFieldPort.text)
+        }
+    }
+
+    Connections {
+        target: buttonSaveConf
+        onClicked: {
+            dataExch.saveValue("Host", textFieldHost.text)
+            dataExch.saveValue("Port", textFieldPort.text)
+            dataExch.saveValue("BelongID", textFieldBelongID.text)
+            dataExch.saveValue("UserID", textFieldUserID.text)
+        }
+    }
+
+    Connections {
+        target: buttonLoadConf
+        onClicked: {
+            textFieldHost.text = dataExch.loadValue("Host")
+            textFieldPort.text = dataExch.loadValue("Port")
+            textFieldBelongID.text = dataExch.loadValue("BelongID")
+            textFieldUserID.text = dataExch.loadValue("UserID")
+            if (textFieldHost.text == "" && textFieldPort.text == "") {
+                textFieldHost.text = qsTr("192.168.3.157")
+                textFieldPort.text = qsTr("40078")
+                textFieldBelongID.text = qsTr("n4")
+                textFieldUserID.text = qsTr("ZXCVB")
+            }
             textFieldURL.text = "ws://%1:%2/websocket".arg(
                         textFieldHost.text).arg(textFieldPort.text)
         }
