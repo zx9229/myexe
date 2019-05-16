@@ -200,9 +200,9 @@ message ExecCmdRsp {
 }
 
 message EchoItem {
-    string LocalID  = 1;
-    string RemoteID = 2;
-    string Data     = 3;
+    string Data   = 1;
+    int32  RspCnt = 2;//要返回几个响应.
+    int32  SecGap = 3;//响应间隔多少秒.
 }
 
 message ReportDataItem {

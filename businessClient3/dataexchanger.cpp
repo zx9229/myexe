@@ -138,9 +138,11 @@ QString DataExchanger::jsonExample(const QString& typeName)
     txdata::MsgType_Parse(typeName.toStdString(), &msgType);
     if (msgType == txdata::MsgType::ID_EchoItem)
     {
-        txdata::EchoItem egObj;
-        egObj.set_data("data");
-        return zxtools::object2json(egObj);
+        txdata::EchoItem tmpObj;
+        tmpObj.set_data("DATA");
+        tmpObj.set_rspcnt(2);
+        tmpObj.set_secgap(0);
+        return zxtools::object2json(tmpObj);
     }
     return "";
 }

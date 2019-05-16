@@ -430,7 +430,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 	}
 
 	if msgData.RecverID == thls.ownInfo.UserID {
-		thls.handle_MsgType_ID_Common1Req_exec(msgData, msgConn)
+		go thls.handle_MsgType_ID_Common1Req_exec(msgData, msgConn)
 		return
 	}
 
@@ -998,11 +998,17 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 }
 
 func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream CommonRspWrapper) {
-	data := &txdata.EchoItem{LocalID: reqData.LocalID, RemoteID: reqData.RemoteID, Data: reqData.Data}
-	data.Data = reqData.Data + "_rsp_1"
-	stream.sendData(data, false)
-	data.Data = reqData.Data + "_rsp_2"
-	stream.sendData(data, true)
+	if reqData.RspCnt <= 0 || reqData.SecGap < 0 {
+		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "field (RspCnt and/or SecGap) error"}, true)
+	} else {
+		for i := int32(1); i <= reqData.RspCnt; i++ {
+			isLast := (i == reqData.RspCnt)
+			stream.sendData(&txdata.EchoItem{Data: fmt.Sprintf("%v.%v", reqData.Data, i), RspCnt: reqData.RspCnt, SecGap: reqData.SecGap}, isLast)
+			if !isLast {
+				time.Sleep(time.Second * time.Duration(reqData.SecGap))
+			}
+		}
+	}
 }
 
 func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream CommonRspWrapper) {

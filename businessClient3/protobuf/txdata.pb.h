@@ -3100,37 +3100,9 @@ class EchoItem : public ::google::protobuf::Message /* @@protoc_insertion_point(
 
   // accessors -------------------------------------------------------
 
-  // string LocalID = 1;
-  void clear_localid();
-  static const int kLocalIDFieldNumber = 1;
-  const ::std::string& localid() const;
-  void set_localid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_localid(::std::string&& value);
-  #endif
-  void set_localid(const char* value);
-  void set_localid(const char* value, size_t size);
-  ::std::string* mutable_localid();
-  ::std::string* release_localid();
-  void set_allocated_localid(::std::string* localid);
-
-  // string RemoteID = 2;
-  void clear_remoteid();
-  static const int kRemoteIDFieldNumber = 2;
-  const ::std::string& remoteid() const;
-  void set_remoteid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_remoteid(::std::string&& value);
-  #endif
-  void set_remoteid(const char* value);
-  void set_remoteid(const char* value, size_t size);
-  ::std::string* mutable_remoteid();
-  ::std::string* release_remoteid();
-  void set_allocated_remoteid(::std::string* remoteid);
-
-  // string Data = 3;
+  // string Data = 1;
   void clear_data();
-  static const int kDataFieldNumber = 3;
+  static const int kDataFieldNumber = 1;
   const ::std::string& data() const;
   void set_data(const ::std::string& value);
   #if LANG_CXX11
@@ -3142,13 +3114,25 @@ class EchoItem : public ::google::protobuf::Message /* @@protoc_insertion_point(
   ::std::string* release_data();
   void set_allocated_data(::std::string* data);
 
+  // int32 RspCnt = 2;
+  void clear_rspcnt();
+  static const int kRspCntFieldNumber = 2;
+  ::google::protobuf::int32 rspcnt() const;
+  void set_rspcnt(::google::protobuf::int32 value);
+
+  // int32 SecGap = 3;
+  void clear_secgap();
+  static const int kSecGapFieldNumber = 3;
+  ::google::protobuf::int32 secgap() const;
+  void set_secgap(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:txdata.EchoItem)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr localid_;
-  ::google::protobuf::internal::ArenaStringPtr remoteid_;
   ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::int32 rspcnt_;
+  ::google::protobuf::int32 secgap_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -6422,113 +6406,7 @@ inline void ExecCmdRsp::set_allocated_reply(::std::string* reply) {
 
 // EchoItem
 
-// string LocalID = 1;
-inline void EchoItem::clear_localid() {
-  localid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& EchoItem::localid() const {
-  // @@protoc_insertion_point(field_get:txdata.EchoItem.LocalID)
-  return localid_.GetNoArena();
-}
-inline void EchoItem::set_localid(const ::std::string& value) {
-  
-  localid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.EchoItem.LocalID)
-}
-#if LANG_CXX11
-inline void EchoItem::set_localid(::std::string&& value) {
-  
-  localid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.EchoItem.LocalID)
-}
-#endif
-inline void EchoItem::set_localid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  localid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.EchoItem.LocalID)
-}
-inline void EchoItem::set_localid(const char* value, size_t size) {
-  
-  localid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.EchoItem.LocalID)
-}
-inline ::std::string* EchoItem::mutable_localid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.EchoItem.LocalID)
-  return localid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* EchoItem::release_localid() {
-  // @@protoc_insertion_point(field_release:txdata.EchoItem.LocalID)
-  
-  return localid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void EchoItem::set_allocated_localid(::std::string* localid) {
-  if (localid != NULL) {
-    
-  } else {
-    
-  }
-  localid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), localid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.EchoItem.LocalID)
-}
-
-// string RemoteID = 2;
-inline void EchoItem::clear_remoteid() {
-  remoteid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& EchoItem::remoteid() const {
-  // @@protoc_insertion_point(field_get:txdata.EchoItem.RemoteID)
-  return remoteid_.GetNoArena();
-}
-inline void EchoItem::set_remoteid(const ::std::string& value) {
-  
-  remoteid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.EchoItem.RemoteID)
-}
-#if LANG_CXX11
-inline void EchoItem::set_remoteid(::std::string&& value) {
-  
-  remoteid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.EchoItem.RemoteID)
-}
-#endif
-inline void EchoItem::set_remoteid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  remoteid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.EchoItem.RemoteID)
-}
-inline void EchoItem::set_remoteid(const char* value, size_t size) {
-  
-  remoteid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.EchoItem.RemoteID)
-}
-inline ::std::string* EchoItem::mutable_remoteid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.EchoItem.RemoteID)
-  return remoteid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* EchoItem::release_remoteid() {
-  // @@protoc_insertion_point(field_release:txdata.EchoItem.RemoteID)
-  
-  return remoteid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void EchoItem::set_allocated_remoteid(::std::string* remoteid) {
-  if (remoteid != NULL) {
-    
-  } else {
-    
-  }
-  remoteid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), remoteid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.EchoItem.RemoteID)
-}
-
-// string Data = 3;
+// string Data = 1;
 inline void EchoItem::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -6579,6 +6457,34 @@ inline void EchoItem::set_allocated_data(::std::string* data) {
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
   // @@protoc_insertion_point(field_set_allocated:txdata.EchoItem.Data)
+}
+
+// int32 RspCnt = 2;
+inline void EchoItem::clear_rspcnt() {
+  rspcnt_ = 0;
+}
+inline ::google::protobuf::int32 EchoItem::rspcnt() const {
+  // @@protoc_insertion_point(field_get:txdata.EchoItem.RspCnt)
+  return rspcnt_;
+}
+inline void EchoItem::set_rspcnt(::google::protobuf::int32 value) {
+  
+  rspcnt_ = value;
+  // @@protoc_insertion_point(field_set:txdata.EchoItem.RspCnt)
+}
+
+// int32 SecGap = 3;
+inline void EchoItem::clear_secgap() {
+  secgap_ = 0;
+}
+inline ::google::protobuf::int32 EchoItem::secgap() const {
+  // @@protoc_insertion_point(field_get:txdata.EchoItem.SecGap)
+  return secgap_;
+}
+inline void EchoItem::set_secgap(::google::protobuf::int32 value) {
+  
+  secgap_ = value;
+  // @@protoc_insertion_point(field_set:txdata.EchoItem.SecGap)
 }
 
 // -------------------------------------------------------------------
