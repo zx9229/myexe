@@ -49,11 +49,11 @@ Item {
                     anchors.right: isReq ? parent.right : undefined
                     Rectangle {
                         id: avatarLeft
-                        width: labelAL.implicitWidth + 6
+                        width: labelAL.implicitWidth + 4
                         height: width
                         visible: !isReq
                         border.color: "gray"
-                        border.width: 2
+                        border.width: 1
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
                             id: labelAL
                             anchors.centerIn: parent
@@ -87,11 +87,11 @@ Item {
                     }
                     Rectangle {
                         id: avatarRight
-                        width: labelAR.implicitWidth + 6
+                        width: labelAR.implicitWidth + 4
                         height: width
                         visible: isReq
                         border.color: "gray"
-                        border.width: 2
+                        border.width: 1
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
                             id: labelAR
                             anchors.centerIn: parent
