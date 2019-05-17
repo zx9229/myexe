@@ -260,6 +260,9 @@ public:
     QString    UserID;//本端.
     int64_t    MsgNo;
     int32_t    SeqNo;
+    int64_t    BatchNo;
+    int64_t    RefNum;
+    QString    RefText;
     QString    SenderID;
     QString    RecverID;
     bool       ToRoot;
@@ -282,6 +285,8 @@ public:
         this->MsgType = INT32_MAX;
         this->MsgNo = INT32_MAX;
         this->SeqNo = INT32_MAX;
+        this->BatchNo = INT64_MAX;
+        this->RefNum = INT64_MAX;
         this->ToRoot = false;
         this->IsLog = false;
         this->IsSafe = false;
@@ -307,6 +312,9 @@ public:
             UserID     TEXT    NOT NULL ,\
             MsgNo      INTEGER NOT NULL ,\
             SeqNo      INTEGER NOT NULL ,\
+            BatchNo    INTEGER     NULL ,\
+            RefNum     INTEGER     NULL ,\
+            RefText    TEXT        NULL ,\
             SenderID   TEXT        NULL ,\
             RecverID   TEXT        NULL ,\
             ToRoot     INTEGER     NULL ,\
@@ -340,6 +348,9 @@ public:
         if (Valid(this->UserID)) { cols.append("UserID"); }
         if (Valid(this->MsgNo)) { cols.append("MsgNo"); }
         if (Valid(this->SeqNo)) { cols.append("SeqNo"); }
+        if (Valid(this->BatchNo)) { cols.append("BatchNo"); }
+        if (Valid(this->RefNum)) { cols.append("RefNum"); }
+        if (Valid(this->RefText)) { cols.append("RefText"); }
         if (Valid(this->SenderID)) { cols.append("SenderID"); }
         if (Valid(this->RecverID)) { cols.append("RecverID"); }
         if (Valid(this->ToRoot)) { cols.append("ToRoot"); }
@@ -367,6 +378,9 @@ public:
         if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
         if (Valid(this->MsgNo)) { query.bindValue(":MsgNo", this->MsgNo); }
         if (Valid(this->SeqNo)) { query.bindValue(":SeqNo", this->SeqNo); }
+        if (Valid(this->BatchNo)) { query.bindValue(":BatchNo", this->BatchNo); }
+        if (Valid(this->RefNum)) { query.bindValue(":RefNum", this->RefNum); }
+        if (Valid(this->RefText)) { query.bindValue(":RefText", this->RefText); }
         if (Valid(this->SenderID)) { query.bindValue(":SenderID", this->SenderID); }
         if (Valid(this->RecverID)) { query.bindValue(":RecverID", this->RecverID); }
         if (Valid(this->ToRoot)) { query.bindValue(":ToRoot", this->ToRoot); }
