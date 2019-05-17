@@ -26,6 +26,7 @@ type Timestamp = timestamp.Timestamp
 // Linux  : grep    "^message" txdata.proto | awk -F" " 'BEGIN{cnt=0}{print"ID_"$2,"= "cnt++";"}'
 // Linux  : grep    "^message" txdata.proto
 // Windows: findstr "^message" txdata.proto
+// 还需要同时修改(ProtoMessage.go)和(m2b.h)
 type MsgType int32
 
 const (
@@ -109,7 +110,7 @@ func (x MsgType) String() string {
 	return proto.EnumName(MsgType_name, int32(x))
 }
 func (MsgType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{0}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{0}
 }
 
 type ConnectionInfo_LinkType int32
@@ -135,7 +136,7 @@ func (x ConnectionInfo_LinkType) String() string {
 	return proto.EnumName(ConnectionInfo_LinkType_name, int32(x))
 }
 func (ConnectionInfo_LinkType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{7, 0}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{7, 0}
 }
 
 // 唯一标识一个消息.
@@ -152,7 +153,7 @@ func (m *UniKey) Reset()         { *m = UniKey{} }
 func (m *UniKey) String() string { return proto.CompactTextString(m) }
 func (*UniKey) ProtoMessage()    {}
 func (*UniKey) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{0}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{0}
 }
 func (m *UniKey) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UniKey.Unmarshal(m, b)
@@ -216,7 +217,7 @@ func (m *Common1Req) Reset()         { *m = Common1Req{} }
 func (m *Common1Req) String() string { return proto.CompactTextString(m) }
 func (*Common1Req) ProtoMessage()    {}
 func (*Common1Req) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{1}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{1}
 }
 func (m *Common1Req) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Common1Req.Unmarshal(m, b)
@@ -351,7 +352,7 @@ func (m *Common1Rsp) Reset()         { *m = Common1Rsp{} }
 func (m *Common1Rsp) String() string { return proto.CompactTextString(m) }
 func (*Common1Rsp) ProtoMessage()    {}
 func (*Common1Rsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{2}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{2}
 }
 func (m *Common1Rsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Common1Rsp.Unmarshal(m, b)
@@ -493,7 +494,7 @@ func (m *Common2Req) Reset()         { *m = Common2Req{} }
 func (m *Common2Req) String() string { return proto.CompactTextString(m) }
 func (*Common2Req) ProtoMessage()    {}
 func (*Common2Req) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{3}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{3}
 }
 func (m *Common2Req) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Common2Req.Unmarshal(m, b)
@@ -637,7 +638,7 @@ func (m *Common2Rsp) Reset()         { *m = Common2Rsp{} }
 func (m *Common2Rsp) String() string { return proto.CompactTextString(m) }
 func (*Common2Rsp) ProtoMessage()    {}
 func (*Common2Rsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{4}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{4}
 }
 func (m *Common2Rsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Common2Rsp.Unmarshal(m, b)
@@ -778,7 +779,7 @@ func (m *Common2Ack) Reset()         { *m = Common2Ack{} }
 func (m *Common2Ack) String() string { return proto.CompactTextString(m) }
 func (*Common2Ack) ProtoMessage()    {}
 func (*Common2Ack) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{5}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{5}
 }
 func (m *Common2Ack) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Common2Ack.Unmarshal(m, b)
@@ -846,7 +847,7 @@ func (m *CommonErr) Reset()         { *m = CommonErr{} }
 func (m *CommonErr) String() string { return proto.CompactTextString(m) }
 func (*CommonErr) ProtoMessage()    {}
 func (*CommonErr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{6}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{6}
 }
 func (m *CommonErr) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CommonErr.Unmarshal(m, b)
@@ -897,7 +898,7 @@ func (m *ConnectionInfo) Reset()         { *m = ConnectionInfo{} }
 func (m *ConnectionInfo) String() string { return proto.CompactTextString(m) }
 func (*ConnectionInfo) ProtoMessage()    {}
 func (*ConnectionInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{7}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{7}
 }
 func (m *ConnectionInfo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectionInfo.Unmarshal(m, b)
@@ -977,7 +978,7 @@ func (m *DisconnectedData) Reset()         { *m = DisconnectedData{} }
 func (m *DisconnectedData) String() string { return proto.CompactTextString(m) }
 func (*DisconnectedData) ProtoMessage()    {}
 func (*DisconnectedData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{8}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{8}
 }
 func (m *DisconnectedData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DisconnectedData.Unmarshal(m, b)
@@ -1016,7 +1017,7 @@ func (m *ConnectReq) Reset()         { *m = ConnectReq{} }
 func (m *ConnectReq) String() string { return proto.CompactTextString(m) }
 func (*ConnectReq) ProtoMessage()    {}
 func (*ConnectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{9}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{9}
 }
 func (m *ConnectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectReq.Unmarshal(m, b)
@@ -1064,7 +1065,7 @@ func (m *ConnectRsp) Reset()         { *m = ConnectRsp{} }
 func (m *ConnectRsp) String() string { return proto.CompactTextString(m) }
 func (*ConnectRsp) ProtoMessage()    {}
 func (*ConnectRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{10}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{10}
 }
 func (m *ConnectRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConnectRsp.Unmarshal(m, b)
@@ -1124,7 +1125,7 @@ func (m *OnlineNotice) Reset()         { *m = OnlineNotice{} }
 func (m *OnlineNotice) String() string { return proto.CompactTextString(m) }
 func (*OnlineNotice) ProtoMessage()    {}
 func (*OnlineNotice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{11}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{11}
 }
 func (m *OnlineNotice) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_OnlineNotice.Unmarshal(m, b)
@@ -1166,7 +1167,7 @@ func (m *SystemReport) Reset()         { *m = SystemReport{} }
 func (m *SystemReport) String() string { return proto.CompactTextString(m) }
 func (*SystemReport) ProtoMessage()    {}
 func (*SystemReport) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{12}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{12}
 }
 func (m *SystemReport) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SystemReport.Unmarshal(m, b)
@@ -1227,7 +1228,7 @@ func (m *EchoItem) Reset()         { *m = EchoItem{} }
 func (m *EchoItem) String() string { return proto.CompactTextString(m) }
 func (*EchoItem) ProtoMessage()    {}
 func (*EchoItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{13}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{13}
 }
 func (m *EchoItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EchoItem.Unmarshal(m, b)
@@ -1281,7 +1282,7 @@ func (m *BinItem) Reset()         { *m = BinItem{} }
 func (m *BinItem) String() string { return proto.CompactTextString(m) }
 func (*BinItem) ProtoMessage()    {}
 func (*BinItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{14}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{14}
 }
 func (m *BinItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BinItem.Unmarshal(m, b)
@@ -1332,7 +1333,7 @@ func (m *EmailItem) Reset()         { *m = EmailItem{} }
 func (m *EmailItem) String() string { return proto.CompactTextString(m) }
 func (*EmailItem) ProtoMessage()    {}
 func (*EmailItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{15}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{15}
 }
 func (m *EmailItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EmailItem.Unmarshal(m, b)
@@ -1411,7 +1412,7 @@ func (m *QryConnInfoReq) Reset()         { *m = QryConnInfoReq{} }
 func (m *QryConnInfoReq) String() string { return proto.CompactTextString(m) }
 func (*QryConnInfoReq) ProtoMessage()    {}
 func (*QryConnInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{16}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{16}
 }
 func (m *QryConnInfoReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_QryConnInfoReq.Unmarshal(m, b)
@@ -1443,7 +1444,7 @@ func (m *QryConnInfoRsp) Reset()         { *m = QryConnInfoRsp{} }
 func (m *QryConnInfoRsp) String() string { return proto.CompactTextString(m) }
 func (*QryConnInfoRsp) ProtoMessage()    {}
 func (*QryConnInfoRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{17}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{17}
 }
 func (m *QryConnInfoRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_QryConnInfoRsp.Unmarshal(m, b)
@@ -1490,7 +1491,7 @@ func (m *QueryRecordReq) Reset()         { *m = QueryRecordReq{} }
 func (m *QueryRecordReq) String() string { return proto.CompactTextString(m) }
 func (*QueryRecordReq) ProtoMessage()    {}
 func (*QueryRecordReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{18}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{18}
 }
 func (m *QueryRecordReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_QueryRecordReq.Unmarshal(m, b)
@@ -1538,7 +1539,7 @@ func (m *QueryRecordRsp) Reset()         { *m = QueryRecordRsp{} }
 func (m *QueryRecordRsp) String() string { return proto.CompactTextString(m) }
 func (*QueryRecordRsp) ProtoMessage()    {}
 func (*QueryRecordRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{19}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{19}
 }
 func (m *QueryRecordRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_QueryRecordRsp.Unmarshal(m, b)
@@ -1591,7 +1592,7 @@ func (m *ExecCmdReq) Reset()         { *m = ExecCmdReq{} }
 func (m *ExecCmdReq) String() string { return proto.CompactTextString(m) }
 func (*ExecCmdReq) ProtoMessage()    {}
 func (*ExecCmdReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{20}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{20}
 }
 func (m *ExecCmdReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExecCmdReq.Unmarshal(m, b)
@@ -1630,7 +1631,7 @@ func (m *ExecCmdRsp) Reset()         { *m = ExecCmdRsp{} }
 func (m *ExecCmdRsp) String() string { return proto.CompactTextString(m) }
 func (*ExecCmdRsp) ProtoMessage()    {}
 func (*ExecCmdRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{21}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{21}
 }
 func (m *ExecCmdRsp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExecCmdRsp.Unmarshal(m, b)
@@ -1670,7 +1671,7 @@ func (m *ReportDataItem) Reset()         { *m = ReportDataItem{} }
 func (m *ReportDataItem) String() string { return proto.CompactTextString(m) }
 func (*ReportDataItem) ProtoMessage()    {}
 func (*ReportDataItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_txdata_96d7428e1ff832d0, []int{22}
+	return fileDescriptor_txdata_3bd037c3a7d18dea, []int{22}
 }
 func (m *ReportDataItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ReportDataItem.Unmarshal(m, b)
@@ -1740,9 +1741,9 @@ func init() {
 	proto.RegisterEnum("txdata.ConnectionInfo_LinkType", ConnectionInfo_LinkType_name, ConnectionInfo_LinkType_value)
 }
 
-func init() { proto.RegisterFile("txdata.proto", fileDescriptor_txdata_96d7428e1ff832d0) }
+func init() { proto.RegisterFile("txdata.proto", fileDescriptor_txdata_3bd037c3a7d18dea) }
 
-var fileDescriptor_txdata_96d7428e1ff832d0 = []byte{
+var fileDescriptor_txdata_3bd037c3a7d18dea = []byte{
 	// 1309 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0x4d, 0x6f, 0xdb, 0x46,
 	0x13, 0x0e, 0x49, 0x7d, 0x8e, 0x64, 0x7a, 0xb3, 0xf9, 0x78, 0x09, 0x1f, 0xde, 0xa8, 0x3c, 0xa9,
