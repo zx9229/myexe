@@ -40,19 +40,37 @@ message UniKey {
     int32   SeqNo  = 3;//同一消息的顺序号(Req+Rsp为同一消息,可1对n,Req为0,Rsp从1开始增加).
 }
 
-//常用于(Common2Req)和(Common2Rsp)的通信过程中.
-message CommonErr {
-    int32                     ErrNo    = 1;
-    string                    ErrMsg   = 2;
+message Common1Req {
+    int64                     MsgNo     =  1;
+    int32                     SeqNo     =  2;
+    int64                     BatchNo   =  3;
+    int64                     RefNum    =  4;
+    string                    RefText   =  5;
+    string                    SenderID  =  6;
+    string                    RecverID  =  7;
+    bool                      ToRoot    =  8;//指代传输的方向.
+    bool                      IsLog     =  9;
+    bool                      IsPush    = 10;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    MsgType                   ReqType   = 11;
+    bytes                     ReqData   = 12;
+    google.protobuf.Timestamp ReqTime   = 13;
 }
 
-//对某消息进行确认.
-message Common2Ack {
-    UniKey  Key      = 1;
-    string  SenderID = 2;//消息的发送者.
-    string  RecverID = 3;//消息的接收者.
-    bool    ToRoot   = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
-    bool    IsLog    = 5;//对本消息打日志.
+message Common1Rsp {
+    int64                     MsgNo     =  1;
+    int32                     SeqNo     =  2;
+    int64                     BatchNo   =  3;
+    int64                     RefNum    =  4;
+    string                    RefText   =  5;
+    string                    SenderID  =  6;
+    string                    RecverID  =  7;
+    bool                      ToRoot    =  8;
+    bool                      IsLog     =  9;
+    bool                      IsPush    = 10;
+    MsgType                   RspType   = 11;
+    bytes                     RspData   = 12;
+    google.protobuf.Timestamp RspTime   = 13;
+    bool                      IsLast    = 14;//最后一条响应的标志.
 }
 
 message Common2Req {
@@ -91,37 +109,19 @@ message Common2Rsp {
     bool                      IsLast   = 15;//最后一条响应的标志.
 }
 
-message Common1Req {
-    int64                     MsgNo     =  1;
-    int32                     SeqNo     =  2;
-    int64                     BatchNo   =  3;
-    int64                     RefNum    =  4;
-    string                    RefText   =  5;
-    string                    SenderID  =  6;
-    string                    RecverID  =  7;
-    bool                      ToRoot    =  8;//指代传输的方向.
-    bool                      IsLog     =  9;
-    bool                      IsPush    = 10;//上报(把请求发送到目的地就行了,不需要返回响应包).
-    MsgType                   ReqType   = 11;
-    bytes                     ReqData   = 12;
-    google.protobuf.Timestamp ReqTime   = 13;
+//对某消息进行确认.
+message Common2Ack {
+    UniKey  Key      = 1;
+    string  SenderID = 2;//消息的发送者.
+    string  RecverID = 3;//消息的接收者.
+    bool    ToRoot   = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
+    bool    IsLog    = 5;//对本消息打日志.
 }
 
-message Common1Rsp {
-    int64                     MsgNo     =  1;
-    int32                     SeqNo     =  2;
-    int64                     BatchNo   =  3;
-    int64                     RefNum    =  4;
-    string                    RefText   =  5;
-    string                    SenderID  =  6;
-    string                    RecverID  =  7;
-    bool                      ToRoot    =  8;
-    bool                      IsLog     =  9;
-    bool                      IsPush    = 10;
-    MsgType                   RspType   = 11;
-    bytes                     RspData   = 12;
-    google.protobuf.Timestamp RspTime   = 13;
-    bool                      IsLast    = 14;//最后一条响应的标志.
+//常用于(Common2Req)和(Common2Rsp)的通信过程中.
+message CommonErr {
+    int32                     ErrNo    = 1;
+    string                    ErrMsg   = 2;
 }
 
 message ConnectionInfo {
@@ -181,6 +181,28 @@ message SystemReport {
     string          Message = 4;
 }
 
+message EchoItem {
+    string Data   = 1;
+    int32  RspCnt = 2;//要返回几个响应.
+    int32  SecGap = 3;//响应间隔多少秒.
+}
+
+//二进制(想传啥就传啥)
+message BinItem {
+    int32          Type = 1;
+    repeated bytes Data = 2;
+}
+
+message EmailItem {
+    string Username    = 1;
+    string Password    = 2;
+    string SmtpAddr    = 3;
+    string To          = 4;
+    string Subject     = 5;
+    string ContentType = 6;
+    string Content     = 7;
+}
+
 message QryConnInfoReq {
 }
 
@@ -212,31 +234,8 @@ message ExecCmdRsp {
     string Reply = 1;
 }
 
-message EchoItem {
-    string Data   = 1;
-    int32  RspCnt = 2;//要返回几个响应.
-    int32  SecGap = 3;//响应间隔多少秒.
-}
-
 message ReportDataItem {
     int32  Level = 1;
     string Topic = 2;//Data的主题.
     string Data  = 3;
-}
-
-//发送邮件的项
-message SendMailItem {
-    string Username    = 1;
-    string Password    = 2;
-    string SmtpAddr    = 3;
-    string To          = 4;
-    string Subject     = 5;
-    string ContentType = 6;
-    string Content     = 7;
-}
-
-//二进制(想传啥就传啥)
-message BinItem {
-    int32          Type = 1;
-    repeated bytes Data = 2;
 }
