@@ -66,7 +66,7 @@ public:
         //return QSqlTableModel::roleNames();
         QHash<int, QByteArray> roleNameHash;
         QStringList fieldNameList = this->nameList();
-        for (int i = 0; i<fieldNameList.size(); i++)
+        for (int i = 0; i < fieldNameList.size(); i++)
         {
             roleNameHash[Qt::UserRole + i] = fieldNameList[i].toLatin1();
         }
@@ -88,7 +88,7 @@ public:
         //}
         QStringList fieldNameList;
         QSqlRecord rec = this->record();//having only the field names.
-        for (int i = 0; i<rec.count(); i++)
+        for (int i = 0; i < rec.count(); i++)
         {
             fieldNameList.append(rec.field(i).name());
         }
@@ -104,7 +104,7 @@ public:
     {
         QStringList qmlList;
         QStringList fieldNameList = this->nameList();
-        for (int i = 0; i<fieldNameList.size(); i++) {
+        for (int i = 0; i < fieldNameList.size(); i++) {
             QString sss;
             sss += QString(R"(import QtQuick 2.4;)");
             sss += QString(R"(import QtQuick.Controls 1.4;)");
@@ -128,7 +128,7 @@ public:
             QVariant vObjTableView;
             vObjTableView.setValue(objTableView);
             QVariant dynamicSnippet1 = "dynamicSnippet1";
-            for (int i = 0; i<fieldNameList.size(); i++) {
+            for (int i = 0; i < fieldNameList.size(); i++) {
                 QString sss;
                 sss += QString(R"(import QtQuick 2.4;)");
                 sss += QString(R"(import QtQuick.Controls 1.4;)");
@@ -157,6 +157,9 @@ public slots:
             while (canFetchMore()) {
                 fetchMore();
             }
+        }
+        else {
+            qDebug() << "MySqlTableModel" << bRet << this->selectStatement();
         }
         return bRet;
     }
