@@ -10,13 +10,13 @@ void zxtools::qdt2gpt(::google::protobuf::Timestamp& gptDst, const QDateTime& qd
     //boost库也大多使用该布局, 比如split:
     //inline SequenceSequenceT& split(SequenceSequenceT& Result, RangeT& Input, PredicateT Pred, token_compress_mode_type eCompress=token_compress_off);
     //所以这里也(尽量)采用这种方式.
-    gptDst.set_seconds(qdtSrc.offsetFromUtc());
+    gptDst.set_seconds(qdtSrc.toSecsSinceEpoch());
     gptDst.set_nanos(qdtSrc.time().msec() * 1000 * 1000);
 }
 
 void zxtools::gpt2qdt(QDateTime& qdtDst, const ::google::protobuf::Timestamp& gptSrc)
 {
-    qdtDst.fromTime_t(static_cast<uint>(gptSrc.seconds()));
+    qdtDst = QDateTime::fromMSecsSinceEpoch(gptSrc.seconds() * 1000 + gptSrc.nanos() / 1000 / 1000);
 }
 
 GPMSGPTR zxtools::name2object(const std::string& name)
