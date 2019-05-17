@@ -57,59 +57,71 @@ message Common2Ack {
 
 message Common2Req {
     UniKey                    Key      =  1;
-    string                    SenderID =  2;//可能因为UpCache或ROOT而中途变化.
-    string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      ToRoot   =  4;
-    bool                      IsLog    =  5;
-    bool                      IsSafe   =  6;//续传.
-    bool                      IsPush   =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
-    bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   ReqType  =  9;
-    bytes                     ReqData  = 10;
-    google.protobuf.Timestamp ReqTime  = 11;
+    int64                     BatchNo  =  2;//批次号(预留:某消息需求同时微信报警和邮件报警,此时可以让两个消息号映射到同一个批次号)
+    int64                     RefNum   =  3;//参考数字(预留).
+    string                    RefText  =  4;//参考文本(预留).
+    string                    SenderID =  5;//中途可能因为UpCache或ROOT而中途变化.
+    string                    RecverID =  6;//一旦赋值(发送)自始至终都不会变化.
+    bool                      ToRoot   =  7;
+    bool                      IsLog    =  8;
+    bool                      IsSafe   =  9;//续传.
+    bool                      IsPush   = 10;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    bool                      UpCache  = 11;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   ReqType  = 12;
+    bytes                     ReqData  = 13;
+    google.protobuf.Timestamp ReqTime  = 14;
 }
 
 //可能出现的情况:SERVER收到了请求结构体,但是解析请求结构体失败,然后不知道怎么赋值响应结构体,便可使用(CommonErr)返回具体错误.
 message Common2Rsp {
     UniKey                    Key      =  1;
-    string                    SenderID =  2;//中途可能变化.
-    string                    RecverID =  3;//一旦赋值(发送)自始至终都不会变化.
-    bool                      ToRoot   =  4;
-    bool                      IsLog    =  5;
-    bool                      IsSafe   =  6;
-    bool                      IsPush   =  7;
-    bool                      UpCache  =  8;//最先收到本条数据的节点,负有缓存本条数据的义务.
-    MsgType                   RspType  =  9;
-    bytes                     RspData  = 10;
-    google.protobuf.Timestamp RspTime  = 11;
-    bool                      IsLast   = 12;//最后一条响应的标志.
+    int64                     BatchNo  =  2;
+    int64                     RefNum   =  3;
+    string                    RefText  =  4;
+    string                    SenderID =  5;//中途可能因为UpCache或ROOT而中途变化.
+    string                    RecverID =  6;//一旦赋值(发送)自始至终都不会变化.
+    bool                      ToRoot   =  7;
+    bool                      IsLog    =  8;
+    bool                      IsSafe   =  9;
+    bool                      IsPush   = 10;
+    bool                      UpCache  = 11;//最先收到本条数据的节点,负有缓存本条数据的义务.
+    MsgType                   RspType  = 12;
+    bytes                     RspData  = 13;
+    google.protobuf.Timestamp RspTime  = 14;
+    bool                      IsLast   = 15;//最后一条响应的标志.
 }
 
 message Common1Req {
     int64                     MsgNo     =  1;
     int32                     SeqNo     =  2;
-    string                    SenderID  =  3;
-    string                    RecverID  =  4;
-    bool                      ToRoot    =  5;//指代传输的方向.
-    bool                      IsLog     =  6;
-    bool                      IsPush    =  7;//上报(把请求发送到目的地就行了,不需要返回响应包).
-    MsgType                   ReqType   =  8;
-    bytes                     ReqData   =  9;
-    google.protobuf.Timestamp ReqTime   = 10;
+    int64                     BatchNo   =  3;
+    int64                     RefNum    =  4;
+    string                    RefText   =  5;
+    string                    SenderID  =  6;
+    string                    RecverID  =  7;
+    bool                      ToRoot    =  8;//指代传输的方向.
+    bool                      IsLog     =  9;
+    bool                      IsPush    = 10;//上报(把请求发送到目的地就行了,不需要返回响应包).
+    MsgType                   ReqType   = 11;
+    bytes                     ReqData   = 12;
+    google.protobuf.Timestamp ReqTime   = 13;
 }
 
 message Common1Rsp {
     int64                     MsgNo     =  1;
     int32                     SeqNo     =  2;
-    string                    SenderID  =  3;
-    string                    RecverID  =  4;
-    bool                      ToRoot    =  5;
-    bool                      IsLog     =  6;
-    bool                      IsPush    =  7;
-    MsgType                   RspType   =  8;
-    bytes                     RspData   =  9;
-    google.protobuf.Timestamp RspTime   = 10;
-    bool                      IsLast    = 11;//最后一条响应的标志.
+    int64                     BatchNo   =  3;
+    int64                     RefNum    =  4;
+    string                    RefText   =  5;
+    string                    SenderID  =  6;
+    string                    RecverID  =  7;
+    bool                      ToRoot    =  8;
+    bool                      IsLog     =  9;
+    bool                      IsPush    = 10;
+    MsgType                   RspType   = 11;
+    bytes                     RspData   = 12;
+    google.protobuf.Timestamp RspTime   = 13;
+    bool                      IsLast    = 14;//最后一条响应的标志.
 }
 
 message ConnectionInfo {
@@ -163,9 +175,10 @@ message OnlineNotice {
 
 //发往(根节点)方向的通知/报告.
 message SystemReport {
-    string          UserID  = 1;//发送该消息的用户.
-    repeated string Pathway = 2;//消息的传送路径(预留字段)
-    string          Message = 3;
+    int32           Level   = 1;//消息的等级.
+    string          UserID  = 2;//消息的发送者.
+    repeated string Pathway = 3;//消息的传送路径(预留字段)
+    string          Message = 4;
 }
 
 message QryConnInfoReq {
@@ -206,8 +219,9 @@ message EchoItem {
 }
 
 message ReportDataItem {
-    string Topic = 1;//Data的主题.
-    string Data  = 2;
+    int32  Level = 1;
+    string Topic = 2;//Data的主题.
+    string Data  = 3;
 }
 
 //发送邮件的项
@@ -219,4 +233,10 @@ message SendMailItem {
     string Subject     = 5;
     string ContentType = 6;
     string Content     = 7;
+}
+
+//二进制(想传啥就传啥)
+message BinItem {
+    int32          Type = 1;
+    repeated bytes Data = 2;
 }
