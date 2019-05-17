@@ -1,4 +1,7 @@
-QT += quick core network websockets sql
+QT += quick core network websockets sql remoteobjects
+android {
+QT += androidextras
+}
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
