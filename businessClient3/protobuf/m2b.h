@@ -67,11 +67,11 @@ public:
         // ff  txdata.proto
         switch (msgType)
         {
-        case ::txdata::MsgType::ID_CommonErr:
-            msgOut = QSharedPointer<txdata::CommonErr>(new txdata::CommonErr);
+        case ::txdata::MsgType::ID_Common1Req:
+            msgOut = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
             break;
-        case ::txdata::MsgType::ID_Common2Ack:
-            msgOut = QSharedPointer<txdata::Common2Ack>(new txdata::Common2Ack);
+        case ::txdata::MsgType::ID_Common1Rsp:
+            msgOut = QSharedPointer<txdata::Common1Rsp>(new txdata::Common1Rsp);
             break;
         case ::txdata::MsgType::ID_Common2Req:
             msgOut = QSharedPointer<txdata::Common2Req>(new txdata::Common2Req);
@@ -79,11 +79,11 @@ public:
         case ::txdata::MsgType::ID_Common2Rsp:
             msgOut = QSharedPointer<txdata::Common2Rsp>(new txdata::Common2Rsp);
             break;
-        case ::txdata::MsgType::ID_Common1Req:
-            msgOut = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
+        case ::txdata::MsgType::ID_Common2Ack:
+            msgOut = QSharedPointer<txdata::Common2Ack>(new txdata::Common2Ack);
             break;
-        case ::txdata::MsgType::ID_Common1Rsp:
-            msgOut = QSharedPointer<txdata::Common1Rsp>(new txdata::Common1Rsp);
+        case ::txdata::MsgType::ID_CommonErr:
+            msgOut = QSharedPointer<txdata::CommonErr>(new txdata::CommonErr);
             break;
         case ::txdata::MsgType::ID_ConnectionInfo:
             msgOut = QSharedPointer<txdata::ConnectionInfo>(new txdata::ConnectionInfo);
@@ -103,6 +103,15 @@ public:
         case ::txdata::MsgType::ID_SystemReport:
             msgOut = QSharedPointer<txdata::SystemReport>(new txdata::SystemReport);
             break;
+        case ::txdata::MsgType::ID_EchoItem:
+            msgOut = QSharedPointer<txdata::EchoItem>(new txdata::EchoItem);
+            break;
+        case ::txdata::MsgType::ID_BinItem:
+            msgOut = QSharedPointer<txdata::BinItem>(new txdata::BinItem);
+            break;
+        case ::txdata::MsgType::ID_EmailItem:
+            msgOut = QSharedPointer<txdata::EmailItem>(new txdata::EmailItem);
+            break;
         case ::txdata::MsgType::ID_QryConnInfoReq:
             msgOut = QSharedPointer<txdata::QryConnInfoReq>(new txdata::QryConnInfoReq);
             break;
@@ -121,14 +130,8 @@ public:
         case ::txdata::MsgType::ID_ExecCmdRsp:
             msgOut = QSharedPointer<txdata::ExecCmdRsp>(new txdata::ExecCmdRsp);
             break;
-        case ::txdata::MsgType::ID_EchoItem:
-            msgOut = QSharedPointer<txdata::EchoItem>(new txdata::EchoItem);
-            break;
         case ::txdata::MsgType::ID_ReportDataItem:
             msgOut = QSharedPointer<txdata::ReportDataItem>(new txdata::ReportDataItem);
-            break;
-        case ::txdata::MsgType::ID_SendMailItem:
-            msgOut = QSharedPointer<txdata::SendMailItem>(new txdata::SendMailItem);
             break;
         default:
             break;

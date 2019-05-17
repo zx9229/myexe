@@ -126,9 +126,9 @@ QStringList DataExchanger::getTxMsgTypeNameList()
 {
     QStringList typeNameList;
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EchoItem));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EmailItem));
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SendMailItem));
     return  typeNameList;
 }
 

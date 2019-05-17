@@ -43,7 +43,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[23];
+  static const ::google::protobuf::internal::ParseTable schema[24];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -51,6 +51,9 @@ struct TableStruct {
 void AddDescriptors();
 }  // namespace protobuf_txdata_2eproto
 namespace txdata {
+class BinItem;
+class BinItemDefaultTypeInternal;
+extern BinItemDefaultTypeInternal _BinItem_default_instance_;
 class Common1Req;
 class Common1ReqDefaultTypeInternal;
 extern Common1ReqDefaultTypeInternal _Common1Req_default_instance_;
@@ -84,6 +87,9 @@ extern DisconnectedDataDefaultTypeInternal _DisconnectedData_default_instance_;
 class EchoItem;
 class EchoItemDefaultTypeInternal;
 extern EchoItemDefaultTypeInternal _EchoItem_default_instance_;
+class EmailItem;
+class EmailItemDefaultTypeInternal;
+extern EmailItemDefaultTypeInternal _EmailItem_default_instance_;
 class ExecCmdReq;
 class ExecCmdReqDefaultTypeInternal;
 extern ExecCmdReqDefaultTypeInternal _ExecCmdReq_default_instance_;
@@ -111,9 +117,6 @@ extern QueryRecordRspDefaultTypeInternal _QueryRecordRsp_default_instance_;
 class ReportDataItem;
 class ReportDataItemDefaultTypeInternal;
 extern ReportDataItemDefaultTypeInternal _ReportDataItem_default_instance_;
-class SendMailItem;
-class SendMailItemDefaultTypeInternal;
-extern SendMailItemDefaultTypeInternal _SendMailItem_default_instance_;
 class SystemReport;
 class SystemReportDefaultTypeInternal;
 extern SystemReportDefaultTypeInternal _SystemReport_default_instance_;
@@ -123,6 +126,7 @@ extern UniKeyDefaultTypeInternal _UniKey_default_instance_;
 }  // namespace txdata
 namespace google {
 namespace protobuf {
+template<> ::txdata::BinItem* Arena::CreateMaybeMessage<::txdata::BinItem>(Arena*);
 template<> ::txdata::Common1Req* Arena::CreateMaybeMessage<::txdata::Common1Req>(Arena*);
 template<> ::txdata::Common1Rsp* Arena::CreateMaybeMessage<::txdata::Common1Rsp>(Arena*);
 template<> ::txdata::Common2Ack* Arena::CreateMaybeMessage<::txdata::Common2Ack>(Arena*);
@@ -134,6 +138,7 @@ template<> ::txdata::ConnectRsp* Arena::CreateMaybeMessage<::txdata::ConnectRsp>
 template<> ::txdata::ConnectionInfo* Arena::CreateMaybeMessage<::txdata::ConnectionInfo>(Arena*);
 template<> ::txdata::DisconnectedData* Arena::CreateMaybeMessage<::txdata::DisconnectedData>(Arena*);
 template<> ::txdata::EchoItem* Arena::CreateMaybeMessage<::txdata::EchoItem>(Arena*);
+template<> ::txdata::EmailItem* Arena::CreateMaybeMessage<::txdata::EmailItem>(Arena*);
 template<> ::txdata::ExecCmdReq* Arena::CreateMaybeMessage<::txdata::ExecCmdReq>(Arena*);
 template<> ::txdata::ExecCmdRsp* Arena::CreateMaybeMessage<::txdata::ExecCmdRsp>(Arena*);
 template<> ::txdata::OnlineNotice* Arena::CreateMaybeMessage<::txdata::OnlineNotice>(Arena*);
@@ -143,7 +148,6 @@ template<> ::txdata::QryConnInfoRsp_CacheEntry_DoNotUse* Arena::CreateMaybeMessa
 template<> ::txdata::QueryRecordReq* Arena::CreateMaybeMessage<::txdata::QueryRecordReq>(Arena*);
 template<> ::txdata::QueryRecordRsp* Arena::CreateMaybeMessage<::txdata::QueryRecordRsp>(Arena*);
 template<> ::txdata::ReportDataItem* Arena::CreateMaybeMessage<::txdata::ReportDataItem>(Arena*);
-template<> ::txdata::SendMailItem* Arena::CreateMaybeMessage<::txdata::SendMailItem>(Arena*);
 template<> ::txdata::SystemReport* Arena::CreateMaybeMessage<::txdata::SystemReport>(Arena*);
 template<> ::txdata::UniKey* Arena::CreateMaybeMessage<::txdata::UniKey>(Arena*);
 }  // namespace protobuf
@@ -174,33 +178,34 @@ inline bool ConnectionInfo_LinkType_Parse(
 }
 enum MsgType {
   Zero1 = 0,
-  ID_CommonErr = 1,
-  ID_Common2Ack = 2,
+  ID_Common1Req = 1,
+  ID_Common1Rsp = 2,
   ID_Common2Req = 3,
   ID_Common2Rsp = 4,
-  ID_Common1Req = 5,
-  ID_Common1Rsp = 6,
+  ID_Common2Ack = 5,
+  ID_CommonErr = 6,
   ID_ConnectionInfo = 7,
   ID_DisconnectedData = 8,
   ID_ConnectReq = 9,
   ID_ConnectRsp = 10,
   ID_OnlineNotice = 11,
   ID_SystemReport = 12,
-  ID_QryConnInfoReq = 13,
-  ID_QryConnInfoRsp = 14,
-  ID_QueryRecordReq = 15,
-  ID_QueryRecordRsp = 16,
-  ID_ExecCmdReq = 17,
-  ID_ExecCmdRsp = 18,
-  ID_EchoItem = 19,
-  ID_ReportDataItem = 20,
-  ID_SendMailItem = 21,
+  ID_EchoItem = 13,
+  ID_BinItem = 14,
+  ID_EmailItem = 15,
+  ID_QryConnInfoReq = 16,
+  ID_QryConnInfoRsp = 17,
+  ID_QueryRecordReq = 18,
+  ID_QueryRecordRsp = 19,
+  ID_ExecCmdReq = 20,
+  ID_ExecCmdRsp = 21,
+  ID_ReportDataItem = 22,
   MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool MsgType_IsValid(int value);
 const MsgType MsgType_MIN = Zero1;
-const MsgType MsgType_MAX = ID_SendMailItem;
+const MsgType MsgType_MAX = ID_ReportDataItem;
 const int MsgType_ARRAYSIZE = MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MsgType_descriptor();
@@ -340,24 +345,24 @@ class UniKey : public ::google::protobuf::Message /* @@protoc_insertion_point(cl
 };
 // -------------------------------------------------------------------
 
-class CommonErr : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.CommonErr) */ {
+class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common1Req) */ {
  public:
-  CommonErr();
-  virtual ~CommonErr();
+  Common1Req();
+  virtual ~Common1Req();
 
-  CommonErr(const CommonErr& from);
+  Common1Req(const Common1Req& from);
 
-  inline CommonErr& operator=(const CommonErr& from) {
+  inline Common1Req& operator=(const Common1Req& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  CommonErr(CommonErr&& from) noexcept
-    : CommonErr() {
+  Common1Req(Common1Req&& from) noexcept
+    : Common1Req() {
     *this = ::std::move(from);
   }
 
-  inline CommonErr& operator=(CommonErr&& from) noexcept {
+  inline Common1Req& operator=(Common1Req&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -367,34 +372,34 @@ class CommonErr : public ::google::protobuf::Message /* @@protoc_insertion_point
   }
   #endif
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CommonErr& default_instance();
+  static const Common1Req& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const CommonErr* internal_default_instance() {
-    return reinterpret_cast<const CommonErr*>(
-               &_CommonErr_default_instance_);
+  static inline const Common1Req* internal_default_instance() {
+    return reinterpret_cast<const Common1Req*>(
+               &_Common1Req_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  void Swap(CommonErr* other);
-  friend void swap(CommonErr& a, CommonErr& b) {
+  void Swap(Common1Req* other);
+  friend void swap(Common1Req& a, Common1Req& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline CommonErr* New() const final {
-    return CreateMaybeMessage<CommonErr>(NULL);
+  inline Common1Req* New() const final {
+    return CreateMaybeMessage<Common1Req>(NULL);
   }
 
-  CommonErr* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<CommonErr>(arena);
+  Common1Req* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Common1Req>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const CommonErr& from);
-  void MergeFrom(const CommonErr& from);
+  void CopyFrom(const Common1Req& from);
+  void MergeFrom(const Common1Req& from);
   void Clear() final;
   bool IsInitialized() const final;
 
@@ -411,7 +416,7 @@ class CommonErr : public ::google::protobuf::Message /* @@protoc_insertion_point
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(CommonErr* other);
+  void InternalSwap(Common1Req* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -427,35 +432,854 @@ class CommonErr : public ::google::protobuf::Message /* @@protoc_insertion_point
 
   // accessors -------------------------------------------------------
 
-  // string ErrMsg = 2;
-  void clear_errmsg();
-  static const int kErrMsgFieldNumber = 2;
-  const ::std::string& errmsg() const;
-  void set_errmsg(const ::std::string& value);
+  // string RefText = 5;
+  void clear_reftext();
+  static const int kRefTextFieldNumber = 5;
+  const ::std::string& reftext() const;
+  void set_reftext(const ::std::string& value);
   #if LANG_CXX11
-  void set_errmsg(::std::string&& value);
+  void set_reftext(::std::string&& value);
   #endif
-  void set_errmsg(const char* value);
-  void set_errmsg(const char* value, size_t size);
-  ::std::string* mutable_errmsg();
-  ::std::string* release_errmsg();
-  void set_allocated_errmsg(::std::string* errmsg);
+  void set_reftext(const char* value);
+  void set_reftext(const char* value, size_t size);
+  ::std::string* mutable_reftext();
+  ::std::string* release_reftext();
+  void set_allocated_reftext(::std::string* reftext);
 
-  // int32 ErrNo = 1;
-  void clear_errno();
-  static const int kErrNoFieldNumber = 1;
-#ifdef errno
-#undef errno
-  ::google::protobuf::int32 errno() const;
-#endif
-  void set_errno(::google::protobuf::int32 value);
+  // string SenderID = 6;
+  void clear_senderid();
+  static const int kSenderIDFieldNumber = 6;
+  const ::std::string& senderid() const;
+  void set_senderid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_senderid(::std::string&& value);
+  #endif
+  void set_senderid(const char* value);
+  void set_senderid(const char* value, size_t size);
+  ::std::string* mutable_senderid();
+  ::std::string* release_senderid();
+  void set_allocated_senderid(::std::string* senderid);
 
-  // @@protoc_insertion_point(class_scope:txdata.CommonErr)
+  // string RecverID = 7;
+  void clear_recverid();
+  static const int kRecverIDFieldNumber = 7;
+  const ::std::string& recverid() const;
+  void set_recverid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_recverid(::std::string&& value);
+  #endif
+  void set_recverid(const char* value);
+  void set_recverid(const char* value, size_t size);
+  ::std::string* mutable_recverid();
+  ::std::string* release_recverid();
+  void set_allocated_recverid(::std::string* recverid);
+
+  // bytes ReqData = 12;
+  void clear_reqdata();
+  static const int kReqDataFieldNumber = 12;
+  const ::std::string& reqdata() const;
+  void set_reqdata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reqdata(::std::string&& value);
+  #endif
+  void set_reqdata(const char* value);
+  void set_reqdata(const void* value, size_t size);
+  ::std::string* mutable_reqdata();
+  ::std::string* release_reqdata();
+  void set_allocated_reqdata(::std::string* reqdata);
+
+  // .google.protobuf.Timestamp ReqTime = 13;
+  bool has_reqtime() const;
+  void clear_reqtime();
+  static const int kReqTimeFieldNumber = 13;
+  private:
+  const ::google::protobuf::Timestamp& _internal_reqtime() const;
+  public:
+  const ::google::protobuf::Timestamp& reqtime() const;
+  ::google::protobuf::Timestamp* release_reqtime();
+  ::google::protobuf::Timestamp* mutable_reqtime();
+  void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
+
+  // int64 MsgNo = 1;
+  void clear_msgno();
+  static const int kMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 msgno() const;
+  void set_msgno(::google::protobuf::int64 value);
+
+  // int64 BatchNo = 3;
+  void clear_batchno();
+  static const int kBatchNoFieldNumber = 3;
+  ::google::protobuf::int64 batchno() const;
+  void set_batchno(::google::protobuf::int64 value);
+
+  // int64 RefNum = 4;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 4;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
+  // int32 SeqNo = 2;
+  void clear_seqno();
+  static const int kSeqNoFieldNumber = 2;
+  ::google::protobuf::int32 seqno() const;
+  void set_seqno(::google::protobuf::int32 value);
+
+  // bool ToRoot = 8;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 8;
+  bool toroot() const;
+  void set_toroot(bool value);
+
+  // bool IsLog = 9;
+  void clear_islog();
+  static const int kIsLogFieldNumber = 9;
+  bool islog() const;
+  void set_islog(bool value);
+
+  // bool IsPush = 10;
+  void clear_ispush();
+  static const int kIsPushFieldNumber = 10;
+  bool ispush() const;
+  void set_ispush(bool value);
+
+  // .txdata.MsgType ReqType = 11;
+  void clear_reqtype();
+  static const int kReqTypeFieldNumber = 11;
+  ::txdata::MsgType reqtype() const;
+  void set_reqtype(::txdata::MsgType value);
+
+  // @@protoc_insertion_point(class_scope:txdata.Common1Req)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr errmsg_;
-  ::google::protobuf::int32 errno_;
+  ::google::protobuf::internal::ArenaStringPtr reftext_;
+  ::google::protobuf::internal::ArenaStringPtr senderid_;
+  ::google::protobuf::internal::ArenaStringPtr recverid_;
+  ::google::protobuf::internal::ArenaStringPtr reqdata_;
+  ::google::protobuf::Timestamp* reqtime_;
+  ::google::protobuf::int64 msgno_;
+  ::google::protobuf::int64 batchno_;
+  ::google::protobuf::int64 refnum_;
+  ::google::protobuf::int32 seqno_;
+  bool toroot_;
+  bool islog_;
+  bool ispush_;
+  int reqtype_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common1Rsp) */ {
+ public:
+  Common1Rsp();
+  virtual ~Common1Rsp();
+
+  Common1Rsp(const Common1Rsp& from);
+
+  inline Common1Rsp& operator=(const Common1Rsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Common1Rsp(Common1Rsp&& from) noexcept
+    : Common1Rsp() {
+    *this = ::std::move(from);
+  }
+
+  inline Common1Rsp& operator=(Common1Rsp&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Common1Rsp& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Common1Rsp* internal_default_instance() {
+    return reinterpret_cast<const Common1Rsp*>(
+               &_Common1Rsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(Common1Rsp* other);
+  friend void swap(Common1Rsp& a, Common1Rsp& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Common1Rsp* New() const final {
+    return CreateMaybeMessage<Common1Rsp>(NULL);
+  }
+
+  Common1Rsp* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Common1Rsp>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Common1Rsp& from);
+  void MergeFrom(const Common1Rsp& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Common1Rsp* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string RefText = 5;
+  void clear_reftext();
+  static const int kRefTextFieldNumber = 5;
+  const ::std::string& reftext() const;
+  void set_reftext(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reftext(::std::string&& value);
+  #endif
+  void set_reftext(const char* value);
+  void set_reftext(const char* value, size_t size);
+  ::std::string* mutable_reftext();
+  ::std::string* release_reftext();
+  void set_allocated_reftext(::std::string* reftext);
+
+  // string SenderID = 6;
+  void clear_senderid();
+  static const int kSenderIDFieldNumber = 6;
+  const ::std::string& senderid() const;
+  void set_senderid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_senderid(::std::string&& value);
+  #endif
+  void set_senderid(const char* value);
+  void set_senderid(const char* value, size_t size);
+  ::std::string* mutable_senderid();
+  ::std::string* release_senderid();
+  void set_allocated_senderid(::std::string* senderid);
+
+  // string RecverID = 7;
+  void clear_recverid();
+  static const int kRecverIDFieldNumber = 7;
+  const ::std::string& recverid() const;
+  void set_recverid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_recverid(::std::string&& value);
+  #endif
+  void set_recverid(const char* value);
+  void set_recverid(const char* value, size_t size);
+  ::std::string* mutable_recverid();
+  ::std::string* release_recverid();
+  void set_allocated_recverid(::std::string* recverid);
+
+  // bytes RspData = 12;
+  void clear_rspdata();
+  static const int kRspDataFieldNumber = 12;
+  const ::std::string& rspdata() const;
+  void set_rspdata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_rspdata(::std::string&& value);
+  #endif
+  void set_rspdata(const char* value);
+  void set_rspdata(const void* value, size_t size);
+  ::std::string* mutable_rspdata();
+  ::std::string* release_rspdata();
+  void set_allocated_rspdata(::std::string* rspdata);
+
+  // .google.protobuf.Timestamp RspTime = 13;
+  bool has_rsptime() const;
+  void clear_rsptime();
+  static const int kRspTimeFieldNumber = 13;
+  private:
+  const ::google::protobuf::Timestamp& _internal_rsptime() const;
+  public:
+  const ::google::protobuf::Timestamp& rsptime() const;
+  ::google::protobuf::Timestamp* release_rsptime();
+  ::google::protobuf::Timestamp* mutable_rsptime();
+  void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
+
+  // int64 MsgNo = 1;
+  void clear_msgno();
+  static const int kMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 msgno() const;
+  void set_msgno(::google::protobuf::int64 value);
+
+  // int64 BatchNo = 3;
+  void clear_batchno();
+  static const int kBatchNoFieldNumber = 3;
+  ::google::protobuf::int64 batchno() const;
+  void set_batchno(::google::protobuf::int64 value);
+
+  // int64 RefNum = 4;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 4;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
+  // int32 SeqNo = 2;
+  void clear_seqno();
+  static const int kSeqNoFieldNumber = 2;
+  ::google::protobuf::int32 seqno() const;
+  void set_seqno(::google::protobuf::int32 value);
+
+  // bool ToRoot = 8;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 8;
+  bool toroot() const;
+  void set_toroot(bool value);
+
+  // bool IsLog = 9;
+  void clear_islog();
+  static const int kIsLogFieldNumber = 9;
+  bool islog() const;
+  void set_islog(bool value);
+
+  // bool IsPush = 10;
+  void clear_ispush();
+  static const int kIsPushFieldNumber = 10;
+  bool ispush() const;
+  void set_ispush(bool value);
+
+  // bool IsLast = 14;
+  void clear_islast();
+  static const int kIsLastFieldNumber = 14;
+  bool islast() const;
+  void set_islast(bool value);
+
+  // .txdata.MsgType RspType = 11;
+  void clear_rsptype();
+  static const int kRspTypeFieldNumber = 11;
+  ::txdata::MsgType rsptype() const;
+  void set_rsptype(::txdata::MsgType value);
+
+  // @@protoc_insertion_point(class_scope:txdata.Common1Rsp)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr reftext_;
+  ::google::protobuf::internal::ArenaStringPtr senderid_;
+  ::google::protobuf::internal::ArenaStringPtr recverid_;
+  ::google::protobuf::internal::ArenaStringPtr rspdata_;
+  ::google::protobuf::Timestamp* rsptime_;
+  ::google::protobuf::int64 msgno_;
+  ::google::protobuf::int64 batchno_;
+  ::google::protobuf::int64 refnum_;
+  ::google::protobuf::int32 seqno_;
+  bool toroot_;
+  bool islog_;
+  bool ispush_;
+  bool islast_;
+  int rsptype_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Common2Req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common2Req) */ {
+ public:
+  Common2Req();
+  virtual ~Common2Req();
+
+  Common2Req(const Common2Req& from);
+
+  inline Common2Req& operator=(const Common2Req& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Common2Req(Common2Req&& from) noexcept
+    : Common2Req() {
+    *this = ::std::move(from);
+  }
+
+  inline Common2Req& operator=(Common2Req&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Common2Req& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Common2Req* internal_default_instance() {
+    return reinterpret_cast<const Common2Req*>(
+               &_Common2Req_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(Common2Req* other);
+  friend void swap(Common2Req& a, Common2Req& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Common2Req* New() const final {
+    return CreateMaybeMessage<Common2Req>(NULL);
+  }
+
+  Common2Req* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Common2Req>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Common2Req& from);
+  void MergeFrom(const Common2Req& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Common2Req* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string RefText = 4;
+  void clear_reftext();
+  static const int kRefTextFieldNumber = 4;
+  const ::std::string& reftext() const;
+  void set_reftext(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reftext(::std::string&& value);
+  #endif
+  void set_reftext(const char* value);
+  void set_reftext(const char* value, size_t size);
+  ::std::string* mutable_reftext();
+  ::std::string* release_reftext();
+  void set_allocated_reftext(::std::string* reftext);
+
+  // string SenderID = 5;
+  void clear_senderid();
+  static const int kSenderIDFieldNumber = 5;
+  const ::std::string& senderid() const;
+  void set_senderid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_senderid(::std::string&& value);
+  #endif
+  void set_senderid(const char* value);
+  void set_senderid(const char* value, size_t size);
+  ::std::string* mutable_senderid();
+  ::std::string* release_senderid();
+  void set_allocated_senderid(::std::string* senderid);
+
+  // string RecverID = 6;
+  void clear_recverid();
+  static const int kRecverIDFieldNumber = 6;
+  const ::std::string& recverid() const;
+  void set_recverid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_recverid(::std::string&& value);
+  #endif
+  void set_recverid(const char* value);
+  void set_recverid(const char* value, size_t size);
+  ::std::string* mutable_recverid();
+  ::std::string* release_recverid();
+  void set_allocated_recverid(::std::string* recverid);
+
+  // bytes ReqData = 13;
+  void clear_reqdata();
+  static const int kReqDataFieldNumber = 13;
+  const ::std::string& reqdata() const;
+  void set_reqdata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reqdata(::std::string&& value);
+  #endif
+  void set_reqdata(const char* value);
+  void set_reqdata(const void* value, size_t size);
+  ::std::string* mutable_reqdata();
+  ::std::string* release_reqdata();
+  void set_allocated_reqdata(::std::string* reqdata);
+
+  // .txdata.UniKey Key = 1;
+  bool has_key() const;
+  void clear_key();
+  static const int kKeyFieldNumber = 1;
+  private:
+  const ::txdata::UniKey& _internal_key() const;
+  public:
+  const ::txdata::UniKey& key() const;
+  ::txdata::UniKey* release_key();
+  ::txdata::UniKey* mutable_key();
+  void set_allocated_key(::txdata::UniKey* key);
+
+  // .google.protobuf.Timestamp ReqTime = 14;
+  bool has_reqtime() const;
+  void clear_reqtime();
+  static const int kReqTimeFieldNumber = 14;
+  private:
+  const ::google::protobuf::Timestamp& _internal_reqtime() const;
+  public:
+  const ::google::protobuf::Timestamp& reqtime() const;
+  ::google::protobuf::Timestamp* release_reqtime();
+  ::google::protobuf::Timestamp* mutable_reqtime();
+  void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
+
+  // int64 BatchNo = 2;
+  void clear_batchno();
+  static const int kBatchNoFieldNumber = 2;
+  ::google::protobuf::int64 batchno() const;
+  void set_batchno(::google::protobuf::int64 value);
+
+  // int64 RefNum = 3;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 3;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
+  // bool ToRoot = 7;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 7;
+  bool toroot() const;
+  void set_toroot(bool value);
+
+  // bool IsLog = 8;
+  void clear_islog();
+  static const int kIsLogFieldNumber = 8;
+  bool islog() const;
+  void set_islog(bool value);
+
+  // bool IsSafe = 9;
+  void clear_issafe();
+  static const int kIsSafeFieldNumber = 9;
+  bool issafe() const;
+  void set_issafe(bool value);
+
+  // bool IsPush = 10;
+  void clear_ispush();
+  static const int kIsPushFieldNumber = 10;
+  bool ispush() const;
+  void set_ispush(bool value);
+
+  // bool UpCache = 11;
+  void clear_upcache();
+  static const int kUpCacheFieldNumber = 11;
+  bool upcache() const;
+  void set_upcache(bool value);
+
+  // .txdata.MsgType ReqType = 12;
+  void clear_reqtype();
+  static const int kReqTypeFieldNumber = 12;
+  ::txdata::MsgType reqtype() const;
+  void set_reqtype(::txdata::MsgType value);
+
+  // @@protoc_insertion_point(class_scope:txdata.Common2Req)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr reftext_;
+  ::google::protobuf::internal::ArenaStringPtr senderid_;
+  ::google::protobuf::internal::ArenaStringPtr recverid_;
+  ::google::protobuf::internal::ArenaStringPtr reqdata_;
+  ::txdata::UniKey* key_;
+  ::google::protobuf::Timestamp* reqtime_;
+  ::google::protobuf::int64 batchno_;
+  ::google::protobuf::int64 refnum_;
+  bool toroot_;
+  bool islog_;
+  bool issafe_;
+  bool ispush_;
+  bool upcache_;
+  int reqtype_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class Common2Rsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common2Rsp) */ {
+ public:
+  Common2Rsp();
+  virtual ~Common2Rsp();
+
+  Common2Rsp(const Common2Rsp& from);
+
+  inline Common2Rsp& operator=(const Common2Rsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Common2Rsp(Common2Rsp&& from) noexcept
+    : Common2Rsp() {
+    *this = ::std::move(from);
+  }
+
+  inline Common2Rsp& operator=(Common2Rsp&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Common2Rsp& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Common2Rsp* internal_default_instance() {
+    return reinterpret_cast<const Common2Rsp*>(
+               &_Common2Rsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(Common2Rsp* other);
+  friend void swap(Common2Rsp& a, Common2Rsp& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Common2Rsp* New() const final {
+    return CreateMaybeMessage<Common2Rsp>(NULL);
+  }
+
+  Common2Rsp* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Common2Rsp>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Common2Rsp& from);
+  void MergeFrom(const Common2Rsp& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Common2Rsp* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string RefText = 4;
+  void clear_reftext();
+  static const int kRefTextFieldNumber = 4;
+  const ::std::string& reftext() const;
+  void set_reftext(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reftext(::std::string&& value);
+  #endif
+  void set_reftext(const char* value);
+  void set_reftext(const char* value, size_t size);
+  ::std::string* mutable_reftext();
+  ::std::string* release_reftext();
+  void set_allocated_reftext(::std::string* reftext);
+
+  // string SenderID = 5;
+  void clear_senderid();
+  static const int kSenderIDFieldNumber = 5;
+  const ::std::string& senderid() const;
+  void set_senderid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_senderid(::std::string&& value);
+  #endif
+  void set_senderid(const char* value);
+  void set_senderid(const char* value, size_t size);
+  ::std::string* mutable_senderid();
+  ::std::string* release_senderid();
+  void set_allocated_senderid(::std::string* senderid);
+
+  // string RecverID = 6;
+  void clear_recverid();
+  static const int kRecverIDFieldNumber = 6;
+  const ::std::string& recverid() const;
+  void set_recverid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_recverid(::std::string&& value);
+  #endif
+  void set_recverid(const char* value);
+  void set_recverid(const char* value, size_t size);
+  ::std::string* mutable_recverid();
+  ::std::string* release_recverid();
+  void set_allocated_recverid(::std::string* recverid);
+
+  // bytes RspData = 13;
+  void clear_rspdata();
+  static const int kRspDataFieldNumber = 13;
+  const ::std::string& rspdata() const;
+  void set_rspdata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_rspdata(::std::string&& value);
+  #endif
+  void set_rspdata(const char* value);
+  void set_rspdata(const void* value, size_t size);
+  ::std::string* mutable_rspdata();
+  ::std::string* release_rspdata();
+  void set_allocated_rspdata(::std::string* rspdata);
+
+  // .txdata.UniKey Key = 1;
+  bool has_key() const;
+  void clear_key();
+  static const int kKeyFieldNumber = 1;
+  private:
+  const ::txdata::UniKey& _internal_key() const;
+  public:
+  const ::txdata::UniKey& key() const;
+  ::txdata::UniKey* release_key();
+  ::txdata::UniKey* mutable_key();
+  void set_allocated_key(::txdata::UniKey* key);
+
+  // .google.protobuf.Timestamp RspTime = 14;
+  bool has_rsptime() const;
+  void clear_rsptime();
+  static const int kRspTimeFieldNumber = 14;
+  private:
+  const ::google::protobuf::Timestamp& _internal_rsptime() const;
+  public:
+  const ::google::protobuf::Timestamp& rsptime() const;
+  ::google::protobuf::Timestamp* release_rsptime();
+  ::google::protobuf::Timestamp* mutable_rsptime();
+  void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
+
+  // int64 BatchNo = 2;
+  void clear_batchno();
+  static const int kBatchNoFieldNumber = 2;
+  ::google::protobuf::int64 batchno() const;
+  void set_batchno(::google::protobuf::int64 value);
+
+  // int64 RefNum = 3;
+  void clear_refnum();
+  static const int kRefNumFieldNumber = 3;
+  ::google::protobuf::int64 refnum() const;
+  void set_refnum(::google::protobuf::int64 value);
+
+  // bool ToRoot = 7;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 7;
+  bool toroot() const;
+  void set_toroot(bool value);
+
+  // bool IsLog = 8;
+  void clear_islog();
+  static const int kIsLogFieldNumber = 8;
+  bool islog() const;
+  void set_islog(bool value);
+
+  // bool IsSafe = 9;
+  void clear_issafe();
+  static const int kIsSafeFieldNumber = 9;
+  bool issafe() const;
+  void set_issafe(bool value);
+
+  // bool IsPush = 10;
+  void clear_ispush();
+  static const int kIsPushFieldNumber = 10;
+  bool ispush() const;
+  void set_ispush(bool value);
+
+  // .txdata.MsgType RspType = 12;
+  void clear_rsptype();
+  static const int kRspTypeFieldNumber = 12;
+  ::txdata::MsgType rsptype() const;
+  void set_rsptype(::txdata::MsgType value);
+
+  // bool UpCache = 11;
+  void clear_upcache();
+  static const int kUpCacheFieldNumber = 11;
+  bool upcache() const;
+  void set_upcache(bool value);
+
+  // bool IsLast = 15;
+  void clear_islast();
+  static const int kIsLastFieldNumber = 15;
+  bool islast() const;
+  void set_islast(bool value);
+
+  // @@protoc_insertion_point(class_scope:txdata.Common2Rsp)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr reftext_;
+  ::google::protobuf::internal::ArenaStringPtr senderid_;
+  ::google::protobuf::internal::ArenaStringPtr recverid_;
+  ::google::protobuf::internal::ArenaStringPtr rspdata_;
+  ::txdata::UniKey* key_;
+  ::google::protobuf::Timestamp* rsptime_;
+  ::google::protobuf::int64 batchno_;
+  ::google::protobuf::int64 refnum_;
+  bool toroot_;
+  bool islog_;
+  bool issafe_;
+  bool ispush_;
+  int rsptype_;
+  bool upcache_;
+  bool islast_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -496,7 +1320,7 @@ class Common2Ack : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_Common2Ack_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    5;
 
   void Swap(Common2Ack* other);
   friend void swap(Common2Ack& a, Common2Ack& b) {
@@ -614,24 +1438,24 @@ class Common2Ack : public ::google::protobuf::Message /* @@protoc_insertion_poin
 };
 // -------------------------------------------------------------------
 
-class Common2Req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common2Req) */ {
+class CommonErr : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.CommonErr) */ {
  public:
-  Common2Req();
-  virtual ~Common2Req();
+  CommonErr();
+  virtual ~CommonErr();
 
-  Common2Req(const Common2Req& from);
+  CommonErr(const CommonErr& from);
 
-  inline Common2Req& operator=(const Common2Req& from) {
+  inline CommonErr& operator=(const CommonErr& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Common2Req(Common2Req&& from) noexcept
-    : Common2Req() {
+  CommonErr(CommonErr&& from) noexcept
+    : CommonErr() {
     *this = ::std::move(from);
   }
 
-  inline Common2Req& operator=(Common2Req&& from) noexcept {
+  inline CommonErr& operator=(CommonErr&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -641,655 +1465,34 @@ class Common2Req : public ::google::protobuf::Message /* @@protoc_insertion_poin
   }
   #endif
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Common2Req& default_instance();
+  static const CommonErr& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Common2Req* internal_default_instance() {
-    return reinterpret_cast<const Common2Req*>(
-               &_Common2Req_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    3;
-
-  void Swap(Common2Req* other);
-  friend void swap(Common2Req& a, Common2Req& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Common2Req* New() const final {
-    return CreateMaybeMessage<Common2Req>(NULL);
-  }
-
-  Common2Req* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Common2Req>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Common2Req& from);
-  void MergeFrom(const Common2Req& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Common2Req* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string SenderID = 2;
-  void clear_senderid();
-  static const int kSenderIDFieldNumber = 2;
-  const ::std::string& senderid() const;
-  void set_senderid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_senderid(::std::string&& value);
-  #endif
-  void set_senderid(const char* value);
-  void set_senderid(const char* value, size_t size);
-  ::std::string* mutable_senderid();
-  ::std::string* release_senderid();
-  void set_allocated_senderid(::std::string* senderid);
-
-  // string RecverID = 3;
-  void clear_recverid();
-  static const int kRecverIDFieldNumber = 3;
-  const ::std::string& recverid() const;
-  void set_recverid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_recverid(::std::string&& value);
-  #endif
-  void set_recverid(const char* value);
-  void set_recverid(const char* value, size_t size);
-  ::std::string* mutable_recverid();
-  ::std::string* release_recverid();
-  void set_allocated_recverid(::std::string* recverid);
-
-  // bytes ReqData = 10;
-  void clear_reqdata();
-  static const int kReqDataFieldNumber = 10;
-  const ::std::string& reqdata() const;
-  void set_reqdata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_reqdata(::std::string&& value);
-  #endif
-  void set_reqdata(const char* value);
-  void set_reqdata(const void* value, size_t size);
-  ::std::string* mutable_reqdata();
-  ::std::string* release_reqdata();
-  void set_allocated_reqdata(::std::string* reqdata);
-
-  // .txdata.UniKey Key = 1;
-  bool has_key() const;
-  void clear_key();
-  static const int kKeyFieldNumber = 1;
-  private:
-  const ::txdata::UniKey& _internal_key() const;
-  public:
-  const ::txdata::UniKey& key() const;
-  ::txdata::UniKey* release_key();
-  ::txdata::UniKey* mutable_key();
-  void set_allocated_key(::txdata::UniKey* key);
-
-  // .google.protobuf.Timestamp ReqTime = 11;
-  bool has_reqtime() const;
-  void clear_reqtime();
-  static const int kReqTimeFieldNumber = 11;
-  private:
-  const ::google::protobuf::Timestamp& _internal_reqtime() const;
-  public:
-  const ::google::protobuf::Timestamp& reqtime() const;
-  ::google::protobuf::Timestamp* release_reqtime();
-  ::google::protobuf::Timestamp* mutable_reqtime();
-  void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
-
-  // bool ToRoot = 4;
-  void clear_toroot();
-  static const int kToRootFieldNumber = 4;
-  bool toroot() const;
-  void set_toroot(bool value);
-
-  // bool IsLog = 5;
-  void clear_islog();
-  static const int kIsLogFieldNumber = 5;
-  bool islog() const;
-  void set_islog(bool value);
-
-  // bool IsSafe = 6;
-  void clear_issafe();
-  static const int kIsSafeFieldNumber = 6;
-  bool issafe() const;
-  void set_issafe(bool value);
-
-  // bool IsPush = 7;
-  void clear_ispush();
-  static const int kIsPushFieldNumber = 7;
-  bool ispush() const;
-  void set_ispush(bool value);
-
-  // bool UpCache = 8;
-  void clear_upcache();
-  static const int kUpCacheFieldNumber = 8;
-  bool upcache() const;
-  void set_upcache(bool value);
-
-  // .txdata.MsgType ReqType = 9;
-  void clear_reqtype();
-  static const int kReqTypeFieldNumber = 9;
-  ::txdata::MsgType reqtype() const;
-  void set_reqtype(::txdata::MsgType value);
-
-  // @@protoc_insertion_point(class_scope:txdata.Common2Req)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr senderid_;
-  ::google::protobuf::internal::ArenaStringPtr recverid_;
-  ::google::protobuf::internal::ArenaStringPtr reqdata_;
-  ::txdata::UniKey* key_;
-  ::google::protobuf::Timestamp* reqtime_;
-  bool toroot_;
-  bool islog_;
-  bool issafe_;
-  bool ispush_;
-  bool upcache_;
-  int reqtype_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
-class Common2Rsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common2Rsp) */ {
- public:
-  Common2Rsp();
-  virtual ~Common2Rsp();
-
-  Common2Rsp(const Common2Rsp& from);
-
-  inline Common2Rsp& operator=(const Common2Rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Common2Rsp(Common2Rsp&& from) noexcept
-    : Common2Rsp() {
-    *this = ::std::move(from);
-  }
-
-  inline Common2Rsp& operator=(Common2Rsp&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Common2Rsp& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Common2Rsp* internal_default_instance() {
-    return reinterpret_cast<const Common2Rsp*>(
-               &_Common2Rsp_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    4;
-
-  void Swap(Common2Rsp* other);
-  friend void swap(Common2Rsp& a, Common2Rsp& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Common2Rsp* New() const final {
-    return CreateMaybeMessage<Common2Rsp>(NULL);
-  }
-
-  Common2Rsp* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Common2Rsp>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Common2Rsp& from);
-  void MergeFrom(const Common2Rsp& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Common2Rsp* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string SenderID = 2;
-  void clear_senderid();
-  static const int kSenderIDFieldNumber = 2;
-  const ::std::string& senderid() const;
-  void set_senderid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_senderid(::std::string&& value);
-  #endif
-  void set_senderid(const char* value);
-  void set_senderid(const char* value, size_t size);
-  ::std::string* mutable_senderid();
-  ::std::string* release_senderid();
-  void set_allocated_senderid(::std::string* senderid);
-
-  // string RecverID = 3;
-  void clear_recverid();
-  static const int kRecverIDFieldNumber = 3;
-  const ::std::string& recverid() const;
-  void set_recverid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_recverid(::std::string&& value);
-  #endif
-  void set_recverid(const char* value);
-  void set_recverid(const char* value, size_t size);
-  ::std::string* mutable_recverid();
-  ::std::string* release_recverid();
-  void set_allocated_recverid(::std::string* recverid);
-
-  // bytes RspData = 10;
-  void clear_rspdata();
-  static const int kRspDataFieldNumber = 10;
-  const ::std::string& rspdata() const;
-  void set_rspdata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_rspdata(::std::string&& value);
-  #endif
-  void set_rspdata(const char* value);
-  void set_rspdata(const void* value, size_t size);
-  ::std::string* mutable_rspdata();
-  ::std::string* release_rspdata();
-  void set_allocated_rspdata(::std::string* rspdata);
-
-  // .txdata.UniKey Key = 1;
-  bool has_key() const;
-  void clear_key();
-  static const int kKeyFieldNumber = 1;
-  private:
-  const ::txdata::UniKey& _internal_key() const;
-  public:
-  const ::txdata::UniKey& key() const;
-  ::txdata::UniKey* release_key();
-  ::txdata::UniKey* mutable_key();
-  void set_allocated_key(::txdata::UniKey* key);
-
-  // .google.protobuf.Timestamp RspTime = 11;
-  bool has_rsptime() const;
-  void clear_rsptime();
-  static const int kRspTimeFieldNumber = 11;
-  private:
-  const ::google::protobuf::Timestamp& _internal_rsptime() const;
-  public:
-  const ::google::protobuf::Timestamp& rsptime() const;
-  ::google::protobuf::Timestamp* release_rsptime();
-  ::google::protobuf::Timestamp* mutable_rsptime();
-  void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
-
-  // bool ToRoot = 4;
-  void clear_toroot();
-  static const int kToRootFieldNumber = 4;
-  bool toroot() const;
-  void set_toroot(bool value);
-
-  // bool IsLog = 5;
-  void clear_islog();
-  static const int kIsLogFieldNumber = 5;
-  bool islog() const;
-  void set_islog(bool value);
-
-  // bool IsSafe = 6;
-  void clear_issafe();
-  static const int kIsSafeFieldNumber = 6;
-  bool issafe() const;
-  void set_issafe(bool value);
-
-  // bool IsPush = 7;
-  void clear_ispush();
-  static const int kIsPushFieldNumber = 7;
-  bool ispush() const;
-  void set_ispush(bool value);
-
-  // .txdata.MsgType RspType = 9;
-  void clear_rsptype();
-  static const int kRspTypeFieldNumber = 9;
-  ::txdata::MsgType rsptype() const;
-  void set_rsptype(::txdata::MsgType value);
-
-  // bool UpCache = 8;
-  void clear_upcache();
-  static const int kUpCacheFieldNumber = 8;
-  bool upcache() const;
-  void set_upcache(bool value);
-
-  // bool IsLast = 12;
-  void clear_islast();
-  static const int kIsLastFieldNumber = 12;
-  bool islast() const;
-  void set_islast(bool value);
-
-  // @@protoc_insertion_point(class_scope:txdata.Common2Rsp)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr senderid_;
-  ::google::protobuf::internal::ArenaStringPtr recverid_;
-  ::google::protobuf::internal::ArenaStringPtr rspdata_;
-  ::txdata::UniKey* key_;
-  ::google::protobuf::Timestamp* rsptime_;
-  bool toroot_;
-  bool islog_;
-  bool issafe_;
-  bool ispush_;
-  int rsptype_;
-  bool upcache_;
-  bool islast_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
-class Common1Req : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common1Req) */ {
- public:
-  Common1Req();
-  virtual ~Common1Req();
-
-  Common1Req(const Common1Req& from);
-
-  inline Common1Req& operator=(const Common1Req& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Common1Req(Common1Req&& from) noexcept
-    : Common1Req() {
-    *this = ::std::move(from);
-  }
-
-  inline Common1Req& operator=(Common1Req&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Common1Req& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Common1Req* internal_default_instance() {
-    return reinterpret_cast<const Common1Req*>(
-               &_Common1Req_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    5;
-
-  void Swap(Common1Req* other);
-  friend void swap(Common1Req& a, Common1Req& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Common1Req* New() const final {
-    return CreateMaybeMessage<Common1Req>(NULL);
-  }
-
-  Common1Req* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Common1Req>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Common1Req& from);
-  void MergeFrom(const Common1Req& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Common1Req* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string SenderID = 3;
-  void clear_senderid();
-  static const int kSenderIDFieldNumber = 3;
-  const ::std::string& senderid() const;
-  void set_senderid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_senderid(::std::string&& value);
-  #endif
-  void set_senderid(const char* value);
-  void set_senderid(const char* value, size_t size);
-  ::std::string* mutable_senderid();
-  ::std::string* release_senderid();
-  void set_allocated_senderid(::std::string* senderid);
-
-  // string RecverID = 4;
-  void clear_recverid();
-  static const int kRecverIDFieldNumber = 4;
-  const ::std::string& recverid() const;
-  void set_recverid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_recverid(::std::string&& value);
-  #endif
-  void set_recverid(const char* value);
-  void set_recverid(const char* value, size_t size);
-  ::std::string* mutable_recverid();
-  ::std::string* release_recverid();
-  void set_allocated_recverid(::std::string* recverid);
-
-  // bytes ReqData = 9;
-  void clear_reqdata();
-  static const int kReqDataFieldNumber = 9;
-  const ::std::string& reqdata() const;
-  void set_reqdata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_reqdata(::std::string&& value);
-  #endif
-  void set_reqdata(const char* value);
-  void set_reqdata(const void* value, size_t size);
-  ::std::string* mutable_reqdata();
-  ::std::string* release_reqdata();
-  void set_allocated_reqdata(::std::string* reqdata);
-
-  // .google.protobuf.Timestamp ReqTime = 10;
-  bool has_reqtime() const;
-  void clear_reqtime();
-  static const int kReqTimeFieldNumber = 10;
-  private:
-  const ::google::protobuf::Timestamp& _internal_reqtime() const;
-  public:
-  const ::google::protobuf::Timestamp& reqtime() const;
-  ::google::protobuf::Timestamp* release_reqtime();
-  ::google::protobuf::Timestamp* mutable_reqtime();
-  void set_allocated_reqtime(::google::protobuf::Timestamp* reqtime);
-
-  // int64 MsgNo = 1;
-  void clear_msgno();
-  static const int kMsgNoFieldNumber = 1;
-  ::google::protobuf::int64 msgno() const;
-  void set_msgno(::google::protobuf::int64 value);
-
-  // int32 SeqNo = 2;
-  void clear_seqno();
-  static const int kSeqNoFieldNumber = 2;
-  ::google::protobuf::int32 seqno() const;
-  void set_seqno(::google::protobuf::int32 value);
-
-  // bool ToRoot = 5;
-  void clear_toroot();
-  static const int kToRootFieldNumber = 5;
-  bool toroot() const;
-  void set_toroot(bool value);
-
-  // bool IsLog = 6;
-  void clear_islog();
-  static const int kIsLogFieldNumber = 6;
-  bool islog() const;
-  void set_islog(bool value);
-
-  // bool IsPush = 7;
-  void clear_ispush();
-  static const int kIsPushFieldNumber = 7;
-  bool ispush() const;
-  void set_ispush(bool value);
-
-  // .txdata.MsgType ReqType = 8;
-  void clear_reqtype();
-  static const int kReqTypeFieldNumber = 8;
-  ::txdata::MsgType reqtype() const;
-  void set_reqtype(::txdata::MsgType value);
-
-  // @@protoc_insertion_point(class_scope:txdata.Common1Req)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr senderid_;
-  ::google::protobuf::internal::ArenaStringPtr recverid_;
-  ::google::protobuf::internal::ArenaStringPtr reqdata_;
-  ::google::protobuf::Timestamp* reqtime_;
-  ::google::protobuf::int64 msgno_;
-  ::google::protobuf::int32 seqno_;
-  bool toroot_;
-  bool islog_;
-  bool ispush_;
-  int reqtype_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
-class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.Common1Rsp) */ {
- public:
-  Common1Rsp();
-  virtual ~Common1Rsp();
-
-  Common1Rsp(const Common1Rsp& from);
-
-  inline Common1Rsp& operator=(const Common1Rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Common1Rsp(Common1Rsp&& from) noexcept
-    : Common1Rsp() {
-    *this = ::std::move(from);
-  }
-
-  inline Common1Rsp& operator=(Common1Rsp&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Common1Rsp& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Common1Rsp* internal_default_instance() {
-    return reinterpret_cast<const Common1Rsp*>(
-               &_Common1Rsp_default_instance_);
+  static inline const CommonErr* internal_default_instance() {
+    return reinterpret_cast<const CommonErr*>(
+               &_CommonErr_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     6;
 
-  void Swap(Common1Rsp* other);
-  friend void swap(Common1Rsp& a, Common1Rsp& b) {
+  void Swap(CommonErr* other);
+  friend void swap(CommonErr& a, CommonErr& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Common1Rsp* New() const final {
-    return CreateMaybeMessage<Common1Rsp>(NULL);
+  inline CommonErr* New() const final {
+    return CreateMaybeMessage<CommonErr>(NULL);
   }
 
-  Common1Rsp* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Common1Rsp>(arena);
+  CommonErr* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CommonErr>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Common1Rsp& from);
-  void MergeFrom(const Common1Rsp& from);
+  void CopyFrom(const CommonErr& from);
+  void MergeFrom(const CommonErr& from);
   void Clear() final;
   bool IsInitialized() const final;
 
@@ -1306,7 +1509,7 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Common1Rsp* other);
+  void InternalSwap(CommonErr* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -1322,117 +1525,35 @@ class Common1Rsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
 
   // accessors -------------------------------------------------------
 
-  // string SenderID = 3;
-  void clear_senderid();
-  static const int kSenderIDFieldNumber = 3;
-  const ::std::string& senderid() const;
-  void set_senderid(const ::std::string& value);
+  // string ErrMsg = 2;
+  void clear_errmsg();
+  static const int kErrMsgFieldNumber = 2;
+  const ::std::string& errmsg() const;
+  void set_errmsg(const ::std::string& value);
   #if LANG_CXX11
-  void set_senderid(::std::string&& value);
+  void set_errmsg(::std::string&& value);
   #endif
-  void set_senderid(const char* value);
-  void set_senderid(const char* value, size_t size);
-  ::std::string* mutable_senderid();
-  ::std::string* release_senderid();
-  void set_allocated_senderid(::std::string* senderid);
+  void set_errmsg(const char* value);
+  void set_errmsg(const char* value, size_t size);
+  ::std::string* mutable_errmsg();
+  ::std::string* release_errmsg();
+  void set_allocated_errmsg(::std::string* errmsg);
 
-  // string RecverID = 4;
-  void clear_recverid();
-  static const int kRecverIDFieldNumber = 4;
-  const ::std::string& recverid() const;
-  void set_recverid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_recverid(::std::string&& value);
-  #endif
-  void set_recverid(const char* value);
-  void set_recverid(const char* value, size_t size);
-  ::std::string* mutable_recverid();
-  ::std::string* release_recverid();
-  void set_allocated_recverid(::std::string* recverid);
+  // int32 ErrNo = 1;
+  void clear_errno();
+  static const int kErrNoFieldNumber = 1;
+#ifdef errno
+#undef errno
+  ::google::protobuf::int32 errno() const;
+#endif
+  void set_errno(::google::protobuf::int32 value);
 
-  // bytes RspData = 9;
-  void clear_rspdata();
-  static const int kRspDataFieldNumber = 9;
-  const ::std::string& rspdata() const;
-  void set_rspdata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_rspdata(::std::string&& value);
-  #endif
-  void set_rspdata(const char* value);
-  void set_rspdata(const void* value, size_t size);
-  ::std::string* mutable_rspdata();
-  ::std::string* release_rspdata();
-  void set_allocated_rspdata(::std::string* rspdata);
-
-  // .google.protobuf.Timestamp RspTime = 10;
-  bool has_rsptime() const;
-  void clear_rsptime();
-  static const int kRspTimeFieldNumber = 10;
-  private:
-  const ::google::protobuf::Timestamp& _internal_rsptime() const;
-  public:
-  const ::google::protobuf::Timestamp& rsptime() const;
-  ::google::protobuf::Timestamp* release_rsptime();
-  ::google::protobuf::Timestamp* mutable_rsptime();
-  void set_allocated_rsptime(::google::protobuf::Timestamp* rsptime);
-
-  // int64 MsgNo = 1;
-  void clear_msgno();
-  static const int kMsgNoFieldNumber = 1;
-  ::google::protobuf::int64 msgno() const;
-  void set_msgno(::google::protobuf::int64 value);
-
-  // int32 SeqNo = 2;
-  void clear_seqno();
-  static const int kSeqNoFieldNumber = 2;
-  ::google::protobuf::int32 seqno() const;
-  void set_seqno(::google::protobuf::int32 value);
-
-  // bool ToRoot = 5;
-  void clear_toroot();
-  static const int kToRootFieldNumber = 5;
-  bool toroot() const;
-  void set_toroot(bool value);
-
-  // bool IsLog = 6;
-  void clear_islog();
-  static const int kIsLogFieldNumber = 6;
-  bool islog() const;
-  void set_islog(bool value);
-
-  // bool IsPush = 7;
-  void clear_ispush();
-  static const int kIsPushFieldNumber = 7;
-  bool ispush() const;
-  void set_ispush(bool value);
-
-  // bool IsLast = 11;
-  void clear_islast();
-  static const int kIsLastFieldNumber = 11;
-  bool islast() const;
-  void set_islast(bool value);
-
-  // .txdata.MsgType RspType = 8;
-  void clear_rsptype();
-  static const int kRspTypeFieldNumber = 8;
-  ::txdata::MsgType rsptype() const;
-  void set_rsptype(::txdata::MsgType value);
-
-  // @@protoc_insertion_point(class_scope:txdata.Common1Rsp)
+  // @@protoc_insertion_point(class_scope:txdata.CommonErr)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr senderid_;
-  ::google::protobuf::internal::ArenaStringPtr recverid_;
-  ::google::protobuf::internal::ArenaStringPtr rspdata_;
-  ::google::protobuf::Timestamp* rsptime_;
-  ::google::protobuf::int64 msgno_;
-  ::google::protobuf::int32 seqno_;
-  bool toroot_;
-  bool islog_;
-  bool ispush_;
-  bool islast_;
-  int rsptype_;
+  ::google::protobuf::internal::ArenaStringPtr errmsg_;
+  ::google::protobuf::int32 errno_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -2226,10 +2347,10 @@ class SystemReport : public ::google::protobuf::Message /* @@protoc_insertion_po
 
   // accessors -------------------------------------------------------
 
-  // repeated string Pathway = 2;
+  // repeated string Pathway = 3;
   int pathway_size() const;
   void clear_pathway();
-  static const int kPathwayFieldNumber = 2;
+  static const int kPathwayFieldNumber = 3;
   const ::std::string& pathway(int index) const;
   ::std::string* mutable_pathway(int index);
   void set_pathway(int index, const ::std::string& value);
@@ -2248,9 +2369,9 @@ class SystemReport : public ::google::protobuf::Message /* @@protoc_insertion_po
   const ::google::protobuf::RepeatedPtrField< ::std::string>& pathway() const;
   ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_pathway();
 
-  // string UserID = 1;
+  // string UserID = 2;
   void clear_userid();
-  static const int kUserIDFieldNumber = 1;
+  static const int kUserIDFieldNumber = 2;
   const ::std::string& userid() const;
   void set_userid(const ::std::string& value);
   #if LANG_CXX11
@@ -2262,9 +2383,9 @@ class SystemReport : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::std::string* release_userid();
   void set_allocated_userid(::std::string* userid);
 
-  // string Message = 3;
+  // string Message = 4;
   void clear_message();
-  static const int kMessageFieldNumber = 3;
+  static const int kMessageFieldNumber = 4;
   const ::std::string& message() const;
   void set_message(const ::std::string& value);
   #if LANG_CXX11
@@ -2276,6 +2397,12 @@ class SystemReport : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::std::string* release_message();
   void set_allocated_message(::std::string* message);
 
+  // int32 Level = 1;
+  void clear_level();
+  static const int kLevelFieldNumber = 1;
+  ::google::protobuf::int32 level() const;
+  void set_level(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:txdata.SystemReport)
  private:
 
@@ -2283,6 +2410,459 @@ class SystemReport : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::google::protobuf::RepeatedPtrField< ::std::string> pathway_;
   ::google::protobuf::internal::ArenaStringPtr userid_;
   ::google::protobuf::internal::ArenaStringPtr message_;
+  ::google::protobuf::int32 level_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class EchoItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.EchoItem) */ {
+ public:
+  EchoItem();
+  virtual ~EchoItem();
+
+  EchoItem(const EchoItem& from);
+
+  inline EchoItem& operator=(const EchoItem& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  EchoItem(EchoItem&& from) noexcept
+    : EchoItem() {
+    *this = ::std::move(from);
+  }
+
+  inline EchoItem& operator=(EchoItem&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const EchoItem& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const EchoItem* internal_default_instance() {
+    return reinterpret_cast<const EchoItem*>(
+               &_EchoItem_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  void Swap(EchoItem* other);
+  friend void swap(EchoItem& a, EchoItem& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EchoItem* New() const final {
+    return CreateMaybeMessage<EchoItem>(NULL);
+  }
+
+  EchoItem* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EchoItem>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const EchoItem& from);
+  void MergeFrom(const EchoItem& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EchoItem* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string Data = 1;
+  void clear_data();
+  static const int kDataFieldNumber = 1;
+  const ::std::string& data() const;
+  void set_data(const ::std::string& value);
+  #if LANG_CXX11
+  void set_data(::std::string&& value);
+  #endif
+  void set_data(const char* value);
+  void set_data(const char* value, size_t size);
+  ::std::string* mutable_data();
+  ::std::string* release_data();
+  void set_allocated_data(::std::string* data);
+
+  // int32 RspCnt = 2;
+  void clear_rspcnt();
+  static const int kRspCntFieldNumber = 2;
+  ::google::protobuf::int32 rspcnt() const;
+  void set_rspcnt(::google::protobuf::int32 value);
+
+  // int32 SecGap = 3;
+  void clear_secgap();
+  static const int kSecGapFieldNumber = 3;
+  ::google::protobuf::int32 secgap() const;
+  void set_secgap(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:txdata.EchoItem)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::int32 rspcnt_;
+  ::google::protobuf::int32 secgap_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class BinItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.BinItem) */ {
+ public:
+  BinItem();
+  virtual ~BinItem();
+
+  BinItem(const BinItem& from);
+
+  inline BinItem& operator=(const BinItem& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  BinItem(BinItem&& from) noexcept
+    : BinItem() {
+    *this = ::std::move(from);
+  }
+
+  inline BinItem& operator=(BinItem&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const BinItem& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const BinItem* internal_default_instance() {
+    return reinterpret_cast<const BinItem*>(
+               &_BinItem_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    14;
+
+  void Swap(BinItem* other);
+  friend void swap(BinItem& a, BinItem& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline BinItem* New() const final {
+    return CreateMaybeMessage<BinItem>(NULL);
+  }
+
+  BinItem* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<BinItem>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const BinItem& from);
+  void MergeFrom(const BinItem& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(BinItem* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated bytes Data = 2;
+  int data_size() const;
+  void clear_data();
+  static const int kDataFieldNumber = 2;
+  const ::std::string& data(int index) const;
+  ::std::string* mutable_data(int index);
+  void set_data(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_data(int index, ::std::string&& value);
+  #endif
+  void set_data(int index, const char* value);
+  void set_data(int index, const void* value, size_t size);
+  ::std::string* add_data();
+  void add_data(const ::std::string& value);
+  #if LANG_CXX11
+  void add_data(::std::string&& value);
+  #endif
+  void add_data(const char* value);
+  void add_data(const void* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField< ::std::string>& data() const;
+  ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_data();
+
+  // int32 Type = 1;
+  void clear_type();
+  static const int kTypeFieldNumber = 1;
+  ::google::protobuf::int32 type() const;
+  void set_type(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:txdata.BinItem)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> data_;
+  ::google::protobuf::int32 type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class EmailItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.EmailItem) */ {
+ public:
+  EmailItem();
+  virtual ~EmailItem();
+
+  EmailItem(const EmailItem& from);
+
+  inline EmailItem& operator=(const EmailItem& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  EmailItem(EmailItem&& from) noexcept
+    : EmailItem() {
+    *this = ::std::move(from);
+  }
+
+  inline EmailItem& operator=(EmailItem&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const EmailItem& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const EmailItem* internal_default_instance() {
+    return reinterpret_cast<const EmailItem*>(
+               &_EmailItem_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    15;
+
+  void Swap(EmailItem* other);
+  friend void swap(EmailItem& a, EmailItem& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EmailItem* New() const final {
+    return CreateMaybeMessage<EmailItem>(NULL);
+  }
+
+  EmailItem* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EmailItem>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const EmailItem& from);
+  void MergeFrom(const EmailItem& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EmailItem* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string Username = 1;
+  void clear_username();
+  static const int kUsernameFieldNumber = 1;
+  const ::std::string& username() const;
+  void set_username(const ::std::string& value);
+  #if LANG_CXX11
+  void set_username(::std::string&& value);
+  #endif
+  void set_username(const char* value);
+  void set_username(const char* value, size_t size);
+  ::std::string* mutable_username();
+  ::std::string* release_username();
+  void set_allocated_username(::std::string* username);
+
+  // string Password = 2;
+  void clear_password();
+  static const int kPasswordFieldNumber = 2;
+  const ::std::string& password() const;
+  void set_password(const ::std::string& value);
+  #if LANG_CXX11
+  void set_password(::std::string&& value);
+  #endif
+  void set_password(const char* value);
+  void set_password(const char* value, size_t size);
+  ::std::string* mutable_password();
+  ::std::string* release_password();
+  void set_allocated_password(::std::string* password);
+
+  // string SmtpAddr = 3;
+  void clear_smtpaddr();
+  static const int kSmtpAddrFieldNumber = 3;
+  const ::std::string& smtpaddr() const;
+  void set_smtpaddr(const ::std::string& value);
+  #if LANG_CXX11
+  void set_smtpaddr(::std::string&& value);
+  #endif
+  void set_smtpaddr(const char* value);
+  void set_smtpaddr(const char* value, size_t size);
+  ::std::string* mutable_smtpaddr();
+  ::std::string* release_smtpaddr();
+  void set_allocated_smtpaddr(::std::string* smtpaddr);
+
+  // string To = 4;
+  void clear_to();
+  static const int kToFieldNumber = 4;
+  const ::std::string& to() const;
+  void set_to(const ::std::string& value);
+  #if LANG_CXX11
+  void set_to(::std::string&& value);
+  #endif
+  void set_to(const char* value);
+  void set_to(const char* value, size_t size);
+  ::std::string* mutable_to();
+  ::std::string* release_to();
+  void set_allocated_to(::std::string* to);
+
+  // string Subject = 5;
+  void clear_subject();
+  static const int kSubjectFieldNumber = 5;
+  const ::std::string& subject() const;
+  void set_subject(const ::std::string& value);
+  #if LANG_CXX11
+  void set_subject(::std::string&& value);
+  #endif
+  void set_subject(const char* value);
+  void set_subject(const char* value, size_t size);
+  ::std::string* mutable_subject();
+  ::std::string* release_subject();
+  void set_allocated_subject(::std::string* subject);
+
+  // string ContentType = 6;
+  void clear_contenttype();
+  static const int kContentTypeFieldNumber = 6;
+  const ::std::string& contenttype() const;
+  void set_contenttype(const ::std::string& value);
+  #if LANG_CXX11
+  void set_contenttype(::std::string&& value);
+  #endif
+  void set_contenttype(const char* value);
+  void set_contenttype(const char* value, size_t size);
+  ::std::string* mutable_contenttype();
+  ::std::string* release_contenttype();
+  void set_allocated_contenttype(::std::string* contenttype);
+
+  // string Content = 7;
+  void clear_content();
+  static const int kContentFieldNumber = 7;
+  const ::std::string& content() const;
+  void set_content(const ::std::string& value);
+  #if LANG_CXX11
+  void set_content(::std::string&& value);
+  #endif
+  void set_content(const char* value);
+  void set_content(const char* value, size_t size);
+  ::std::string* mutable_content();
+  ::std::string* release_content();
+  void set_allocated_content(::std::string* content);
+
+  // @@protoc_insertion_point(class_scope:txdata.EmailItem)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr username_;
+  ::google::protobuf::internal::ArenaStringPtr password_;
+  ::google::protobuf::internal::ArenaStringPtr smtpaddr_;
+  ::google::protobuf::internal::ArenaStringPtr to_;
+  ::google::protobuf::internal::ArenaStringPtr subject_;
+  ::google::protobuf::internal::ArenaStringPtr contenttype_;
+  ::google::protobuf::internal::ArenaStringPtr content_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -2323,7 +2903,7 @@ class QryConnInfoReq : public ::google::protobuf::Message /* @@protoc_insertion_
                &_QryConnInfoReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    16;
 
   void Swap(QryConnInfoReq* other);
   friend void swap(QryConnInfoReq& a, QryConnInfoReq& b) {
@@ -2440,7 +3020,7 @@ class QryConnInfoRsp : public ::google::protobuf::Message /* @@protoc_insertion_
                &_QryConnInfoRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    18;
 
   void Swap(QryConnInfoRsp* other);
   friend void swap(QryConnInfoRsp& a, QryConnInfoRsp& b) {
@@ -2567,7 +3147,7 @@ class QueryRecordReq : public ::google::protobuf::Message /* @@protoc_insertion_
                &_QueryRecordReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    19;
 
   void Swap(QueryRecordReq* other);
   friend void swap(QueryRecordReq& a, QueryRecordReq& b) {
@@ -2685,7 +3265,7 @@ class QueryRecordRsp : public ::google::protobuf::Message /* @@protoc_insertion_
                &_QueryRecordRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    20;
 
   void Swap(QueryRecordRsp* other);
   friend void swap(QueryRecordRsp& a, QueryRecordRsp& b) {
@@ -2826,7 +3406,7 @@ class ExecCmdReq : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_ExecCmdReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    21;
 
   void Swap(ExecCmdReq* other);
   friend void swap(ExecCmdReq& a, ExecCmdReq& b) {
@@ -2937,7 +3517,7 @@ class ExecCmdRsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_ExecCmdRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    22;
 
   void Swap(ExecCmdRsp* other);
   friend void swap(ExecCmdRsp& a, ExecCmdRsp& b) {
@@ -3013,131 +3593,6 @@ class ExecCmdRsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
 };
 // -------------------------------------------------------------------
 
-class EchoItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.EchoItem) */ {
- public:
-  EchoItem();
-  virtual ~EchoItem();
-
-  EchoItem(const EchoItem& from);
-
-  inline EchoItem& operator=(const EchoItem& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  EchoItem(EchoItem&& from) noexcept
-    : EchoItem() {
-    *this = ::std::move(from);
-  }
-
-  inline EchoItem& operator=(EchoItem&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const EchoItem& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const EchoItem* internal_default_instance() {
-    return reinterpret_cast<const EchoItem*>(
-               &_EchoItem_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    20;
-
-  void Swap(EchoItem* other);
-  friend void swap(EchoItem& a, EchoItem& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline EchoItem* New() const final {
-    return CreateMaybeMessage<EchoItem>(NULL);
-  }
-
-  EchoItem* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<EchoItem>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const EchoItem& from);
-  void MergeFrom(const EchoItem& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(EchoItem* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string Data = 1;
-  void clear_data();
-  static const int kDataFieldNumber = 1;
-  const ::std::string& data() const;
-  void set_data(const ::std::string& value);
-  #if LANG_CXX11
-  void set_data(::std::string&& value);
-  #endif
-  void set_data(const char* value);
-  void set_data(const char* value, size_t size);
-  ::std::string* mutable_data();
-  ::std::string* release_data();
-  void set_allocated_data(::std::string* data);
-
-  // int32 RspCnt = 2;
-  void clear_rspcnt();
-  static const int kRspCntFieldNumber = 2;
-  ::google::protobuf::int32 rspcnt() const;
-  void set_rspcnt(::google::protobuf::int32 value);
-
-  // int32 SecGap = 3;
-  void clear_secgap();
-  static const int kSecGapFieldNumber = 3;
-  ::google::protobuf::int32 secgap() const;
-  void set_secgap(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:txdata.EchoItem)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr data_;
-  ::google::protobuf::int32 rspcnt_;
-  ::google::protobuf::int32 secgap_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
 class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ReportDataItem) */ {
  public:
   ReportDataItem();
@@ -3173,7 +3628,7 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
                &_ReportDataItem_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    23;
 
   void Swap(ReportDataItem* other);
   friend void swap(ReportDataItem& a, ReportDataItem& b) {
@@ -3225,9 +3680,9 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
 
   // accessors -------------------------------------------------------
 
-  // string Topic = 1;
+  // string Topic = 2;
   void clear_topic();
-  static const int kTopicFieldNumber = 1;
+  static const int kTopicFieldNumber = 2;
   const ::std::string& topic() const;
   void set_topic(const ::std::string& value);
   #if LANG_CXX11
@@ -3239,9 +3694,9 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
   ::std::string* release_topic();
   void set_allocated_topic(::std::string* topic);
 
-  // string Data = 2;
+  // string Data = 3;
   void clear_data();
-  static const int kDataFieldNumber = 2;
+  static const int kDataFieldNumber = 3;
   const ::std::string& data() const;
   void set_data(const ::std::string& value);
   #if LANG_CXX11
@@ -3253,213 +3708,19 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
   ::std::string* release_data();
   void set_allocated_data(::std::string* data);
 
+  // int32 Level = 1;
+  void clear_level();
+  static const int kLevelFieldNumber = 1;
+  ::google::protobuf::int32 level() const;
+  void set_level(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:txdata.ReportDataItem)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr topic_;
   ::google::protobuf::internal::ArenaStringPtr data_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::protobuf_txdata_2eproto::TableStruct;
-};
-// -------------------------------------------------------------------
-
-class SendMailItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.SendMailItem) */ {
- public:
-  SendMailItem();
-  virtual ~SendMailItem();
-
-  SendMailItem(const SendMailItem& from);
-
-  inline SendMailItem& operator=(const SendMailItem& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  SendMailItem(SendMailItem&& from) noexcept
-    : SendMailItem() {
-    *this = ::std::move(from);
-  }
-
-  inline SendMailItem& operator=(SendMailItem&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const SendMailItem& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const SendMailItem* internal_default_instance() {
-    return reinterpret_cast<const SendMailItem*>(
-               &_SendMailItem_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    22;
-
-  void Swap(SendMailItem* other);
-  friend void swap(SendMailItem& a, SendMailItem& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline SendMailItem* New() const final {
-    return CreateMaybeMessage<SendMailItem>(NULL);
-  }
-
-  SendMailItem* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<SendMailItem>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const SendMailItem& from);
-  void MergeFrom(const SendMailItem& from);
-  void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(SendMailItem* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string Username = 1;
-  void clear_username();
-  static const int kUsernameFieldNumber = 1;
-  const ::std::string& username() const;
-  void set_username(const ::std::string& value);
-  #if LANG_CXX11
-  void set_username(::std::string&& value);
-  #endif
-  void set_username(const char* value);
-  void set_username(const char* value, size_t size);
-  ::std::string* mutable_username();
-  ::std::string* release_username();
-  void set_allocated_username(::std::string* username);
-
-  // string Password = 2;
-  void clear_password();
-  static const int kPasswordFieldNumber = 2;
-  const ::std::string& password() const;
-  void set_password(const ::std::string& value);
-  #if LANG_CXX11
-  void set_password(::std::string&& value);
-  #endif
-  void set_password(const char* value);
-  void set_password(const char* value, size_t size);
-  ::std::string* mutable_password();
-  ::std::string* release_password();
-  void set_allocated_password(::std::string* password);
-
-  // string SmtpAddr = 3;
-  void clear_smtpaddr();
-  static const int kSmtpAddrFieldNumber = 3;
-  const ::std::string& smtpaddr() const;
-  void set_smtpaddr(const ::std::string& value);
-  #if LANG_CXX11
-  void set_smtpaddr(::std::string&& value);
-  #endif
-  void set_smtpaddr(const char* value);
-  void set_smtpaddr(const char* value, size_t size);
-  ::std::string* mutable_smtpaddr();
-  ::std::string* release_smtpaddr();
-  void set_allocated_smtpaddr(::std::string* smtpaddr);
-
-  // string To = 4;
-  void clear_to();
-  static const int kToFieldNumber = 4;
-  const ::std::string& to() const;
-  void set_to(const ::std::string& value);
-  #if LANG_CXX11
-  void set_to(::std::string&& value);
-  #endif
-  void set_to(const char* value);
-  void set_to(const char* value, size_t size);
-  ::std::string* mutable_to();
-  ::std::string* release_to();
-  void set_allocated_to(::std::string* to);
-
-  // string Subject = 5;
-  void clear_subject();
-  static const int kSubjectFieldNumber = 5;
-  const ::std::string& subject() const;
-  void set_subject(const ::std::string& value);
-  #if LANG_CXX11
-  void set_subject(::std::string&& value);
-  #endif
-  void set_subject(const char* value);
-  void set_subject(const char* value, size_t size);
-  ::std::string* mutable_subject();
-  ::std::string* release_subject();
-  void set_allocated_subject(::std::string* subject);
-
-  // string ContentType = 6;
-  void clear_contenttype();
-  static const int kContentTypeFieldNumber = 6;
-  const ::std::string& contenttype() const;
-  void set_contenttype(const ::std::string& value);
-  #if LANG_CXX11
-  void set_contenttype(::std::string&& value);
-  #endif
-  void set_contenttype(const char* value);
-  void set_contenttype(const char* value, size_t size);
-  ::std::string* mutable_contenttype();
-  ::std::string* release_contenttype();
-  void set_allocated_contenttype(::std::string* contenttype);
-
-  // string Content = 7;
-  void clear_content();
-  static const int kContentFieldNumber = 7;
-  const ::std::string& content() const;
-  void set_content(const ::std::string& value);
-  #if LANG_CXX11
-  void set_content(::std::string&& value);
-  #endif
-  void set_content(const char* value);
-  void set_content(const char* value, size_t size);
-  ::std::string* mutable_content();
-  ::std::string* release_content();
-  void set_allocated_content(::std::string* content);
-
-  // @@protoc_insertion_point(class_scope:txdata.SendMailItem)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr username_;
-  ::google::protobuf::internal::ArenaStringPtr password_;
-  ::google::protobuf::internal::ArenaStringPtr smtpaddr_;
-  ::google::protobuf::internal::ArenaStringPtr to_;
-  ::google::protobuf::internal::ArenaStringPtr subject_;
-  ::google::protobuf::internal::ArenaStringPtr contenttype_;
-  ::google::protobuf::internal::ArenaStringPtr content_;
+  ::google::protobuf::int32 level_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -3557,73 +3818,1646 @@ inline void UniKey::set_seqno(::google::protobuf::int32 value) {
 
 // -------------------------------------------------------------------
 
-// CommonErr
+// Common1Req
 
-// int32 ErrNo = 1;
-inline void CommonErr::clear_errno() {
-  errno_ = 0;
+// int64 MsgNo = 1;
+inline void Common1Req::clear_msgno() {
+  msgno_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int32 CommonErr::errno() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonErr.ErrNo)
-  return errno_;
+inline ::google::protobuf::int64 Common1Req::msgno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.MsgNo)
+  return msgno_;
 }
-inline void CommonErr::set_errno(::google::protobuf::int32 value) {
+inline void Common1Req::set_msgno(::google::protobuf::int64 value) {
   
-  errno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.CommonErr.ErrNo)
+  msgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.MsgNo)
 }
 
-// string ErrMsg = 2;
-inline void CommonErr::clear_errmsg() {
-  errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// int32 SeqNo = 2;
+inline void Common1Req::clear_seqno() {
+  seqno_ = 0;
 }
-inline const ::std::string& CommonErr::errmsg() const {
-  // @@protoc_insertion_point(field_get:txdata.CommonErr.ErrMsg)
-  return errmsg_.GetNoArena();
+inline ::google::protobuf::int32 Common1Req::seqno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.SeqNo)
+  return seqno_;
 }
-inline void CommonErr::set_errmsg(const ::std::string& value) {
+inline void Common1Req::set_seqno(::google::protobuf::int32 value) {
   
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.CommonErr.ErrMsg)
+  seqno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.SeqNo)
+}
+
+// int64 BatchNo = 3;
+inline void Common1Req::clear_batchno() {
+  batchno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common1Req::batchno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.BatchNo)
+  return batchno_;
+}
+inline void Common1Req::set_batchno(::google::protobuf::int64 value) {
+  
+  batchno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.BatchNo)
+}
+
+// int64 RefNum = 4;
+inline void Common1Req::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common1Req::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.RefNum)
+  return refnum_;
+}
+inline void Common1Req::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.RefNum)
+}
+
+// string RefText = 5;
+inline void Common1Req::clear_reftext() {
+  reftext_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Req::reftext() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.RefText)
+  return reftext_.GetNoArena();
+}
+inline void Common1Req::set_reftext(const ::std::string& value) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.RefText)
 }
 #if LANG_CXX11
-inline void CommonErr::set_errmsg(::std::string&& value) {
+inline void Common1Req::set_reftext(::std::string&& value) {
   
-  errmsg_.SetNoArena(
+  reftext_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonErr.ErrMsg)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.RefText)
 }
 #endif
-inline void CommonErr::set_errmsg(const char* value) {
+inline void Common1Req::set_reftext(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.CommonErr.ErrMsg)
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.RefText)
 }
-inline void CommonErr::set_errmsg(const char* value, size_t size) {
+inline void Common1Req::set_reftext(const char* value, size_t size) {
   
-  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.CommonErr.ErrMsg)
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.RefText)
 }
-inline ::std::string* CommonErr::mutable_errmsg() {
+inline ::std::string* Common1Req::mutable_reftext() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.CommonErr.ErrMsg)
-  return errmsg_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.RefText)
+  return reftext_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* CommonErr::release_errmsg() {
-  // @@protoc_insertion_point(field_release:txdata.CommonErr.ErrMsg)
+inline ::std::string* Common1Req::release_reftext() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Req.RefText)
   
-  return errmsg_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return reftext_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void CommonErr::set_allocated_errmsg(::std::string* errmsg) {
-  if (errmsg != NULL) {
+inline void Common1Req::set_allocated_reftext(::std::string* reftext) {
+  if (reftext != NULL) {
     
   } else {
     
   }
-  errmsg_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), errmsg);
-  // @@protoc_insertion_point(field_set_allocated:txdata.CommonErr.ErrMsg)
+  reftext_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reftext);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.RefText)
+}
+
+// string SenderID = 6;
+inline void Common1Req::clear_senderid() {
+  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Req::senderid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.SenderID)
+  return senderid_.GetNoArena();
+}
+inline void Common1Req::set_senderid(const ::std::string& value) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.SenderID)
+}
+#if LANG_CXX11
+inline void Common1Req::set_senderid(::std::string&& value) {
+  
+  senderid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.SenderID)
+}
+#endif
+inline void Common1Req::set_senderid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.SenderID)
+}
+inline void Common1Req::set_senderid(const char* value, size_t size) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.SenderID)
+}
+inline ::std::string* Common1Req::mutable_senderid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.SenderID)
+  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Req::release_senderid() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Req.SenderID)
+  
+  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Req::set_allocated_senderid(::std::string* senderid) {
+  if (senderid != NULL) {
+    
+  } else {
+    
+  }
+  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.SenderID)
+}
+
+// string RecverID = 7;
+inline void Common1Req::clear_recverid() {
+  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Req::recverid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.RecverID)
+  return recverid_.GetNoArena();
+}
+inline void Common1Req::set_recverid(const ::std::string& value) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.RecverID)
+}
+#if LANG_CXX11
+inline void Common1Req::set_recverid(::std::string&& value) {
+  
+  recverid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.RecverID)
+}
+#endif
+inline void Common1Req::set_recverid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.RecverID)
+}
+inline void Common1Req::set_recverid(const char* value, size_t size) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.RecverID)
+}
+inline ::std::string* Common1Req::mutable_recverid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.RecverID)
+  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Req::release_recverid() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Req.RecverID)
+  
+  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Req::set_allocated_recverid(::std::string* recverid) {
+  if (recverid != NULL) {
+    
+  } else {
+    
+  }
+  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.RecverID)
+}
+
+// bool ToRoot = 8;
+inline void Common1Req::clear_toroot() {
+  toroot_ = false;
+}
+inline bool Common1Req::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.ToRoot)
+  return toroot_;
+}
+inline void Common1Req::set_toroot(bool value) {
+  
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.ToRoot)
+}
+
+// bool IsLog = 9;
+inline void Common1Req::clear_islog() {
+  islog_ = false;
+}
+inline bool Common1Req::islog() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.IsLog)
+  return islog_;
+}
+inline void Common1Req::set_islog(bool value) {
+  
+  islog_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.IsLog)
+}
+
+// bool IsPush = 10;
+inline void Common1Req::clear_ispush() {
+  ispush_ = false;
+}
+inline bool Common1Req::ispush() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.IsPush)
+  return ispush_;
+}
+inline void Common1Req::set_ispush(bool value) {
+  
+  ispush_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.IsPush)
+}
+
+// .txdata.MsgType ReqType = 11;
+inline void Common1Req::clear_reqtype() {
+  reqtype_ = 0;
+}
+inline ::txdata::MsgType Common1Req::reqtype() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqType)
+  return static_cast< ::txdata::MsgType >(reqtype_);
+}
+inline void Common1Req::set_reqtype(::txdata::MsgType value) {
+  
+  reqtype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.ReqType)
+}
+
+// bytes ReqData = 12;
+inline void Common1Req::clear_reqdata() {
+  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Req::reqdata() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqData)
+  return reqdata_.GetNoArena();
+}
+inline void Common1Req::set_reqdata(const ::std::string& value) {
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Req.ReqData)
+}
+#if LANG_CXX11
+inline void Common1Req::set_reqdata(::std::string&& value) {
+  
+  reqdata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.ReqData)
+}
+#endif
+inline void Common1Req::set_reqdata(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.ReqData)
+}
+inline void Common1Req::set_reqdata(const void* value, size_t size) {
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.ReqData)
+}
+inline ::std::string* Common1Req::mutable_reqdata() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.ReqData)
+  return reqdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Req::release_reqdata() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Req.ReqData)
+  
+  return reqdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Req::set_allocated_reqdata(::std::string* reqdata) {
+  if (reqdata != NULL) {
+    
+  } else {
+    
+  }
+  reqdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reqdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.ReqData)
+}
+
+// .google.protobuf.Timestamp ReqTime = 13;
+inline bool Common1Req::has_reqtime() const {
+  return this != internal_default_instance() && reqtime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& Common1Req::_internal_reqtime() const {
+  return *reqtime_;
+}
+inline const ::google::protobuf::Timestamp& Common1Req::reqtime() const {
+  const ::google::protobuf::Timestamp* p = reqtime_;
+  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* Common1Req::release_reqtime() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Req.ReqTime)
+  
+  ::google::protobuf::Timestamp* temp = reqtime_;
+  reqtime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* Common1Req::mutable_reqtime() {
+  
+  if (reqtime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    reqtime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.ReqTime)
+  return reqtime_;
+}
+inline void Common1Req::set_allocated_reqtime(::google::protobuf::Timestamp* reqtime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reqtime_);
+  }
+  if (reqtime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(reqtime)->GetArena();
+    if (message_arena != submessage_arena) {
+      reqtime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, reqtime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  reqtime_ = reqtime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.ReqTime)
+}
+
+// -------------------------------------------------------------------
+
+// Common1Rsp
+
+// int64 MsgNo = 1;
+inline void Common1Rsp::clear_msgno() {
+  msgno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common1Rsp::msgno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.MsgNo)
+  return msgno_;
+}
+inline void Common1Rsp::set_msgno(::google::protobuf::int64 value) {
+  
+  msgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.MsgNo)
+}
+
+// int32 SeqNo = 2;
+inline void Common1Rsp::clear_seqno() {
+  seqno_ = 0;
+}
+inline ::google::protobuf::int32 Common1Rsp::seqno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.SeqNo)
+  return seqno_;
+}
+inline void Common1Rsp::set_seqno(::google::protobuf::int32 value) {
+  
+  seqno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.SeqNo)
+}
+
+// int64 BatchNo = 3;
+inline void Common1Rsp::clear_batchno() {
+  batchno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common1Rsp::batchno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.BatchNo)
+  return batchno_;
+}
+inline void Common1Rsp::set_batchno(::google::protobuf::int64 value) {
+  
+  batchno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.BatchNo)
+}
+
+// int64 RefNum = 4;
+inline void Common1Rsp::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common1Rsp::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RefNum)
+  return refnum_;
+}
+inline void Common1Rsp::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RefNum)
+}
+
+// string RefText = 5;
+inline void Common1Rsp::clear_reftext() {
+  reftext_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Rsp::reftext() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RefText)
+  return reftext_.GetNoArena();
+}
+inline void Common1Rsp::set_reftext(const ::std::string& value) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RefText)
+}
+#if LANG_CXX11
+inline void Common1Rsp::set_reftext(::std::string&& value) {
+  
+  reftext_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.RefText)
+}
+#endif
+inline void Common1Rsp::set_reftext(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.RefText)
+}
+inline void Common1Rsp::set_reftext(const char* value, size_t size) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.RefText)
+}
+inline ::std::string* Common1Rsp::mutable_reftext() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RefText)
+  return reftext_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Rsp::release_reftext() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RefText)
+  
+  return reftext_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Rsp::set_allocated_reftext(::std::string* reftext) {
+  if (reftext != NULL) {
+    
+  } else {
+    
+  }
+  reftext_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reftext);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RefText)
+}
+
+// string SenderID = 6;
+inline void Common1Rsp::clear_senderid() {
+  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Rsp::senderid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.SenderID)
+  return senderid_.GetNoArena();
+}
+inline void Common1Rsp::set_senderid(const ::std::string& value) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.SenderID)
+}
+#if LANG_CXX11
+inline void Common1Rsp::set_senderid(::std::string&& value) {
+  
+  senderid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.SenderID)
+}
+#endif
+inline void Common1Rsp::set_senderid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.SenderID)
+}
+inline void Common1Rsp::set_senderid(const char* value, size_t size) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.SenderID)
+}
+inline ::std::string* Common1Rsp::mutable_senderid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.SenderID)
+  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Rsp::release_senderid() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.SenderID)
+  
+  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Rsp::set_allocated_senderid(::std::string* senderid) {
+  if (senderid != NULL) {
+    
+  } else {
+    
+  }
+  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.SenderID)
+}
+
+// string RecverID = 7;
+inline void Common1Rsp::clear_recverid() {
+  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Rsp::recverid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RecverID)
+  return recverid_.GetNoArena();
+}
+inline void Common1Rsp::set_recverid(const ::std::string& value) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RecverID)
+}
+#if LANG_CXX11
+inline void Common1Rsp::set_recverid(::std::string&& value) {
+  
+  recverid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.RecverID)
+}
+#endif
+inline void Common1Rsp::set_recverid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.RecverID)
+}
+inline void Common1Rsp::set_recverid(const char* value, size_t size) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.RecverID)
+}
+inline ::std::string* Common1Rsp::mutable_recverid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RecverID)
+  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Rsp::release_recverid() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RecverID)
+  
+  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Rsp::set_allocated_recverid(::std::string* recverid) {
+  if (recverid != NULL) {
+    
+  } else {
+    
+  }
+  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RecverID)
+}
+
+// bool ToRoot = 8;
+inline void Common1Rsp::clear_toroot() {
+  toroot_ = false;
+}
+inline bool Common1Rsp::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.ToRoot)
+  return toroot_;
+}
+inline void Common1Rsp::set_toroot(bool value) {
+  
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.ToRoot)
+}
+
+// bool IsLog = 9;
+inline void Common1Rsp::clear_islog() {
+  islog_ = false;
+}
+inline bool Common1Rsp::islog() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsLog)
+  return islog_;
+}
+inline void Common1Rsp::set_islog(bool value) {
+  
+  islog_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsLog)
+}
+
+// bool IsPush = 10;
+inline void Common1Rsp::clear_ispush() {
+  ispush_ = false;
+}
+inline bool Common1Rsp::ispush() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsPush)
+  return ispush_;
+}
+inline void Common1Rsp::set_ispush(bool value) {
+  
+  ispush_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsPush)
+}
+
+// .txdata.MsgType RspType = 11;
+inline void Common1Rsp::clear_rsptype() {
+  rsptype_ = 0;
+}
+inline ::txdata::MsgType Common1Rsp::rsptype() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspType)
+  return static_cast< ::txdata::MsgType >(rsptype_);
+}
+inline void Common1Rsp::set_rsptype(::txdata::MsgType value) {
+  
+  rsptype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RspType)
+}
+
+// bytes RspData = 12;
+inline void Common1Rsp::clear_rspdata() {
+  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common1Rsp::rspdata() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspData)
+  return rspdata_.GetNoArena();
+}
+inline void Common1Rsp::set_rspdata(const ::std::string& value) {
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RspData)
+}
+#if LANG_CXX11
+inline void Common1Rsp::set_rspdata(::std::string&& value) {
+  
+  rspdata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.RspData)
+}
+#endif
+inline void Common1Rsp::set_rspdata(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.RspData)
+}
+inline void Common1Rsp::set_rspdata(const void* value, size_t size) {
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.RspData)
+}
+inline ::std::string* Common1Rsp::mutable_rspdata() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RspData)
+  return rspdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common1Rsp::release_rspdata() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RspData)
+  
+  return rspdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common1Rsp::set_allocated_rspdata(::std::string* rspdata) {
+  if (rspdata != NULL) {
+    
+  } else {
+    
+  }
+  rspdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rspdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspData)
+}
+
+// .google.protobuf.Timestamp RspTime = 13;
+inline bool Common1Rsp::has_rsptime() const {
+  return this != internal_default_instance() && rsptime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& Common1Rsp::_internal_rsptime() const {
+  return *rsptime_;
+}
+inline const ::google::protobuf::Timestamp& Common1Rsp::rsptime() const {
+  const ::google::protobuf::Timestamp* p = rsptime_;
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* Common1Rsp::release_rsptime() {
+  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RspTime)
+  
+  ::google::protobuf::Timestamp* temp = rsptime_;
+  rsptime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* Common1Rsp::mutable_rsptime() {
+  
+  if (rsptime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    rsptime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RspTime)
+  return rsptime_;
+}
+inline void Common1Rsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsptime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(rsptime_);
+  }
+  if (rsptime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(rsptime)->GetArena();
+    if (message_arena != submessage_arena) {
+      rsptime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, rsptime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  rsptime_ = rsptime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspTime)
+}
+
+// bool IsLast = 14;
+inline void Common1Rsp::clear_islast() {
+  islast_ = false;
+}
+inline bool Common1Rsp::islast() const {
+  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsLast)
+  return islast_;
+}
+inline void Common1Rsp::set_islast(bool value) {
+  
+  islast_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsLast)
+}
+
+// -------------------------------------------------------------------
+
+// Common2Req
+
+// .txdata.UniKey Key = 1;
+inline bool Common2Req::has_key() const {
+  return this != internal_default_instance() && key_ != NULL;
+}
+inline void Common2Req::clear_key() {
+  if (GetArenaNoVirtual() == NULL && key_ != NULL) {
+    delete key_;
+  }
+  key_ = NULL;
+}
+inline const ::txdata::UniKey& Common2Req::_internal_key() const {
+  return *key_;
+}
+inline const ::txdata::UniKey& Common2Req::key() const {
+  const ::txdata::UniKey* p = key_;
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.Key)
+  return p != NULL ? *p : *reinterpret_cast<const ::txdata::UniKey*>(
+      &::txdata::_UniKey_default_instance_);
+}
+inline ::txdata::UniKey* Common2Req::release_key() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.Key)
+  
+  ::txdata::UniKey* temp = key_;
+  key_ = NULL;
+  return temp;
+}
+inline ::txdata::UniKey* Common2Req::mutable_key() {
+  
+  if (key_ == NULL) {
+    auto* p = CreateMaybeMessage<::txdata::UniKey>(GetArenaNoVirtual());
+    key_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.Key)
+  return key_;
+}
+inline void Common2Req::set_allocated_key(::txdata::UniKey* key) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete key_;
+  }
+  if (key) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      key = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, key, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  key_ = key;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.Key)
+}
+
+// int64 BatchNo = 2;
+inline void Common2Req::clear_batchno() {
+  batchno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common2Req::batchno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.BatchNo)
+  return batchno_;
+}
+inline void Common2Req::set_batchno(::google::protobuf::int64 value) {
+  
+  batchno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.BatchNo)
+}
+
+// int64 RefNum = 3;
+inline void Common2Req::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common2Req::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.RefNum)
+  return refnum_;
+}
+inline void Common2Req::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.RefNum)
+}
+
+// string RefText = 4;
+inline void Common2Req::clear_reftext() {
+  reftext_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Req::reftext() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.RefText)
+  return reftext_.GetNoArena();
+}
+inline void Common2Req::set_reftext(const ::std::string& value) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.RefText)
+}
+#if LANG_CXX11
+inline void Common2Req::set_reftext(::std::string&& value) {
+  
+  reftext_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.RefText)
+}
+#endif
+inline void Common2Req::set_reftext(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.RefText)
+}
+inline void Common2Req::set_reftext(const char* value, size_t size) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.RefText)
+}
+inline ::std::string* Common2Req::mutable_reftext() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.RefText)
+  return reftext_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Req::release_reftext() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.RefText)
+  
+  return reftext_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Req::set_allocated_reftext(::std::string* reftext) {
+  if (reftext != NULL) {
+    
+  } else {
+    
+  }
+  reftext_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reftext);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.RefText)
+}
+
+// string SenderID = 5;
+inline void Common2Req::clear_senderid() {
+  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Req::senderid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.SenderID)
+  return senderid_.GetNoArena();
+}
+inline void Common2Req::set_senderid(const ::std::string& value) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.SenderID)
+}
+#if LANG_CXX11
+inline void Common2Req::set_senderid(::std::string&& value) {
+  
+  senderid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.SenderID)
+}
+#endif
+inline void Common2Req::set_senderid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.SenderID)
+}
+inline void Common2Req::set_senderid(const char* value, size_t size) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.SenderID)
+}
+inline ::std::string* Common2Req::mutable_senderid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.SenderID)
+  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Req::release_senderid() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.SenderID)
+  
+  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Req::set_allocated_senderid(::std::string* senderid) {
+  if (senderid != NULL) {
+    
+  } else {
+    
+  }
+  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.SenderID)
+}
+
+// string RecverID = 6;
+inline void Common2Req::clear_recverid() {
+  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Req::recverid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.RecverID)
+  return recverid_.GetNoArena();
+}
+inline void Common2Req::set_recverid(const ::std::string& value) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.RecverID)
+}
+#if LANG_CXX11
+inline void Common2Req::set_recverid(::std::string&& value) {
+  
+  recverid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.RecverID)
+}
+#endif
+inline void Common2Req::set_recverid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.RecverID)
+}
+inline void Common2Req::set_recverid(const char* value, size_t size) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.RecverID)
+}
+inline ::std::string* Common2Req::mutable_recverid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.RecverID)
+  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Req::release_recverid() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.RecverID)
+  
+  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Req::set_allocated_recverid(::std::string* recverid) {
+  if (recverid != NULL) {
+    
+  } else {
+    
+  }
+  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.RecverID)
+}
+
+// bool ToRoot = 7;
+inline void Common2Req::clear_toroot() {
+  toroot_ = false;
+}
+inline bool Common2Req::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.ToRoot)
+  return toroot_;
+}
+inline void Common2Req::set_toroot(bool value) {
+  
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.ToRoot)
+}
+
+// bool IsLog = 8;
+inline void Common2Req::clear_islog() {
+  islog_ = false;
+}
+inline bool Common2Req::islog() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsLog)
+  return islog_;
+}
+inline void Common2Req::set_islog(bool value) {
+  
+  islog_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsLog)
+}
+
+// bool IsSafe = 9;
+inline void Common2Req::clear_issafe() {
+  issafe_ = false;
+}
+inline bool Common2Req::issafe() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsSafe)
+  return issafe_;
+}
+inline void Common2Req::set_issafe(bool value) {
+  
+  issafe_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsSafe)
+}
+
+// bool IsPush = 10;
+inline void Common2Req::clear_ispush() {
+  ispush_ = false;
+}
+inline bool Common2Req::ispush() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsPush)
+  return ispush_;
+}
+inline void Common2Req::set_ispush(bool value) {
+  
+  ispush_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsPush)
+}
+
+// bool UpCache = 11;
+inline void Common2Req::clear_upcache() {
+  upcache_ = false;
+}
+inline bool Common2Req::upcache() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.UpCache)
+  return upcache_;
+}
+inline void Common2Req::set_upcache(bool value) {
+  
+  upcache_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.UpCache)
+}
+
+// .txdata.MsgType ReqType = 12;
+inline void Common2Req::clear_reqtype() {
+  reqtype_ = 0;
+}
+inline ::txdata::MsgType Common2Req::reqtype() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqType)
+  return static_cast< ::txdata::MsgType >(reqtype_);
+}
+inline void Common2Req::set_reqtype(::txdata::MsgType value) {
+  
+  reqtype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.ReqType)
+}
+
+// bytes ReqData = 13;
+inline void Common2Req::clear_reqdata() {
+  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Req::reqdata() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqData)
+  return reqdata_.GetNoArena();
+}
+inline void Common2Req::set_reqdata(const ::std::string& value) {
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Req.ReqData)
+}
+#if LANG_CXX11
+inline void Common2Req::set_reqdata(::std::string&& value) {
+  
+  reqdata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.ReqData)
+}
+#endif
+inline void Common2Req::set_reqdata(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.ReqData)
+}
+inline void Common2Req::set_reqdata(const void* value, size_t size) {
+  
+  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.ReqData)
+}
+inline ::std::string* Common2Req::mutable_reqdata() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.ReqData)
+  return reqdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Req::release_reqdata() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.ReqData)
+  
+  return reqdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Req::set_allocated_reqdata(::std::string* reqdata) {
+  if (reqdata != NULL) {
+    
+  } else {
+    
+  }
+  reqdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reqdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.ReqData)
+}
+
+// .google.protobuf.Timestamp ReqTime = 14;
+inline bool Common2Req::has_reqtime() const {
+  return this != internal_default_instance() && reqtime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& Common2Req::_internal_reqtime() const {
+  return *reqtime_;
+}
+inline const ::google::protobuf::Timestamp& Common2Req::reqtime() const {
+  const ::google::protobuf::Timestamp* p = reqtime_;
+  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* Common2Req::release_reqtime() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Req.ReqTime)
+  
+  ::google::protobuf::Timestamp* temp = reqtime_;
+  reqtime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* Common2Req::mutable_reqtime() {
+  
+  if (reqtime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    reqtime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.ReqTime)
+  return reqtime_;
+}
+inline void Common2Req::set_allocated_reqtime(::google::protobuf::Timestamp* reqtime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reqtime_);
+  }
+  if (reqtime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(reqtime)->GetArena();
+    if (message_arena != submessage_arena) {
+      reqtime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, reqtime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  reqtime_ = reqtime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.ReqTime)
+}
+
+// -------------------------------------------------------------------
+
+// Common2Rsp
+
+// .txdata.UniKey Key = 1;
+inline bool Common2Rsp::has_key() const {
+  return this != internal_default_instance() && key_ != NULL;
+}
+inline void Common2Rsp::clear_key() {
+  if (GetArenaNoVirtual() == NULL && key_ != NULL) {
+    delete key_;
+  }
+  key_ = NULL;
+}
+inline const ::txdata::UniKey& Common2Rsp::_internal_key() const {
+  return *key_;
+}
+inline const ::txdata::UniKey& Common2Rsp::key() const {
+  const ::txdata::UniKey* p = key_;
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.Key)
+  return p != NULL ? *p : *reinterpret_cast<const ::txdata::UniKey*>(
+      &::txdata::_UniKey_default_instance_);
+}
+inline ::txdata::UniKey* Common2Rsp::release_key() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.Key)
+  
+  ::txdata::UniKey* temp = key_;
+  key_ = NULL;
+  return temp;
+}
+inline ::txdata::UniKey* Common2Rsp::mutable_key() {
+  
+  if (key_ == NULL) {
+    auto* p = CreateMaybeMessage<::txdata::UniKey>(GetArenaNoVirtual());
+    key_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.Key)
+  return key_;
+}
+inline void Common2Rsp::set_allocated_key(::txdata::UniKey* key) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete key_;
+  }
+  if (key) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      key = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, key, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  key_ = key;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.Key)
+}
+
+// int64 BatchNo = 2;
+inline void Common2Rsp::clear_batchno() {
+  batchno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common2Rsp::batchno() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.BatchNo)
+  return batchno_;
+}
+inline void Common2Rsp::set_batchno(::google::protobuf::int64 value) {
+  
+  batchno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.BatchNo)
+}
+
+// int64 RefNum = 3;
+inline void Common2Rsp::clear_refnum() {
+  refnum_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Common2Rsp::refnum() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RefNum)
+  return refnum_;
+}
+inline void Common2Rsp::set_refnum(::google::protobuf::int64 value) {
+  
+  refnum_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RefNum)
+}
+
+// string RefText = 4;
+inline void Common2Rsp::clear_reftext() {
+  reftext_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Rsp::reftext() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RefText)
+  return reftext_.GetNoArena();
+}
+inline void Common2Rsp::set_reftext(const ::std::string& value) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RefText)
+}
+#if LANG_CXX11
+inline void Common2Rsp::set_reftext(::std::string&& value) {
+  
+  reftext_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.RefText)
+}
+#endif
+inline void Common2Rsp::set_reftext(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.RefText)
+}
+inline void Common2Rsp::set_reftext(const char* value, size_t size) {
+  
+  reftext_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.RefText)
+}
+inline ::std::string* Common2Rsp::mutable_reftext() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RefText)
+  return reftext_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Rsp::release_reftext() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RefText)
+  
+  return reftext_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Rsp::set_allocated_reftext(::std::string* reftext) {
+  if (reftext != NULL) {
+    
+  } else {
+    
+  }
+  reftext_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reftext);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RefText)
+}
+
+// string SenderID = 5;
+inline void Common2Rsp::clear_senderid() {
+  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Rsp::senderid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.SenderID)
+  return senderid_.GetNoArena();
+}
+inline void Common2Rsp::set_senderid(const ::std::string& value) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.SenderID)
+}
+#if LANG_CXX11
+inline void Common2Rsp::set_senderid(::std::string&& value) {
+  
+  senderid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.SenderID)
+}
+#endif
+inline void Common2Rsp::set_senderid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.SenderID)
+}
+inline void Common2Rsp::set_senderid(const char* value, size_t size) {
+  
+  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.SenderID)
+}
+inline ::std::string* Common2Rsp::mutable_senderid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.SenderID)
+  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Rsp::release_senderid() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.SenderID)
+  
+  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Rsp::set_allocated_senderid(::std::string* senderid) {
+  if (senderid != NULL) {
+    
+  } else {
+    
+  }
+  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.SenderID)
+}
+
+// string RecverID = 6;
+inline void Common2Rsp::clear_recverid() {
+  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Rsp::recverid() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RecverID)
+  return recverid_.GetNoArena();
+}
+inline void Common2Rsp::set_recverid(const ::std::string& value) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RecverID)
+}
+#if LANG_CXX11
+inline void Common2Rsp::set_recverid(::std::string&& value) {
+  
+  recverid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.RecverID)
+}
+#endif
+inline void Common2Rsp::set_recverid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.RecverID)
+}
+inline void Common2Rsp::set_recverid(const char* value, size_t size) {
+  
+  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.RecverID)
+}
+inline ::std::string* Common2Rsp::mutable_recverid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RecverID)
+  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Rsp::release_recverid() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RecverID)
+  
+  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Rsp::set_allocated_recverid(::std::string* recverid) {
+  if (recverid != NULL) {
+    
+  } else {
+    
+  }
+  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RecverID)
+}
+
+// bool ToRoot = 7;
+inline void Common2Rsp::clear_toroot() {
+  toroot_ = false;
+}
+inline bool Common2Rsp::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.ToRoot)
+  return toroot_;
+}
+inline void Common2Rsp::set_toroot(bool value) {
+  
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.ToRoot)
+}
+
+// bool IsLog = 8;
+inline void Common2Rsp::clear_islog() {
+  islog_ = false;
+}
+inline bool Common2Rsp::islog() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsLog)
+  return islog_;
+}
+inline void Common2Rsp::set_islog(bool value) {
+  
+  islog_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsLog)
+}
+
+// bool IsSafe = 9;
+inline void Common2Rsp::clear_issafe() {
+  issafe_ = false;
+}
+inline bool Common2Rsp::issafe() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsSafe)
+  return issafe_;
+}
+inline void Common2Rsp::set_issafe(bool value) {
+  
+  issafe_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsSafe)
+}
+
+// bool IsPush = 10;
+inline void Common2Rsp::clear_ispush() {
+  ispush_ = false;
+}
+inline bool Common2Rsp::ispush() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsPush)
+  return ispush_;
+}
+inline void Common2Rsp::set_ispush(bool value) {
+  
+  ispush_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsPush)
+}
+
+// bool UpCache = 11;
+inline void Common2Rsp::clear_upcache() {
+  upcache_ = false;
+}
+inline bool Common2Rsp::upcache() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.UpCache)
+  return upcache_;
+}
+inline void Common2Rsp::set_upcache(bool value) {
+  
+  upcache_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.UpCache)
+}
+
+// .txdata.MsgType RspType = 12;
+inline void Common2Rsp::clear_rsptype() {
+  rsptype_ = 0;
+}
+inline ::txdata::MsgType Common2Rsp::rsptype() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspType)
+  return static_cast< ::txdata::MsgType >(rsptype_);
+}
+inline void Common2Rsp::set_rsptype(::txdata::MsgType value) {
+  
+  rsptype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RspType)
+}
+
+// bytes RspData = 13;
+inline void Common2Rsp::clear_rspdata() {
+  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Common2Rsp::rspdata() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspData)
+  return rspdata_.GetNoArena();
+}
+inline void Common2Rsp::set_rspdata(const ::std::string& value) {
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RspData)
+}
+#if LANG_CXX11
+inline void Common2Rsp::set_rspdata(::std::string&& value) {
+  
+  rspdata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.RspData)
+}
+#endif
+inline void Common2Rsp::set_rspdata(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.RspData)
+}
+inline void Common2Rsp::set_rspdata(const void* value, size_t size) {
+  
+  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.RspData)
+}
+inline ::std::string* Common2Rsp::mutable_rspdata() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RspData)
+  return rspdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Common2Rsp::release_rspdata() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RspData)
+  
+  return rspdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Common2Rsp::set_allocated_rspdata(::std::string* rspdata) {
+  if (rspdata != NULL) {
+    
+  } else {
+    
+  }
+  rspdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rspdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RspData)
+}
+
+// .google.protobuf.Timestamp RspTime = 14;
+inline bool Common2Rsp::has_rsptime() const {
+  return this != internal_default_instance() && rsptime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& Common2Rsp::_internal_rsptime() const {
+  return *rsptime_;
+}
+inline const ::google::protobuf::Timestamp& Common2Rsp::rsptime() const {
+  const ::google::protobuf::Timestamp* p = rsptime_;
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* Common2Rsp::release_rsptime() {
+  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RspTime)
+  
+  ::google::protobuf::Timestamp* temp = rsptime_;
+  rsptime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* Common2Rsp::mutable_rsptime() {
+  
+  if (rsptime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    rsptime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RspTime)
+  return rsptime_;
+}
+inline void Common2Rsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsptime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(rsptime_);
+  }
+  if (rsptime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(rsptime)->GetArena();
+    if (message_arena != submessage_arena) {
+      rsptime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, rsptime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  rsptime_ = rsptime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RspTime)
+}
+
+// bool IsLast = 15;
+inline void Common2Rsp::clear_islast() {
+  islast_ = false;
+}
+inline bool Common2Rsp::islast() const {
+  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsLast)
+  return islast_;
+}
+inline void Common2Rsp::set_islast(bool value) {
+  
+  islast_ = value;
+  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsLast)
 }
 
 // -------------------------------------------------------------------
@@ -3820,1322 +5654,73 @@ inline void Common2Ack::set_islog(bool value) {
 
 // -------------------------------------------------------------------
 
-// Common2Req
+// CommonErr
 
-// .txdata.UniKey Key = 1;
-inline bool Common2Req::has_key() const {
-  return this != internal_default_instance() && key_ != NULL;
+// int32 ErrNo = 1;
+inline void CommonErr::clear_errno() {
+  errno_ = 0;
 }
-inline void Common2Req::clear_key() {
-  if (GetArenaNoVirtual() == NULL && key_ != NULL) {
-    delete key_;
-  }
-  key_ = NULL;
+inline ::google::protobuf::int32 CommonErr::errno() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonErr.ErrNo)
+  return errno_;
 }
-inline const ::txdata::UniKey& Common2Req::_internal_key() const {
-  return *key_;
-}
-inline const ::txdata::UniKey& Common2Req::key() const {
-  const ::txdata::UniKey* p = key_;
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.Key)
-  return p != NULL ? *p : *reinterpret_cast<const ::txdata::UniKey*>(
-      &::txdata::_UniKey_default_instance_);
-}
-inline ::txdata::UniKey* Common2Req::release_key() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Req.Key)
+inline void CommonErr::set_errno(::google::protobuf::int32 value) {
   
-  ::txdata::UniKey* temp = key_;
-  key_ = NULL;
-  return temp;
-}
-inline ::txdata::UniKey* Common2Req::mutable_key() {
-  
-  if (key_ == NULL) {
-    auto* p = CreateMaybeMessage<::txdata::UniKey>(GetArenaNoVirtual());
-    key_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.Key)
-  return key_;
-}
-inline void Common2Req::set_allocated_key(::txdata::UniKey* key) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete key_;
-  }
-  if (key) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      key = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, key, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  key_ = key;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.Key)
+  errno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.CommonErr.ErrNo)
 }
 
-// string SenderID = 2;
-inline void Common2Req::clear_senderid() {
-  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string ErrMsg = 2;
+inline void CommonErr::clear_errmsg() {
+  errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Common2Req::senderid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.SenderID)
-  return senderid_.GetNoArena();
+inline const ::std::string& CommonErr::errmsg() const {
+  // @@protoc_insertion_point(field_get:txdata.CommonErr.ErrMsg)
+  return errmsg_.GetNoArena();
 }
-inline void Common2Req::set_senderid(const ::std::string& value) {
+inline void CommonErr::set_errmsg(const ::std::string& value) {
   
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.SenderID)
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.CommonErr.ErrMsg)
 }
 #if LANG_CXX11
-inline void Common2Req::set_senderid(::std::string&& value) {
+inline void CommonErr::set_errmsg(::std::string&& value) {
   
-  senderid_.SetNoArena(
+  errmsg_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.SenderID)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.CommonErr.ErrMsg)
 }
 #endif
-inline void Common2Req::set_senderid(const char* value) {
+inline void CommonErr::set_errmsg(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.SenderID)
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.CommonErr.ErrMsg)
 }
-inline void Common2Req::set_senderid(const char* value, size_t size) {
+inline void CommonErr::set_errmsg(const char* value, size_t size) {
   
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.SenderID)
+  // @@protoc_insertion_point(field_set_pointer:txdata.CommonErr.ErrMsg)
 }
-inline ::std::string* Common2Req::mutable_senderid() {
+inline ::std::string* CommonErr::mutable_errmsg() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.SenderID)
-  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.CommonErr.ErrMsg)
+  return errmsg_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Common2Req::release_senderid() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Req.SenderID)
+inline ::std::string* CommonErr::release_errmsg() {
+  // @@protoc_insertion_point(field_release:txdata.CommonErr.ErrMsg)
   
-  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return errmsg_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Common2Req::set_allocated_senderid(::std::string* senderid) {
-  if (senderid != NULL) {
+inline void CommonErr::set_allocated_errmsg(::std::string* errmsg) {
+  if (errmsg != NULL) {
     
   } else {
     
   }
-  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.SenderID)
-}
-
-// string RecverID = 3;
-inline void Common2Req::clear_recverid() {
-  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common2Req::recverid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.RecverID)
-  return recverid_.GetNoArena();
-}
-inline void Common2Req::set_recverid(const ::std::string& value) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.RecverID)
-}
-#if LANG_CXX11
-inline void Common2Req::set_recverid(::std::string&& value) {
-  
-  recverid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.RecverID)
-}
-#endif
-inline void Common2Req::set_recverid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.RecverID)
-}
-inline void Common2Req::set_recverid(const char* value, size_t size) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.RecverID)
-}
-inline ::std::string* Common2Req::mutable_recverid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.RecverID)
-  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common2Req::release_recverid() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Req.RecverID)
-  
-  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common2Req::set_allocated_recverid(::std::string* recverid) {
-  if (recverid != NULL) {
-    
-  } else {
-    
-  }
-  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.RecverID)
-}
-
-// bool ToRoot = 4;
-inline void Common2Req::clear_toroot() {
-  toroot_ = false;
-}
-inline bool Common2Req::toroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.ToRoot)
-  return toroot_;
-}
-inline void Common2Req::set_toroot(bool value) {
-  
-  toroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.ToRoot)
-}
-
-// bool IsLog = 5;
-inline void Common2Req::clear_islog() {
-  islog_ = false;
-}
-inline bool Common2Req::islog() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsLog)
-  return islog_;
-}
-inline void Common2Req::set_islog(bool value) {
-  
-  islog_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsLog)
-}
-
-// bool IsSafe = 6;
-inline void Common2Req::clear_issafe() {
-  issafe_ = false;
-}
-inline bool Common2Req::issafe() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsSafe)
-  return issafe_;
-}
-inline void Common2Req::set_issafe(bool value) {
-  
-  issafe_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsSafe)
-}
-
-// bool IsPush = 7;
-inline void Common2Req::clear_ispush() {
-  ispush_ = false;
-}
-inline bool Common2Req::ispush() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.IsPush)
-  return ispush_;
-}
-inline void Common2Req::set_ispush(bool value) {
-  
-  ispush_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.IsPush)
-}
-
-// bool UpCache = 8;
-inline void Common2Req::clear_upcache() {
-  upcache_ = false;
-}
-inline bool Common2Req::upcache() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.UpCache)
-  return upcache_;
-}
-inline void Common2Req::set_upcache(bool value) {
-  
-  upcache_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.UpCache)
-}
-
-// .txdata.MsgType ReqType = 9;
-inline void Common2Req::clear_reqtype() {
-  reqtype_ = 0;
-}
-inline ::txdata::MsgType Common2Req::reqtype() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqType)
-  return static_cast< ::txdata::MsgType >(reqtype_);
-}
-inline void Common2Req::set_reqtype(::txdata::MsgType value) {
-  
-  reqtype_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.ReqType)
-}
-
-// bytes ReqData = 10;
-inline void Common2Req::clear_reqdata() {
-  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common2Req::reqdata() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqData)
-  return reqdata_.GetNoArena();
-}
-inline void Common2Req::set_reqdata(const ::std::string& value) {
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Req.ReqData)
-}
-#if LANG_CXX11
-inline void Common2Req::set_reqdata(::std::string&& value) {
-  
-  reqdata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Req.ReqData)
-}
-#endif
-inline void Common2Req::set_reqdata(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Req.ReqData)
-}
-inline void Common2Req::set_reqdata(const void* value, size_t size) {
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Req.ReqData)
-}
-inline ::std::string* Common2Req::mutable_reqdata() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.ReqData)
-  return reqdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common2Req::release_reqdata() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Req.ReqData)
-  
-  return reqdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common2Req::set_allocated_reqdata(::std::string* reqdata) {
-  if (reqdata != NULL) {
-    
-  } else {
-    
-  }
-  reqdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reqdata);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.ReqData)
-}
-
-// .google.protobuf.Timestamp ReqTime = 11;
-inline bool Common2Req::has_reqtime() const {
-  return this != internal_default_instance() && reqtime_ != NULL;
-}
-inline const ::google::protobuf::Timestamp& Common2Req::_internal_reqtime() const {
-  return *reqtime_;
-}
-inline const ::google::protobuf::Timestamp& Common2Req::reqtime() const {
-  const ::google::protobuf::Timestamp* p = reqtime_;
-  // @@protoc_insertion_point(field_get:txdata.Common2Req.ReqTime)
-  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
-      &::google::protobuf::_Timestamp_default_instance_);
-}
-inline ::google::protobuf::Timestamp* Common2Req::release_reqtime() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Req.ReqTime)
-  
-  ::google::protobuf::Timestamp* temp = reqtime_;
-  reqtime_ = NULL;
-  return temp;
-}
-inline ::google::protobuf::Timestamp* Common2Req::mutable_reqtime() {
-  
-  if (reqtime_ == NULL) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    reqtime_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Req.ReqTime)
-  return reqtime_;
-}
-inline void Common2Req::set_allocated_reqtime(::google::protobuf::Timestamp* reqtime) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reqtime_);
-  }
-  if (reqtime) {
-    ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(reqtime)->GetArena();
-    if (message_arena != submessage_arena) {
-      reqtime = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, reqtime, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  reqtime_ = reqtime;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Req.ReqTime)
-}
-
-// -------------------------------------------------------------------
-
-// Common2Rsp
-
-// .txdata.UniKey Key = 1;
-inline bool Common2Rsp::has_key() const {
-  return this != internal_default_instance() && key_ != NULL;
-}
-inline void Common2Rsp::clear_key() {
-  if (GetArenaNoVirtual() == NULL && key_ != NULL) {
-    delete key_;
-  }
-  key_ = NULL;
-}
-inline const ::txdata::UniKey& Common2Rsp::_internal_key() const {
-  return *key_;
-}
-inline const ::txdata::UniKey& Common2Rsp::key() const {
-  const ::txdata::UniKey* p = key_;
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.Key)
-  return p != NULL ? *p : *reinterpret_cast<const ::txdata::UniKey*>(
-      &::txdata::_UniKey_default_instance_);
-}
-inline ::txdata::UniKey* Common2Rsp::release_key() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.Key)
-  
-  ::txdata::UniKey* temp = key_;
-  key_ = NULL;
-  return temp;
-}
-inline ::txdata::UniKey* Common2Rsp::mutable_key() {
-  
-  if (key_ == NULL) {
-    auto* p = CreateMaybeMessage<::txdata::UniKey>(GetArenaNoVirtual());
-    key_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.Key)
-  return key_;
-}
-inline void Common2Rsp::set_allocated_key(::txdata::UniKey* key) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete key_;
-  }
-  if (key) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      key = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, key, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  key_ = key;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.Key)
-}
-
-// string SenderID = 2;
-inline void Common2Rsp::clear_senderid() {
-  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common2Rsp::senderid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.SenderID)
-  return senderid_.GetNoArena();
-}
-inline void Common2Rsp::set_senderid(const ::std::string& value) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.SenderID)
-}
-#if LANG_CXX11
-inline void Common2Rsp::set_senderid(::std::string&& value) {
-  
-  senderid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.SenderID)
-}
-#endif
-inline void Common2Rsp::set_senderid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.SenderID)
-}
-inline void Common2Rsp::set_senderid(const char* value, size_t size) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.SenderID)
-}
-inline ::std::string* Common2Rsp::mutable_senderid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.SenderID)
-  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common2Rsp::release_senderid() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.SenderID)
-  
-  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common2Rsp::set_allocated_senderid(::std::string* senderid) {
-  if (senderid != NULL) {
-    
-  } else {
-    
-  }
-  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.SenderID)
-}
-
-// string RecverID = 3;
-inline void Common2Rsp::clear_recverid() {
-  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common2Rsp::recverid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RecverID)
-  return recverid_.GetNoArena();
-}
-inline void Common2Rsp::set_recverid(const ::std::string& value) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RecverID)
-}
-#if LANG_CXX11
-inline void Common2Rsp::set_recverid(::std::string&& value) {
-  
-  recverid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.RecverID)
-}
-#endif
-inline void Common2Rsp::set_recverid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.RecverID)
-}
-inline void Common2Rsp::set_recverid(const char* value, size_t size) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.RecverID)
-}
-inline ::std::string* Common2Rsp::mutable_recverid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RecverID)
-  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common2Rsp::release_recverid() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RecverID)
-  
-  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common2Rsp::set_allocated_recverid(::std::string* recverid) {
-  if (recverid != NULL) {
-    
-  } else {
-    
-  }
-  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RecverID)
-}
-
-// bool ToRoot = 4;
-inline void Common2Rsp::clear_toroot() {
-  toroot_ = false;
-}
-inline bool Common2Rsp::toroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.ToRoot)
-  return toroot_;
-}
-inline void Common2Rsp::set_toroot(bool value) {
-  
-  toroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.ToRoot)
-}
-
-// bool IsLog = 5;
-inline void Common2Rsp::clear_islog() {
-  islog_ = false;
-}
-inline bool Common2Rsp::islog() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsLog)
-  return islog_;
-}
-inline void Common2Rsp::set_islog(bool value) {
-  
-  islog_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsLog)
-}
-
-// bool IsSafe = 6;
-inline void Common2Rsp::clear_issafe() {
-  issafe_ = false;
-}
-inline bool Common2Rsp::issafe() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsSafe)
-  return issafe_;
-}
-inline void Common2Rsp::set_issafe(bool value) {
-  
-  issafe_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsSafe)
-}
-
-// bool IsPush = 7;
-inline void Common2Rsp::clear_ispush() {
-  ispush_ = false;
-}
-inline bool Common2Rsp::ispush() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsPush)
-  return ispush_;
-}
-inline void Common2Rsp::set_ispush(bool value) {
-  
-  ispush_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsPush)
-}
-
-// bool UpCache = 8;
-inline void Common2Rsp::clear_upcache() {
-  upcache_ = false;
-}
-inline bool Common2Rsp::upcache() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.UpCache)
-  return upcache_;
-}
-inline void Common2Rsp::set_upcache(bool value) {
-  
-  upcache_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.UpCache)
-}
-
-// .txdata.MsgType RspType = 9;
-inline void Common2Rsp::clear_rsptype() {
-  rsptype_ = 0;
-}
-inline ::txdata::MsgType Common2Rsp::rsptype() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspType)
-  return static_cast< ::txdata::MsgType >(rsptype_);
-}
-inline void Common2Rsp::set_rsptype(::txdata::MsgType value) {
-  
-  rsptype_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RspType)
-}
-
-// bytes RspData = 10;
-inline void Common2Rsp::clear_rspdata() {
-  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common2Rsp::rspdata() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspData)
-  return rspdata_.GetNoArena();
-}
-inline void Common2Rsp::set_rspdata(const ::std::string& value) {
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.RspData)
-}
-#if LANG_CXX11
-inline void Common2Rsp::set_rspdata(::std::string&& value) {
-  
-  rspdata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common2Rsp.RspData)
-}
-#endif
-inline void Common2Rsp::set_rspdata(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common2Rsp.RspData)
-}
-inline void Common2Rsp::set_rspdata(const void* value, size_t size) {
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common2Rsp.RspData)
-}
-inline ::std::string* Common2Rsp::mutable_rspdata() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RspData)
-  return rspdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common2Rsp::release_rspdata() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RspData)
-  
-  return rspdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common2Rsp::set_allocated_rspdata(::std::string* rspdata) {
-  if (rspdata != NULL) {
-    
-  } else {
-    
-  }
-  rspdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rspdata);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RspData)
-}
-
-// .google.protobuf.Timestamp RspTime = 11;
-inline bool Common2Rsp::has_rsptime() const {
-  return this != internal_default_instance() && rsptime_ != NULL;
-}
-inline const ::google::protobuf::Timestamp& Common2Rsp::_internal_rsptime() const {
-  return *rsptime_;
-}
-inline const ::google::protobuf::Timestamp& Common2Rsp::rsptime() const {
-  const ::google::protobuf::Timestamp* p = rsptime_;
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.RspTime)
-  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
-      &::google::protobuf::_Timestamp_default_instance_);
-}
-inline ::google::protobuf::Timestamp* Common2Rsp::release_rsptime() {
-  // @@protoc_insertion_point(field_release:txdata.Common2Rsp.RspTime)
-  
-  ::google::protobuf::Timestamp* temp = rsptime_;
-  rsptime_ = NULL;
-  return temp;
-}
-inline ::google::protobuf::Timestamp* Common2Rsp::mutable_rsptime() {
-  
-  if (rsptime_ == NULL) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    rsptime_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common2Rsp.RspTime)
-  return rsptime_;
-}
-inline void Common2Rsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsptime) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(rsptime_);
-  }
-  if (rsptime) {
-    ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(rsptime)->GetArena();
-    if (message_arena != submessage_arena) {
-      rsptime = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, rsptime, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  rsptime_ = rsptime;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common2Rsp.RspTime)
-}
-
-// bool IsLast = 12;
-inline void Common2Rsp::clear_islast() {
-  islast_ = false;
-}
-inline bool Common2Rsp::islast() const {
-  // @@protoc_insertion_point(field_get:txdata.Common2Rsp.IsLast)
-  return islast_;
-}
-inline void Common2Rsp::set_islast(bool value) {
-  
-  islast_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common2Rsp.IsLast)
-}
-
-// -------------------------------------------------------------------
-
-// Common1Req
-
-// int64 MsgNo = 1;
-inline void Common1Req::clear_msgno() {
-  msgno_ = GOOGLE_LONGLONG(0);
-}
-inline ::google::protobuf::int64 Common1Req::msgno() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.MsgNo)
-  return msgno_;
-}
-inline void Common1Req::set_msgno(::google::protobuf::int64 value) {
-  
-  msgno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.MsgNo)
-}
-
-// int32 SeqNo = 2;
-inline void Common1Req::clear_seqno() {
-  seqno_ = 0;
-}
-inline ::google::protobuf::int32 Common1Req::seqno() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.SeqNo)
-  return seqno_;
-}
-inline void Common1Req::set_seqno(::google::protobuf::int32 value) {
-  
-  seqno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.SeqNo)
-}
-
-// string SenderID = 3;
-inline void Common1Req::clear_senderid() {
-  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Req::senderid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.SenderID)
-  return senderid_.GetNoArena();
-}
-inline void Common1Req::set_senderid(const ::std::string& value) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.SenderID)
-}
-#if LANG_CXX11
-inline void Common1Req::set_senderid(::std::string&& value) {
-  
-  senderid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.SenderID)
-}
-#endif
-inline void Common1Req::set_senderid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.SenderID)
-}
-inline void Common1Req::set_senderid(const char* value, size_t size) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.SenderID)
-}
-inline ::std::string* Common1Req::mutable_senderid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.SenderID)
-  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Req::release_senderid() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Req.SenderID)
-  
-  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Req::set_allocated_senderid(::std::string* senderid) {
-  if (senderid != NULL) {
-    
-  } else {
-    
-  }
-  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.SenderID)
-}
-
-// string RecverID = 4;
-inline void Common1Req::clear_recverid() {
-  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Req::recverid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.RecverID)
-  return recverid_.GetNoArena();
-}
-inline void Common1Req::set_recverid(const ::std::string& value) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.RecverID)
-}
-#if LANG_CXX11
-inline void Common1Req::set_recverid(::std::string&& value) {
-  
-  recverid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.RecverID)
-}
-#endif
-inline void Common1Req::set_recverid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.RecverID)
-}
-inline void Common1Req::set_recverid(const char* value, size_t size) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.RecverID)
-}
-inline ::std::string* Common1Req::mutable_recverid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.RecverID)
-  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Req::release_recverid() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Req.RecverID)
-  
-  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Req::set_allocated_recverid(::std::string* recverid) {
-  if (recverid != NULL) {
-    
-  } else {
-    
-  }
-  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.RecverID)
-}
-
-// bool ToRoot = 5;
-inline void Common1Req::clear_toroot() {
-  toroot_ = false;
-}
-inline bool Common1Req::toroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.ToRoot)
-  return toroot_;
-}
-inline void Common1Req::set_toroot(bool value) {
-  
-  toroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.ToRoot)
-}
-
-// bool IsLog = 6;
-inline void Common1Req::clear_islog() {
-  islog_ = false;
-}
-inline bool Common1Req::islog() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.IsLog)
-  return islog_;
-}
-inline void Common1Req::set_islog(bool value) {
-  
-  islog_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.IsLog)
-}
-
-// bool IsPush = 7;
-inline void Common1Req::clear_ispush() {
-  ispush_ = false;
-}
-inline bool Common1Req::ispush() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.IsPush)
-  return ispush_;
-}
-inline void Common1Req::set_ispush(bool value) {
-  
-  ispush_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.IsPush)
-}
-
-// .txdata.MsgType ReqType = 8;
-inline void Common1Req::clear_reqtype() {
-  reqtype_ = 0;
-}
-inline ::txdata::MsgType Common1Req::reqtype() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqType)
-  return static_cast< ::txdata::MsgType >(reqtype_);
-}
-inline void Common1Req::set_reqtype(::txdata::MsgType value) {
-  
-  reqtype_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.ReqType)
-}
-
-// bytes ReqData = 9;
-inline void Common1Req::clear_reqdata() {
-  reqdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Req::reqdata() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqData)
-  return reqdata_.GetNoArena();
-}
-inline void Common1Req::set_reqdata(const ::std::string& value) {
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Req.ReqData)
-}
-#if LANG_CXX11
-inline void Common1Req::set_reqdata(::std::string&& value) {
-  
-  reqdata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Req.ReqData)
-}
-#endif
-inline void Common1Req::set_reqdata(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Req.ReqData)
-}
-inline void Common1Req::set_reqdata(const void* value, size_t size) {
-  
-  reqdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Req.ReqData)
-}
-inline ::std::string* Common1Req::mutable_reqdata() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.ReqData)
-  return reqdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Req::release_reqdata() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Req.ReqData)
-  
-  return reqdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Req::set_allocated_reqdata(::std::string* reqdata) {
-  if (reqdata != NULL) {
-    
-  } else {
-    
-  }
-  reqdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reqdata);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.ReqData)
-}
-
-// .google.protobuf.Timestamp ReqTime = 10;
-inline bool Common1Req::has_reqtime() const {
-  return this != internal_default_instance() && reqtime_ != NULL;
-}
-inline const ::google::protobuf::Timestamp& Common1Req::_internal_reqtime() const {
-  return *reqtime_;
-}
-inline const ::google::protobuf::Timestamp& Common1Req::reqtime() const {
-  const ::google::protobuf::Timestamp* p = reqtime_;
-  // @@protoc_insertion_point(field_get:txdata.Common1Req.ReqTime)
-  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
-      &::google::protobuf::_Timestamp_default_instance_);
-}
-inline ::google::protobuf::Timestamp* Common1Req::release_reqtime() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Req.ReqTime)
-  
-  ::google::protobuf::Timestamp* temp = reqtime_;
-  reqtime_ = NULL;
-  return temp;
-}
-inline ::google::protobuf::Timestamp* Common1Req::mutable_reqtime() {
-  
-  if (reqtime_ == NULL) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    reqtime_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Req.ReqTime)
-  return reqtime_;
-}
-inline void Common1Req::set_allocated_reqtime(::google::protobuf::Timestamp* reqtime) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(reqtime_);
-  }
-  if (reqtime) {
-    ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(reqtime)->GetArena();
-    if (message_arena != submessage_arena) {
-      reqtime = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, reqtime, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  reqtime_ = reqtime;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Req.ReqTime)
-}
-
-// -------------------------------------------------------------------
-
-// Common1Rsp
-
-// int64 MsgNo = 1;
-inline void Common1Rsp::clear_msgno() {
-  msgno_ = GOOGLE_LONGLONG(0);
-}
-inline ::google::protobuf::int64 Common1Rsp::msgno() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.MsgNo)
-  return msgno_;
-}
-inline void Common1Rsp::set_msgno(::google::protobuf::int64 value) {
-  
-  msgno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.MsgNo)
-}
-
-// int32 SeqNo = 2;
-inline void Common1Rsp::clear_seqno() {
-  seqno_ = 0;
-}
-inline ::google::protobuf::int32 Common1Rsp::seqno() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.SeqNo)
-  return seqno_;
-}
-inline void Common1Rsp::set_seqno(::google::protobuf::int32 value) {
-  
-  seqno_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.SeqNo)
-}
-
-// string SenderID = 3;
-inline void Common1Rsp::clear_senderid() {
-  senderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Rsp::senderid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.SenderID)
-  return senderid_.GetNoArena();
-}
-inline void Common1Rsp::set_senderid(const ::std::string& value) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.SenderID)
-}
-#if LANG_CXX11
-inline void Common1Rsp::set_senderid(::std::string&& value) {
-  
-  senderid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.SenderID)
-}
-#endif
-inline void Common1Rsp::set_senderid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.SenderID)
-}
-inline void Common1Rsp::set_senderid(const char* value, size_t size) {
-  
-  senderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.SenderID)
-}
-inline ::std::string* Common1Rsp::mutable_senderid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.SenderID)
-  return senderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Rsp::release_senderid() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.SenderID)
-  
-  return senderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Rsp::set_allocated_senderid(::std::string* senderid) {
-  if (senderid != NULL) {
-    
-  } else {
-    
-  }
-  senderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), senderid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.SenderID)
-}
-
-// string RecverID = 4;
-inline void Common1Rsp::clear_recverid() {
-  recverid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Rsp::recverid() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RecverID)
-  return recverid_.GetNoArena();
-}
-inline void Common1Rsp::set_recverid(const ::std::string& value) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RecverID)
-}
-#if LANG_CXX11
-inline void Common1Rsp::set_recverid(::std::string&& value) {
-  
-  recverid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.RecverID)
-}
-#endif
-inline void Common1Rsp::set_recverid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.RecverID)
-}
-inline void Common1Rsp::set_recverid(const char* value, size_t size) {
-  
-  recverid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.RecverID)
-}
-inline ::std::string* Common1Rsp::mutable_recverid() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RecverID)
-  return recverid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Rsp::release_recverid() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RecverID)
-  
-  return recverid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Rsp::set_allocated_recverid(::std::string* recverid) {
-  if (recverid != NULL) {
-    
-  } else {
-    
-  }
-  recverid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), recverid);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RecverID)
-}
-
-// bool ToRoot = 5;
-inline void Common1Rsp::clear_toroot() {
-  toroot_ = false;
-}
-inline bool Common1Rsp::toroot() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.ToRoot)
-  return toroot_;
-}
-inline void Common1Rsp::set_toroot(bool value) {
-  
-  toroot_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.ToRoot)
-}
-
-// bool IsLog = 6;
-inline void Common1Rsp::clear_islog() {
-  islog_ = false;
-}
-inline bool Common1Rsp::islog() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsLog)
-  return islog_;
-}
-inline void Common1Rsp::set_islog(bool value) {
-  
-  islog_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsLog)
-}
-
-// bool IsPush = 7;
-inline void Common1Rsp::clear_ispush() {
-  ispush_ = false;
-}
-inline bool Common1Rsp::ispush() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsPush)
-  return ispush_;
-}
-inline void Common1Rsp::set_ispush(bool value) {
-  
-  ispush_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsPush)
-}
-
-// .txdata.MsgType RspType = 8;
-inline void Common1Rsp::clear_rsptype() {
-  rsptype_ = 0;
-}
-inline ::txdata::MsgType Common1Rsp::rsptype() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspType)
-  return static_cast< ::txdata::MsgType >(rsptype_);
-}
-inline void Common1Rsp::set_rsptype(::txdata::MsgType value) {
-  
-  rsptype_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RspType)
-}
-
-// bytes RspData = 9;
-inline void Common1Rsp::clear_rspdata() {
-  rspdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Common1Rsp::rspdata() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspData)
-  return rspdata_.GetNoArena();
-}
-inline void Common1Rsp::set_rspdata(const ::std::string& value) {
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.RspData)
-}
-#if LANG_CXX11
-inline void Common1Rsp::set_rspdata(::std::string&& value) {
-  
-  rspdata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.Common1Rsp.RspData)
-}
-#endif
-inline void Common1Rsp::set_rspdata(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.Common1Rsp.RspData)
-}
-inline void Common1Rsp::set_rspdata(const void* value, size_t size) {
-  
-  rspdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.Common1Rsp.RspData)
-}
-inline ::std::string* Common1Rsp::mutable_rspdata() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RspData)
-  return rspdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Common1Rsp::release_rspdata() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RspData)
-  
-  return rspdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Common1Rsp::set_allocated_rspdata(::std::string* rspdata) {
-  if (rspdata != NULL) {
-    
-  } else {
-    
-  }
-  rspdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rspdata);
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspData)
-}
-
-// .google.protobuf.Timestamp RspTime = 10;
-inline bool Common1Rsp::has_rsptime() const {
-  return this != internal_default_instance() && rsptime_ != NULL;
-}
-inline const ::google::protobuf::Timestamp& Common1Rsp::_internal_rsptime() const {
-  return *rsptime_;
-}
-inline const ::google::protobuf::Timestamp& Common1Rsp::rsptime() const {
-  const ::google::protobuf::Timestamp* p = rsptime_;
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.RspTime)
-  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
-      &::google::protobuf::_Timestamp_default_instance_);
-}
-inline ::google::protobuf::Timestamp* Common1Rsp::release_rsptime() {
-  // @@protoc_insertion_point(field_release:txdata.Common1Rsp.RspTime)
-  
-  ::google::protobuf::Timestamp* temp = rsptime_;
-  rsptime_ = NULL;
-  return temp;
-}
-inline ::google::protobuf::Timestamp* Common1Rsp::mutable_rsptime() {
-  
-  if (rsptime_ == NULL) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    rsptime_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:txdata.Common1Rsp.RspTime)
-  return rsptime_;
-}
-inline void Common1Rsp::set_allocated_rsptime(::google::protobuf::Timestamp* rsptime) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(rsptime_);
-  }
-  if (rsptime) {
-    ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(rsptime)->GetArena();
-    if (message_arena != submessage_arena) {
-      rsptime = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, rsptime, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  rsptime_ = rsptime;
-  // @@protoc_insertion_point(field_set_allocated:txdata.Common1Rsp.RspTime)
-}
-
-// bool IsLast = 11;
-inline void Common1Rsp::clear_islast() {
-  islast_ = false;
-}
-inline bool Common1Rsp::islast() const {
-  // @@protoc_insertion_point(field_get:txdata.Common1Rsp.IsLast)
-  return islast_;
-}
-inline void Common1Rsp::set_islast(bool value) {
-  
-  islast_ = value;
-  // @@protoc_insertion_point(field_set:txdata.Common1Rsp.IsLast)
+  errmsg_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), errmsg);
+  // @@protoc_insertion_point(field_set_allocated:txdata.CommonErr.ErrMsg)
 }
 
 // -------------------------------------------------------------------
@@ -5821,7 +6406,21 @@ inline void OnlineNotice::set_rootisonline(bool value) {
 
 // SystemReport
 
-// string UserID = 1;
+// int32 Level = 1;
+inline void SystemReport::clear_level() {
+  level_ = 0;
+}
+inline ::google::protobuf::int32 SystemReport::level() const {
+  // @@protoc_insertion_point(field_get:txdata.SystemReport.Level)
+  return level_;
+}
+inline void SystemReport::set_level(::google::protobuf::int32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:txdata.SystemReport.Level)
+}
+
+// string UserID = 2;
 inline void SystemReport::clear_userid() {
   userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -5874,7 +6473,7 @@ inline void SystemReport::set_allocated_userid(::std::string* userid) {
   // @@protoc_insertion_point(field_set_allocated:txdata.SystemReport.UserID)
 }
 
-// repeated string Pathway = 2;
+// repeated string Pathway = 3;
 inline int SystemReport::pathway_size() const {
   return pathway_.size();
 }
@@ -5943,7 +6542,7 @@ SystemReport::mutable_pathway() {
   return &pathway_;
 }
 
-// string Message = 3;
+// string Message = 4;
 inline void SystemReport::clear_message() {
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -5994,6 +6593,553 @@ inline void SystemReport::set_allocated_message(::std::string* message) {
   }
   message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
   // @@protoc_insertion_point(field_set_allocated:txdata.SystemReport.Message)
+}
+
+// -------------------------------------------------------------------
+
+// EchoItem
+
+// string Data = 1;
+inline void EchoItem::clear_data() {
+  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EchoItem::data() const {
+  // @@protoc_insertion_point(field_get:txdata.EchoItem.Data)
+  return data_.GetNoArena();
+}
+inline void EchoItem::set_data(const ::std::string& value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EchoItem.Data)
+}
+#if LANG_CXX11
+inline void EchoItem::set_data(::std::string&& value) {
+  
+  data_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EchoItem.Data)
+}
+#endif
+inline void EchoItem::set_data(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EchoItem.Data)
+}
+inline void EchoItem::set_data(const char* value, size_t size) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EchoItem.Data)
+}
+inline ::std::string* EchoItem::mutable_data() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EchoItem.Data)
+  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EchoItem::release_data() {
+  // @@protoc_insertion_point(field_release:txdata.EchoItem.Data)
+  
+  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EchoItem::set_allocated_data(::std::string* data) {
+  if (data != NULL) {
+    
+  } else {
+    
+  }
+  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EchoItem.Data)
+}
+
+// int32 RspCnt = 2;
+inline void EchoItem::clear_rspcnt() {
+  rspcnt_ = 0;
+}
+inline ::google::protobuf::int32 EchoItem::rspcnt() const {
+  // @@protoc_insertion_point(field_get:txdata.EchoItem.RspCnt)
+  return rspcnt_;
+}
+inline void EchoItem::set_rspcnt(::google::protobuf::int32 value) {
+  
+  rspcnt_ = value;
+  // @@protoc_insertion_point(field_set:txdata.EchoItem.RspCnt)
+}
+
+// int32 SecGap = 3;
+inline void EchoItem::clear_secgap() {
+  secgap_ = 0;
+}
+inline ::google::protobuf::int32 EchoItem::secgap() const {
+  // @@protoc_insertion_point(field_get:txdata.EchoItem.SecGap)
+  return secgap_;
+}
+inline void EchoItem::set_secgap(::google::protobuf::int32 value) {
+  
+  secgap_ = value;
+  // @@protoc_insertion_point(field_set:txdata.EchoItem.SecGap)
+}
+
+// -------------------------------------------------------------------
+
+// BinItem
+
+// int32 Type = 1;
+inline void BinItem::clear_type() {
+  type_ = 0;
+}
+inline ::google::protobuf::int32 BinItem::type() const {
+  // @@protoc_insertion_point(field_get:txdata.BinItem.Type)
+  return type_;
+}
+inline void BinItem::set_type(::google::protobuf::int32 value) {
+  
+  type_ = value;
+  // @@protoc_insertion_point(field_set:txdata.BinItem.Type)
+}
+
+// repeated bytes Data = 2;
+inline int BinItem::data_size() const {
+  return data_.size();
+}
+inline void BinItem::clear_data() {
+  data_.Clear();
+}
+inline const ::std::string& BinItem::data(int index) const {
+  // @@protoc_insertion_point(field_get:txdata.BinItem.Data)
+  return data_.Get(index);
+}
+inline ::std::string* BinItem::mutable_data(int index) {
+  // @@protoc_insertion_point(field_mutable:txdata.BinItem.Data)
+  return data_.Mutable(index);
+}
+inline void BinItem::set_data(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:txdata.BinItem.Data)
+  data_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void BinItem::set_data(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:txdata.BinItem.Data)
+  data_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void BinItem::set_data(int index, const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  data_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:txdata.BinItem.Data)
+}
+inline void BinItem::set_data(int index, const void* value, size_t size) {
+  data_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:txdata.BinItem.Data)
+}
+inline ::std::string* BinItem::add_data() {
+  // @@protoc_insertion_point(field_add_mutable:txdata.BinItem.Data)
+  return data_.Add();
+}
+inline void BinItem::add_data(const ::std::string& value) {
+  data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:txdata.BinItem.Data)
+}
+#if LANG_CXX11
+inline void BinItem::add_data(::std::string&& value) {
+  data_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:txdata.BinItem.Data)
+}
+#endif
+inline void BinItem::add_data(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:txdata.BinItem.Data)
+}
+inline void BinItem::add_data(const void* value, size_t size) {
+  data_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:txdata.BinItem.Data)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+BinItem::data() const {
+  // @@protoc_insertion_point(field_list:txdata.BinItem.Data)
+  return data_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+BinItem::mutable_data() {
+  // @@protoc_insertion_point(field_mutable_list:txdata.BinItem.Data)
+  return &data_;
+}
+
+// -------------------------------------------------------------------
+
+// EmailItem
+
+// string Username = 1;
+inline void EmailItem::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::username() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.Username)
+  return username_.GetNoArena();
+}
+inline void EmailItem::set_username(const ::std::string& value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.Username)
+}
+#if LANG_CXX11
+inline void EmailItem::set_username(::std::string&& value) {
+  
+  username_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.Username)
+}
+#endif
+inline void EmailItem::set_username(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.Username)
+}
+inline void EmailItem::set_username(const char* value, size_t size) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.Username)
+}
+inline ::std::string* EmailItem::mutable_username() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.Username)
+  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_username() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.Username)
+  
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
+    
+  } else {
+    
+  }
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.Username)
+}
+
+// string Password = 2;
+inline void EmailItem::clear_password() {
+  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::password() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.Password)
+  return password_.GetNoArena();
+}
+inline void EmailItem::set_password(const ::std::string& value) {
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.Password)
+}
+#if LANG_CXX11
+inline void EmailItem::set_password(::std::string&& value) {
+  
+  password_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.Password)
+}
+#endif
+inline void EmailItem::set_password(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.Password)
+}
+inline void EmailItem::set_password(const char* value, size_t size) {
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.Password)
+}
+inline ::std::string* EmailItem::mutable_password() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.Password)
+  return password_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_password() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.Password)
+  
+  return password_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_password(::std::string* password) {
+  if (password != NULL) {
+    
+  } else {
+    
+  }
+  password_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), password);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.Password)
+}
+
+// string SmtpAddr = 3;
+inline void EmailItem::clear_smtpaddr() {
+  smtpaddr_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::smtpaddr() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.SmtpAddr)
+  return smtpaddr_.GetNoArena();
+}
+inline void EmailItem::set_smtpaddr(const ::std::string& value) {
+  
+  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.SmtpAddr)
+}
+#if LANG_CXX11
+inline void EmailItem::set_smtpaddr(::std::string&& value) {
+  
+  smtpaddr_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.SmtpAddr)
+}
+#endif
+inline void EmailItem::set_smtpaddr(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.SmtpAddr)
+}
+inline void EmailItem::set_smtpaddr(const char* value, size_t size) {
+  
+  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.SmtpAddr)
+}
+inline ::std::string* EmailItem::mutable_smtpaddr() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.SmtpAddr)
+  return smtpaddr_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_smtpaddr() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.SmtpAddr)
+  
+  return smtpaddr_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_smtpaddr(::std::string* smtpaddr) {
+  if (smtpaddr != NULL) {
+    
+  } else {
+    
+  }
+  smtpaddr_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), smtpaddr);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.SmtpAddr)
+}
+
+// string To = 4;
+inline void EmailItem::clear_to() {
+  to_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::to() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.To)
+  return to_.GetNoArena();
+}
+inline void EmailItem::set_to(const ::std::string& value) {
+  
+  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.To)
+}
+#if LANG_CXX11
+inline void EmailItem::set_to(::std::string&& value) {
+  
+  to_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.To)
+}
+#endif
+inline void EmailItem::set_to(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.To)
+}
+inline void EmailItem::set_to(const char* value, size_t size) {
+  
+  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.To)
+}
+inline ::std::string* EmailItem::mutable_to() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.To)
+  return to_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_to() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.To)
+  
+  return to_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_to(::std::string* to) {
+  if (to != NULL) {
+    
+  } else {
+    
+  }
+  to_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), to);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.To)
+}
+
+// string Subject = 5;
+inline void EmailItem::clear_subject() {
+  subject_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::subject() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.Subject)
+  return subject_.GetNoArena();
+}
+inline void EmailItem::set_subject(const ::std::string& value) {
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.Subject)
+}
+#if LANG_CXX11
+inline void EmailItem::set_subject(::std::string&& value) {
+  
+  subject_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.Subject)
+}
+#endif
+inline void EmailItem::set_subject(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.Subject)
+}
+inline void EmailItem::set_subject(const char* value, size_t size) {
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.Subject)
+}
+inline ::std::string* EmailItem::mutable_subject() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.Subject)
+  return subject_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_subject() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.Subject)
+  
+  return subject_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_subject(::std::string* subject) {
+  if (subject != NULL) {
+    
+  } else {
+    
+  }
+  subject_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), subject);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.Subject)
+}
+
+// string ContentType = 6;
+inline void EmailItem::clear_contenttype() {
+  contenttype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::contenttype() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.ContentType)
+  return contenttype_.GetNoArena();
+}
+inline void EmailItem::set_contenttype(const ::std::string& value) {
+  
+  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.ContentType)
+}
+#if LANG_CXX11
+inline void EmailItem::set_contenttype(::std::string&& value) {
+  
+  contenttype_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.ContentType)
+}
+#endif
+inline void EmailItem::set_contenttype(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.ContentType)
+}
+inline void EmailItem::set_contenttype(const char* value, size_t size) {
+  
+  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.ContentType)
+}
+inline ::std::string* EmailItem::mutable_contenttype() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.ContentType)
+  return contenttype_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_contenttype() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.ContentType)
+  
+  return contenttype_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_contenttype(::std::string* contenttype) {
+  if (contenttype != NULL) {
+    
+  } else {
+    
+  }
+  contenttype_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), contenttype);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.ContentType)
+}
+
+// string Content = 7;
+inline void EmailItem::clear_content() {
+  content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EmailItem::content() const {
+  // @@protoc_insertion_point(field_get:txdata.EmailItem.Content)
+  return content_.GetNoArena();
+}
+inline void EmailItem::set_content(const ::std::string& value) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.EmailItem.Content)
+}
+#if LANG_CXX11
+inline void EmailItem::set_content(::std::string&& value) {
+  
+  content_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.EmailItem.Content)
+}
+#endif
+inline void EmailItem::set_content(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.EmailItem.Content)
+}
+inline void EmailItem::set_content(const char* value, size_t size) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.EmailItem.Content)
+}
+inline ::std::string* EmailItem::mutable_content() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.EmailItem.Content)
+  return content_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EmailItem::release_content() {
+  // @@protoc_insertion_point(field_release:txdata.EmailItem.Content)
+  
+  return content_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EmailItem::set_allocated_content(::std::string* content) {
+  if (content != NULL) {
+    
+  } else {
+    
+  }
+  content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
+  // @@protoc_insertion_point(field_set_allocated:txdata.EmailItem.Content)
 }
 
 // -------------------------------------------------------------------
@@ -6404,94 +7550,23 @@ inline void ExecCmdRsp::set_allocated_reply(::std::string* reply) {
 
 // -------------------------------------------------------------------
 
-// EchoItem
-
-// string Data = 1;
-inline void EchoItem::clear_data() {
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& EchoItem::data() const {
-  // @@protoc_insertion_point(field_get:txdata.EchoItem.Data)
-  return data_.GetNoArena();
-}
-inline void EchoItem::set_data(const ::std::string& value) {
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.EchoItem.Data)
-}
-#if LANG_CXX11
-inline void EchoItem::set_data(::std::string&& value) {
-  
-  data_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.EchoItem.Data)
-}
-#endif
-inline void EchoItem::set_data(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.EchoItem.Data)
-}
-inline void EchoItem::set_data(const char* value, size_t size) {
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.EchoItem.Data)
-}
-inline ::std::string* EchoItem::mutable_data() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.EchoItem.Data)
-  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* EchoItem::release_data() {
-  // @@protoc_insertion_point(field_release:txdata.EchoItem.Data)
-  
-  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void EchoItem::set_allocated_data(::std::string* data) {
-  if (data != NULL) {
-    
-  } else {
-    
-  }
-  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:txdata.EchoItem.Data)
-}
-
-// int32 RspCnt = 2;
-inline void EchoItem::clear_rspcnt() {
-  rspcnt_ = 0;
-}
-inline ::google::protobuf::int32 EchoItem::rspcnt() const {
-  // @@protoc_insertion_point(field_get:txdata.EchoItem.RspCnt)
-  return rspcnt_;
-}
-inline void EchoItem::set_rspcnt(::google::protobuf::int32 value) {
-  
-  rspcnt_ = value;
-  // @@protoc_insertion_point(field_set:txdata.EchoItem.RspCnt)
-}
-
-// int32 SecGap = 3;
-inline void EchoItem::clear_secgap() {
-  secgap_ = 0;
-}
-inline ::google::protobuf::int32 EchoItem::secgap() const {
-  // @@protoc_insertion_point(field_get:txdata.EchoItem.SecGap)
-  return secgap_;
-}
-inline void EchoItem::set_secgap(::google::protobuf::int32 value) {
-  
-  secgap_ = value;
-  // @@protoc_insertion_point(field_set:txdata.EchoItem.SecGap)
-}
-
-// -------------------------------------------------------------------
-
 // ReportDataItem
 
-// string Topic = 1;
+// int32 Level = 1;
+inline void ReportDataItem::clear_level() {
+  level_ = 0;
+}
+inline ::google::protobuf::int32 ReportDataItem::level() const {
+  // @@protoc_insertion_point(field_get:txdata.ReportDataItem.Level)
+  return level_;
+}
+inline void ReportDataItem::set_level(::google::protobuf::int32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:txdata.ReportDataItem.Level)
+}
+
+// string Topic = 2;
 inline void ReportDataItem::clear_topic() {
   topic_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -6544,7 +7619,7 @@ inline void ReportDataItem::set_allocated_topic(::std::string* topic) {
   // @@protoc_insertion_point(field_set_allocated:txdata.ReportDataItem.Topic)
 }
 
-// string Data = 2;
+// string Data = 3;
 inline void ReportDataItem::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -6597,384 +7672,11 @@ inline void ReportDataItem::set_allocated_data(::std::string* data) {
   // @@protoc_insertion_point(field_set_allocated:txdata.ReportDataItem.Data)
 }
 
-// -------------------------------------------------------------------
-
-// SendMailItem
-
-// string Username = 1;
-inline void SendMailItem::clear_username() {
-  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::username() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.Username)
-  return username_.GetNoArena();
-}
-inline void SendMailItem::set_username(const ::std::string& value) {
-  
-  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.Username)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_username(::std::string&& value) {
-  
-  username_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.Username)
-}
-#endif
-inline void SendMailItem::set_username(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.Username)
-}
-inline void SendMailItem::set_username(const char* value, size_t size) {
-  
-  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.Username)
-}
-inline ::std::string* SendMailItem::mutable_username() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.Username)
-  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_username() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.Username)
-  
-  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_username(::std::string* username) {
-  if (username != NULL) {
-    
-  } else {
-    
-  }
-  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.Username)
-}
-
-// string Password = 2;
-inline void SendMailItem::clear_password() {
-  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::password() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.Password)
-  return password_.GetNoArena();
-}
-inline void SendMailItem::set_password(const ::std::string& value) {
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.Password)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_password(::std::string&& value) {
-  
-  password_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.Password)
-}
-#endif
-inline void SendMailItem::set_password(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.Password)
-}
-inline void SendMailItem::set_password(const char* value, size_t size) {
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.Password)
-}
-inline ::std::string* SendMailItem::mutable_password() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.Password)
-  return password_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_password() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.Password)
-  
-  return password_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_password(::std::string* password) {
-  if (password != NULL) {
-    
-  } else {
-    
-  }
-  password_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), password);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.Password)
-}
-
-// string SmtpAddr = 3;
-inline void SendMailItem::clear_smtpaddr() {
-  smtpaddr_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::smtpaddr() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.SmtpAddr)
-  return smtpaddr_.GetNoArena();
-}
-inline void SendMailItem::set_smtpaddr(const ::std::string& value) {
-  
-  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.SmtpAddr)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_smtpaddr(::std::string&& value) {
-  
-  smtpaddr_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.SmtpAddr)
-}
-#endif
-inline void SendMailItem::set_smtpaddr(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.SmtpAddr)
-}
-inline void SendMailItem::set_smtpaddr(const char* value, size_t size) {
-  
-  smtpaddr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.SmtpAddr)
-}
-inline ::std::string* SendMailItem::mutable_smtpaddr() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.SmtpAddr)
-  return smtpaddr_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_smtpaddr() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.SmtpAddr)
-  
-  return smtpaddr_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_smtpaddr(::std::string* smtpaddr) {
-  if (smtpaddr != NULL) {
-    
-  } else {
-    
-  }
-  smtpaddr_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), smtpaddr);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.SmtpAddr)
-}
-
-// string To = 4;
-inline void SendMailItem::clear_to() {
-  to_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::to() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.To)
-  return to_.GetNoArena();
-}
-inline void SendMailItem::set_to(const ::std::string& value) {
-  
-  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.To)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_to(::std::string&& value) {
-  
-  to_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.To)
-}
-#endif
-inline void SendMailItem::set_to(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.To)
-}
-inline void SendMailItem::set_to(const char* value, size_t size) {
-  
-  to_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.To)
-}
-inline ::std::string* SendMailItem::mutable_to() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.To)
-  return to_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_to() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.To)
-  
-  return to_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_to(::std::string* to) {
-  if (to != NULL) {
-    
-  } else {
-    
-  }
-  to_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), to);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.To)
-}
-
-// string Subject = 5;
-inline void SendMailItem::clear_subject() {
-  subject_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::subject() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.Subject)
-  return subject_.GetNoArena();
-}
-inline void SendMailItem::set_subject(const ::std::string& value) {
-  
-  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.Subject)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_subject(::std::string&& value) {
-  
-  subject_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.Subject)
-}
-#endif
-inline void SendMailItem::set_subject(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.Subject)
-}
-inline void SendMailItem::set_subject(const char* value, size_t size) {
-  
-  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.Subject)
-}
-inline ::std::string* SendMailItem::mutable_subject() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.Subject)
-  return subject_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_subject() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.Subject)
-  
-  return subject_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_subject(::std::string* subject) {
-  if (subject != NULL) {
-    
-  } else {
-    
-  }
-  subject_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), subject);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.Subject)
-}
-
-// string ContentType = 6;
-inline void SendMailItem::clear_contenttype() {
-  contenttype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::contenttype() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.ContentType)
-  return contenttype_.GetNoArena();
-}
-inline void SendMailItem::set_contenttype(const ::std::string& value) {
-  
-  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.ContentType)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_contenttype(::std::string&& value) {
-  
-  contenttype_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.ContentType)
-}
-#endif
-inline void SendMailItem::set_contenttype(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.ContentType)
-}
-inline void SendMailItem::set_contenttype(const char* value, size_t size) {
-  
-  contenttype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.ContentType)
-}
-inline ::std::string* SendMailItem::mutable_contenttype() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.ContentType)
-  return contenttype_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_contenttype() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.ContentType)
-  
-  return contenttype_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_contenttype(::std::string* contenttype) {
-  if (contenttype != NULL) {
-    
-  } else {
-    
-  }
-  contenttype_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), contenttype);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.ContentType)
-}
-
-// string Content = 7;
-inline void SendMailItem::clear_content() {
-  content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SendMailItem::content() const {
-  // @@protoc_insertion_point(field_get:txdata.SendMailItem.Content)
-  return content_.GetNoArena();
-}
-inline void SendMailItem::set_content(const ::std::string& value) {
-  
-  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.SendMailItem.Content)
-}
-#if LANG_CXX11
-inline void SendMailItem::set_content(::std::string&& value) {
-  
-  content_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.SendMailItem.Content)
-}
-#endif
-inline void SendMailItem::set_content(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.SendMailItem.Content)
-}
-inline void SendMailItem::set_content(const char* value, size_t size) {
-  
-  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.SendMailItem.Content)
-}
-inline ::std::string* SendMailItem::mutable_content() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.SendMailItem.Content)
-  return content_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SendMailItem::release_content() {
-  // @@protoc_insertion_point(field_release:txdata.SendMailItem.Content)
-  
-  return content_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SendMailItem::set_allocated_content(::std::string* content) {
-  if (content != NULL) {
-    
-  } else {
-    
-  }
-  content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
-  // @@protoc_insertion_point(field_set_allocated:txdata.SendMailItem.Content)
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
