@@ -751,6 +751,9 @@ func (thls *businessNode) genRsp4Common2Req(dataReq *txdata.Common2Req, seqno in
 	dataRsp = &txdata.Common2Rsp{}
 	dataRsp.Key = cloneUniKey(dataReq.Key)
 	dataRsp.Key.SeqNo = seqno
+	dataRsp.BatchNo = dataReq.BatchNo
+	dataRsp.RefNum = dataReq.RefNum
+	dataRsp.RefText = dataReq.RefText
 	dataRsp.SenderID = thls.ownInfo.UserID
 	dataRsp.RecverID = dataRsp.Key.UserID
 	dataRsp.ToRoot = !dataReq.ToRoot //TODO:好像在ROOT的时候有问题.
@@ -770,6 +773,9 @@ func (thls *businessNode) genRsp4Common1Req(dataReq *txdata.Common1Req, seqno in
 	dataRsp = &txdata.Common1Rsp{}
 	dataRsp.MsgNo = dataReq.MsgNo
 	dataRsp.SeqNo = seqno
+	dataRsp.BatchNo = dataReq.BatchNo
+	dataRsp.RefNum = dataReq.RefNum
+	dataRsp.RefText = dataReq.RefText
 	dataRsp.SenderID = thls.ownInfo.UserID
 	dataRsp.RecverID = dataReq.SenderID
 	dataRsp.ToRoot = !dataReq.ToRoot
