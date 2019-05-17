@@ -111,17 +111,17 @@ message Common2Rsp {
 
 //对某消息进行确认.
 message Common2Ack {
-    UniKey  Key      = 1;
-    string  SenderID = 2;//消息的发送者.
-    string  RecverID = 3;//消息的接收者.
-    bool    ToRoot   = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
-    bool    IsLog    = 5;//对本消息打日志.
+    UniKey                    Key      = 1;
+    string                    SenderID = 2;//消息的发送者.
+    string                    RecverID = 3;//消息的接收者.
+    bool                      ToRoot   = 4;//传输到ROOT(当前的传输方向,是往ROOT的方向进行传输).
+    bool                      IsLog    = 5;//对本消息打日志.
 }
 
-//常用于(Common2Req)和(Common2Rsp)的通信过程中.
+//常用于(Common1Req)和(Common1Rsp)和(Common2Req)和(Common2Rsp)的通信过程中.
 message CommonErr {
-    int32                     ErrNo    = 1;
-    string                    ErrMsg   = 2;
+    int32  ErrNo  = 1;
+    string ErrMsg = 2;
 }
 
 message ConnectionInfo {
@@ -130,13 +130,13 @@ message ConnectionInfo {
         CONNECT = 1; //以client的身份,connect到server,建立起来的连接.
         ACCEPT  = 2; //以server的身份,accept,建立起来的连接.
     }
-    string    UserID   = 1;//为空表示ROOT节点.
-    string    BelongID = 2;//为空表示ROOT节点.
-    string    Version  = 3;//版本号
-    LinkType  LinkMode = 4;//连接方向
-    int32     ExePid   = 5;//进程ID
-    string    ExePath  = 6;//程序路径
-    string    Remark   = 7;//备注
+    string   UserID   = 1;//为空表示ROOT节点.
+    string   BelongID = 2;//为空表示ROOT节点.
+    string   Version  = 3;//版本号
+    LinkType LinkMode = 4;//连接方向
+    int32    ExePid   = 5;//进程ID
+    string   ExePath  = 6;//程序路径
+    string   Remark   = 7;//备注
 }
 
 message DisconnectedData {
