@@ -113,6 +113,9 @@ void zxtools::Common1Req2CommonData(CommonData* dst, const txdata::Common1Req* s
     dst->UserID = QString::fromStdString(src->senderid());
     dst->MsgNo = src->msgno();
     dst->SeqNo = src->seqno();
+    dst->BatchNo = src->batchno();
+    dst->RefNum = src->refnum();
+    dst->RefText = QString::fromStdString(src->reftext());
     dst->SenderID = QString::fromStdString(src->senderid());
     dst->RecverID = QString::fromStdString(src->recverid());
     dst->ToRoot = src->toroot();
@@ -133,6 +136,9 @@ void zxtools::CommonData2Common1Req(txdata::Common1Req* dst, const CommonData* s
 {
     dst->set_msgno(src->MsgNo);
     dst->set_seqno(src->SeqNo);
+    dst->set_batchno(src->BatchNo);
+    dst->set_refnum(src->RefNum);
+    dst->set_reftext(src->RefText.toStdString());
     dst->set_senderid(src->SenderID.toStdString());
     dst->set_recverid(src->RecverID.toStdString());
     dst->set_toroot(src->ToRoot);
@@ -152,6 +158,9 @@ void zxtools::Common1Rsp2CommonData(CommonData* dst, const txdata::Common1Rsp* s
     dst->UserID = QString::fromStdString(src->recverid());
     dst->MsgNo = src->msgno();
     dst->SeqNo = src->seqno();
+    dst->BatchNo = src->batchno();
+    dst->RefNum = src->refnum();
+    dst->RefText = QString::fromStdString(src->reftext());
     dst->SenderID = QString::fromStdString(src->senderid());
     dst->RecverID = QString::fromStdString(src->recverid());
     dst->ToRoot = src->toroot();
@@ -172,6 +181,9 @@ void zxtools::CommonData2Common1Rsp(txdata::Common1Rsp* dst, const CommonData* s
 {
     dst->set_msgno(src->MsgNo);
     dst->set_seqno(src->SeqNo);
+    dst->set_batchno(src->BatchNo);
+    dst->set_refnum(src->RefNum);
+    dst->set_reftext(src->RefText.toStdString());
     dst->set_senderid(src->SenderID.toStdString());
     dst->set_recverid(src->RecverID.toStdString());
     dst->set_toroot(src->ToRoot);
@@ -192,6 +204,9 @@ void zxtools::Common2Req2CommonData(CommonData* dst, const txdata::Common2Req* s
     dst->UserID = QString::fromStdString(src->key().userid());
     dst->MsgNo = src->key().msgno();
     dst->SeqNo = src->key().seqno();
+    dst->BatchNo = src->batchno();
+    dst->RefNum = src->refnum();
+    dst->RefText = QString::fromStdString(src->reftext());
     dst->SenderID = QString::fromStdString(src->senderid());
     dst->RecverID = QString::fromStdString(src->recverid());
     dst->ToRoot = src->toroot();
@@ -217,6 +232,9 @@ void zxtools::Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* s
     dst->UserID = QString::fromStdString(src->key().userid());
     dst->MsgNo = src->key().msgno();
     dst->SeqNo = src->key().seqno();
+    dst->BatchNo = src->batchno();
+    dst->RefNum = src->refnum();
+    dst->RefText = QString::fromStdString(src->reftext());
     dst->SenderID = QString::fromStdString(src->senderid());
     dst->RecverID = QString::fromStdString(src->recverid());
     dst->ToRoot = src->toroot();
