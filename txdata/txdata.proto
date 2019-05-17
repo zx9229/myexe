@@ -10,27 +10,28 @@ import public "google/protobuf/timestamp.proto";
 // Windows: findstr "^message" txdata.proto
 enum MsgType {
     Zero1               =  0;//第0个本该是(UniKey)
-    ID_CommonErr        =  1;
-    ID_Common2Ack       =  2;
+    ID_Common1Req       =  1;
+    ID_Common1Rsp       =  2;
     ID_Common2Req       =  3;
     ID_Common2Rsp       =  4;
-    ID_Common1Req       =  5;
-    ID_Common1Rsp       =  6;
+    ID_Common2Ack       =  5;
+    ID_CommonErr        =  6;
     ID_ConnectionInfo   =  7;
     ID_DisconnectedData =  8;
     ID_ConnectReq       =  9;
     ID_ConnectRsp       = 10;
     ID_OnlineNotice     = 11;
     ID_SystemReport     = 12;
-    ID_QryConnInfoReq   = 13;
-    ID_QryConnInfoRsp   = 14;
-    ID_QueryRecordReq   = 15;
-    ID_QueryRecordRsp   = 16;
-    ID_ExecCmdReq       = 17;
-    ID_ExecCmdRsp       = 18;
-    ID_EchoItem         = 19;
-    ID_ReportDataItem   = 20;
-    ID_SendMailItem     = 21;
+    ID_EchoItem         = 13;
+    ID_BinItem          = 14;
+    ID_EmailItem        = 15;
+    ID_QryConnInfoReq   = 16;
+    ID_QryConnInfoRsp   = 17;
+    ID_QueryRecordReq   = 18;
+    ID_QueryRecordRsp   = 19;
+    ID_ExecCmdReq       = 20;
+    ID_ExecCmdRsp       = 21;
+    ID_ReportDataItem   = 22;
 }
 
 //唯一标识一个消息.
