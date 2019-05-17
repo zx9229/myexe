@@ -31,7 +31,7 @@ Item {
             Layout.fillWidth: true
             model: MySqlTableModel {
                 id:mstm
-                selectStatement: "SELECT * FROM CommonData WHERE MsgType IN(3,5) AND PeerID='%1'".arg(peerid)
+                selectStatement: "SELECT * FROM CommonData WHERE MsgType IN(1,3) AND PeerID='%1'".arg(peerid)
             }
             delegate: Column {
                 id: idColumn
@@ -77,7 +77,9 @@ Item {
                     }
                 }
             }
-            ScrollBar.vertical: ScrollBar{}
+            ScrollBar.vertical: ScrollBar {
+                id: verScrollBar
+            }
         }
 
         Button {

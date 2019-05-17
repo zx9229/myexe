@@ -34,7 +34,7 @@ Item {
             }
             delegate: Column {
                 id: idColumn
-                property bool isReq: (3==MsgType)||(5==MsgType)
+                property bool isReq: (1==MsgType)||(3==MsgType)
                 spacing: 6
                 anchors.right: isReq ? parent.right : undefined
                 Label {
@@ -57,7 +57,7 @@ Item {
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
                             id: labelAL
                             anchors.centerIn: parent
-                            text: MsgType==3?"C2Q":(MsgType==4?"C2A":(MsgType==5?"C1Q":MsgType==6?"C1A":"NIL"))
+                            text: MsgType==1?"C1Q":(MsgType==2?"C1A":(MsgType==3?"C2Q":MsgType==4?"C2A":"NIL"))
                         }
                     }
                     Rectangle {
@@ -95,7 +95,7 @@ Item {
                         Label {//为了缩减字母,选用(Q&A)代表请求和响应.
                             id: labelAR
                             anchors.centerIn: parent
-                            text: MsgType==3?"C2Q":(MsgType==4?"C2A":(MsgType==5?"C1Q":MsgType==6?"C1A":"NIL"))
+                            text: MsgType==1?"C1Q":(MsgType==2?"C1A":(MsgType==3?"C2Q":MsgType==4?"C2A":"NIL"))
                         }
                     }
                 }
