@@ -153,12 +153,14 @@ public slots:
     virtual bool select() override
     {
         bool bRet = QSqlTableModel::select();
-        if (bRet) {
+        if (bRet)
+        {
             while (canFetchMore()) {
                 fetchMore();
             }
         }
-        else {
+        else
+        {
             qDebug() << "MySqlTableModel" << bRet << this->selectStatement();
         }
         return bRet;
