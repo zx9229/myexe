@@ -62,3 +62,15 @@ onClicked: {
     console.log(obj.results[0].now.text)
 }
 ===============================================================================
+Qt5.9 build-in SQLite 3.16 not support JSON1 Extension
+https://bugreports.qt.io/browse/QTBUG-63498
+Allow sqlite extensions
+https://bugreports.qt.io/browse/QTBUG-70972
+Qt 5.9.1 (MinGW) 编译MySQL驱动的步骤
+https://blog.csdn.net/chinley/article/details/77711971
+===============================================================================
+http://download.qt.io/archive/qt/5.11/5.11.3/submodules/
+https://www.sqlite.org/releaselog/3_9_0.html
+https://www.sqlite.org/about.html
+All source code in one file (sqlite3.c)
+===============================================================================
