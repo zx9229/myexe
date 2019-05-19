@@ -32,7 +32,8 @@ enum MsgType {
     ID_QueryRecordRsp   = 19;
     ID_ExecCmdReq       = 20;
     ID_ExecCmdRsp       = 21;
-    ID_ReportDataItem   = 22;
+    ID_PushWrap         = 22;
+    ID_PushItem         = 23;
 }
 
 //唯一标识一个消息.
@@ -236,8 +237,24 @@ message ExecCmdRsp {
     string Reply = 1;
 }
 
-message ReportDataItem {
-    int32  Level = 1;
-    string Topic = 2;//Data的主题.
-    string Data  = 3;
+//推送用途的包装器.
+//建议仅使用(Common1Req)发送推送消息,因为它没有缓存机制.
+message PushWrap {
+    int64                     MsgNo   = 1; //建议留空,因为(推送服务的节点)会自行分配.
+    string                    UserID  = 2;//建议留空,因为(推送服务的节点)会自行修正.
+    google.protobuf.Timestamp MsgTime = 3;//建议留空,因为,如果默认值,(推送服务的节点)会填写接收时刻.
+    MsgType                   MsgType   = 11;
+    bytes                     MsgData   = 12;//消息内容.
+}
+
+/*
+推送：
+谁发的
+啥时候发的
+大概内容是什么
+详细内容是什么 */
+message PushItem {
+    string Subject = 1;//主题.
+    string Content = 2;//内容.
+    int32  Level   = 3;//预留字段.
 }
