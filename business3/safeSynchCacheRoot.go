@@ -21,7 +21,7 @@ type safeSynchCacheRoot struct {
 	M       map[UniSym]*node4sync
 }
 
-func newSafeSynchCacheRoot(dbc chan *DbOp, engine *xorm.Engine) *safeSynchCacheRoot {
+func newSafeSynchCacheRoot(engine *xorm.Engine, dbc chan *DbOp) *safeSynchCacheRoot {
 	return &safeSynchCacheRoot{dbChan: dbc, xEngine: engine, M: make(map[UniSym]*node4sync)}
 }
 
