@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"unsafe"
 
 	"github.com/golang/glog"
@@ -15,6 +16,23 @@ type ProtoMessage interface {
 	String() string              //pb.Message
 	ProtoMessage()               //pb.Message
 	Descriptor() ([]byte, []int) //自动生成的结构体,全都包含该成员函数.
+}
+
+//DeepCopy omit
+func DeepCopy(src ProtoMessage) (dst ProtoMessage) {
+	if src == nil {
+		return
+	}
+	dst = reflect.New(reflect.TypeOf(src).Elem()).Interface().(ProtoMessage)
+	var err error
+	var byteSlice []byte
+	if byteSlice, err = proto.Marshal(src); err != nil {
+		panic(err)
+	}
+	if err = proto.Unmarshal(byteSlice, dst); err != nil {
+		panic(err)
+	}
+	return
 }
 
 //CalcMessageIndex 用法示例:CalcMessageIndex(&txdata.ConnectionInfo{})
@@ -107,8 +125,10 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 		msgData = new(txdata.ExecCmdReq)
 	case txdata.MsgType_ID_ExecCmdRsp:
 		msgData = new(txdata.ExecCmdRsp)
-	case txdata.MsgType_ID_ReportDataItem:
-		msgData = new(txdata.ReportDataItem)
+	case txdata.MsgType_ID_PushWrap:
+		msgData = new(txdata.PushWrap)
+	case txdata.MsgType_ID_PushItem:
+		msgData = new(txdata.PushItem)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType(%v)", msgType)

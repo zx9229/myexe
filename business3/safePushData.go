@@ -44,24 +44,28 @@ func (thls *safePushCache) Insert(data *txdata.PushWrap) (isInsert bool) {
 		action.wg.Add(1)
 		thls.dbChan <- action
 		action.wg.Wait()
-		var nilobj *DbPushWrap
-		_, isInsert = nilobj.insertOneResult(action.affected, action.err)
+		_, isInsert = (*DbPushWrap)(nil).insertOneResult(action.affected, action.err)
 	}
 	return
 }
 
 //Select 筛选条件(msgNoBeg<MsgNo AND MsgNo<msgNoEnd)
 func (thls *safePushCache) Select(msgNoBeg, msgNoEnd int64) (results []*txdata.PushWrap) {
-	results = make([]*txdata.PushWrap, 0)
 	if thls.engine == nil {
 		thls.Lock()
 		for _, node := range thls.Slc {
 			if msgNoBeg < node.MsgNo {
 				if 0 < msgNoEnd {
 					if node.MsgNo < msgNoEnd {
+						if results == nil {
+							results = make([]*txdata.PushWrap, 0)
+						}
 						results = append(results, node)
 					}
 				} else {
+					if results == nil {
+						results = make([]*txdata.PushWrap, 0)
+					}
 					results = append(results, node)
 				}
 			}
@@ -73,6 +77,7 @@ func (thls *safePushCache) Select(msgNoBeg, msgNoEnd int64) (results []*txdata.P
 		var err error
 		tmpResults := make([]*DbPushWrap, 0)
 		data4qry := &DbPushWrap{}
+		//程序编译好之后,只要运行一次这个代码就OK了,只要第一次OK,以后就是Ok的.
 		fnMsgNo := zxxorm.GuessColName(thls.engine, data4qry, unsafe.Offsetof(data4qry.MsgNo), true)
 		if 0 < msgNoEnd {
 			err = thls.engine.Where(builder.Gt{fnMsgNo: msgNoBeg}.And(builder.Lt{fnMsgNo: msgNoEnd})).Find(&tmpResults)
@@ -81,6 +86,9 @@ func (thls *safePushCache) Select(msgNoBeg, msgNoEnd int64) (results []*txdata.P
 		}
 		if err == nil {
 			for _, tmp := range tmpResults {
+				if results == nil {
+					results = make([]*txdata.PushWrap, 0)
+				}
 				results = append(results, tmp.To())
 			}
 		}
