@@ -13,6 +13,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
 )
@@ -199,7 +200,7 @@ func handleCommon2Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 	fmt.Fprintf(w, string(byteSlice))
 }
 
-func handleCommon1Fun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common1Req, *txdata.Common2Req, int)) {
+func handleCommonFun(node *businessNode, w http.ResponseWriter, r *http.Request, obj interface{}, Obj2Msg func(obj interface{}) (*txdata.Common1Req, *txdata.Common2Req, int)) {
 	var err error
 	var byteSlice []byte
 
@@ -227,29 +228,52 @@ func handleCommon1Fun(node *businessNode, w http.ResponseWriter, r *http.Request
 			break
 		}
 
-		var reqData *txdata.Common1Req
+		var c1reqData *txdata.Common1Req
+		var c1rspSlice []*txdata.Common1Rsp
+		var c2reqData *txdata.Common2Req
+		var c2rspSlice []*txdata.Common2Rsp
 		var secTimeout int
-		if true {
-			reqData, _, secTimeout = Obj2Msg(obj)
-			assert4true(reqData != nil)
+
+		c1reqData, c2reqData, secTimeout = Obj2Msg(obj)
+		if c1reqData != nil {
+			c1rspSlice = node.syncExecuteCommon1ReqRsp(c1reqData, time.Duration(secTimeout)*time.Second)
+		} else if c2reqData != nil {
+			c2rspSlice = node.syncExecuteCommon2ReqRsp(c2reqData, time.Duration(secTimeout)*time.Second)
+		} else {
+			panic("logic_error")
 		}
-		rspSlice := node.syncExecuteCommon1ReqRsp(reqData, time.Duration(secTimeout)*time.Second)
 
 		assert4true(ceData.ErrNo == 0)
 		assert4true(len(resultSlice) == 0)
 		if true {
-			resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: reqData.MsgNo, SeqNo: 0}
-			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
-			resultSlice = append(resultSlice, resultNode)
-		}
-		for _, rspItem := range rspSlice {
-			if resultNode.Data, err = slice2msg(rspItem.RspType, rspItem.RspData); err != nil {
-				assert4true(ceData.ErrNo == 0)
-				ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", rspItem.RspType)
-				resultNode.Data = &ceData
+			if c1reqData != nil {
+				resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: c1reqData.MsgNo, SeqNo: 0}
+			} else {
+				resultNode.Data = &txdata.UniKey{UserID: "SIM", MsgNo: c2reqData.Key.MsgNo, SeqNo: 0}
 			}
 			resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
 			resultSlice = append(resultSlice, resultNode)
+		}
+		if c1rspSlice != nil {
+			for _, rspItem := range c1rspSlice {
+				if resultNode.Data, err = slice2msg(rspItem.RspType, rspItem.RspData); err != nil {
+					assert4true(ceData.ErrNo == 0)
+					ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", rspItem.RspType)
+					resultNode.Data = &ceData
+				}
+				resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+				resultSlice = append(resultSlice, resultNode)
+			}
+		} else {
+			for _, rspItem := range c2rspSlice {
+				if resultNode.Data, err = slice2msg(rspItem.RspType, rspItem.RspData); err != nil {
+					assert4true(ceData.ErrNo == 0)
+					ceData.ErrMsg = fmt.Sprintf("can_not_unmarshal_data(%v)", rspItem.RspType)
+					resultNode.Data = &ceData
+				}
+				resultNode.Name = reflect.TypeOf(resultNode.Data).Elem().Name()
+				resultSlice = append(resultSlice, resultNode)
+			}
 		}
 	}
 	if ceData.ErrNo != 0 {
@@ -321,9 +345,5 @@ func handleEchoItem(node *businessNode, w http.ResponseWriter, r *http.Request) 
 		sec = theObj.Timeout
 		return
 	}
-	if curObj.IsC2 {
-		handleCommon2Fun(node, w, r, curObj, obj2msg)
-	} else {
-		handleCommon1Fun(node, w, r, curObj, obj2msg)
-	}
+	handleCommonFun(node, w, r, curObj, obj2msg)
 }
