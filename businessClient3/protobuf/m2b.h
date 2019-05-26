@@ -130,8 +130,17 @@ public:
         case ::txdata::MsgType::ID_ExecCmdRsp:
             msgOut = QSharedPointer<txdata::ExecCmdRsp>(new txdata::ExecCmdRsp);
             break;
-        case ::txdata::MsgType::ID_ReportDataItem:
-            msgOut = QSharedPointer<txdata::ReportDataItem>(new txdata::ReportDataItem);
+        case ::txdata::MsgType::ID_PushWrap:
+            msgOut = QSharedPointer<txdata::PushWrap>(new txdata::PushWrap);
+            break;
+        case ::txdata::MsgType::ID_PushItem:
+            msgOut = QSharedPointer<txdata::PushItem>(new txdata::PushItem);
+            break;
+        case ::txdata::MsgType::ID_SubscribeReq:
+            msgOut = QSharedPointer<txdata::SubscribeReq>(new txdata::SubscribeReq);
+            break;
+        case ::txdata::MsgType::ID_SubscribeRsp:
+            msgOut = QSharedPointer<txdata::SubscribeRsp>(new txdata::SubscribeRsp);
             break;
         default:
             break;

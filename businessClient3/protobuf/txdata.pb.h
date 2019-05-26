@@ -43,7 +43,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[24];
+  static const ::google::protobuf::internal::ParseTable schema[27];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -99,6 +99,12 @@ extern ExecCmdRspDefaultTypeInternal _ExecCmdRsp_default_instance_;
 class OnlineNotice;
 class OnlineNoticeDefaultTypeInternal;
 extern OnlineNoticeDefaultTypeInternal _OnlineNotice_default_instance_;
+class PushItem;
+class PushItemDefaultTypeInternal;
+extern PushItemDefaultTypeInternal _PushItem_default_instance_;
+class PushWrap;
+class PushWrapDefaultTypeInternal;
+extern PushWrapDefaultTypeInternal _PushWrap_default_instance_;
 class QryConnInfoReq;
 class QryConnInfoReqDefaultTypeInternal;
 extern QryConnInfoReqDefaultTypeInternal _QryConnInfoReq_default_instance_;
@@ -114,9 +120,12 @@ extern QueryRecordReqDefaultTypeInternal _QueryRecordReq_default_instance_;
 class QueryRecordRsp;
 class QueryRecordRspDefaultTypeInternal;
 extern QueryRecordRspDefaultTypeInternal _QueryRecordRsp_default_instance_;
-class ReportDataItem;
-class ReportDataItemDefaultTypeInternal;
-extern ReportDataItemDefaultTypeInternal _ReportDataItem_default_instance_;
+class SubscribeReq;
+class SubscribeReqDefaultTypeInternal;
+extern SubscribeReqDefaultTypeInternal _SubscribeReq_default_instance_;
+class SubscribeRsp;
+class SubscribeRspDefaultTypeInternal;
+extern SubscribeRspDefaultTypeInternal _SubscribeRsp_default_instance_;
 class SystemReport;
 class SystemReportDefaultTypeInternal;
 extern SystemReportDefaultTypeInternal _SystemReport_default_instance_;
@@ -142,12 +151,15 @@ template<> ::txdata::EmailItem* Arena::CreateMaybeMessage<::txdata::EmailItem>(A
 template<> ::txdata::ExecCmdReq* Arena::CreateMaybeMessage<::txdata::ExecCmdReq>(Arena*);
 template<> ::txdata::ExecCmdRsp* Arena::CreateMaybeMessage<::txdata::ExecCmdRsp>(Arena*);
 template<> ::txdata::OnlineNotice* Arena::CreateMaybeMessage<::txdata::OnlineNotice>(Arena*);
+template<> ::txdata::PushItem* Arena::CreateMaybeMessage<::txdata::PushItem>(Arena*);
+template<> ::txdata::PushWrap* Arena::CreateMaybeMessage<::txdata::PushWrap>(Arena*);
 template<> ::txdata::QryConnInfoReq* Arena::CreateMaybeMessage<::txdata::QryConnInfoReq>(Arena*);
 template<> ::txdata::QryConnInfoRsp* Arena::CreateMaybeMessage<::txdata::QryConnInfoRsp>(Arena*);
 template<> ::txdata::QryConnInfoRsp_CacheEntry_DoNotUse* Arena::CreateMaybeMessage<::txdata::QryConnInfoRsp_CacheEntry_DoNotUse>(Arena*);
 template<> ::txdata::QueryRecordReq* Arena::CreateMaybeMessage<::txdata::QueryRecordReq>(Arena*);
 template<> ::txdata::QueryRecordRsp* Arena::CreateMaybeMessage<::txdata::QueryRecordRsp>(Arena*);
-template<> ::txdata::ReportDataItem* Arena::CreateMaybeMessage<::txdata::ReportDataItem>(Arena*);
+template<> ::txdata::SubscribeReq* Arena::CreateMaybeMessage<::txdata::SubscribeReq>(Arena*);
+template<> ::txdata::SubscribeRsp* Arena::CreateMaybeMessage<::txdata::SubscribeRsp>(Arena*);
 template<> ::txdata::SystemReport* Arena::CreateMaybeMessage<::txdata::SystemReport>(Arena*);
 template<> ::txdata::UniKey* Arena::CreateMaybeMessage<::txdata::UniKey>(Arena*);
 }  // namespace protobuf
@@ -199,13 +211,16 @@ enum MsgType {
   ID_QueryRecordRsp = 19,
   ID_ExecCmdReq = 20,
   ID_ExecCmdRsp = 21,
-  ID_ReportDataItem = 22,
+  ID_PushWrap = 22,
+  ID_PushItem = 23,
+  ID_SubscribeReq = 24,
+  ID_SubscribeRsp = 25,
   MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool MsgType_IsValid(int value);
 const MsgType MsgType_MIN = Zero1;
-const MsgType MsgType_MAX = ID_ReportDataItem;
+const MsgType MsgType_MAX = ID_SubscribeRsp;
 const int MsgType_ARRAYSIZE = MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MsgType_descriptor();
@@ -3593,24 +3608,24 @@ class ExecCmdRsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
 };
 // -------------------------------------------------------------------
 
-class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.ReportDataItem) */ {
+class PushWrap : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.PushWrap) */ {
  public:
-  ReportDataItem();
-  virtual ~ReportDataItem();
+  PushWrap();
+  virtual ~PushWrap();
 
-  ReportDataItem(const ReportDataItem& from);
+  PushWrap(const PushWrap& from);
 
-  inline ReportDataItem& operator=(const ReportDataItem& from) {
+  inline PushWrap& operator=(const PushWrap& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ReportDataItem(ReportDataItem&& from) noexcept
-    : ReportDataItem() {
+  PushWrap(PushWrap&& from) noexcept
+    : PushWrap() {
     *this = ::std::move(from);
   }
 
-  inline ReportDataItem& operator=(ReportDataItem&& from) noexcept {
+  inline PushWrap& operator=(PushWrap&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -3620,34 +3635,34 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
   }
   #endif
   static const ::google::protobuf::Descriptor* descriptor();
-  static const ReportDataItem& default_instance();
+  static const PushWrap& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ReportDataItem* internal_default_instance() {
-    return reinterpret_cast<const ReportDataItem*>(
-               &_ReportDataItem_default_instance_);
+  static inline const PushWrap* internal_default_instance() {
+    return reinterpret_cast<const PushWrap*>(
+               &_PushWrap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     23;
 
-  void Swap(ReportDataItem* other);
-  friend void swap(ReportDataItem& a, ReportDataItem& b) {
+  void Swap(PushWrap* other);
+  friend void swap(PushWrap& a, PushWrap& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ReportDataItem* New() const final {
-    return CreateMaybeMessage<ReportDataItem>(NULL);
+  inline PushWrap* New() const final {
+    return CreateMaybeMessage<PushWrap>(NULL);
   }
 
-  ReportDataItem* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ReportDataItem>(arena);
+  PushWrap* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PushWrap>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ReportDataItem& from);
-  void MergeFrom(const ReportDataItem& from);
+  void CopyFrom(const PushWrap& from);
+  void MergeFrom(const PushWrap& from);
   void Clear() final;
   bool IsInitialized() const final;
 
@@ -3664,7 +3679,7 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ReportDataItem* other);
+  void InternalSwap(PushWrap* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -3680,47 +3695,428 @@ class ReportDataItem : public ::google::protobuf::Message /* @@protoc_insertion_
 
   // accessors -------------------------------------------------------
 
-  // string Topic = 2;
-  void clear_topic();
-  static const int kTopicFieldNumber = 2;
-  const ::std::string& topic() const;
-  void set_topic(const ::std::string& value);
+  // string UserID = 2;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 2;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
   #if LANG_CXX11
-  void set_topic(::std::string&& value);
+  void set_userid(::std::string&& value);
   #endif
-  void set_topic(const char* value);
-  void set_topic(const char* value, size_t size);
-  ::std::string* mutable_topic();
-  ::std::string* release_topic();
-  void set_allocated_topic(::std::string* topic);
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
 
-  // string Data = 3;
-  void clear_data();
-  static const int kDataFieldNumber = 3;
-  const ::std::string& data() const;
-  void set_data(const ::std::string& value);
+  // bytes MsgData = 12;
+  void clear_msgdata();
+  static const int kMsgDataFieldNumber = 12;
+  const ::std::string& msgdata() const;
+  void set_msgdata(const ::std::string& value);
   #if LANG_CXX11
-  void set_data(::std::string&& value);
+  void set_msgdata(::std::string&& value);
   #endif
-  void set_data(const char* value);
-  void set_data(const char* value, size_t size);
-  ::std::string* mutable_data();
-  ::std::string* release_data();
-  void set_allocated_data(::std::string* data);
+  void set_msgdata(const char* value);
+  void set_msgdata(const void* value, size_t size);
+  ::std::string* mutable_msgdata();
+  ::std::string* release_msgdata();
+  void set_allocated_msgdata(::std::string* msgdata);
 
-  // int32 Level = 1;
-  void clear_level();
-  static const int kLevelFieldNumber = 1;
-  ::google::protobuf::int32 level() const;
-  void set_level(::google::protobuf::int32 value);
+  // .google.protobuf.Timestamp MsgTime = 3;
+  bool has_msgtime() const;
+  void clear_msgtime();
+  static const int kMsgTimeFieldNumber = 3;
+  private:
+  const ::google::protobuf::Timestamp& _internal_msgtime() const;
+  public:
+  const ::google::protobuf::Timestamp& msgtime() const;
+  ::google::protobuf::Timestamp* release_msgtime();
+  ::google::protobuf::Timestamp* mutable_msgtime();
+  void set_allocated_msgtime(::google::protobuf::Timestamp* msgtime);
 
-  // @@protoc_insertion_point(class_scope:txdata.ReportDataItem)
+  // int64 MsgNo = 1;
+  void clear_msgno();
+  static const int kMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 msgno() const;
+  void set_msgno(::google::protobuf::int64 value);
+
+  // .txdata.MsgType MsgType = 11;
+  void clear_msgtype();
+  static const int kMsgTypeFieldNumber = 11;
+  ::txdata::MsgType msgtype() const;
+  void set_msgtype(::txdata::MsgType value);
+
+  // @@protoc_insertion_point(class_scope:txdata.PushWrap)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr topic_;
-  ::google::protobuf::internal::ArenaStringPtr data_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
+  ::google::protobuf::internal::ArenaStringPtr msgdata_;
+  ::google::protobuf::Timestamp* msgtime_;
+  ::google::protobuf::int64 msgno_;
+  int msgtype_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class PushItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.PushItem) */ {
+ public:
+  PushItem();
+  virtual ~PushItem();
+
+  PushItem(const PushItem& from);
+
+  inline PushItem& operator=(const PushItem& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PushItem(PushItem&& from) noexcept
+    : PushItem() {
+    *this = ::std::move(from);
+  }
+
+  inline PushItem& operator=(PushItem&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PushItem& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PushItem* internal_default_instance() {
+    return reinterpret_cast<const PushItem*>(
+               &_PushItem_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    24;
+
+  void Swap(PushItem* other);
+  friend void swap(PushItem& a, PushItem& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PushItem* New() const final {
+    return CreateMaybeMessage<PushItem>(NULL);
+  }
+
+  PushItem* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PushItem>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PushItem& from);
+  void MergeFrom(const PushItem& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PushItem* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string Subject = 1;
+  void clear_subject();
+  static const int kSubjectFieldNumber = 1;
+  const ::std::string& subject() const;
+  void set_subject(const ::std::string& value);
+  #if LANG_CXX11
+  void set_subject(::std::string&& value);
+  #endif
+  void set_subject(const char* value);
+  void set_subject(const char* value, size_t size);
+  ::std::string* mutable_subject();
+  ::std::string* release_subject();
+  void set_allocated_subject(::std::string* subject);
+
+  // string Content = 2;
+  void clear_content();
+  static const int kContentFieldNumber = 2;
+  const ::std::string& content() const;
+  void set_content(const ::std::string& value);
+  #if LANG_CXX11
+  void set_content(::std::string&& value);
+  #endif
+  void set_content(const char* value);
+  void set_content(const char* value, size_t size);
+  ::std::string* mutable_content();
+  ::std::string* release_content();
+  void set_allocated_content(::std::string* content);
+
+  // int32 Level = 3;
+  void clear_level();
+  static const int kLevelFieldNumber = 3;
+  ::google::protobuf::int32 level() const;
+  void set_level(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:txdata.PushItem)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr subject_;
+  ::google::protobuf::internal::ArenaStringPtr content_;
   ::google::protobuf::int32 level_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class SubscribeReq : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.SubscribeReq) */ {
+ public:
+  SubscribeReq();
+  virtual ~SubscribeReq();
+
+  SubscribeReq(const SubscribeReq& from);
+
+  inline SubscribeReq& operator=(const SubscribeReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  SubscribeReq(SubscribeReq&& from) noexcept
+    : SubscribeReq() {
+    *this = ::std::move(from);
+  }
+
+  inline SubscribeReq& operator=(SubscribeReq&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SubscribeReq& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SubscribeReq* internal_default_instance() {
+    return reinterpret_cast<const SubscribeReq*>(
+               &_SubscribeReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    25;
+
+  void Swap(SubscribeReq* other);
+  friend void swap(SubscribeReq& a, SubscribeReq& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SubscribeReq* New() const final {
+    return CreateMaybeMessage<SubscribeReq>(NULL);
+  }
+
+  SubscribeReq* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<SubscribeReq>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const SubscribeReq& from);
+  void MergeFrom(const SubscribeReq& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SubscribeReq* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 FromMsgNo = 1;
+  void clear_frommsgno();
+  static const int kFromMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 frommsgno() const;
+  void set_frommsgno(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:txdata.SubscribeReq)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 frommsgno_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class SubscribeRsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.SubscribeRsp) */ {
+ public:
+  SubscribeRsp();
+  virtual ~SubscribeRsp();
+
+  SubscribeRsp(const SubscribeRsp& from);
+
+  inline SubscribeRsp& operator=(const SubscribeRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  SubscribeRsp(SubscribeRsp&& from) noexcept
+    : SubscribeRsp() {
+    *this = ::std::move(from);
+  }
+
+  inline SubscribeRsp& operator=(SubscribeRsp&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SubscribeRsp& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SubscribeRsp* internal_default_instance() {
+    return reinterpret_cast<const SubscribeRsp*>(
+               &_SubscribeRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    26;
+
+  void Swap(SubscribeRsp* other);
+  friend void swap(SubscribeRsp& a, SubscribeRsp& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SubscribeRsp* New() const final {
+    return CreateMaybeMessage<SubscribeRsp>(NULL);
+  }
+
+  SubscribeRsp* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<SubscribeRsp>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const SubscribeRsp& from);
+  void MergeFrom(const SubscribeRsp& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SubscribeRsp* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string ErrMsg = 3;
+  void clear_errmsg();
+  static const int kErrMsgFieldNumber = 3;
+  const ::std::string& errmsg() const;
+  void set_errmsg(const ::std::string& value);
+  #if LANG_CXX11
+  void set_errmsg(::std::string&& value);
+  #endif
+  void set_errmsg(const char* value);
+  void set_errmsg(const char* value, size_t size);
+  ::std::string* mutable_errmsg();
+  ::std::string* release_errmsg();
+  void set_allocated_errmsg(::std::string* errmsg);
+
+  // int64 FromMsgNo = 1;
+  void clear_frommsgno();
+  static const int kFromMsgNoFieldNumber = 1;
+  ::google::protobuf::int64 frommsgno() const;
+  void set_frommsgno(::google::protobuf::int64 value);
+
+  // int32 ErrNo = 2;
+  void clear_errno();
+  static const int kErrNoFieldNumber = 2;
+  ::google::protobuf::int32 errno() const;
+  void set_errno(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:txdata.SubscribeRsp)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr errmsg_;
+  ::google::protobuf::int64 frommsgno_;
+  ::google::protobuf::int32 errno_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -7550,131 +7946,427 @@ inline void ExecCmdRsp::set_allocated_reply(::std::string* reply) {
 
 // -------------------------------------------------------------------
 
-// ReportDataItem
+// PushWrap
 
-// int32 Level = 1;
-inline void ReportDataItem::clear_level() {
+// int64 MsgNo = 1;
+inline void PushWrap::clear_msgno() {
+  msgno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 PushWrap::msgno() const {
+  // @@protoc_insertion_point(field_get:txdata.PushWrap.MsgNo)
+  return msgno_;
+}
+inline void PushWrap::set_msgno(::google::protobuf::int64 value) {
+  
+  msgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.PushWrap.MsgNo)
+}
+
+// string UserID = 2;
+inline void PushWrap::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PushWrap::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.PushWrap.UserID)
+  return userid_.GetNoArena();
+}
+inline void PushWrap::set_userid(const ::std::string& value) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.PushWrap.UserID)
+}
+#if LANG_CXX11
+inline void PushWrap::set_userid(::std::string&& value) {
+  
+  userid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.PushWrap.UserID)
+}
+#endif
+inline void PushWrap::set_userid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.PushWrap.UserID)
+}
+inline void PushWrap::set_userid(const char* value, size_t size) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.PushWrap.UserID)
+}
+inline ::std::string* PushWrap::mutable_userid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.PushWrap.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PushWrap::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.PushWrap.UserID)
+  
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PushWrap::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
+    
+  } else {
+    
+  }
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.PushWrap.UserID)
+}
+
+// .google.protobuf.Timestamp MsgTime = 3;
+inline bool PushWrap::has_msgtime() const {
+  return this != internal_default_instance() && msgtime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& PushWrap::_internal_msgtime() const {
+  return *msgtime_;
+}
+inline const ::google::protobuf::Timestamp& PushWrap::msgtime() const {
+  const ::google::protobuf::Timestamp* p = msgtime_;
+  // @@protoc_insertion_point(field_get:txdata.PushWrap.MsgTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* PushWrap::release_msgtime() {
+  // @@protoc_insertion_point(field_release:txdata.PushWrap.MsgTime)
+  
+  ::google::protobuf::Timestamp* temp = msgtime_;
+  msgtime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* PushWrap::mutable_msgtime() {
+  
+  if (msgtime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    msgtime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.PushWrap.MsgTime)
+  return msgtime_;
+}
+inline void PushWrap::set_allocated_msgtime(::google::protobuf::Timestamp* msgtime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(msgtime_);
+  }
+  if (msgtime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(msgtime)->GetArena();
+    if (message_arena != submessage_arena) {
+      msgtime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, msgtime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  msgtime_ = msgtime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.PushWrap.MsgTime)
+}
+
+// .txdata.MsgType MsgType = 11;
+inline void PushWrap::clear_msgtype() {
+  msgtype_ = 0;
+}
+inline ::txdata::MsgType PushWrap::msgtype() const {
+  // @@protoc_insertion_point(field_get:txdata.PushWrap.MsgType)
+  return static_cast< ::txdata::MsgType >(msgtype_);
+}
+inline void PushWrap::set_msgtype(::txdata::MsgType value) {
+  
+  msgtype_ = value;
+  // @@protoc_insertion_point(field_set:txdata.PushWrap.MsgType)
+}
+
+// bytes MsgData = 12;
+inline void PushWrap::clear_msgdata() {
+  msgdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PushWrap::msgdata() const {
+  // @@protoc_insertion_point(field_get:txdata.PushWrap.MsgData)
+  return msgdata_.GetNoArena();
+}
+inline void PushWrap::set_msgdata(const ::std::string& value) {
+  
+  msgdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.PushWrap.MsgData)
+}
+#if LANG_CXX11
+inline void PushWrap::set_msgdata(::std::string&& value) {
+  
+  msgdata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.PushWrap.MsgData)
+}
+#endif
+inline void PushWrap::set_msgdata(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  msgdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.PushWrap.MsgData)
+}
+inline void PushWrap::set_msgdata(const void* value, size_t size) {
+  
+  msgdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.PushWrap.MsgData)
+}
+inline ::std::string* PushWrap::mutable_msgdata() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.PushWrap.MsgData)
+  return msgdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PushWrap::release_msgdata() {
+  // @@protoc_insertion_point(field_release:txdata.PushWrap.MsgData)
+  
+  return msgdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PushWrap::set_allocated_msgdata(::std::string* msgdata) {
+  if (msgdata != NULL) {
+    
+  } else {
+    
+  }
+  msgdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), msgdata);
+  // @@protoc_insertion_point(field_set_allocated:txdata.PushWrap.MsgData)
+}
+
+// -------------------------------------------------------------------
+
+// PushItem
+
+// string Subject = 1;
+inline void PushItem::clear_subject() {
+  subject_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PushItem::subject() const {
+  // @@protoc_insertion_point(field_get:txdata.PushItem.Subject)
+  return subject_.GetNoArena();
+}
+inline void PushItem::set_subject(const ::std::string& value) {
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.PushItem.Subject)
+}
+#if LANG_CXX11
+inline void PushItem::set_subject(::std::string&& value) {
+  
+  subject_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.PushItem.Subject)
+}
+#endif
+inline void PushItem::set_subject(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.PushItem.Subject)
+}
+inline void PushItem::set_subject(const char* value, size_t size) {
+  
+  subject_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.PushItem.Subject)
+}
+inline ::std::string* PushItem::mutable_subject() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.PushItem.Subject)
+  return subject_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PushItem::release_subject() {
+  // @@protoc_insertion_point(field_release:txdata.PushItem.Subject)
+  
+  return subject_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PushItem::set_allocated_subject(::std::string* subject) {
+  if (subject != NULL) {
+    
+  } else {
+    
+  }
+  subject_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), subject);
+  // @@protoc_insertion_point(field_set_allocated:txdata.PushItem.Subject)
+}
+
+// string Content = 2;
+inline void PushItem::clear_content() {
+  content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PushItem::content() const {
+  // @@protoc_insertion_point(field_get:txdata.PushItem.Content)
+  return content_.GetNoArena();
+}
+inline void PushItem::set_content(const ::std::string& value) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.PushItem.Content)
+}
+#if LANG_CXX11
+inline void PushItem::set_content(::std::string&& value) {
+  
+  content_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.PushItem.Content)
+}
+#endif
+inline void PushItem::set_content(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.PushItem.Content)
+}
+inline void PushItem::set_content(const char* value, size_t size) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.PushItem.Content)
+}
+inline ::std::string* PushItem::mutable_content() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.PushItem.Content)
+  return content_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PushItem::release_content() {
+  // @@protoc_insertion_point(field_release:txdata.PushItem.Content)
+  
+  return content_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PushItem::set_allocated_content(::std::string* content) {
+  if (content != NULL) {
+    
+  } else {
+    
+  }
+  content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
+  // @@protoc_insertion_point(field_set_allocated:txdata.PushItem.Content)
+}
+
+// int32 Level = 3;
+inline void PushItem::clear_level() {
   level_ = 0;
 }
-inline ::google::protobuf::int32 ReportDataItem::level() const {
-  // @@protoc_insertion_point(field_get:txdata.ReportDataItem.Level)
+inline ::google::protobuf::int32 PushItem::level() const {
+  // @@protoc_insertion_point(field_get:txdata.PushItem.Level)
   return level_;
 }
-inline void ReportDataItem::set_level(::google::protobuf::int32 value) {
+inline void PushItem::set_level(::google::protobuf::int32 value) {
   
   level_ = value;
-  // @@protoc_insertion_point(field_set:txdata.ReportDataItem.Level)
+  // @@protoc_insertion_point(field_set:txdata.PushItem.Level)
 }
 
-// string Topic = 2;
-inline void ReportDataItem::clear_topic() {
-  topic_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// -------------------------------------------------------------------
+
+// SubscribeReq
+
+// int64 FromMsgNo = 1;
+inline void SubscribeReq::clear_frommsgno() {
+  frommsgno_ = GOOGLE_LONGLONG(0);
 }
-inline const ::std::string& ReportDataItem::topic() const {
-  // @@protoc_insertion_point(field_get:txdata.ReportDataItem.Topic)
-  return topic_.GetNoArena();
+inline ::google::protobuf::int64 SubscribeReq::frommsgno() const {
+  // @@protoc_insertion_point(field_get:txdata.SubscribeReq.FromMsgNo)
+  return frommsgno_;
 }
-inline void ReportDataItem::set_topic(const ::std::string& value) {
+inline void SubscribeReq::set_frommsgno(::google::protobuf::int64 value) {
   
-  topic_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.ReportDataItem.Topic)
+  frommsgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.SubscribeReq.FromMsgNo)
+}
+
+// -------------------------------------------------------------------
+
+// SubscribeRsp
+
+// int64 FromMsgNo = 1;
+inline void SubscribeRsp::clear_frommsgno() {
+  frommsgno_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 SubscribeRsp::frommsgno() const {
+  // @@protoc_insertion_point(field_get:txdata.SubscribeRsp.FromMsgNo)
+  return frommsgno_;
+}
+inline void SubscribeRsp::set_frommsgno(::google::protobuf::int64 value) {
+  
+  frommsgno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.SubscribeRsp.FromMsgNo)
+}
+
+// int32 ErrNo = 2;
+inline void SubscribeRsp::clear_errno() {
+  errno_ = 0;
+}
+inline ::google::protobuf::int32 SubscribeRsp::errno() const {
+  // @@protoc_insertion_point(field_get:txdata.SubscribeRsp.ErrNo)
+  return errno_;
+}
+inline void SubscribeRsp::set_errno(::google::protobuf::int32 value) {
+  
+  errno_ = value;
+  // @@protoc_insertion_point(field_set:txdata.SubscribeRsp.ErrNo)
+}
+
+// string ErrMsg = 3;
+inline void SubscribeRsp::clear_errmsg() {
+  errmsg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& SubscribeRsp::errmsg() const {
+  // @@protoc_insertion_point(field_get:txdata.SubscribeRsp.ErrMsg)
+  return errmsg_.GetNoArena();
+}
+inline void SubscribeRsp::set_errmsg(const ::std::string& value) {
+  
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.SubscribeRsp.ErrMsg)
 }
 #if LANG_CXX11
-inline void ReportDataItem::set_topic(::std::string&& value) {
+inline void SubscribeRsp::set_errmsg(::std::string&& value) {
   
-  topic_.SetNoArena(
+  errmsg_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.ReportDataItem.Topic)
+  // @@protoc_insertion_point(field_set_rvalue:txdata.SubscribeRsp.ErrMsg)
 }
 #endif
-inline void ReportDataItem::set_topic(const char* value) {
+inline void SubscribeRsp::set_errmsg(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  topic_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.ReportDataItem.Topic)
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.SubscribeRsp.ErrMsg)
 }
-inline void ReportDataItem::set_topic(const char* value, size_t size) {
+inline void SubscribeRsp::set_errmsg(const char* value, size_t size) {
   
-  topic_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  errmsg_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.ReportDataItem.Topic)
+  // @@protoc_insertion_point(field_set_pointer:txdata.SubscribeRsp.ErrMsg)
 }
-inline ::std::string* ReportDataItem::mutable_topic() {
+inline ::std::string* SubscribeRsp::mutable_errmsg() {
   
-  // @@protoc_insertion_point(field_mutable:txdata.ReportDataItem.Topic)
-  return topic_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:txdata.SubscribeRsp.ErrMsg)
+  return errmsg_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* ReportDataItem::release_topic() {
-  // @@protoc_insertion_point(field_release:txdata.ReportDataItem.Topic)
+inline ::std::string* SubscribeRsp::release_errmsg() {
+  // @@protoc_insertion_point(field_release:txdata.SubscribeRsp.ErrMsg)
   
-  return topic_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return errmsg_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void ReportDataItem::set_allocated_topic(::std::string* topic) {
-  if (topic != NULL) {
+inline void SubscribeRsp::set_allocated_errmsg(::std::string* errmsg) {
+  if (errmsg != NULL) {
     
   } else {
     
   }
-  topic_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), topic);
-  // @@protoc_insertion_point(field_set_allocated:txdata.ReportDataItem.Topic)
-}
-
-// string Data = 3;
-inline void ReportDataItem::clear_data() {
-  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ReportDataItem::data() const {
-  // @@protoc_insertion_point(field_get:txdata.ReportDataItem.Data)
-  return data_.GetNoArena();
-}
-inline void ReportDataItem::set_data(const ::std::string& value) {
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:txdata.ReportDataItem.Data)
-}
-#if LANG_CXX11
-inline void ReportDataItem::set_data(::std::string&& value) {
-  
-  data_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:txdata.ReportDataItem.Data)
-}
-#endif
-inline void ReportDataItem::set_data(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:txdata.ReportDataItem.Data)
-}
-inline void ReportDataItem::set_data(const char* value, size_t size) {
-  
-  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:txdata.ReportDataItem.Data)
-}
-inline ::std::string* ReportDataItem::mutable_data() {
-  
-  // @@protoc_insertion_point(field_mutable:txdata.ReportDataItem.Data)
-  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ReportDataItem::release_data() {
-  // @@protoc_insertion_point(field_release:txdata.ReportDataItem.Data)
-  
-  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ReportDataItem::set_allocated_data(::std::string* data) {
-  if (data != NULL) {
-    
-  } else {
-    
-  }
-  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:txdata.ReportDataItem.Data)
+  errmsg_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), errmsg);
+  // @@protoc_insertion_point(field_set_allocated:txdata.SubscribeRsp.ErrMsg)
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
