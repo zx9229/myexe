@@ -34,6 +34,8 @@ enum MsgType {
     ID_ExecCmdRsp       = 21;
     ID_PushWrap         = 22;
     ID_PushItem         = 23;
+    ID_SubscribeReq     = 24;
+    ID_SubscribeRsp     = 25;
 }
 
 //唯一标识一个消息.
@@ -257,4 +259,14 @@ message PushItem {
     string Subject = 1;//主题.
     string Content = 2;//内容.
     int32  Level   = 3;//预留字段.
+}
+
+message SubscribeReq {
+    int64  FromMsgNo = 1;
+}
+
+message SubscribeRsp {
+    int64  FromMsgNo = 1;
+    int32  ErrNo     = 2;
+    string ErrMsg    = 3;
 }
