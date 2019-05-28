@@ -178,6 +178,8 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(CommonData::static_create_sql());
         Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(PushWrap::static_create_sql());
+        Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
     }
