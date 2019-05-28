@@ -20,6 +20,7 @@ public:
     static void CommonData2Common1Rsp(txdata::Common1Rsp* dst, const CommonData* src);
     static void Common2Req2CommonData(CommonData* dst, const txdata::Common2Req* src);
     static void Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* src);
+    static void PushWrap2PushWrap(PushWrap* dst, const txdata::PushWrap* src, const std::string& peerid);
 };
 
 #endif // ZXTOOLS_H

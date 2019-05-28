@@ -129,6 +129,8 @@ QStringList DataExchanger::getTxMsgTypeNameList()
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EmailItem));
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
     typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_PushItem));
+    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SubscribeReq));
     return  typeNameList;
 }
 
@@ -142,6 +144,18 @@ QString DataExchanger::jsonExample(const QString& typeName)
         tmpObj.set_data("DATA");
         tmpObj.set_rspcnt(2);
         tmpObj.set_secgap(0);
+        return zxtools::object2json(tmpObj);
+    }
+    if (msgType == txdata::MsgType::ID_PushItem)
+    {
+        txdata::PushItem tmpObj;
+        tmpObj.set_subject("Subject");
+        tmpObj.set_content("Content");
+        return zxtools::object2json(tmpObj);
+    }
+    if (msgType == txdata::MsgType::ID_SubscribeReq)
+    {
+        txdata::SubscribeReq tmpObj;
         return zxtools::object2json(tmpObj);
     }
     return "";
@@ -264,6 +278,50 @@ void DataExchanger::handle_Common2Rsp(QSharedPointer<txdata::Common2Rsp> msgData
     if (msgData->islog())
     {
         qDebug() << QString::fromStdString(msgData->DebugString());
+    }
+}
+
+void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData)
+{
+    Q_ASSERT(msgData.data() != nullptr);
+    if (msgData->islog())
+    {
+        qDebug() << QString::fromStdString(msgData->DebugString());
+    }
+    GPMSGPTR curData;
+    if (!m2b::slice2msg(msgData->reqdata(), msgData->reqtype(), curData))
+    {
+        qDebug() << "handle_Common1Rsp," << "slice2msg fail," << msgData->reqtype();
+        return;
+    }
+    Q_ASSERT(msgData->reqtype() == m2b::CalcMsgType(*curData));
+
+    if (true) {//TODO:
+        CommonData tmpData;
+        zxtools::Common1Req2CommonData(&tmpData, msgData.get());
+        QSqlQuery sqlQuery;
+        bool isOk = tmpData.insert_data(sqlQuery, true, nullptr);
+        Q_ASSERT(isOk);
+        emit sigTableChanged(tmpData.static_table_name());
+    }
+    if (msgData->reqtype() == txdata::MsgType::ID_PushWrap)
+    {
+        GPMSGPTR tmpData;
+        if (m2b::slice2msg(msgData->reqdata(), msgData->reqtype(), tmpData))
+        {
+            QSharedPointer<txdata::PushWrap> tmp2Data = qSharedPointerDynamicCast<txdata::PushWrap>(tmpData);
+            PushWrap pshData;
+            zxtools::PushWrap2PushWrap(&pshData, tmp2Data.get(), msgData->senderid());
+            QSqlQuery sqlQuery;
+            bool isOk = pshData.insert_data(sqlQuery, false, nullptr);
+            Q_ASSERT(isOk);
+            emit sigTableChanged(pshData.static_table_name());
+        }
+    }
+
+    switch (msgData->reqtype()) {
+    default:
+        break;
     }
 }
 
@@ -430,6 +488,9 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
         break;
     case txdata::MsgType::ID_Common2Rsp:
         handle_Common2Rsp(qSharedPointerDynamicCast<txdata::Common2Rsp>(theMsg));
+        break;
+    case txdata::MsgType::ID_Common1Req:
+        handle_Common1Req(qSharedPointerDynamicCast<txdata::Common1Req>(theMsg));
         break;
     case txdata::MsgType::ID_Common1Rsp:
         handle_Common1Rsp(qSharedPointerDynamicCast<txdata::Common1Rsp>(theMsg));

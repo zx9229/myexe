@@ -250,3 +250,15 @@ void zxtools::Common2Rsp2CommonData(CommonData* dst, const txdata::Common2Rsp* s
     dst->InsertTime = QDateTime::currentDateTime();
     dst->IsLast = src->islast();
 }
+
+void zxtools::PushWrap2PushWrap(PushWrap* dst, const txdata::PushWrap* src, const std::string& peerid)
+{
+    dst->PeerID = QString::fromStdString(peerid);
+    dst->MsgNo = src->msgno();
+    dst->UserID = QString::fromStdString(src->userid());
+    gpt2qdt(dst->PshTime, src->msgtime());
+    dst->PshType = static_cast<int32_t>(src->msgtype());
+    dst->PshTypeTxt = QString::fromStdString(::txdata::MsgType_Name(src->msgtype()));
+    dst->PshData = QByteArray::fromStdString(src->msgdata());
+    dst->PshDataTxt = binary2json(src->msgtype(), dst->PshData.toStdString()).trimmed();
+}

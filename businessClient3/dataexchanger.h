@@ -45,6 +45,7 @@ private:
     QString sendCommon2Req(QSharedPointer<txdata::Common2Req> data);
     void handle_Common2Ack(QSharedPointer<txdata::Common2Ack> data);
     void handle_Common2Rsp(QSharedPointer<txdata::Common2Rsp> data);
+    void handle_Common1Req(QSharedPointer<txdata::Common1Req> data);
     void handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> data);
     void handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data);
     void handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data);

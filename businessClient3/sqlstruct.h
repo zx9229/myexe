@@ -415,4 +415,79 @@ public:
 };
 Q_DECLARE_METATYPE(CommonData);
 
+class PushWrap
+{
+public:
+    QString    PeerID;
+    int64_t    MsgNo;
+    QString    UserID;
+    QDateTime  PshTime;
+    int32_t    PshType;
+    QString    PshTypeTxt;
+    QByteArray PshData;   //通信的对象经pb序列化后的二进制数据.
+    QString    PshDataTxt;//通信的对象转换成json字符串.
+public:
+    PushWrap()
+    {
+        this->MsgNo = INT64_MAX;
+        this->PshType = INT32_MAX;
+    }
+public:
+    static QString static_table_name()
+    {
+        return "PushWrap";
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            PeerID     TEXT    NOT NULL,\
+            MsgNo      INTEGER NOT NULL,\
+            UserID     TEXT        NULL,\
+            PshTime    TEXT        NULL,\
+            PshType    INTEGER     NULL,\
+            PshTypeTxt TEXT        NULL,\
+            PshData    BLOB        NULL,\
+            PshDataTxt TEXT        NULL,\
+              PRIMARY KEY(PeerID,MsgNo) )"
+        ).QString::arg(static_table_name());
+        return  sql;
+    }
+    bool insert_data(QSqlQuery& query, bool insertNotReplace, int64_t* lastInsertId = nullptr)
+    {
+        //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
+        bool isOk = false;
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //注意(NOT NULL)要特殊处理.
+        QStringList cols;
+        if (Valid(this->PeerID)) { cols.append("PeerID"); }
+        if (Valid(this->MsgNo)) { cols.append("MsgNo"); }
+        if (Valid(this->UserID)) { cols.append("UserID"); }
+        if (Valid(this->PshTime)) { cols.append("PshTime"); }
+        if (Valid(this->PshType)) { cols.append("PshType"); }
+        if (Valid(this->PshTypeTxt)) { cols.append("PshTypeTxt"); }
+        if (Valid(this->PshData)) { cols.append("PshData"); }
+        if (Valid(this->PshDataTxt)) { cols.append("PshDataTxt"); }
+        //
+        QString sqlStr = QObject::tr("INSERT %1 INTO %2 (%3) VALUES (%4)").arg(insertNotReplace ? "" : "OR REPLACE").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        //
+        if (Valid(this->PeerID)) { query.bindValue(":PeerID", this->PeerID); }
+        if (Valid(this->MsgNo)) { query.bindValue(":MsgNo", this->MsgNo); }
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->PshTime)) { query.bindValue(":PshTime", this->PshTime); }
+        if (Valid(this->PshType)) { query.bindValue(":PshType", this->PshType); }
+        if (Valid(this->PshTypeTxt)) { query.bindValue(":PshTypeTxt", this->PshTypeTxt); }
+        if (Valid(this->PshData)) { query.bindValue(":PshData", this->PshData); }
+        if (Valid(this->PshDataTxt)) { query.bindValue(":PshDataTxt", this->PshDataTxt); }
+        //
+        isOk = query.exec();
+        if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
+        return isOk;
+    }
+};
+Q_DECLARE_METATYPE(PushWrap);
+
 #endif // SQL_STRUCT_H
