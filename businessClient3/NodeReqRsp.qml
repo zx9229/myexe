@@ -31,6 +31,7 @@ Item {
             model: MySqlTableModel {
                 id: mstm
                 selectStatement: "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2'".arg(userid).arg(msgno)
+                //selectStatement: "SELECT * FROM CommonData WHERE UserID='%1' AND MsgNo='%2' AND json_extract(TxDataTxt,'$.SecGap')>0".arg(userid).arg(msgno)
             }
             delegate: Column {
                 id: idColumn
