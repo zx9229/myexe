@@ -18,7 +18,7 @@ type safePushCache struct {
 	idx    int64
 }
 
-func newSafePushCache(dbc chan *DbOp, eng *xorm.Engine) *safePushCache {
+func newSafePushCache(eng *xorm.Engine, dbc chan *DbOp) *safePushCache {
 	return &safePushCache{dbChan: dbc, engine: eng, Slc: make([]*txdata.PushWrap, 0)}
 }
 
@@ -40,6 +40,7 @@ func (thls *safePushCache) Insert(data *txdata.PushWrap) (isInsert bool) {
 			temp := &DbPushWrap{}
 			temp.From(dbop.pm.(*txdata.PushWrap))
 			dbop.affected, dbop.err = session.Insert(temp)
+			dbop.pm.(*txdata.PushWrap).MsgNo = temp.MsgNo
 		}
 		action.wg.Add(1)
 		thls.dbChan <- action

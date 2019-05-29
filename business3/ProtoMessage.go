@@ -129,6 +129,10 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 		msgData = new(txdata.PushWrap)
 	case txdata.MsgType_ID_PushItem:
 		msgData = new(txdata.PushItem)
+	case txdata.MsgType_ID_SubscribeReq:
+		msgData = new(txdata.SubscribeReq)
+	case txdata.MsgType_ID_SubscribeRsp:
+		msgData = new(txdata.SubscribeRsp)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType(%v)", msgType)

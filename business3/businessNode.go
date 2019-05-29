@@ -11,6 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/go-xorm/core"
+	"github.com/go-xorm/xorm"
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
@@ -42,7 +44,7 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 		CacheC1RR  *safeNodeC1ReqRspCache
 		ZZZXML     *safeUniSymCache
 		BAQYTDHC   *safeMemoryTmpCache
-		AQZXJG     *safeSynchCache
+		AQZXJG     *safeSynchCacheRoot
 		OwnMsgNo   string //用(int64)时会出现BUG(明明int64的值在慢慢地增加,但是Marshal后的字符串中,我们可以看到,其值一直没有变化,迫于无奈,我使用了string)
 		//chanSync   chan string
 	}{LetUpCache: thls.letUpCache, OwnInfo: &thls.ownInfo, IamRoot: thls.iAmRoot, ParentInfo: &thls.parentInfo, RootOnline: thls.rootOnline, CacheUser: thls.cacheUser, CacheSock: thls.cacheSock, CacheSync: thls.cacheSync, CacheC2RR: thls.cacheC2RR, CacheC1RR: thls.cacheC1RR, ZZZXML: thls.cacheZZZXML, BAQYTDHC: thls.cBAQYTDHC, AQZXJG: thls.cAQZXJG, OwnMsgNo: strconv.FormatInt(atomic.LoadInt64(&thls.ownMsgNo), 10)}
@@ -51,6 +53,8 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 }
 
 type businessNode struct {
+	xEngine     *xorm.Engine
+	chanDB      chan *DbOp
 	letUpCache  bool                  //(一经设置,不再修改)让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
 	ownInfo     txdata.ConnectionInfo //(一经设置,不再修改)
 	iAmRoot     bool                  //(一经设置,不再修改)(I am root node)
@@ -65,7 +69,9 @@ type businessNode struct {
 	chanSync    chan string         //哪个UserID连通了,就投递过来一个信号.
 	cacheZZZXML *safeUniSymCache    //(正在执行命令)的Req消息的UniSym.给续传模式的命令使用,因为只有它们可能续传.
 	cBAQYTDHC   *safeMemoryTmpCache //(ROOT模式有用)(不安全用途的缓存)(Common2Req+Common2Rsp+!IsSafe)的数据缓存在这里.
-	cAQZXJG     *safeSynchCache     //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
+	cAQZXJG     *safeSynchCacheRoot //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
+	cachePush   *safePushCache
+	cacheSub    *safeSubscriberMap
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -90,6 +96,8 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	//
 	curData.iAmRoot = (curData.ownInfo.UserID == EMPTYSTR)
 	//
+	curData.initDatabase(cfg.DataSourceName, cfg.LocationName)
+	//
 	curData.parentInfo.setData(nil, nil, true)
 	//
 	if curData.iAmRoot {
@@ -98,12 +106,14 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	//
 	curData.cacheUser = newSafeConnInfoMap()
 	curData.cacheSock = newSafeWsSocketMap()
-	curData.cacheSync = newSafeSynchCache()
+	curData.cacheSync = newSafeSynchCache(curData.xEngine, curData.chanDB)
 	curData.cacheC2RR = newSafeNodeC2ReqRspCache()
 	curData.cacheC1RR = newSafeNodeC1ReqRspCache()
 	curData.cacheZZZXML = newSafeUniSymCache()
 	curData.cBAQYTDHC = newSafeMemoryTmpCache()
-	curData.cAQZXJG = newSafeSynchCache()
+	curData.cAQZXJG = newSafeSynchCacheRoot(curData.xEngine, curData.chanDB)
+	curData.cachePush = newSafePushCache(curData.xEngine, curData.chanDB)
+	curData.cacheSub = newSafeSubscriberMap(curData.cachePush)
 	//
 	curData.refreshSeqNo()
 	//
@@ -111,6 +121,84 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	go curData.backgroundWork()
 	//
 	return curData
+}
+
+func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
+	if len(DataSourceName) == 0 {
+		return
+	}
+	var err error
+	var xEngine *xorm.Engine
+	if xEngine, err = xorm.NewEngine("sqlite3", DataSourceName); err != nil {
+		glog.Fatalln(err)
+	}
+	//
+	xEngine.SetMapper(core.SameMapper{}) //支持结构体名称和对应的表名称以及结构体field名称与对应的表字段名称相同的命名.
+	//
+	if 0 < len(LocationName) {
+		if location, err := time.LoadLocation(LocationName); err != nil {
+			glog.Fatalln(err)
+		} else {
+			xEngine.DatabaseTZ = location
+			xEngine.TZLocation = location
+		}
+	}
+	//
+	beanSlice := make([]interface{}, 0)
+	beanSlice = append(beanSlice, &DbCommonReqRsp{})
+	beanSlice = append(beanSlice, &DbCommonReqRspRoot{})
+	beanSlice = append(beanSlice, &DbPushWrap{})
+	//
+	if err = xEngine.CreateTables(beanSlice...); err != nil { //应该是:只要存在这个tablename,就跳过它.
+		glog.Fatalln(err)
+	}
+	if err = xEngine.Sync2(beanSlice...); err != nil { //同步数据库结构
+		glog.Fatalln(err)
+	}
+
+	thls.xEngine = xEngine
+
+	if thls.xEngine != nil && thls.chanDB == nil {
+		thls.chanDB = make(chan *DbOp, 256)
+		go func() {
+			var session *xorm.Session
+			var cnt int
+			var isOk bool
+			var dbop *DbOp
+			for {
+				if dbop, isOk = <-thls.chanDB; !isOk {
+					if session != nil {
+						if err = session.Commit(); err != nil {
+							panic(err)
+						}
+						session.Close()
+						session = nil
+						cnt = 0
+					}
+					break
+				}
+				if session == nil {
+					session = xEngine.NewSession()
+					if err = session.Begin(); err != nil {
+						panic(err)
+					}
+				}
+				dbop.handler(session, dbop)
+				dbop.wg.Done()
+				//
+				cnt = (cnt + 1) % 10000 //如果连续处理的数据超过阈值,不论chan里面有没有数据,均立即提交.
+				if cnt == 0 || len(thls.chanDB) <= 0 {
+					//队列里面已经没有数据了,就立即提交.
+					if err = session.Commit(); err != nil {
+						panic(err)
+					}
+					session.Close()
+					session = nil
+					cnt = 0
+				}
+			}
+		}()
+	}
 }
 
 func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
@@ -182,6 +270,7 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 	}
 	//thls.deleteConnectionFromAll(msgConn, false)
 	thls.cacheSock.deleteData(msgConn)
+	thls.cacheSub.deleteByConn(msgConn)
 }
 
 //func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {
@@ -496,6 +585,7 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		//儿子向父亲发送DisconnectedData,父亲接收了DisconnectedData,父亲无法清理缓存.
 		glog.Errorf("cache cleanup failed, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
+	thls.cacheSub.deleteData(msgData.Info.UserID)
 	thls.sendData(thls.parentInfo.conn, msgData)
 }
 
@@ -994,6 +1084,10 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 	case txdata.MsgType_ID_ExecCmdReq:
 	case txdata.MsgType_ID_QryConnInfoReq:
 		thls.execute_MsgType_ID_QryConnInfoReq(objData.(*txdata.QryConnInfoReq), stream)
+	case txdata.MsgType_ID_PushItem:
+		thls.execute_MsgType_ID_PushItem(objData.(*txdata.PushItem), stream)
+	case txdata.MsgType_ID_SubscribeReq:
+		thls.execute_MsgType_ID_SubscribeReq(objData.(*txdata.SubscribeReq), stream, reqData, msgConn)
 	default:
 		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
 			//TODO:报警.
@@ -1017,6 +1111,29 @@ func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, 
 	}
 }
 
+func (thls *businessNode) execute_MsgType_ID_SubscribeReq(reqData *txdata.SubscribeReq, stream CommonRspWrapper, c1req *txdata.Common1Req, conn *wsnet.WsSocket) {
+	isSuccess := thls.cacheSub.insertData(c1req.SenderID, c1req.RecverID, !c1req.ToRoot, c1req.IsLog, conn, reqData.FromMsgNo)
+	rsp := &txdata.SubscribeRsp{}
+	if !isSuccess {
+		rsp.ErrNo = 1
+		rsp.ErrMsg = "maybe already sub"
+	}
+	stream.sendData(rsp, true)
+}
+
+func (thls *businessNode) execute_MsgType_ID_PushItem(reqData *txdata.PushItem, stream CommonRspWrapper) {
+	tmpData := &txdata.PushWrap{}
+	tmpData.MsgNo = 0
+	tmpData.UserID = thls.ownInfo.UserID
+	tmpData.MsgTime, _ = ptypes.TimestampProto(time.Now())
+	tmpData.MsgType = CalcMessageType(reqData)
+	tmpData.MsgData = msg2slice(reqData)
+	if thls.cachePush.Insert(tmpData) == true {
+		thls.cacheSub.Send(tmpData)
+	}
+
+}
+
 func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream CommonRspWrapper) {
 }
 
@@ -1033,21 +1150,21 @@ func (thls *businessNode) backgroundWork() {
 	var userID string
 	var isOk bool
 	var cie *connInfoEx
-	var nodeSlice []*node4sync
-	var nodeItem *node4sync
+	var nodeSlice []ProtoMessage
+	var nodeItem ProtoMessage
 	for {
 		if userID, isOk = <-thls.chanSync; isOk {
 			if userID == EMPTYSTR {
 				if nodeSlice = thls.cacheSync.queryDataByToRoot(true); nodeSlice != nil {
 					for _, nodeItem = range nodeSlice {
-						thls.sendData(thls.parentInfo.conn, nodeItem.data)
+						thls.sendData(thls.parentInfo.conn, nodeItem)
 					}
 				}
 			} else {
 				if cie, isOk = thls.cacheUser.queryData(userID); isOk {
 					if nodeSlice = thls.cacheSync.queryData(false, userID); nodeSlice != nil {
 						for _, nodeItem = range nodeSlice {
-							thls.sendData(cie.conn, nodeItem.data)
+							thls.sendData(cie.conn, nodeItem)
 						}
 					}
 				}
