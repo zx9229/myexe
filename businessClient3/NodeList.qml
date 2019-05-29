@@ -5,13 +5,20 @@ import MySqlTableModel 0.1
 
 Item {
     signal sigShowNodeRequest(string UserID)
+    signal sigShowNodePushWrap(string UserID)
 
     ColumnLayout {
         anchors.fill: parent
 
-        Button {
-            text: qsTr("刷新NodeList")
-            onClicked: mstm.select()
+        RowLayout {
+            Button {
+                text: qsTr("刷新NodeList")
+                onClicked: mstm.select()
+            }
+            Button {
+                text: qsTr("进入NodePushWrap")
+                onClicked: sigShowNodePushWrap(listView.currentItem.testid)
+            }
         }
 
         ListView {
@@ -25,6 +32,7 @@ Item {
             }
 
             delegate: Rectangle {
+                property string testid: UserID
                 id: idRect
                 radius: 5
                 color: "lightgray"

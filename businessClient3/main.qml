@@ -22,6 +22,9 @@ Window {
                 item.sigShowNodeRequest.connect(function(PeerID){
                     pageLoader.setSource("qrc:/NodeRequest.qml", {"peerid":PeerID})
                 })
+                item.sigShowNodePushWrap.connect(function(PeerID){
+                    pageLoader.setSource("qrc:/NodePushWrap.qml", {"peerid":PeerID})
+                })
             } else if (source == "qrc:/NodeRequest.qml") {
                 item.sigShowNodeList.connect(function(){
                     pageLoader.source = "qrc:/NodeList.qml"
@@ -32,6 +35,10 @@ Window {
             } else if (source == "qrc:/NodeReqRsp.qml") {
                 item.sigShowNodeRequest.connect(function(PeerID){
                     pageLoader.setSource("qrc:/NodeRequest.qml", {"peerid":PeerID})
+                })
+            } else if (source == "qrc:/NodePushWrap.qml") {
+                item.sigShowNodeList.connect(function(){
+                    pageLoader.source = "qrc:/NodeList.qml"
                 })
             }
         }

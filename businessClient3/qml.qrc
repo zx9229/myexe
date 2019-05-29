@@ -6,5 +6,6 @@
         <file>NodeList.qml</file>
         <file>NodeRequest.qml</file>
         <file>NodeReqRsp.qml</file>
+        <file>NodePushWrap.qml</file>
     </qresource>
 </RCC>
