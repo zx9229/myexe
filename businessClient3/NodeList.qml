@@ -72,6 +72,38 @@ Item {
             }
 
             ScrollBar.vertical: ScrollBar {}
+
+            header: RefreshView{
+                id:rv_refresh
+                tips: "刷新中..."
+                onRefeash: {
+                    timer.start()
+                }
+                Timer {
+                    id: timer
+                    interval:300; running: false; repeat: false
+                    onTriggered:{
+                        mstm.select()
+                        rv_refresh.hideView()
+                    }
+                }
+            }
+            footer: RefreshView{
+                id:rv_load
+                tips: "加载更多"
+                onRefeash: {
+                    loadMoreTimer.start()
+                }
+                Timer {
+                    id: loadMoreTimer
+                    property bool isRefresh: true
+                    interval:300; running: false; repeat: false
+                    onTriggered:{
+                        mstm.select()
+                        rv_load.hideView()
+                    }
+                }
+            }
         }
     }
 

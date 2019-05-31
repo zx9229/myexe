@@ -7,5 +7,6 @@
         <file>NodeRequest.qml</file>
         <file>NodeReqRsp.qml</file>
         <file>NodePushWrap.qml</file>
+        <file>RefreshView.qml</file>
     </qresource>
 </RCC>
