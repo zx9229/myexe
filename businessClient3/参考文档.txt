@@ -77,13 +77,18 @@ All source code in one file (sqlite3.c)
 一个下拉刷新，上拉加载的例子
 https://github.com/zdc212133/RefreshView
 ===============================================================================
+Qml侧边滑动菜单
 https://blog.csdn.net/zhengtianzuo06/article/details/78275524
 https://www.jianshu.com/p/36a052edf5dc
+===============================================================================
+QML侧边伸缩导航栏
 https://blog.csdn.net/u010002704/article/details/41520455
+===============================================================================
+Qt qml pageview 左右滑动分页组件
+https://www.cnblogs.com/surfsky/p/4352862.html
+===============================================================================
 Qt on Android 沉浸式状态栏
 https://qtdream.com/topic/46/qt-on-android-%E6%B2%89%E6%B5%B8%E5%BC%8F%E7%8A%B6%E6%80%81%E6%A0%8F
-===============================================================================
-https://www.cnblogs.com/surfsky/p/4352862.html
 ===============================================================================
 Qt5.7.0的QML实现SwipeView
 https://blog.csdn.net/MyLovelyJay/article/details/80928302
