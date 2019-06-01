@@ -4,22 +4,10 @@ import QtQuick.Controls 2.0
 import MySqlTableModel 0.1
 
 Item {
-    signal sigShowNodeRequest(string UserID)
-    signal sigShowNodePushWrap(string UserID)
+    signal sigPickPeerID(string peerid)
 
     ColumnLayout {
         anchors.fill: parent
-
-        RowLayout {
-            Button {
-                text: qsTr("刷新NodeList")
-                onClicked: mstm.select()
-            }
-            Button {
-                text: qsTr("进入NodePushWrap")
-                onClicked: sigShowNodePushWrap(listView.currentItem.testid)
-            }
-        }
 
         ListView {
             id: listView
@@ -64,10 +52,9 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         idRect.ListView.view.currentIndex = index //https://blog.csdn.net/x356982611/article/details/53008236
+                        sigPickPeerID(UserID)
                     }
-                    onPressAndHold: {
-                        sigShowNodeRequest(UserID)
-                    }
+                    onPressAndHold: {}
                 }
             }
 

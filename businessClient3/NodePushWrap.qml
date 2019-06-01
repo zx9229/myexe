@@ -5,20 +5,10 @@ import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
 Item {
-    signal sigShowNodeList()
     property string peerid
+
     ColumnLayout {
         anchors.fill: parent
-
-        RowLayout {
-            Button {
-                text: qsTr("<[返回]")
-                onClicked: sigShowNodeList()
-            }
-            Button {
-                text: qsTr("刷新NodePushWrap")
-            }
-        }
 
         ListView {
             id: listView
@@ -58,9 +48,7 @@ Item {
                         onDoubleClicked: {
                             messageText.selectByMouse = !messageText.selectByMouse
                         }
-                        onPressAndHold: {
-                            //sigShowNodeReqRsp(UserID, MsgNo)
-                        }
+                        onPressAndHold: {}
                     }
                 }
                 states: State {

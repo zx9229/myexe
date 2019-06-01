@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE bool saveValue(const QString& key, const QString& value);
     Q_INVOKABLE void setURL(const QString& url);
     Q_INVOKABLE void setOwnInfo(const QString& userID, const QString& belongID);
+    Q_INVOKABLE QString getUserID();
     Q_INVOKABLE bool start();
     Q_INVOKABLE QString demoFun(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool forceToDB);
     Q_INVOKABLE QString QryConnInfoReq(const QString& userId);

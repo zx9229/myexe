@@ -8,5 +8,7 @@
         <file>NodeReqRsp.qml</file>
         <file>NodePushWrap.qml</file>
         <file>RefreshView.qml</file>
+        <file>HomePage.qml</file>
+        <file>HomePageComponent.qml</file>
     </qresource>
 </RCC>

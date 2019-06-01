@@ -4,25 +4,11 @@ import QtQuick.Layouts 1.3
 import MySqlTableModel 0.1
 
 Item {
-    signal sigShowNodeRequest(string UserID)
-    //property alias statement: mstm.selectStatement
-    property string peerid
     property string userid
     property string msgno
 
     ColumnLayout {
         anchors.fill: parent
-
-        RowLayout {
-            Button {
-                text: qsTr("<[返回]")
-                onClicked: sigShowNodeRequest(peerid)
-            }
-            Button {
-                text: qsTr("刷新NodeReqRsp")
-                onClicked: mstm.select()
-            }
-        }
 
         ListView {
             id: listView

@@ -6,24 +6,12 @@ import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
 Item {
-    signal sigShowNodeList()
-    signal sigShowNodeReqRsp(string UserID, var MsgNo)//The var type is a generic property type that can refer to any data type.
+    signal sigPickMsgNo(string MsgNo)
     //property alias statement: mstm.selectStatement
     property string peerid
 
     ColumnLayout {
         anchors.fill: parent
-
-        RowLayout {
-            Button {
-                text: qsTr("<[返回]")
-                onClicked: sigShowNodeList()
-            }
-            Button {
-                text: qsTr("刷新NodeRequest")
-                onClicked: mstm.select()
-            }
-        }
 
         ListView {
             id: listView
@@ -60,13 +48,12 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             idColumn.ListView.view.currentIndex = index
+                            sigPickMsgNo(MsgNo.toString())
                         }
                         onDoubleClicked: {
                             messageText.selectByMouse = !messageText.selectByMouse
                         }
-                        onPressAndHold: {
-                            sigShowNodeReqRsp(UserID, MsgNo)
-                        }
+                        onPressAndHold: {}
                     }
                 }
                 states: State {

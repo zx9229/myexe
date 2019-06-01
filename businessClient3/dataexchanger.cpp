@@ -64,6 +64,11 @@ void DataExchanger::setOwnInfo(const QString &userID, const QString &belongID)
     m_ownInfo.set_belongid(belongID.toStdString());
 }
 
+QString DataExchanger::getUserID()
+{
+    return QString::fromStdString(m_ownInfo.userid());
+}
+
 bool DataExchanger::start()
 {
     m_ws.stop(true);
