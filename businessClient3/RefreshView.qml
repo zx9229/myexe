@@ -19,8 +19,8 @@ Item {
         spacing: 8
         anchors.centerIn: parent
         BusyIndicator{
-            width: label.implicitHeight
-            height: label.implicitHeight
+            width: Math.max(label.implicitHeight, 32)
+            height: Math.max(label.implicitHeight, 32)
             running: visible
         }
         Label{
