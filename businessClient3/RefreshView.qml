@@ -19,12 +19,13 @@ Item {
         spacing: 8
         anchors.centerIn: parent
         BusyIndicator{
-            width: 32
-            height: 32
+            width: label.implicitHeight
+            height: label.implicitHeight
             running: visible
         }
         Label{
-            font.pixelSize: 14
+            id: label
+            //font.pixelSize: 14
             anchors.verticalCenter: parent.verticalCenter
             text: tips
         }
