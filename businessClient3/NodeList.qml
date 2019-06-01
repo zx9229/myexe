@@ -57,35 +57,34 @@ Item {
                     onPressAndHold: {}
                 }
             }
-
-            ScrollBar.vertical: ScrollBar {}
-
-            header: RefreshView{
-                id:rv_refresh
-                tips: "刷新中..."
+            ScrollBar.vertical: ScrollBar {
+                id: verScrollBar
+            }
+            header: RefreshView {
+                id: rv_refresh
+                tips: qsTr("刷新中...")
                 onRefeash: {
                     timer.start()
                 }
                 Timer {
                     id: timer
                     interval:300; running: false; repeat: false
-                    onTriggered:{
+                    onTriggered: {
                         mstm.select()
                         rv_refresh.hideView()
                     }
                 }
             }
-            footer: RefreshView{
-                id:rv_load
-                tips: "加载更多"
+            footer: RefreshView {
+                id: rv_load
+                tips: qsTr("加载更多")
                 onRefeash: {
                     loadMoreTimer.start()
                 }
                 Timer {
                     id: loadMoreTimer
-                    property bool isRefresh: true
                     interval:300; running: false; repeat: false
-                    onTriggered:{
+                    onTriggered: {
                         mstm.select()
                         rv_load.hideView()
                     }

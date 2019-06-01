@@ -28,7 +28,7 @@ Item {
                 btnText: qsTr("节点推送消息")
                 onSigClicked: {
                     if (typeof(peerID) === "undefined") {
-                        ToolTip.show("请先指定对端节点")
+                        ToolTip.show("请先指定对端节点", 5000)
                     } else {
                         sigShowNodePushWrap(peerID)
                     }
@@ -39,7 +39,7 @@ Item {
                 btnText: qsTr("节点请求")
                 onSigClicked: {
                     if (typeof(peerID) === "undefined") {
-                        ToolTip.show("请先指定对端节点")
+                        ToolTip.show("请先指定对端节点", 5000)
                     } else {
                         sigShowNodeRequest(peerID)
                     }
@@ -51,9 +51,9 @@ Item {
                 onSigClicked: {
                     if (false) {
                     } else if (typeof(peerID) === "undefined") {
-                        ToolTip.show("请先指定对端节点")
+                        ToolTip.show("请先指定对端节点", 5000)
                     } else if (typeof(msgNo)  === "undefined") {
-                        ToolTip.show("请先指定消息编号")
+                        ToolTip.show("请先指定消息编号", 5000)
                     } else {
                         sigShowNodeReqRsp(userID, msgNo)
                     }
