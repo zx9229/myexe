@@ -284,6 +284,25 @@ void DataExchanger::handle_Common2Rsp(QSharedPointer<txdata::Common2Rsp> msgData
     {
         qDebug() << QString::fromStdString(msgData->DebugString());
     }
+    GPMSGPTR curData;
+    if (!m2b::slice2msg(msgData->rspdata(), msgData->rsptype(), curData))
+    {
+        qDebug() << "handle_Common2Rsp," << "slice2msg fail," << msgData->rsptype();
+        return;
+    }
+    Q_ASSERT(msgData->rsptype() == m2b::CalcMsgType(*curData));
+
+    if (msgData->mutable_key()->msgno() != 0)
+    {
+        CommonData tmpData;
+        zxtools::Common2Rsp2CommonData(&tmpData, msgData.get());
+        QSqlQuery sqlQuery;
+        bool isOk = tmpData.insert_data(sqlQuery, true, nullptr);
+        Q_ASSERT(isOk);
+        isOk = tmpData.updateRequestData(sqlQuery);
+        Q_ASSERT(isOk);
+        emit sigTableChanged(tmpData.static_table_name());
+    }
 }
 
 void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData)
