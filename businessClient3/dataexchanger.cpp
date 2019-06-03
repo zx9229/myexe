@@ -112,6 +112,7 @@ QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText,
         tmpCommonData.insert_data(sqlQuery, true, nullptr);
         m_MsgNo.Value.setNum(msgNo);
         m_MsgNo.update_data(sqlQuery);
+        emit sigTableChanged(tmpCommonData.static_table_name());
     }
 
     return message;
