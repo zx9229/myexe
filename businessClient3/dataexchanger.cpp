@@ -122,7 +122,7 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
     txdata::QryConnInfoReq tmpData;
     QString typeName = m2b::CalcMsgTypeName(tmpData);
     QString jsonText = zxtools::object2json(tmpData, nullptr);
-    return sendReq(typeName, jsonText, userId, false, false, false, false, true, false, true);
+    return sendReq(typeName, jsonText, userId, false, false, false, false, true, false, false);
 }
 
 QStringList DataExchanger::getTxMsgTypeNameList()
