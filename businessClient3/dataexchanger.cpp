@@ -70,11 +70,14 @@ bool DataExchanger::start()
     return m_ws.start(m_url);
 }
 
-QString DataExchanger::demoFun(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool forceToDB)
+QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB)
 {
     QString message;
-
-    int64_t msgNo = m_MsgNo.Value.toLongLong() + 1;
+    int64_t msgNo = 0;
+    if (fillMsgNo || !isC1NotC2)
+    {
+        msgNo = m_MsgNo.Value.toLongLong() + 1;
+    }
     GPMSGPTR msgData;
     message = toC1C2(msgNo, typeName, jsonText, rID, isLog, isSafe, isPush, isUpCache, isC1NotC2, msgData);
     if (!message.isEmpty())
@@ -119,7 +122,7 @@ QString DataExchanger::QryConnInfoReq(const QString &userId)
     txdata::QryConnInfoReq tmpData;
     QString typeName = m2b::CalcMsgTypeName(tmpData);
     QString jsonText = zxtools::object2json(tmpData, nullptr);
-    return demoFun(typeName, jsonText, userId, false, false, false, false, true, true);
+    return sendReq(typeName, jsonText, userId, false, false, false, false, true, false, true);
 }
 
 QStringList DataExchanger::getTxMsgTypeNameList()

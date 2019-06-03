@@ -142,6 +142,12 @@ Item {
                             visible: false
                         }
                         Controls1.CheckBox {
+                            id: cbFillMsgNo
+                            text: qsTr("FillMsgNo")
+                            checked: true
+                            visible: true
+                        }
+                        Controls1.CheckBox {
                             id: cbForceToDB
                             text: qsTr("DB")
                             checked: false
@@ -162,6 +168,8 @@ Item {
                                     cbIsSafe.visible = !rbC1Req.checked
                                     cbIsUpCache.checked = false
                                     cbIsUpCache.visible = !rbC1Req.checked
+                                    cbFillMsgNo.checked = true
+                                    cbFillMsgNo.visible = rbC1Req.checked
                                 }
                             }
                             Controls1.RadioButton {
@@ -173,6 +181,8 @@ Item {
                                     cbIsSafe.visible = !rbC1Req.checked
                                     cbIsUpCache.checked = false
                                     cbIsUpCache.visible = !rbC1Req.checked
+                                    cbFillMsgNo.checked = true
+                                    cbFillMsgNo.visible = rbC1Req.checked
                                 }
                             }
                         }
@@ -184,7 +194,7 @@ Item {
                     Button {
                         text: qsTr("发送")
                         onClicked: {
-                            var message = dataExch.demoFun(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbForceToDB.checked)
+                            var message = dataExch.sendReq(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbFillMsgNo.checked,cbForceToDB.checked)
                             ToolTip.show("send: "+message, 5000)
                         }
                     }
