@@ -106,7 +106,7 @@ QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText,
         }
     }
 
-    if (message.isEmpty() || forceToDB)
+    if ((0 != tmpCommonData.MsgNo && message.isEmpty()) || forceToDB)
     {
         QSqlQuery sqlQuery;
         tmpCommonData.insert_data(sqlQuery, true, nullptr);
@@ -301,7 +301,8 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
     }
     Q_ASSERT(msgData->reqtype() == m2b::CalcMsgType(*curData));
 
-    if (true) {//TODO:
+    if (msgData->msgno() != 0)
+    {
         CommonData tmpData;
         zxtools::Common1Req2CommonData(&tmpData, msgData.get());
         QSqlQuery sqlQuery;
@@ -309,6 +310,7 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
         Q_ASSERT(isOk);
         emit sigTableChanged(tmpData.static_table_name());
     }
+
     if (msgData->reqtype() == txdata::MsgType::ID_PushWrap)
     {
         GPMSGPTR tmpData;
@@ -345,7 +347,8 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
     }
     Q_ASSERT(msgData->rsptype() == m2b::CalcMsgType(*curData));
 
-    if (true) {//TODO:
+    if (msgData->msgno() != 0)
+    {
         CommonData tmpData;
         zxtools::Common1Rsp2CommonData(&tmpData, msgData.get());
         QSqlQuery sqlQuery;
