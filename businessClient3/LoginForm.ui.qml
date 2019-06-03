@@ -154,20 +154,20 @@ Item {
     Connections {
         target: buttonSaveConf
         onClicked: {
-            dataExch.saveValue("Host", textFieldHost.text)
-            dataExch.saveValue("Port", textFieldPort.text)
-            dataExch.saveValue("BelongID", textFieldBelongID.text)
-            dataExch.saveValue("UserID", textFieldUserID.text)
+            dataExch.dbSaveValue("Host", textFieldHost.text)
+            dataExch.dbSaveValue("Port", textFieldPort.text)
+            dataExch.dbSaveValue("BelongID", textFieldBelongID.text)
+            dataExch.dbSaveValue("UserID", textFieldUserID.text)
         }
     }
 
     Connections {
         target: buttonLoadConf
         onClicked: {
-            textFieldHost.text = dataExch.loadValue("Host")
-            textFieldPort.text = dataExch.loadValue("Port")
-            textFieldBelongID.text = dataExch.loadValue("BelongID")
-            textFieldUserID.text = dataExch.loadValue("UserID")
+            textFieldHost.text = dataExch.dbLoadValue("Host")
+            textFieldPort.text = dataExch.dbLoadValue("Port")
+            textFieldBelongID.text = dataExch.dbLoadValue("BelongID")
+            textFieldUserID.text = dataExch.dbLoadValue("UserID")
             if (textFieldHost.text == "" && textFieldPort.text == "") {
                 textFieldHost.text = qsTr("192.168.3.157")
                 textFieldPort.text = qsTr("40078")

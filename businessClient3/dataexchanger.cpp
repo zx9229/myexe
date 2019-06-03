@@ -34,19 +34,14 @@ DataExchanger::~DataExchanger()
 
 }
 
-MyWebsock& DataExchanger::ws()
-{
-    return m_ws;
-}
-
-QString DataExchanger::loadValue(const QString& key)
+QString DataExchanger::dbLoadValue(const QString& key)
 {
     QSqlQuery sqlQuery;
     KeyValue kv(key, QString());
     return kv.refresh_data(sqlQuery) ? kv.Value : QString();
 }
 
-bool DataExchanger::saveValue(const QString& key, const QString& value)
+bool DataExchanger::dbSaveValue(const QString& key, const QString& value)
 {
     QSqlQuery sqlQuery;
     KeyValue kv(key, value);
