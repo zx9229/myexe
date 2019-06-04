@@ -43,7 +43,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[27];
+  static const ::google::protobuf::internal::ParseTable schema[30];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -99,6 +99,15 @@ extern ExecCmdRspDefaultTypeInternal _ExecCmdRsp_default_instance_;
 class OnlineNotice;
 class OnlineNoticeDefaultTypeInternal;
 extern OnlineNoticeDefaultTypeInternal _OnlineNotice_default_instance_;
+class PathwayInfo;
+class PathwayInfoDefaultTypeInternal;
+extern PathwayInfoDefaultTypeInternal _PathwayInfo_default_instance_;
+class PathwayInfo_InfoEntry_DoNotUse;
+class PathwayInfo_InfoEntry_DoNotUseDefaultTypeInternal;
+extern PathwayInfo_InfoEntry_DoNotUseDefaultTypeInternal _PathwayInfo_InfoEntry_DoNotUse_default_instance_;
+class PathwayInfo_Pathway;
+class PathwayInfo_PathwayDefaultTypeInternal;
+extern PathwayInfo_PathwayDefaultTypeInternal _PathwayInfo_Pathway_default_instance_;
 class PushItem;
 class PushItemDefaultTypeInternal;
 extern PushItemDefaultTypeInternal _PushItem_default_instance_;
@@ -151,6 +160,9 @@ template<> ::txdata::EmailItem* Arena::CreateMaybeMessage<::txdata::EmailItem>(A
 template<> ::txdata::ExecCmdReq* Arena::CreateMaybeMessage<::txdata::ExecCmdReq>(Arena*);
 template<> ::txdata::ExecCmdRsp* Arena::CreateMaybeMessage<::txdata::ExecCmdRsp>(Arena*);
 template<> ::txdata::OnlineNotice* Arena::CreateMaybeMessage<::txdata::OnlineNotice>(Arena*);
+template<> ::txdata::PathwayInfo* Arena::CreateMaybeMessage<::txdata::PathwayInfo>(Arena*);
+template<> ::txdata::PathwayInfo_InfoEntry_DoNotUse* Arena::CreateMaybeMessage<::txdata::PathwayInfo_InfoEntry_DoNotUse>(Arena*);
+template<> ::txdata::PathwayInfo_Pathway* Arena::CreateMaybeMessage<::txdata::PathwayInfo_Pathway>(Arena*);
 template<> ::txdata::PushItem* Arena::CreateMaybeMessage<::txdata::PushItem>(Arena*);
 template<> ::txdata::PushWrap* Arena::CreateMaybeMessage<::txdata::PushWrap>(Arena*);
 template<> ::txdata::QryConnInfoReq* Arena::CreateMaybeMessage<::txdata::QryConnInfoReq>(Arena*);
@@ -215,12 +227,13 @@ enum MsgType {
   ID_PushItem = 23,
   ID_SubscribeReq = 24,
   ID_SubscribeRsp = 25,
+  ID_PathwayInfo = 26,
   MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool MsgType_IsValid(int value);
 const MsgType MsgType_MIN = Zero1;
-const MsgType MsgType_MAX = ID_SubscribeRsp;
+const MsgType MsgType_MAX = ID_PathwayInfo;
 const int MsgType_ARRAYSIZE = MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MsgType_descriptor();
@@ -4117,6 +4130,274 @@ class SubscribeRsp : public ::google::protobuf::Message /* @@protoc_insertion_po
   ::google::protobuf::internal::ArenaStringPtr errmsg_;
   ::google::protobuf::int64 frommsgno_;
   ::google::protobuf::int32 errno_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class PathwayInfo_Pathway : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.PathwayInfo.Pathway) */ {
+ public:
+  PathwayInfo_Pathway();
+  virtual ~PathwayInfo_Pathway();
+
+  PathwayInfo_Pathway(const PathwayInfo_Pathway& from);
+
+  inline PathwayInfo_Pathway& operator=(const PathwayInfo_Pathway& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PathwayInfo_Pathway(PathwayInfo_Pathway&& from) noexcept
+    : PathwayInfo_Pathway() {
+    *this = ::std::move(from);
+  }
+
+  inline PathwayInfo_Pathway& operator=(PathwayInfo_Pathway&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PathwayInfo_Pathway& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PathwayInfo_Pathway* internal_default_instance() {
+    return reinterpret_cast<const PathwayInfo_Pathway*>(
+               &_PathwayInfo_Pathway_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    27;
+
+  void Swap(PathwayInfo_Pathway* other);
+  friend void swap(PathwayInfo_Pathway& a, PathwayInfo_Pathway& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PathwayInfo_Pathway* New() const final {
+    return CreateMaybeMessage<PathwayInfo_Pathway>(NULL);
+  }
+
+  PathwayInfo_Pathway* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PathwayInfo_Pathway>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PathwayInfo_Pathway& from);
+  void MergeFrom(const PathwayInfo_Pathway& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PathwayInfo_Pathway* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string Data = 1;
+  int data_size() const;
+  void clear_data();
+  static const int kDataFieldNumber = 1;
+  const ::std::string& data(int index) const;
+  ::std::string* mutable_data(int index);
+  void set_data(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_data(int index, ::std::string&& value);
+  #endif
+  void set_data(int index, const char* value);
+  void set_data(int index, const char* value, size_t size);
+  ::std::string* add_data();
+  void add_data(const ::std::string& value);
+  #if LANG_CXX11
+  void add_data(::std::string&& value);
+  #endif
+  void add_data(const char* value);
+  void add_data(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField< ::std::string>& data() const;
+  ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_data();
+
+  // @@protoc_insertion_point(class_scope:txdata.PathwayInfo.Pathway)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> data_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class PathwayInfo_InfoEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<PathwayInfo_InfoEntry_DoNotUse, 
+    ::std::string, ::txdata::PathwayInfo_Pathway,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > {
+public:
+  typedef ::google::protobuf::internal::MapEntry<PathwayInfo_InfoEntry_DoNotUse, 
+    ::std::string, ::txdata::PathwayInfo_Pathway,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > SuperType;
+  PathwayInfo_InfoEntry_DoNotUse();
+  PathwayInfo_InfoEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const PathwayInfo_InfoEntry_DoNotUse& other);
+  static const PathwayInfo_InfoEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const PathwayInfo_InfoEntry_DoNotUse*>(&_PathwayInfo_InfoEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
+class PathwayInfo : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.PathwayInfo) */ {
+ public:
+  PathwayInfo();
+  virtual ~PathwayInfo();
+
+  PathwayInfo(const PathwayInfo& from);
+
+  inline PathwayInfo& operator=(const PathwayInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PathwayInfo(PathwayInfo&& from) noexcept
+    : PathwayInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline PathwayInfo& operator=(PathwayInfo&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PathwayInfo& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PathwayInfo* internal_default_instance() {
+    return reinterpret_cast<const PathwayInfo*>(
+               &_PathwayInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    29;
+
+  void Swap(PathwayInfo* other);
+  friend void swap(PathwayInfo& a, PathwayInfo& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PathwayInfo* New() const final {
+    return CreateMaybeMessage<PathwayInfo>(NULL);
+  }
+
+  PathwayInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PathwayInfo>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PathwayInfo& from);
+  void MergeFrom(const PathwayInfo& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PathwayInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef PathwayInfo_Pathway Pathway;
+
+  // accessors -------------------------------------------------------
+
+  // map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+  int info_size() const;
+  void clear_info();
+  static const int kInfoFieldNumber = 2;
+  const ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >&
+      info() const;
+  ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >*
+      mutable_info();
+
+  // string UserID = 1;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 1;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_userid(::std::string&& value);
+  #endif
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
+
+  // @@protoc_insertion_point(class_scope:txdata.PathwayInfo)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      PathwayInfo_InfoEntry_DoNotUse,
+      ::std::string, ::txdata::PathwayInfo_Pathway,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+      0 > info_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -8358,9 +8639,165 @@ inline void SubscribeRsp::set_allocated_errmsg(::std::string* errmsg) {
   // @@protoc_insertion_point(field_set_allocated:txdata.SubscribeRsp.ErrMsg)
 }
 
+// -------------------------------------------------------------------
+
+// PathwayInfo_Pathway
+
+// repeated string Data = 1;
+inline int PathwayInfo_Pathway::data_size() const {
+  return data_.size();
+}
+inline void PathwayInfo_Pathway::clear_data() {
+  data_.Clear();
+}
+inline const ::std::string& PathwayInfo_Pathway::data(int index) const {
+  // @@protoc_insertion_point(field_get:txdata.PathwayInfo.Pathway.Data)
+  return data_.Get(index);
+}
+inline ::std::string* PathwayInfo_Pathway::mutable_data(int index) {
+  // @@protoc_insertion_point(field_mutable:txdata.PathwayInfo.Pathway.Data)
+  return data_.Mutable(index);
+}
+inline void PathwayInfo_Pathway::set_data(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:txdata.PathwayInfo.Pathway.Data)
+  data_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void PathwayInfo_Pathway::set_data(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:txdata.PathwayInfo.Pathway.Data)
+  data_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void PathwayInfo_Pathway::set_data(int index, const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  data_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:txdata.PathwayInfo.Pathway.Data)
+}
+inline void PathwayInfo_Pathway::set_data(int index, const char* value, size_t size) {
+  data_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:txdata.PathwayInfo.Pathway.Data)
+}
+inline ::std::string* PathwayInfo_Pathway::add_data() {
+  // @@protoc_insertion_point(field_add_mutable:txdata.PathwayInfo.Pathway.Data)
+  return data_.Add();
+}
+inline void PathwayInfo_Pathway::add_data(const ::std::string& value) {
+  data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:txdata.PathwayInfo.Pathway.Data)
+}
+#if LANG_CXX11
+inline void PathwayInfo_Pathway::add_data(::std::string&& value) {
+  data_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:txdata.PathwayInfo.Pathway.Data)
+}
+#endif
+inline void PathwayInfo_Pathway::add_data(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:txdata.PathwayInfo.Pathway.Data)
+}
+inline void PathwayInfo_Pathway::add_data(const char* value, size_t size) {
+  data_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:txdata.PathwayInfo.Pathway.Data)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+PathwayInfo_Pathway::data() const {
+  // @@protoc_insertion_point(field_list:txdata.PathwayInfo.Pathway.Data)
+  return data_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+PathwayInfo_Pathway::mutable_data() {
+  // @@protoc_insertion_point(field_mutable_list:txdata.PathwayInfo.Pathway.Data)
+  return &data_;
+}
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// PathwayInfo
+
+// string UserID = 1;
+inline void PathwayInfo::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PathwayInfo::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.PathwayInfo.UserID)
+  return userid_.GetNoArena();
+}
+inline void PathwayInfo::set_userid(const ::std::string& value) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.PathwayInfo.UserID)
+}
+#if LANG_CXX11
+inline void PathwayInfo::set_userid(::std::string&& value) {
+  
+  userid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.PathwayInfo.UserID)
+}
+#endif
+inline void PathwayInfo::set_userid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.PathwayInfo.UserID)
+}
+inline void PathwayInfo::set_userid(const char* value, size_t size) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.PathwayInfo.UserID)
+}
+inline ::std::string* PathwayInfo::mutable_userid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.PathwayInfo.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PathwayInfo::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.PathwayInfo.UserID)
+  
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PathwayInfo::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
+    
+  } else {
+    
+  }
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.PathwayInfo.UserID)
+}
+
+// map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+inline int PathwayInfo::info_size() const {
+  return info_.size();
+}
+inline void PathwayInfo::clear_info() {
+  info_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >&
+PathwayInfo::info() const {
+  // @@protoc_insertion_point(field_map:txdata.PathwayInfo.Info)
+  return info_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >*
+PathwayInfo::mutable_info() {
+  // @@protoc_insertion_point(field_mutable_map:txdata.PathwayInfo.Info)
+  return info_.MutableMap();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

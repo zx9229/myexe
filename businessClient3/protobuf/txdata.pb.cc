@@ -24,8 +24,10 @@ extern PROTOBUF_INTERNAL_EXPORT_protobuf_google_2fprotobuf_2ftimestamp_2eproto :
 }  // namespace protobuf_google_2fprotobuf_2ftimestamp_2eproto
 namespace protobuf_txdata_2eproto {
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ConnectionInfo;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_PathwayInfo_Pathway;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_UniKey;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ConnectReq;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_PathwayInfo_InfoEntry_DoNotUse;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_txdata_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QryConnInfoRsp_CacheEntry_DoNotUse;
 }  // namespace protobuf_txdata_2eproto
 namespace txdata {
@@ -164,6 +166,21 @@ class SubscribeRspDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<SubscribeRsp>
       _instance;
 } _SubscribeRsp_default_instance_;
+class PathwayInfo_PathwayDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<PathwayInfo_Pathway>
+      _instance;
+} _PathwayInfo_Pathway_default_instance_;
+class PathwayInfo_InfoEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<PathwayInfo_InfoEntry_DoNotUse>
+      _instance;
+} _PathwayInfo_InfoEntry_DoNotUse_default_instance_;
+class PathwayInfoDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<PathwayInfo>
+      _instance;
+} _PathwayInfo_default_instance_;
 }  // namespace txdata
 namespace protobuf_txdata_2eproto {
 static void InitDefaultsUniKey() {
@@ -556,6 +573,49 @@ static void InitDefaultsSubscribeRsp() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_SubscribeRsp =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSubscribeRsp}, {}};
 
+static void InitDefaultsPathwayInfo_Pathway() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_PathwayInfo_Pathway_default_instance_;
+    new (ptr) ::txdata::PathwayInfo_Pathway();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::txdata::PathwayInfo_Pathway::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_PathwayInfo_Pathway =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsPathwayInfo_Pathway}, {}};
+
+static void InitDefaultsPathwayInfo_InfoEntry_DoNotUse() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_PathwayInfo_InfoEntry_DoNotUse_default_instance_;
+    new (ptr) ::txdata::PathwayInfo_InfoEntry_DoNotUse();
+  }
+  ::txdata::PathwayInfo_InfoEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_PathwayInfo_InfoEntry_DoNotUse =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsPathwayInfo_InfoEntry_DoNotUse}, {
+      &protobuf_txdata_2eproto::scc_info_PathwayInfo_Pathway.base,}};
+
+static void InitDefaultsPathwayInfo() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_PathwayInfo_default_instance_;
+    new (ptr) ::txdata::PathwayInfo();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::txdata::PathwayInfo::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_PathwayInfo =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsPathwayInfo}, {
+      &protobuf_txdata_2eproto::scc_info_PathwayInfo_InfoEntry_DoNotUse.base,}};
+
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_UniKey.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Common1Req.base);
@@ -584,9 +644,12 @@ void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_PushItem.base);
   ::google::protobuf::internal::InitSCC(&scc_info_SubscribeReq.base);
   ::google::protobuf::internal::InitSCC(&scc_info_SubscribeRsp.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo_Pathway.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo_InfoEntry_DoNotUse.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[27];
+::google::protobuf::Metadata file_level_metadata[30];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[2];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -847,6 +910,28 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SubscribeRsp, frommsgno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SubscribeRsp, errno_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SubscribeRsp, errmsg_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_Pathway, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_Pathway, data_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_InfoEntry_DoNotUse, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_InfoEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_InfoEntry_DoNotUse, key_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo_InfoEntry_DoNotUse, value_),
+  0,
+  1,
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo, userid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo, info_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::txdata::UniKey)},
@@ -876,6 +961,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 235, -1, sizeof(::txdata::PushItem)},
   { 243, -1, sizeof(::txdata::SubscribeReq)},
   { 249, -1, sizeof(::txdata::SubscribeRsp)},
+  { 257, -1, sizeof(::txdata::PathwayInfo_Pathway)},
+  { 263, 270, sizeof(::txdata::PathwayInfo_InfoEntry_DoNotUse)},
+  { 272, -1, sizeof(::txdata::PathwayInfo)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -906,6 +994,9 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PushItem_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_SubscribeReq_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_SubscribeRsp_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_Pathway_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_InfoEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -923,7 +1014,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 27);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 30);
 }
 
 void AddDescriptorsImpl() {
@@ -1002,23 +1093,28 @@ void AddDescriptorsImpl() {
       "\030\002 \001(\t\022\r\n\005Level\030\003 \001(\005\"!\n\014SubscribeReq\022\021\n"
       "\tFromMsgNo\030\001 \001(\003\"@\n\014SubscribeRsp\022\021\n\tFrom"
       "MsgNo\030\001 \001(\003\022\r\n\005ErrNo\030\002 \001(\005\022\016\n\006ErrMsg\030\003 \001"
-      "(\t*\206\004\n\007MsgType\022\t\n\005Zero1\020\000\022\021\n\rID_Common1R"
-      "eq\020\001\022\021\n\rID_Common1Rsp\020\002\022\021\n\rID_Common2Req"
-      "\020\003\022\021\n\rID_Common2Rsp\020\004\022\021\n\rID_Common2Ack\020\005"
-      "\022\020\n\014ID_CommonErr\020\006\022\025\n\021ID_ConnectionInfo\020"
-      "\007\022\027\n\023ID_DisconnectedData\020\010\022\021\n\rID_Connect"
-      "Req\020\t\022\021\n\rID_ConnectRsp\020\n\022\023\n\017ID_OnlineNot"
-      "ice\020\013\022\023\n\017ID_SystemReport\020\014\022\017\n\013ID_EchoIte"
-      "m\020\r\022\016\n\nID_BinItem\020\016\022\020\n\014ID_EmailItem\020\017\022\025\n"
-      "\021ID_QryConnInfoReq\020\020\022\025\n\021ID_QryConnInfoRs"
-      "p\020\021\022\025\n\021ID_QueryRecordReq\020\022\022\025\n\021ID_QueryRe"
-      "cordRsp\020\023\022\021\n\rID_ExecCmdReq\020\024\022\021\n\rID_ExecC"
-      "mdRsp\020\025\022\017\n\013ID_PushWrap\020\026\022\017\n\013ID_PushItem\020"
-      "\027\022\023\n\017ID_SubscribeReq\020\030\022\023\n\017ID_SubscribeRs"
-      "p\020\031P\000b\006proto3"
+      "(\t\"\255\001\n\013PathwayInfo\022\016\n\006UserID\030\001 \001(\t\022+\n\004In"
+      "fo\030\002 \003(\0132\035.txdata.PathwayInfo.InfoEntry\032"
+      "\027\n\007Pathway\022\014\n\004Data\030\001 \003(\t\032H\n\tInfoEntry\022\013\n"
+      "\003key\030\001 \001(\t\022*\n\005value\030\002 \001(\0132\033.txdata.Pathw"
+      "ayInfo.Pathway:\0028\001*\232\004\n\007MsgType\022\t\n\005Zero1\020"
+      "\000\022\021\n\rID_Common1Req\020\001\022\021\n\rID_Common1Rsp\020\002\022"
+      "\021\n\rID_Common2Req\020\003\022\021\n\rID_Common2Rsp\020\004\022\021\n"
+      "\rID_Common2Ack\020\005\022\020\n\014ID_CommonErr\020\006\022\025\n\021ID"
+      "_ConnectionInfo\020\007\022\027\n\023ID_DisconnectedData"
+      "\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\rID_ConnectRsp\020\n"
+      "\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017ID_SystemReport"
+      "\020\014\022\017\n\013ID_EchoItem\020\r\022\016\n\nID_BinItem\020\016\022\020\n\014I"
+      "D_EmailItem\020\017\022\025\n\021ID_QryConnInfoReq\020\020\022\025\n\021"
+      "ID_QryConnInfoRsp\020\021\022\025\n\021ID_QueryRecordReq"
+      "\020\022\022\025\n\021ID_QueryRecordRsp\020\023\022\021\n\rID_ExecCmdR"
+      "eq\020\024\022\021\n\rID_ExecCmdRsp\020\025\022\017\n\013ID_PushWrap\020\026"
+      "\022\017\n\013ID_PushItem\020\027\022\023\n\017ID_SubscribeReq\020\030\022\023"
+      "\n\017ID_SubscribeRsp\020\031\022\022\n\016ID_PathwayInfo\020\032P"
+      "\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3453);
+      descriptor, 3649);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -1091,6 +1187,7 @@ bool MsgType_IsValid(int value) {
     case 23:
     case 24:
     case 25:
+    case 26:
       return true;
     default:
       return false;
@@ -11509,6 +11606,643 @@ void SubscribeRsp::InternalSwap(SubscribeRsp* other) {
 }
 
 
+// ===================================================================
+
+void PathwayInfo_Pathway::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PathwayInfo_Pathway::kDataFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PathwayInfo_Pathway::PathwayInfo_Pathway()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_txdata_2eproto::scc_info_PathwayInfo_Pathway.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:txdata.PathwayInfo.Pathway)
+}
+PathwayInfo_Pathway::PathwayInfo_Pathway(const PathwayInfo_Pathway& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      data_(from.data_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:txdata.PathwayInfo.Pathway)
+}
+
+void PathwayInfo_Pathway::SharedCtor() {
+}
+
+PathwayInfo_Pathway::~PathwayInfo_Pathway() {
+  // @@protoc_insertion_point(destructor:txdata.PathwayInfo.Pathway)
+  SharedDtor();
+}
+
+void PathwayInfo_Pathway::SharedDtor() {
+}
+
+void PathwayInfo_Pathway::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* PathwayInfo_Pathway::descriptor() {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const PathwayInfo_Pathway& PathwayInfo_Pathway::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_txdata_2eproto::scc_info_PathwayInfo_Pathway.base);
+  return *internal_default_instance();
+}
+
+
+void PathwayInfo_Pathway::Clear() {
+// @@protoc_insertion_point(message_clear_start:txdata.PathwayInfo.Pathway)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool PathwayInfo_Pathway::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:txdata.PathwayInfo.Pathway)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated string Data = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_data()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->data(this->data_size() - 1).data(),
+            static_cast<int>(this->data(this->data_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.PathwayInfo.Pathway.Data"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:txdata.PathwayInfo.Pathway)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:txdata.PathwayInfo.Pathway)
+  return false;
+#undef DO_
+}
+
+void PathwayInfo_Pathway::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:txdata.PathwayInfo.Pathway)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string Data = 1;
+  for (int i = 0, n = this->data_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->data(i).data(), static_cast<int>(this->data(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PathwayInfo.Pathway.Data");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->data(i), output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:txdata.PathwayInfo.Pathway)
+}
+
+::google::protobuf::uint8* PathwayInfo_Pathway::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:txdata.PathwayInfo.Pathway)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string Data = 1;
+  for (int i = 0, n = this->data_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->data(i).data(), static_cast<int>(this->data(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PathwayInfo.Pathway.Data");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(1, this->data(i), target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:txdata.PathwayInfo.Pathway)
+  return target;
+}
+
+size_t PathwayInfo_Pathway::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:txdata.PathwayInfo.Pathway)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // repeated string Data = 1;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->data_size());
+  for (int i = 0, n = this->data_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->data(i));
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void PathwayInfo_Pathway::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:txdata.PathwayInfo.Pathway)
+  GOOGLE_DCHECK_NE(&from, this);
+  const PathwayInfo_Pathway* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const PathwayInfo_Pathway>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:txdata.PathwayInfo.Pathway)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:txdata.PathwayInfo.Pathway)
+    MergeFrom(*source);
+  }
+}
+
+void PathwayInfo_Pathway::MergeFrom(const PathwayInfo_Pathway& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:txdata.PathwayInfo.Pathway)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  data_.MergeFrom(from.data_);
+}
+
+void PathwayInfo_Pathway::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:txdata.PathwayInfo.Pathway)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PathwayInfo_Pathway::CopyFrom(const PathwayInfo_Pathway& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:txdata.PathwayInfo.Pathway)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PathwayInfo_Pathway::IsInitialized() const {
+  return true;
+}
+
+void PathwayInfo_Pathway::Swap(PathwayInfo_Pathway* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PathwayInfo_Pathway::InternalSwap(PathwayInfo_Pathway* other) {
+  using std::swap;
+  data_.InternalSwap(CastToBase(&other->data_));
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata PathwayInfo_Pathway::GetMetadata() const {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+PathwayInfo_InfoEntry_DoNotUse::PathwayInfo_InfoEntry_DoNotUse() {}
+PathwayInfo_InfoEntry_DoNotUse::PathwayInfo_InfoEntry_DoNotUse(::google::protobuf::Arena* arena) : SuperType(arena) {}
+void PathwayInfo_InfoEntry_DoNotUse::MergeFrom(const PathwayInfo_InfoEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata PathwayInfo_InfoEntry_DoNotUse::GetMetadata() const {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[28];
+}
+void PathwayInfo_InfoEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+
+// ===================================================================
+
+void PathwayInfo::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PathwayInfo::kUserIDFieldNumber;
+const int PathwayInfo::kInfoFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PathwayInfo::PathwayInfo()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_txdata_2eproto::scc_info_PathwayInfo.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:txdata.PathwayInfo)
+}
+PathwayInfo::PathwayInfo(const PathwayInfo& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  info_.MergeFrom(from.info_);
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.userid().size() > 0) {
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
+  }
+  // @@protoc_insertion_point(copy_constructor:txdata.PathwayInfo)
+}
+
+void PathwayInfo::SharedCtor() {
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+PathwayInfo::~PathwayInfo() {
+  // @@protoc_insertion_point(destructor:txdata.PathwayInfo)
+  SharedDtor();
+}
+
+void PathwayInfo::SharedDtor() {
+  userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void PathwayInfo::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* PathwayInfo::descriptor() {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const PathwayInfo& PathwayInfo::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_txdata_2eproto::scc_info_PathwayInfo.base);
+  return *internal_default_instance();
+}
+
+
+void PathwayInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:txdata.PathwayInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  info_.Clear();
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+bool PathwayInfo::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:txdata.PathwayInfo)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string UserID = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_userid()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->userid().data(), static_cast<int>(this->userid().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.PathwayInfo.UserID"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+          PathwayInfo_InfoEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              PathwayInfo_InfoEntry_DoNotUse,
+              ::std::string, ::txdata::PathwayInfo_Pathway,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway > > parser(&info_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.PathwayInfo.InfoEntry.key"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:txdata.PathwayInfo)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:txdata.PathwayInfo)
+  return false;
+#undef DO_
+}
+
+void PathwayInfo::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:txdata.PathwayInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->userid().data(), static_cast<int>(this->userid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PathwayInfo.UserID");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->userid(), output);
+  }
+
+  // map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+  if (!this->info().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "txdata.PathwayInfo.InfoEntry.key");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->info().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->info().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_iterator
+          it = this->info().begin();
+          it != this->info().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<PathwayInfo_InfoEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(info_.NewEntryWrapper(
+            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+            2, *entry, output);
+        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+      }
+    } else {
+      ::std::unique_ptr<PathwayInfo_InfoEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_iterator
+          it = this->info().begin();
+          it != this->info().end(); ++it) {
+        entry.reset(info_.NewEntryWrapper(
+            it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+            2, *entry, output);
+        Utf8Check::Check(&*it);
+      }
+    }
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:txdata.PathwayInfo)
+}
+
+::google::protobuf::uint8* PathwayInfo::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:txdata.PathwayInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->userid().data(), static_cast<int>(this->userid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PathwayInfo.UserID");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->userid(), target);
+  }
+
+  // map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+  if (!this->info().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "txdata.PathwayInfo.InfoEntry.key");
+      }
+    };
+
+    if (deterministic &&
+        this->info().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->info().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_iterator
+          it = this->info().begin();
+          it != this->info().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<PathwayInfo_InfoEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(info_.NewEntryWrapper(
+            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::
+                   InternalWriteMessageNoVirtualToArray(
+                       2, *entry, deterministic, target);
+;
+        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+      }
+    } else {
+      ::std::unique_ptr<PathwayInfo_InfoEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_iterator
+          it = this->info().begin();
+          it != this->info().end(); ++it) {
+        entry.reset(info_.NewEntryWrapper(
+            it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::
+                   InternalWriteMessageNoVirtualToArray(
+                       2, *entry, deterministic, target);
+;
+        Utf8Check::Check(&*it);
+      }
+    }
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:txdata.PathwayInfo)
+  return target;
+}
+
+size_t PathwayInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:txdata.PathwayInfo)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // map<string, .txdata.PathwayInfo.Pathway> Info = 2;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->info_size());
+  {
+    ::std::unique_ptr<PathwayInfo_InfoEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::txdata::PathwayInfo_Pathway >::const_iterator
+        it = this->info().begin();
+        it != this->info().end(); ++it) {
+      entry.reset(info_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
+
+  // string UserID = 1;
+  if (this->userid().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->userid());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void PathwayInfo::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:txdata.PathwayInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  const PathwayInfo* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const PathwayInfo>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:txdata.PathwayInfo)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:txdata.PathwayInfo)
+    MergeFrom(*source);
+  }
+}
+
+void PathwayInfo::MergeFrom(const PathwayInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:txdata.PathwayInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  info_.MergeFrom(from.info_);
+  if (from.userid().size() > 0) {
+
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
+  }
+}
+
+void PathwayInfo::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:txdata.PathwayInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PathwayInfo::CopyFrom(const PathwayInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:txdata.PathwayInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PathwayInfo::IsInitialized() const {
+  return true;
+}
+
+void PathwayInfo::Swap(PathwayInfo* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PathwayInfo::InternalSwap(PathwayInfo* other) {
+  using std::swap;
+  info_.Swap(&other->info_);
+  userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata PathwayInfo::GetMetadata() const {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace txdata
 namespace google {
@@ -11593,6 +12327,15 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::SubscribeReq* Arena::Cre
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::SubscribeRsp* Arena::CreateMaybeMessage< ::txdata::SubscribeRsp >(Arena* arena) {
   return Arena::CreateInternal< ::txdata::SubscribeRsp >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::PathwayInfo_Pathway* Arena::CreateMaybeMessage< ::txdata::PathwayInfo_Pathway >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::PathwayInfo_Pathway >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::PathwayInfo_InfoEntry_DoNotUse* Arena::CreateMaybeMessage< ::txdata::PathwayInfo_InfoEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::PathwayInfo_InfoEntry_DoNotUse >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::PathwayInfo* Arena::CreateMaybeMessage< ::txdata::PathwayInfo >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::PathwayInfo >(arena);
 }
 }  // namespace protobuf
 }  // namespace google
