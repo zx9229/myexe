@@ -487,6 +487,27 @@ public:
         if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
         return isOk;
     }
+    static bool select_data(QSqlQuery& query, const QString& whereCond, QList<PushWrap>& dataOut)
+    {
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【fromQVariant\(curData.$1,query.value\("$1"\)\);】.
+        QString sqlStr = QObject::tr("SELECT * FROM %1").QString::arg(static_table_name());
+        if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
+        if (query.exec(sqlStr) == false)
+            return false;
+        while (query.next()) {
+            PushWrap curData;
+            fromQVariant(curData.PeerID,query.value("PeerID"));
+            fromQVariant(curData.MsgNo,query.value("MsgNo"));
+            fromQVariant(curData.UserID,query.value("UserID"));
+            fromQVariant(curData.PshTime,query.value("PshTime"));
+            fromQVariant(curData.PshType,query.value("PshType"));
+            fromQVariant(curData.PshTypeTxt,query.value("PshTypeTxt"));
+            fromQVariant(curData.PshData,query.value("PshData"));
+            fromQVariant(curData.PshDataTxt,query.value("PshDataTxt"));
+            dataOut.append(curData);
+        }
+        return true;
+    }
 };
 Q_DECLARE_METATYPE(PushWrap);
 

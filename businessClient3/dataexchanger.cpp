@@ -18,7 +18,8 @@ enum StatusErrorType
 DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
     m_ws(parent),
-    m_MsgNo("MsgNo", QString())
+    m_MsgNo("MsgNo", QString()),
+    m_lastFind(false)
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
@@ -116,14 +117,6 @@ QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText,
     }
 
     return message;
-}
-
-QString DataExchanger::QryConnInfoReq(const QString &userId)
-{
-    txdata::QryConnInfoReq tmpData;
-    QString typeName = m2b::CalcMsgTypeName(tmpData);
-    QString jsonText = zxtools::object2json(tmpData, nullptr);
-    return sendReq(typeName, jsonText, userId, false, false, false, false, true, false, false);
 }
 
 QStringList DataExchanger::getTxMsgTypeNameList()
@@ -425,7 +418,6 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
     {
         m_parentInfo.CopyFrom(data->inforeq());
         emit sigReady();
-        QString mesg = this->QryConnInfoReq("");
     }
     else
     {
@@ -458,6 +450,24 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
 {
     Q_ASSERT(data.data() != nullptr);
     QSqlQuery sqlQuery;
+    bool curFind = (data->info().find(m_subUser.toStdString()) == data->info().end());
+    if (m_lastFind != curFind)
+    {
+        if (curFind)
+        {
+            QString whereCond = QString("PeerID='%1' ORDER BY MsgNo DESC LIMIT 1").arg(m_subUser);
+            QList<PushWrap> dataList;
+            bool isOk = PushWrap::select_data(sqlQuery, whereCond, dataList);
+            Q_ASSERT(isOk);
+            txdata::SubscribeReq tmpData;
+            tmpData.set_frommsgno(dataList.empty() ? 0 : dataList[0].MsgNo);
+            QString jsonText = zxtools::object2json(tmpData, &isOk);
+            Q_ASSERT(isOk);
+            QString typeName = m2b::CalcMsgTypeName(tmpData);
+            sendReq(typeName, jsonText, m_subUser, false, false, false, false, true, false, false);
+        }
+        m_lastFind = curFind;
+    }
     PathwayInfo::delete_data(sqlQuery, "");
     for (auto it = data->info().begin(); it != data->info().end(); ++it)
     {

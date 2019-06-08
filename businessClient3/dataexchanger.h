@@ -26,7 +26,6 @@ public:
     Q_INVOKABLE QString getUserID();
     Q_INVOKABLE bool start();
     Q_INVOKABLE QString sendReq(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
-    Q_INVOKABLE QString QryConnInfoReq(const QString& userId);
     Q_INVOKABLE QStringList getTxMsgTypeNameList();
     Q_INVOKABLE QString jsonExample(const QString& typeName);
 
@@ -67,6 +66,8 @@ private:
     QSqlDatabase m_db;
     KeyValue     m_MsgNo;
 
+    bool m_lastFind;
+    QString m_subUser;
     SafeSynchCache m_cacheSync;
 };
 
