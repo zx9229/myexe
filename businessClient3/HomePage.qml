@@ -4,6 +4,7 @@ import QtQuick.Controls 2.4
 
 Item {
     signal sigShowNodeList()
+    signal sigShowPathwayInfo()
     signal sigShowNodePushWrap(string PeerID)
     signal sigShowNodeRequest(string PeerID)
     signal sigShowNodeReqRsp(string UserID, string MsgNo)
@@ -65,7 +66,8 @@ Item {
             }
             HomePageComponent{
                 txtText: qsTr("")
-                btnText: qsTr("按钮6")
+                btnText: qsTr("路径信息")
+                onSigClicked: sigShowPathwayInfo()
             }
         }
         Rectangle {

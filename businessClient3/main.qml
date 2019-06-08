@@ -30,6 +30,12 @@ Window {
                             loader1.source = urlStr
                         }
                     })
+                    item.sigShowPathwayInfo.connect(function(){
+                        var urlStr = "qrc:/PathwayInfo.qml"
+                        if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {
+                            loader1.source = urlStr
+                        }
+                    })
                     item.sigShowNodePushWrap.connect(function(PeerID){
                         var urlStr = "qrc:/NodePushWrap.qml"
                         if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {

@@ -48,6 +48,7 @@ private:
     void handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> data);
     void handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data);
     void handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data);
+    void handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data);
     void deal_QryConnInfoRsp(QSharedPointer<txdata::QryConnInfoRsp> data);
 
 private slots:

@@ -184,6 +184,8 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(PushWrap::static_create_sql());
         Q_ASSERT(isOk);
+        isOk = sqlQuery.exec(PathwayInfo::static_create_sql());
+        Q_ASSERT(isOk);
         isOk = m_db.commit();
         Q_ASSERT(isOk);
     }
@@ -452,6 +454,23 @@ void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
     }
 }
 
+void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+    QSqlQuery sqlQuery;
+    PathwayInfo::delete_data(sqlQuery, "");
+    for (auto it = data->info().begin(); it != data->info().end(); ++it)
+    {
+        PathwayInfo tmpData;
+        QStringList pathway;
+        for (int i = 0; i < it->second.data_size(); i++) { pathway.append(QString::fromStdString(it->second.data(i))); }
+        tmpData.UserID = QString::fromStdString(it->first);
+        tmpData.Pathway = pathway.join("->");
+        tmpData.insert_data(sqlQuery, false);
+    }
+    emit sigTableChanged(PathwayInfo::static_table_name());
+}
+
 void DataExchanger::deal_QryConnInfoRsp(QSharedPointer<txdata::QryConnInfoRsp> msgData)
 {
     Q_ASSERT(msgData.data() != nullptr);
@@ -534,6 +553,9 @@ void DataExchanger::slotOnMessage(const QByteArray &message)
     case txdata::MsgType::ID_OnlineNotice:
         break;
     case txdata::MsgType::ID_SystemReport:
+        break;
+    case txdata::MsgType::ID_PathwayInfo:
+        handle_PathwayInfo(qSharedPointerDynamicCast<txdata::PathwayInfo>(theMsg));
         break;
     default:
         break;

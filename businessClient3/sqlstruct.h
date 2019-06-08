@@ -490,4 +490,54 @@ public:
 };
 Q_DECLARE_METATYPE(PushWrap);
 
+class PathwayInfo
+{
+public:
+    QString    UserID;
+    QString    Pathway;
+public:
+    static QString static_table_name()
+    {
+        return "PathwayInfo";
+    }
+    static QString static_create_sql()
+    {
+        QString sql = QObject::tr(
+            "CREATE TABLE IF NOT EXISTS %1 (\
+            UserID  TEXT NOT NULL PRIMARY KEY ,\
+            Pathway TEXT     NULL )"
+        ).QString::arg(static_table_name());
+        return  sql;
+    }
+    bool insert_data(QSqlQuery& query, bool insertNotReplace, int64_t* lastInsertId = nullptr)
+    {
+        //请外部保证在同一个(上下文/先后顺序/总之就是加锁的意思).
+        bool isOk = false;
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){cols.append\("$1"\);}】.
+        //查找【^.+? ([a-zA-Z0-9_]+);.*$】替换【if\(Valid\(this->$1\)\){query.bindValue\(":$1",this->$1\);}】.
+        //注意(NOT NULL)要特殊处理.
+        QStringList cols;
+        if (Valid(this->UserID)) { cols.append("UserID"); }
+        if (Valid(this->Pathway)) { cols.append("Pathway"); }
+        //
+        QString sqlStr = QObject::tr("INSERT %1 INTO %2 (%3) VALUES (%4)").arg(insertNotReplace ? "" : "OR REPLACE").arg(static_table_name()).arg(cols.join(',')).arg(":" + cols.join(", :"));
+        isOk = query.prepare(sqlStr);
+        Q_ASSERT(isOk);
+        //
+        if (Valid(this->UserID)) { query.bindValue(":UserID", this->UserID); }
+        if (Valid(this->Pathway)) { query.bindValue(":Pathway", this->Pathway); }
+        //
+        isOk = query.exec();
+        if (isOk && lastInsertId) { *lastInsertId = query.lastInsertId().toLongLong(); }
+        return isOk;
+    }
+    static bool delete_data(QSqlQuery& query, const QString& whereCond)
+    {
+        QString sqlStr = QObject::tr("DELETE FROM %1").arg(static_table_name());
+        if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
+        return query.exec(sqlStr);
+    }
+};
+Q_DECLARE_METATYPE(PathwayInfo);
+
 #endif // SQL_STRUCT_H
