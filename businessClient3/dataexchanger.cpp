@@ -19,7 +19,8 @@ DataExchanger::DataExchanger(QObject *parent) :
     QObject(parent),
     m_ws(parent),
     m_MsgNo("MsgNo", QString()),
-    m_lastFind(false)
+    m_lastFind(false),
+    m_subUser("")
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
@@ -450,7 +451,7 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
 {
     Q_ASSERT(data.data() != nullptr);
     QSqlQuery sqlQuery;
-    bool curFind = (data->info().find(m_subUser.toStdString()) == data->info().end());
+    bool curFind = (data->info().find(m_subUser.toStdString()) != data->info().end());
     if (m_lastFind != curFind)
     {
         if (curFind)
