@@ -129,7 +129,7 @@ Item {
     Connections {
         target: buttonSignIn
         onClicked: {
-            dataExch.setURL(textFieldURL.text)
+            dataExch.memSetData("url", textFieldURL.text)
             dataExch.memSetInfo("myself", ["UserID"], textFieldUserID.text)
             dataExch.memSetInfo("myself", ["BelongID"], textFieldBelongID.text)
             dataExch.start()

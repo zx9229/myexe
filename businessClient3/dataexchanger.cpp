@@ -80,9 +80,22 @@ bool DataExchanger::dbSaveValue(const QString& key, const QString& value)
     return kv.insert_data(sqlQuery, false);
 }
 
-void DataExchanger::setURL(const QString &url)
+QString DataExchanger::memGetData(const QString& varName)
 {
-    m_url = url;  // 例如【ws://localhost:65535/websocket】.
+    return "";
+}
+
+bool DataExchanger::memSetData(const QString& varName, const QString& value)
+{
+    if (varName == "url")
+    {
+        m_url = value;  // 例如【ws://localhost:65535/websocket】.
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 QString DataExchanger::memGetInfo(const QString& varName, const QStringList& paths)

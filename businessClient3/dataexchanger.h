@@ -21,7 +21,8 @@ public:
 public:
     Q_INVOKABLE QString dbLoadValue(const QString& key);
     Q_INVOKABLE bool    dbSaveValue(const QString& key, const QString& value);
-    Q_INVOKABLE void setURL(const QString& url);
+    Q_INVOKABLE QString memGetData(const QString& varName);
+    Q_INVOKABLE bool    memSetData(const QString& varName, const QString& value);
     Q_INVOKABLE QString memGetInfo(const QString& varName, const QStringList& paths);
     Q_INVOKABLE bool    memSetInfo(const QString& varName, const QStringList& paths, const QString& value);
     Q_INVOKABLE bool start();
