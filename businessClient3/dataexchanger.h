@@ -22,8 +22,8 @@ public:
     Q_INVOKABLE QString dbLoadValue(const QString& key);
     Q_INVOKABLE bool    dbSaveValue(const QString& key, const QString& value);
     Q_INVOKABLE void setURL(const QString& url);
-    Q_INVOKABLE void setOwnInfo(const QString& userID, const QString& belongID);
-    Q_INVOKABLE QString getUserID();
+    Q_INVOKABLE QString memGetInfo(const QString& varName, const QStringList& paths);
+    Q_INVOKABLE bool    memSetInfo(const QString& varName, const QStringList& paths, const QString& value);
     Q_INVOKABLE bool start();
     Q_INVOKABLE QString sendReq(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
     Q_INVOKABLE QStringList getTxMsgTypeNameList();

@@ -3,9 +3,39 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QtCore/QMetaEnum>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include "m2b.h"
 #include "google/protobuf/util/json_util.h"
 #include "zxtools.h"
+#include <fstream>
+
+QString qjoGetSet(QJsonObject& clObj, const QStringList& paths, const QString* value)
+{
+    Q_ASSERT(!paths.empty());
+    if (paths.size() == 1)
+    {
+        if (nullptr == value)
+        {
+            return clObj.value(paths.at(0)).toString();
+        }
+        else
+        {
+            clObj.insert(paths.at(0), *value);
+            return *value;
+        }
+    }
+    else
+    {
+        QJsonObject childObj = clObj.value(paths.at(0)).toObject();
+        QString retVal = qjoGetSet(childObj, paths.mid(1), value);
+        if (nullptr != value)
+        {
+            clObj.insert(paths.at(0), childObj);
+        }
+        return retVal;
+    }
+}
 
 enum StatusErrorType
 {
@@ -55,15 +85,72 @@ void DataExchanger::setURL(const QString &url)
     m_url = url;  // 例如【ws://localhost:65535/websocket】.
 }
 
-void DataExchanger::setOwnInfo(const QString &userID, const QString &belongID)
+QString DataExchanger::memGetInfo(const QString& varName, const QStringList& paths)
 {
-    m_ownInfo.set_userid(userID.toStdString());
-    m_ownInfo.set_belongid(belongID.toStdString());
+    txdata::ConnectionInfo* pCI = nullptr;
+    if (varName == "myself")
+    {
+        pCI = &m_ownInfo;
+    }
+    else if (varName == "parent")
+    {
+        pCI = &m_parentInfo;
+    }
+    else
+    {
+        return "";
+    }
+    bool isOk = false;
+    QString jsonText = zxtools::object2json(*pCI, &isOk);
+    Q_ASSERT(isOk);
+    QByteArray jsonTextBA = jsonText.toLocal8Bit();
+    //
+    QJsonParseError jsonParseError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonTextBA, &jsonParseError);
+    Q_ASSERT(jsonParseError.error == QJsonParseError::NoError);
+    QJsonObject jsonRoot = jsonDoc.object();
+    return  qjoGetSet(jsonRoot, paths, nullptr);
 }
 
-QString DataExchanger::getUserID()
+bool DataExchanger::memSetInfo(const QString& varName, const QStringList& paths, const QString& value)
 {
-    return QString::fromStdString(m_ownInfo.userid());
+    auto filename2content = [](const std::string& filename, std::string& content)
+    {
+        std::copy(std::istreambuf_iterator<char>(std::ifstream(filename).rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(content));
+    };
+    txdata::ConnectionInfo* pCI = nullptr;
+    if (varName == "myself")
+    {
+        pCI = &m_ownInfo;
+    }
+    else if (varName == "parent")
+    {
+        pCI = &m_parentInfo;
+    }
+    else
+    {
+        return false;
+    }
+    bool isOk = false;
+    QString jsonText = zxtools::object2json(*pCI, &isOk);
+    Q_ASSERT(isOk);
+    QByteArray jsonTextBA = jsonText.toLocal8Bit();
+    //
+    QJsonParseError jsonParseError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonTextBA, &jsonParseError);
+    Q_ASSERT(jsonParseError.error == QJsonParseError::NoError);
+    QJsonObject jsonRoot = jsonDoc.object();
+    qjoGetSet(jsonRoot, paths, &value);
+    jsonDoc.setObject(jsonRoot);
+    //
+    jsonTextBA = jsonDoc.toJson();
+    jsonText = QString::fromLocal8Bit(jsonTextBA);
+    //
+    QString typeName = m2b::CalcMsgTypeName(m_ownInfo);
+    GPMSGPTR gpmsgptr = zxtools::json2object(typeName, jsonText);
+    QSharedPointer<txdata::ConnectionInfo> spCI = qSharedPointerDynamicCast<txdata::ConnectionInfo>(gpmsgptr);
+    *pCI = *spCI;
+    return true;
 }
 
 bool DataExchanger::start()

@@ -10,7 +10,7 @@ Item {
     signal sigShowNodeReqRsp(string UserID, string MsgNo)
     signal sigShowSystemSettings()
     //The var type is a generic property type that can refer to any data type.
-    property var userID: dataExch.getUserID()
+    property var userID: dataExch.memGetInfo("myself", ["UserID"])
     property var peerID: undefined
     property var msgNo : undefined
 

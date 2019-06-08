@@ -130,7 +130,8 @@ Item {
         target: buttonSignIn
         onClicked: {
             dataExch.setURL(textFieldURL.text)
-            dataExch.setOwnInfo(textFieldUserID.text, textFieldBelongID.text)
+            dataExch.memSetInfo("myself", ["UserID"], textFieldUserID.text)
+            dataExch.memSetInfo("myself", ["BelongID"], textFieldBelongID.text)
             dataExch.start()
         }
     }
