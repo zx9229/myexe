@@ -7,13 +7,14 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "dataexchanger.h"
+#include "mylog.h"
 #include "mysqltablemodel.h"
 #include "datawrapper.h"
+#include "temputils.h"
 
 int main(int argc, char *argv[])
 {
-    bool useRO=true;
+    bool useRO = true;
 #if defined(Q_OS_WIN)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     //useRO=false;
@@ -21,19 +22,26 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    bool isService=((2==argc)&& (qstrcmp(argv[1],"-service")==0));
-    isService=useRO&&isService;
+    bool isService = ((2 == argc) && (qstrcmp(argv[1], "-service") == 0));
+    isService = useRO && isService;
+
+    {
+        QByteArray logName;
+        logName = isService ? TempUtils::calcServiceLogName().toUtf8() : TempUtils::calcAppLogName().toUtf8();
+        Q_ASSERT(logName.isEmpty() == false);
+        mylog::initialize(logName.constData());
+    }
 
     MySqlTableModel::doQmlRegisterType();
 
-    DataWrapper dataWrap(useRO,isService);//DataExchanger dataExch;
+    DataWrapper dataWrap(useRO, isService);//DataExchanger dataExch;
 
     QSharedPointer<QQmlApplicationEngine> engine;
-    if(!useRO|| !isService)
+    if (!useRO || !isService)
     {
-        engine=QSharedPointer<QQmlApplicationEngine>(new QQmlApplicationEngine);
+        engine = QSharedPointer<QQmlApplicationEngine>(new QQmlApplicationEngine);
     }
-    if(engine)
+    if (engine)
     {
         {
             //注意: 此处的"dataExch"必须小写字母开头，QML才能访问C++对象的函数与属性.
