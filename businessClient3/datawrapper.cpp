@@ -5,10 +5,16 @@ DataWrapper::DataWrapper(bool isRO, QObject *parent) :QObject(parent)
     if (isRO)
     {
         m_client = QSharedPointer<DataROReplica>(new DataROReplica);
+        QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
+        QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
+        QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
     }
     else
     {
         m_daExch = QSharedPointer<DataExchanger>(new DataExchanger);
+        QObject::connect(m_daExch.get(),&DataExchanger::sigReady,this,&DataWrapper::sigReady);
+        QObject::connect(m_daExch.get(),&DataExchanger::sigStatusError,this,&DataWrapper::sigStatusError);
+        QObject::connect(m_daExch.get(),&DataExchanger::sigTableChanged,this,&DataWrapper::sigTableChanged);
     }
 }
 

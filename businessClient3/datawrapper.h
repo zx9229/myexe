@@ -6,20 +6,25 @@
 
 class DataWrapper :public QObject
 {
+    Q_OBJECT
 public:
     DataWrapper(bool isRO, QObject *parent = nullptr);
 public Q_SLOTS:
-    QString dbLoadValue(const QString & key);
-    bool    dbSaveValue(const QString & key, const QString & value);
-    QString memGetData(const QString & varName);
-    bool    memSetData(const QString & varName, const QString & value);
-    QString memGetInfo(const QString & varName, const QStringList & paths);
-    bool    memSetInfo(const QString & varName, const QStringList & paths, const QString & value);
-    bool start();
-    QString sendReq(const QString & typeName, const QString & jsonText, const QString & rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
-    QStringList getTxMsgTypeNameList();
-    QString jsonExample(const QString & typeName);
-public:
+    Q_INVOKABLE QString dbLoadValue(const QString & key);
+    Q_INVOKABLE bool    dbSaveValue(const QString & key, const QString & value);
+    Q_INVOKABLE QString memGetData(const QString & varName);
+    Q_INVOKABLE bool    memSetData(const QString & varName, const QString & value);
+    Q_INVOKABLE QString memGetInfo(const QString & varName, const QStringList & paths);
+    Q_INVOKABLE bool    memSetInfo(const QString & varName, const QStringList & paths, const QString & value);
+    Q_INVOKABLE bool start();
+    Q_INVOKABLE QString sendReq(const QString & typeName, const QString & jsonText, const QString & rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
+    Q_INVOKABLE QStringList getTxMsgTypeNameList();
+    Q_INVOKABLE QString jsonExample(const QString & typeName);
+signals:
+    void sigReady();
+    void sigStatusError(const QString & errMessage, int errType);
+    void sigTableChanged(const QString & tableName);
+private:
     QSharedPointer<DataExchanger> m_daExch;
     QSharedPointer<DataROReplica> m_client;
 };

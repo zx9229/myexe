@@ -6,6 +6,7 @@
 
 class DataROSvr :public DataROSource
 {
+    Q_OBJECT
 public:
     DataROSvr(QObject *parent = nullptr);
     public Q_SLOTS:
