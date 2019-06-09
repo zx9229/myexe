@@ -4,6 +4,8 @@ QT += androidextras
 }
 CONFIG += c++11
 
+REPC_SOURCE  = dataro.rep
+REPC_REPLICA = dataro.rep
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -20,7 +22,9 @@ SOURCES += \
     main.cpp \
     mywebsock.cpp \
     protobuf/txdata.pb.cc \
-    zxtools.cpp
+    zxtools.cpp \
+    datarosvr.cpp \
+    datawrapper.cpp
 
 RESOURCES += qml.qrc
 
@@ -43,7 +47,9 @@ HEADERS += \
     protobuf/txdata.pb.h \
     safesynchcache.h \
     sqlstruct.h \
-    zxtools.h
+    zxtools.h \
+    datarosvr.h \
+    datawrapper.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter
@@ -68,6 +74,7 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+    android/gradlew.bat \
+    dataro.rep
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

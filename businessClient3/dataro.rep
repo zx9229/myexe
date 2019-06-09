@@ -1,0 +1,16 @@
+class DataRO
+{
+    SLOT(QString dbLoadValue(const QString& key));
+    SLOT(bool    dbSaveValue(const QString& key, const QString& value));
+    SLOT(QString memGetData(const QString& varName));
+    SLOT(bool    memSetData(const QString& varName, const QString& value));
+    SLOT(QString memGetInfo(const QString& varName, const QStringList& paths));
+    SLOT(bool    memSetInfo(const QString& varName, const QStringList& paths, const QString& value));
+    SLOT(bool start());
+    SLOT(QString sendReq(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB));
+    SLOT(QStringList getTxMsgTypeNameList());
+    SLOT(QString jsonExample(const QString& typeName));
+    SIGNAL(sigReady());
+    SIGNAL(sigStatusError(const QString& errMessage, int errType));
+    SIGNAL(sigTableChanged(const QString &tableName));
+}
