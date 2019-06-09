@@ -1,3 +1,4 @@
+#include <QSqlDatabase>
 #include "datawrapper.h"
 
 DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(parent)
@@ -20,6 +21,12 @@ DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(pa
             QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
             QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
             QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
+            {
+                m_db = QSqlDatabase::addDatabase("QSQLITE");
+                m_db.setDatabaseName(QString().isEmpty() ? (SQLITE_DB_NAME) : (":memory:"));
+                bool isOk = m_db.open();
+                Q_ASSERT(isOk);
+            }
         }
     }
     else

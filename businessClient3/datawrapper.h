@@ -30,6 +30,7 @@ private:
     QSharedPointer<DataROReplica> m_client;
     QSharedPointer<QRemoteObjectHost> m_node;
     QSharedPointer<DataROSvr> m_server;
+    QSqlDatabase m_db;
 };
 
 #endif // DATA_WRAPPER_H

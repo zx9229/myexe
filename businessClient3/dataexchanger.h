@@ -10,7 +10,8 @@
 #include "sqlstruct.h"
 #include "safesynchcache.h"
 
-#define LOCAL_RO_URL "local:data_ro_svr"
+#define LOCAL_RO_URL    "local:data_ro_svr"
+#define SQLITE_DB_NAME  "_zx_test.db"
 
 class DataExchanger : public QObject
 {

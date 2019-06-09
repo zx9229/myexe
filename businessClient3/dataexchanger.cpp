@@ -262,7 +262,7 @@ QString DataExchanger::jsonExample(const QString& typeName)
 void DataExchanger::initDB()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName(QString().isEmpty() ? ("_zx_test.db") : (":memory:"));
+    m_db.setDatabaseName(QString().isEmpty() ? (SQLITE_DB_NAME) : (":memory:"));
     bool isOk = false;
     isOk = m_db.open();
     Q_ASSERT(isOk);
