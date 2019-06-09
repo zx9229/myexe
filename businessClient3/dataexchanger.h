@@ -10,6 +10,8 @@
 #include "sqlstruct.h"
 #include "safesynchcache.h"
 
+#define LOCAL_RO_URL "local:data_ro_svr"
+
 class DataExchanger : public QObject
 {
     Q_OBJECT

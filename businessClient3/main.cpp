@@ -9,27 +9,39 @@
 #include <QQmlContext>
 #include "dataexchanger.h"
 #include "mysqltablemodel.h"
+#include "datawrapper.h"
 
 int main(int argc, char *argv[])
 {
+    bool useRO=true;
 #if defined(Q_OS_WIN)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    //useRO=false;
 #endif
 
     QGuiApplication app(argc, argv);
 
+    bool isService=((2==argc)&& (qstrcmp(argv[1],"-service")==0));
+    isService=useRO&&isService;
+
     MySqlTableModel::doQmlRegisterType();
 
-    DataExchanger dataExch;
+    DataWrapper dataWrap(useRO,isService);//DataExchanger dataExch;
 
-    QQmlApplicationEngine engine;
+    QSharedPointer<QQmlApplicationEngine> engine;
+    if(!useRO|| !isService)
     {
-        //注意: 此处的"dataExch"必须小写字母开头，QML才能访问C++对象的函数与属性.
-        engine.rootContext()->setContextProperty("dataExch", &dataExch);
+        engine=QSharedPointer<QQmlApplicationEngine>(new QQmlApplicationEngine);
     }
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty())
-        return -1;
-
+    if(engine)
+    {
+        {
+            //注意: 此处的"dataExch"必须小写字母开头，QML才能访问C++对象的函数与属性.
+            engine->rootContext()->setContextProperty("dataExch", &dataWrap);
+        }
+        engine->load(QUrl(QStringLiteral("qrc:/main.qml")));
+        if (engine->rootObjects().isEmpty())
+            return -1;
+    }
     return app.exec();
 }

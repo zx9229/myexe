@@ -3,12 +3,13 @@
 #include <QScopedPointer>
 #include "rep_dataro_replica.h"
 #include "dataexchanger.h"
+#include "datarosvr.h"
 
 class DataWrapper :public QObject
 {
     Q_OBJECT
 public:
-    DataWrapper(bool isRO, QObject *parent = nullptr);
+    DataWrapper(bool useRO,bool isServer, QObject *parent = nullptr);
 public Q_SLOTS:
     Q_INVOKABLE QString dbLoadValue(const QString & key);
     Q_INVOKABLE bool    dbSaveValue(const QString & key, const QString & value);
@@ -27,6 +28,8 @@ signals:
 private:
     QSharedPointer<DataExchanger> m_daExch;
     QSharedPointer<DataROReplica> m_client;
+    QSharedPointer<QRemoteObjectHost> m_node;
+    QSharedPointer<DataROSvr> m_server;
 };
 
 #endif // DATA_WRAPPER_H

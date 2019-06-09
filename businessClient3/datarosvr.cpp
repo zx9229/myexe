@@ -8,6 +8,14 @@ DataROSvr::DataROSvr(QObject *parent) :DataROSource(parent)
     QObject::connect(&m_dataExch, &DataExchanger::sigTableChanged, this, &DataROSource::sigTableChanged);
 }
 
+void DataROSvr::doRun()
+{
+    bool setHostUrlRet = m_node.setHostUrl(QUrl(QStringLiteral(LOCAL_RO_URL)));
+    Q_ASSERT(true == setHostUrlRet);
+    bool enableRemotingRet = m_node.enableRemoting(this);
+    Q_ASSERT(true == enableRemotingRet);
+}
+
 QString DataROSvr::dbLoadValue(const QString & key)
 {
     return m_dataExch.dbLoadValue(key);

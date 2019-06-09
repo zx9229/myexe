@@ -1,13 +1,26 @@
 #include "datawrapper.h"
 
-DataWrapper::DataWrapper(bool isRO, QObject *parent) :QObject(parent)
+DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(parent)
 {
-    if (isRO)
+    if(useRO)
     {
-        m_client = QSharedPointer<DataROReplica>(new DataROReplica);
-        QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
-        QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
-        QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
+        if(isServer)
+        {
+            m_server=QSharedPointer<DataROSvr>(new DataROSvr);
+            m_server->doRun();
+        }
+        else
+        {
+            m_node.reset(new QRemoteObjectHost);
+            bool connectToNodeRet = m_node->connectToNode(QUrl(QStringLiteral(LOCAL_RO_URL)));
+            Q_ASSERT(connectToNodeRet);
+            m_client.reset(m_node->acquire<DataROReplica>());
+            bool waitForSourceRet = m_client->waitForSource(3000);
+            Q_ASSERT(waitForSourceRet);
+            QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
+            QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
+            QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
+        }
     }
     else
     {

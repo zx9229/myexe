@@ -9,7 +9,8 @@ class DataROSvr :public DataROSource
     Q_OBJECT
 public:
     DataROSvr(QObject *parent = nullptr);
-    public Q_SLOTS:
+    void doRun();
+public Q_SLOTS:
     virtual QString dbLoadValue(const QString & key);
     virtual bool    dbSaveValue(const QString & key, const QString & value);
     virtual QString memGetData(const QString & varName);
@@ -22,6 +23,7 @@ public:
     virtual QString jsonExample(const QString & typeName);
 public:
     DataExchanger m_dataExch;
+    QRemoteObjectHost m_node;
 };
 
 #endif // DATA_RO_SVR_H
