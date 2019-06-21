@@ -21,6 +21,11 @@ MyWebsock::MyWebsock(QObject *parent /* = Q_NULLPTR */) :
     QObject::connect(&m_timer, &QTimer::timeout, this, &MyWebsock::reconnect);
 }
 
+QAbstractSocket::SocketState MyWebsock::state()
+{
+    return m_ws.state();
+}
+
 bool MyWebsock::start(const QUrl& url)
 {
     if (!m_url.isEmpty() || url.isEmpty() || m_alive)

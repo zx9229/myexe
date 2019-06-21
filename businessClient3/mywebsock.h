@@ -14,6 +14,7 @@ public:
     explicit MyWebsock(QObject *parent = Q_NULLPTR);
 
 public:
+    QAbstractSocket::SocketState state();
     bool start(const QUrl& url);
     void interrupt();
     void stop(bool sync = false);
