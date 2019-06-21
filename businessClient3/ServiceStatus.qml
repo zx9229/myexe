@@ -9,23 +9,40 @@ Item {
             id: roStateTransition
             readOnly: true
             Layout.fillWidth: true
-            text: "状态变迁"
+            text: qsTr("状态变迁")
         }
         TextField {
             id: roState
             readOnly: true
             Layout.fillWidth: true
-            text: "当前状态"
+            text: qsTr("QtRemoteObjects状态")
+        }
+        TextField {
+            id: serviceState
+            readOnly: true
+            Layout.fillWidth: true
+            text: qsTr("服务状态")
         }
         Button {
             Layout.fillWidth: true
-            text: "查询当前状态"
-            onClicked: roState.text = dataExch.remoteObjectState()
-        }
-        Button {
-            Layout.fillWidth: true
-            text: "启动服务"
+            text: qsTr("启动服务")
             onClicked: dataExch.startService()
+        }
+        Button {
+            Layout.fillWidth: true
+            text: qsTr("查询QtRemoteObjects状态")
+            onClicked: {
+                var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
+                roState.text = "%1  [%2]".arg(dataExch.remoteObjectState()).arg(localDT)
+            }
+        }
+        Button {
+            Layout.fillWidth: true
+            text: qsTr("查询service状态")
+            onClicked: {
+                var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
+                serviceState.text = "%1  [%2]".arg(dataExch.serviceState()).arg(localDT)
+            }
         }
         Rectangle {
             Layout.fillHeight: true
@@ -34,7 +51,8 @@ Item {
     Connections {
         target: dataExch
         onSigStateChanged: {
-            roStateTransition.text = "%1(%2) => %3(%4)".arg(sOldState).arg(iOldState).arg(sState).arg(iState)
+            var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
+            roStateTransition.text = "%1(%2) => %3(%4)  [%5]".arg(sOldState).arg(iOldState).arg(sState).arg(iState).arg(localDT)
         }
     }
 }
