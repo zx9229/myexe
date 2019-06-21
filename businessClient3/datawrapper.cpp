@@ -4,44 +4,44 @@
 
 DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(parent)
 {
-    if(useRO)
+    if (useRO)
     {
-        if(isServer)
+        if (isServer)
         {
-            m_server=QSharedPointer<DataROSvr>(new DataROSvr);
+            m_server = QSharedPointer<DataROSvr>(new DataROSvr);
             m_server->doRun();
-            qDebug()<<"server init ok";
+            qDebug() << "server init ok";
         }
         else
         {
             m_node.reset(new QRemoteObjectHost);
             bool connectToNodeRet = m_node->connectToNode(QUrl(QStringLiteral(LOCAL_RO_URL)));
-            qDebug()<<"connectToNodeRet="<<connectToNodeRet;
+            qDebug() << "connectToNodeRet=" << connectToNodeRet;
             //Q_ASSERT(connectToNodeRet);
             m_client.reset(m_node->acquire<DataROReplica>());
             bool waitForSourceRet = m_client->waitForSource(3000);
-            qDebug()<<"waitForSourceRet="<<waitForSourceRet;
+            qDebug() << "waitForSourceRet=" << waitForSourceRet;
             //Q_ASSERT(waitForSourceRet);
-            QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
-            QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
-            QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
-            QObject::connect(m_client.get(),&DataROReplica::stateChanged,this,&DataWrapper::onStateChanged);
+            QObject::connect(m_client.get(), &DataROReplica::sigReady, this, &DataWrapper::sigReady);
+            QObject::connect(m_client.get(), &DataROReplica::sigStatusError, this, &DataWrapper::sigStatusError);
+            QObject::connect(m_client.get(), &DataROReplica::sigTableChanged, this, &DataWrapper::sigTableChanged);
+            QObject::connect(m_client.get(), &DataROReplica::stateChanged, this, &DataWrapper::onStateChanged);
             {
                 m_db = QSqlDatabase::addDatabase("QSQLITE");
                 m_db.setDatabaseName(QString().isEmpty() ? (SQLITE_DB_NAME) : (":memory:"));
                 bool isOk = m_db.open();
                 Q_ASSERT(isOk);
             }
-            qDebug()<<"client init ok";
+            qDebug() << "client init ok";
         }
     }
     else
     {
         m_daExch = QSharedPointer<DataExchanger>(new DataExchanger);
-        QObject::connect(m_daExch.get(),&DataExchanger::sigReady,this,&DataWrapper::sigReady);
-        QObject::connect(m_daExch.get(),&DataExchanger::sigStatusError,this,&DataWrapper::sigStatusError);
-        QObject::connect(m_daExch.get(),&DataExchanger::sigTableChanged,this,&DataWrapper::sigTableChanged);
-        qDebug()<<"DataExchanger init ok";
+        QObject::connect(m_daExch.get(), &DataExchanger::sigReady, this, &DataWrapper::sigReady);
+        QObject::connect(m_daExch.get(), &DataExchanger::sigStatusError, this, &DataWrapper::sigStatusError);
+        QObject::connect(m_daExch.get(), &DataExchanger::sigTableChanged, this, &DataWrapper::sigTableChanged);
+        qDebug() << "DataExchanger init ok";
     }
 }
 
@@ -129,6 +129,20 @@ bool    DataWrapper::memSetInfo(const QString & varName, const QStringList & pat
     }
 }
 
+QString  DataWrapper::serviceState()
+{
+    if (m_daExch)
+    {
+        return m_daExch->serviceState();
+    }
+    else
+    {
+        auto reply = m_client->serviceState();
+        reply.waitForFinished(1000);
+        return reply.returnValue();
+    }
+}
+
 bool DataWrapper::start()
 {
     if (m_daExch)
@@ -138,7 +152,7 @@ bool DataWrapper::start()
     else
     {
         auto reply = m_client->start();
-        if(reply.waitForFinished(1000))
+        if (reply.waitForFinished(1000))
         {
             return reply.returnValue();
         }
@@ -196,9 +210,9 @@ QString DataWrapper::jsonExample(const QString & typeName)
 
 Q_INVOKABLE QString DataWrapper::remoteObjectState()
 {
-    QRemoteObjectReplica::State curState=QRemoteObjectReplica::Uninitialized;
+    QRemoteObjectReplica::State curState = QRemoteObjectReplica::Uninitialized;
     QMetaEnum metaEnum = QMetaEnum::fromType<QRemoteObjectReplica::State>();
-    if(m_client)
+    if (m_client)
     {
         curState = m_client->state();
     }

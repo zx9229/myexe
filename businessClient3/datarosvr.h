@@ -17,6 +17,7 @@ public Q_SLOTS:
     virtual bool    memSetData(const QString & varName, const QString & value);
     virtual QString memGetInfo(const QString & varName, const QStringList & paths);
     virtual bool    memSetInfo(const QString & varName, const QStringList & paths, const QString & value);
+    virtual QString serviceState();
     virtual bool start();
     virtual QString sendReq(const QString & typeName, const QString & jsonText, const QString & rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
     virtual QStringList getTxMsgTypeNameList();

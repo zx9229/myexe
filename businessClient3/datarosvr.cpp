@@ -40,6 +40,10 @@ bool    DataROSvr::memSetInfo(const QString & varName, const QStringList & paths
 {
     return m_dataExch.memSetInfo(varName, paths, value);
 }
+QString DataROSvr::serviceState()
+{
+    return m_dataExch.serviceState();
+}
 bool DataROSvr::start()
 {
     return m_dataExch.start();
