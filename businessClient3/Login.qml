@@ -4,6 +4,7 @@ LoginForm {
     id: loginForm
 
     signal sigShowHomePage() //声明一个自定义的信号, https://www.jianshu.com/p/442f461ee62b
+    signal sigPickUserID(string UserID)
 
     Timer {
         interval: 500
@@ -20,7 +21,7 @@ LoginForm {
         target: dataExch
         onSigStatusError: {
             var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
-            loginForm.textAreaMessage.text = localDT + '\n' + errMessage
+            loginForm.txtAreaMessage.text = localDT + '\n' + errMessage
         }
     }
 
@@ -29,7 +30,8 @@ LoginForm {
         target: dataExch
         onSigReady: {
             var localDT = (new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss")
-            loginForm.textAreaMessage.text = localDT + '\n' + "SUCCESS"
+            loginForm.txtAreaMessage.text = localDT + '\n' + "SUCCESS"
+            sigPickUserID(loginForm.txtFieldUserID.text)
             sigShowHomePage()
         }
     }

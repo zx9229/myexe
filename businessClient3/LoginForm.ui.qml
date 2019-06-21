@@ -8,7 +8,8 @@ Item {
     width: 400
     height: 400
     property alias labelDT: labelDT
-    property alias textAreaMessage: textAreaMessage
+    property alias txtAreaMessage: textAreaMessage
+    property alias txtFieldUserID: textFieldUserID
 
     GridLayout {
         id: gridLayout
@@ -117,8 +118,16 @@ Item {
             Layout.columnSpan: 2
         }
 
+        Button {
+            id: buttonTest
+            text: qsTr("测试")
+            Layout.fillWidth: true
+            Layout.columnSpan: 2
+        }
+
         TextArea {
             id: textAreaMessage
+            readOnly: true
             text: qsTr("Text Area")
             Layout.columnSpan: 2
             Layout.fillHeight: true
@@ -170,13 +179,26 @@ Item {
             textFieldBelongID.text = dataExch.dbLoadValue("BelongID")
             textFieldUserID.text = dataExch.dbLoadValue("UserID")
             if (textFieldHost.text == "" && textFieldPort.text == "") {
-                textFieldHost.text = qsTr("192.168.3.157")
+                textFieldHost.text = qsTr("192.168.3.57")
                 textFieldPort.text = qsTr("40078")
                 textFieldBelongID.text = qsTr("n4")
                 textFieldUserID.text = qsTr("ZXCVB")
             }
             textFieldURL.text = "ws://%1:%2/websocket".arg(
                         textFieldHost.text).arg(textFieldPort.text)
+        }
+    }
+
+    Connections {
+        target: buttonTest
+        onClicked: {
+            var roState = dataExch.remoteObjectState()
+            var ssState = dataExch.serviceState()
+            var localDT = (new Date()).toLocaleString(Qt.locale(),
+                                                      "yyyy-MM-dd hh:mm:ss")
+            var message = "[%1]\nremoteObjectState=[%2]\nserviceState=[%3]".arg(
+                        localDT).arg(roState).arg(ssState)
+            loginForm.txtAreaMessage.text = message
         }
     }
 }
