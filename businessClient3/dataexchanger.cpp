@@ -127,10 +127,10 @@ QString DataExchanger::memGetInfo(const QString& varName, const QStringList& pat
 
 bool DataExchanger::memSetInfo(const QString& varName, const QStringList& paths, const QString& value)
 {
-    auto filename2content = [](const std::string& filename, std::string& content)
-    {
-        std::copy(std::istreambuf_iterator<char>(std::ifstream(filename).rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(content));
-    };
+    //auto filename2content = [](const std::string& filename, std::string& content)
+    //{
+    //    std::copy(std::istreambuf_iterator<char>(std::ifstream(filename).rdbuf()), std::istreambuf_iterator<char>(), std::back_inserter(content));
+    //};
     txdata::ConnectionInfo* pCI = nullptr;
     if (varName == "myself")
     {
@@ -164,6 +164,12 @@ bool DataExchanger::memSetInfo(const QString& varName, const QStringList& paths,
     QSharedPointer<txdata::ConnectionInfo> spCI = qSharedPointerDynamicCast<txdata::ConnectionInfo>(gpmsgptr);
     *pCI = *spCI;
     return true;
+}
+
+QString DataExchanger::serviceState()
+{
+    QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketState>();
+    return  metaEnum.valueToKey(m_ws.state());
 }
 
 bool DataExchanger::start()
