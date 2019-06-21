@@ -3,14 +3,15 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
 
 Item {
-    signal sigShowNodeList()
+    signal sigShowServiceStatus()
+    signal sigShowLogin()
     signal sigShowPathwayInfo()
     signal sigShowNodePushWrap(string PeerID)
     signal sigShowNodeRequest(string PeerID)
     signal sigShowNodeReqRsp(string UserID, string MsgNo)
     signal sigShowSystemSettings()
     //The var type is a generic property type that can refer to any data type.
-    property var userID: dataExch.memGetInfo("myself", ["UserID"])
+    property var userID: undefined
     property var peerID: undefined
     property var msgNo : undefined
 
@@ -21,8 +22,11 @@ Item {
             rows: 3
             HomePageComponent {
                 txtText: qsTr("\n")
-                btnText: qsTr("节点列表")
-                onSigClicked: sigShowNodeList()
+                btnText: qsTr("刷新本端节点")
+                onSigClicked: {
+                    var userid = dataExch.memGetInfo("myself", ["UserID"])
+                    userID =  (userid === "") ? undefined : userid
+                }
             }
             HomePageComponent {
                 txtText: '本端节点:[%1]\n对端节点:[%2]'.arg(userID).arg(peerID)
@@ -51,6 +55,8 @@ Item {
                 btnText: qsTr("节点请求响应")
                 onSigClicked: {
                     if (false) {
+                    } else if (typeof(userID) === "undefined") {
+                        ToolTip.show("请先刷新本端节点", 5000)
                     } else if (typeof(peerID) === "undefined") {
                         ToolTip.show("请先指定对端节点", 5000)
                     } else if (typeof(msgNo)  === "undefined") {
@@ -68,6 +74,16 @@ Item {
                 txtText: qsTr("")
                 btnText: qsTr("路径信息")
                 onSigClicked: sigShowPathwayInfo()
+            }
+            HomePageComponent{
+                txtText: qsTr("")
+                btnText: qsTr("服务状态")
+                onSigClicked: sigShowServiceStatus()
+            }
+            HomePageComponent{
+                txtText: qsTr("")
+                btnText: qsTr("登录页面")
+                onSigClicked: sigShowLogin()
             }
         }
         Rectangle {
