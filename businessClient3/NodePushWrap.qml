@@ -43,7 +43,7 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            idColumn.ListView.view.currentIndex = index
+                            idColumn.ListView.view.currentIndex = index //https://blog.csdn.net/x356982611/article/details/53008236
                         }
                         onDoubleClicked: {
                             messageText.selectByMouse = !messageText.selectByMouse

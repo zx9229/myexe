@@ -1,15 +1,15 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>Login.qml</file>
-        <file>LoginForm.ui.qml</file>
-        <file>NodeList.qml</file>
-        <file>NodeRequest.qml</file>
-        <file>NodeReqRsp.qml</file>
-        <file>NodePushWrap.qml</file>
-        <file>RefreshView.qml</file>
         <file>HomePage.qml</file>
         <file>HomePageComponent.qml</file>
+        <file>Login.qml</file>
+        <file>LoginForm.ui.qml</file>
+        <file>NodePushWrap.qml</file>
+        <file>NodeRequest.qml</file>
+        <file>NodeReqRsp.qml</file>
         <file>PathwayInfo.qml</file>
+        <file>RefreshView.qml</file>
+        <file>ServiceStatus.qml</file>
     </qresource>
 </RCC>

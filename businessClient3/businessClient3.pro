@@ -24,7 +24,9 @@ SOURCES += \
     protobuf/txdata.pb.cc \
     zxtools.cpp \
     datarosvr.cpp \
-    datawrapper.cpp
+    datawrapper.cpp \
+    temputils.cpp \
+    myandroidcls.cpp
 
 RESOURCES += qml.qrc
 
@@ -49,7 +51,10 @@ HEADERS += \
     sqlstruct.h \
     zxtools.h \
     datarosvr.h \
-    datawrapper.h
+    datawrapper.h \
+    mylog.h \
+    temputils.h \
+    myandroidcls.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter
@@ -75,6 +80,9 @@ DISTFILES += \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew.bat \
-    dataro.rep
+    dataro.rep \
+    android/src/zx/qtproject/example/AndroidTool.java \
+    android/src/zx/qtproject/example/ZxActivity.java \
+    android/src/zx/qtproject/example/ZxService.java
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
