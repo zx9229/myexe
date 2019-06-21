@@ -4,6 +4,7 @@
 #include "rep_dataro_replica.h"
 #include "dataexchanger.h"
 #include "datarosvr.h"
+#include <QRemoteObjectReplica>
 
 class DataWrapper :public QObject
 {
@@ -21,10 +22,15 @@ public Q_SLOTS:
     Q_INVOKABLE QString sendReq(const QString & typeName, const QString & jsonText, const QString & rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
     Q_INVOKABLE QStringList getTxMsgTypeNameList();
     Q_INVOKABLE QString jsonExample(const QString & typeName);
+    Q_INVOKABLE QString remoteObjectState();
+    Q_INVOKABLE void    startService();
 signals:
     void sigReady();
     void sigStatusError(const QString & errMessage, int errType);
     void sigTableChanged(const QString & tableName);
+    void sigStateChanged(int iState, const QString& sState, int iOldState, const QString& sOldState);
+private:
+    void onStateChanged(QRemoteObjectReplica::State state, QRemoteObjectReplica::State oldState);
 private:
     QSharedPointer<DataExchanger> m_daExch;
     QSharedPointer<DataROReplica> m_client;

@@ -1,5 +1,6 @@
 #include <QSqlDatabase>
 #include "datawrapper.h"
+#include "myandroidcls.h"
 
 DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(parent)
 {
@@ -9,24 +10,29 @@ DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(pa
         {
             m_server=QSharedPointer<DataROSvr>(new DataROSvr);
             m_server->doRun();
+            qDebug()<<"server init ok";
         }
         else
         {
             m_node.reset(new QRemoteObjectHost);
             bool connectToNodeRet = m_node->connectToNode(QUrl(QStringLiteral(LOCAL_RO_URL)));
-            Q_ASSERT(connectToNodeRet);
+            qDebug()<<"connectToNodeRet="<<connectToNodeRet;
+            //Q_ASSERT(connectToNodeRet);
             m_client.reset(m_node->acquire<DataROReplica>());
             bool waitForSourceRet = m_client->waitForSource(3000);
-            Q_ASSERT(waitForSourceRet);
+            qDebug()<<"waitForSourceRet="<<waitForSourceRet;
+            //Q_ASSERT(waitForSourceRet);
             QObject::connect(m_client.get(),&DataROReplica::sigReady,this,&DataWrapper::sigReady);
             QObject::connect(m_client.get(),&DataROReplica::sigStatusError,this,&DataWrapper::sigStatusError);
             QObject::connect(m_client.get(),&DataROReplica::sigTableChanged,this,&DataWrapper::sigTableChanged);
+            QObject::connect(m_client.get(),&DataROReplica::stateChanged,this,&DataWrapper::onStateChanged);
             {
                 m_db = QSqlDatabase::addDatabase("QSQLITE");
                 m_db.setDatabaseName(QString().isEmpty() ? (SQLITE_DB_NAME) : (":memory:"));
                 bool isOk = m_db.open();
                 Q_ASSERT(isOk);
             }
+            qDebug()<<"client init ok";
         }
     }
     else
@@ -35,6 +41,7 @@ DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(pa
         QObject::connect(m_daExch.get(),&DataExchanger::sigReady,this,&DataWrapper::sigReady);
         QObject::connect(m_daExch.get(),&DataExchanger::sigStatusError,this,&DataWrapper::sigStatusError);
         QObject::connect(m_daExch.get(),&DataExchanger::sigTableChanged,this,&DataWrapper::sigTableChanged);
+        qDebug()<<"DataExchanger init ok";
     }
 }
 
@@ -131,8 +138,15 @@ bool DataWrapper::start()
     else
     {
         auto reply = m_client->start();
-        reply.waitForFinished();
-        return reply.returnValue();
+        if(reply.waitForFinished(1000))
+        {
+            return reply.returnValue();
+        }
+        else
+        {
+            emit sigStatusError("start timeout", 0);
+            return false;
+        }
     }
 }
 
@@ -178,4 +192,28 @@ QString DataWrapper::jsonExample(const QString & typeName)
         reply.waitForFinished();
         return reply.returnValue();
     }
+}
+
+Q_INVOKABLE QString DataWrapper::remoteObjectState()
+{
+    QRemoteObjectReplica::State curState=QRemoteObjectReplica::Uninitialized;
+    QMetaEnum metaEnum = QMetaEnum::fromType<QRemoteObjectReplica::State>();
+    if(m_client)
+    {
+        curState = m_client->state();
+    }
+    return metaEnum.valueToKey(curState);
+}
+
+Q_INVOKABLE void DataWrapper::startService()
+{
+    android_tool::funTest();
+}
+
+void DataWrapper::onStateChanged(QRemoteObjectReplica::State state, QRemoteObjectReplica::State oldState)
+{
+    QMetaEnum metaEnum = QMetaEnum::fromType<QRemoteObjectReplica::State>();
+    QString sState = metaEnum.valueToKey(state);
+    QString sOldState = metaEnum.valueToKey(oldState);
+    emit sigStateChanged(state, sState, oldState, sOldState);
 }
