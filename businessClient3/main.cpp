@@ -11,25 +11,35 @@
 #include "mysqltablemodel.h"
 #include "datawrapper.h"
 #include "temputils.h"
+#include "myandroidcls.h"
 
 int main(int argc, char *argv[])
 {
     bool useRO = true;
 #if defined(Q_OS_WIN)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    //useRO=false;
+    useRO = false;
 #endif
-
-    QGuiApplication app(argc, argv);
 
     bool isService = ((2 == argc) && (qstrcmp(argv[1], "-service") == 0));
     isService = useRO && isService;
+    {
+        QStringList strList;
+        strList.append(QString("argc=%1").arg(argc));
+        for (int i = 0; i < argc; i++) { strList.append(argv[i]); }
+        android_tool::logVerbose("Zx_main", strList.join(", "));
+    }
+    QSharedPointer<QCoreApplication> app;
+    isService ? app.reset(new QCoreApplication(argc, argv)) : app.reset(new QGuiApplication(argc, argv));
 
     {
         QByteArray logName;
         logName = isService ? TempUtils::calcServiceLogName().toUtf8() : TempUtils::calcAppLogName().toUtf8();
         Q_ASSERT(logName.isEmpty() == false);
         mylog::initialize(logName.constData());
+        for (int i = 0; i < argc; i++) {
+            qDebug() << QString("argv[%1]=%2").arg(i).arg(argv[i]);
+        }
     }
 
     MySqlTableModel::doQmlRegisterType();
@@ -37,7 +47,7 @@ int main(int argc, char *argv[])
     DataWrapper dataWrap(useRO, isService);//DataExchanger dataExch;
 
     QSharedPointer<QQmlApplicationEngine> engine;
-    if (!useRO || !isService)
+    if (!isService)
     {
         engine = QSharedPointer<QQmlApplicationEngine>(new QQmlApplicationEngine);
     }
@@ -51,5 +61,5 @@ int main(int argc, char *argv[])
         if (engine->rootObjects().isEmpty())
             return -1;
     }
-    return app.exec();
+    return app->exec();
 }
