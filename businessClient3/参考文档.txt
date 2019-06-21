@@ -93,3 +93,6 @@ https://qtdream.com/topic/46/qt-on-android-%E6%B2%89%E6%B5%B8%E5%BC%8F%E7%8A%B6%
 Qt5.7.0的QML实现SwipeView
 https://blog.csdn.net/MyLovelyJay/article/details/80928302
 ===============================================================================
+Android 8.0 不再允许后台service直接通过startService方式去启动，否则就会引起IllegalStateException。解决方式：
+https://www.cnblogs.com/wangqiang9/p/10595417.html
+===============================================================================
