@@ -2,8 +2,8 @@
 #define DATA_WRAPPER_H
 #include <QScopedPointer>
 #include "rep_dataro_replica.h"
-#include "dataexchanger.h"
 #include "datarosvr.h"
+#include "dataexchanger.h"
 #include <QRemoteObjectReplica>
 
 class DataWrapper :public QObject
