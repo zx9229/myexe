@@ -48,7 +48,7 @@ Item {
             Layout.fillWidth: true
             text: qsTr("TTS(TextToSpeech)")
             onClicked: {
-                dataExch.testTTS(textArea.text)
+                dataExch.ttsSpeak(textArea.text)
             }
         }
         TextArea {

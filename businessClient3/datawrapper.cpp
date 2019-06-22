@@ -224,6 +224,12 @@ Q_INVOKABLE void DataWrapper::startService()
     android_tool::funTest();
 }
 
+Q_INVOKABLE void DataWrapper::ttsSpeak(const QString & text)
+{
+    android_tool::ttsInit();
+    android_tool::ttsSpeak(text);
+}
+
 void DataWrapper::onStateChanged(QRemoteObjectReplica::State state, QRemoteObjectReplica::State oldState)
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<QRemoteObjectReplica::State>();

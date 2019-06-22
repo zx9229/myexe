@@ -25,6 +25,7 @@ public Q_SLOTS:
     Q_INVOKABLE QString jsonExample(const QString & typeName);
     Q_INVOKABLE QString remoteObjectState();
     Q_INVOKABLE void    startService();
+    Q_INVOKABLE void    ttsSpeak(const QString & text);
 signals:
     void sigReady();
     void sigStatusError(const QString & errMessage, int errType);

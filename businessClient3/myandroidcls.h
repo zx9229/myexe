@@ -44,6 +44,21 @@ public:
 #endif
         return msg;
     }
+    static void ttsInit()
+    {
+#ifdef Q_OS_ANDROID
+        QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/ZxTTS", "staticInit", "(Landroid/content/Context;)V", QtAndroid::androidActivity().object());
+#endif
+    }
+    static bool ttsSpeak(const QString& text)
+    {
+        bool retVal = false;
+#ifdef Q_OS_ANDROID
+        jboolean jRetVal = QAndroidJniObject::callStaticMethod<jboolean>("zx/qtproject/example/ZxTTS", "staticSpeak", "(Ljava/lang/String;)Z", QAndroidJniObject::fromString(text).object());
+        retVal = jRetVal;
+#endif
+        return retVal;
+    }
 };
 
 #endif // MYANDROIDCLS_H
