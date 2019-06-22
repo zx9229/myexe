@@ -278,8 +278,6 @@ void DataExchanger::initDB()
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(KeyValue::static_create_sql());
         Q_ASSERT(isOk);
-        isOk = sqlQuery.exec(ConnInfoEx::static_create_sql());
-        Q_ASSERT(isOk);
         isOk = sqlQuery.exec(CommonData::static_create_sql());
         Q_ASSERT(isOk);
         isOk = sqlQuery.exec(PushWrap::static_create_sql());
@@ -483,7 +481,6 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
 
     switch (msgData->rsptype()) {
     case txdata::ID_QryConnInfoRsp:
-        deal_QryConnInfoRsp(qSharedPointerDynamicCast<txdata::QryConnInfoRsp>(curData));
         break;
     default:
         break;
@@ -586,29 +583,6 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
         tmpData.insert_data(sqlQuery, false);
     }
     emit sigTableChanged(PathwayInfo::static_table_name());
-}
-
-void DataExchanger::deal_QryConnInfoRsp(QSharedPointer<txdata::QryConnInfoRsp> msgData)
-{
-    Q_ASSERT(msgData.data() != nullptr);
-    QSqlQuery sqlQuery;
-    ConnInfoEx::delete_data(sqlQuery, "");
-    for (auto&p : msgData->cache())
-    {
-        const txdata::ConnectReq& curData = p.second;
-        ConnInfoEx cie;
-        cie.UserID = QString::fromStdString(curData.inforeq().userid());
-        cie.BelongID = QString::fromStdString(curData.inforeq().belongid());
-        cie.Version = QString::fromStdString(curData.inforeq().version());
-        cie.ExePid = curData.inforeq().exepid();
-        cie.ExePath = QString::fromStdString(curData.inforeq().exepath());
-        cie.Remark = QString::fromStdString(curData.inforeq().remark());
-        QStringList pathway;
-        for (int i = 0; i < curData.pathway_size(); i++) { pathway.append(QString::fromStdString(curData.pathway().Get(i))); }
-        cie.Pathway = pathway.join("->");
-        cie.insert_data(sqlQuery, false);
-    }
-    emit sigTableChanged(ConnInfoEx::static_table_name());
 }
 
 void DataExchanger::slotOnConnected()
