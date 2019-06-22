@@ -81,7 +81,7 @@ void android_tool::toastShow(const QString& message)
 {
 #ifdef Q_OS_ANDROID
     QAndroidJniObject AJO_message = QAndroidJniObject::fromString(message);
-    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/AndroidTool", "toastShow", "(Landroid/content/Context;Ljava/lang/String;)V", QtAndroid::androidActivity().object(), AJO_message.object());
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/AndroidTool", "toastShow", "(Landroid/content/Context;Ljava/lang/String;)V", QtAndroid::androidContext().object(), AJO_message.object());
 #endif
 }
 
@@ -95,7 +95,7 @@ void android_tool::startTheService()
 void android_tool::ttsInit()
 {
 #ifdef Q_OS_ANDROID
-    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/ZxTTS", "staticInit", "(Landroid/content/Context;)V", QtAndroid::androidActivity().object());
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/ZxTTS", "staticInit", "(Landroid/content/Context;)V", QtAndroid::androidContext().object());
 #endif
 }
 

@@ -9,6 +9,7 @@
 #include "google/protobuf/util/json_util.h"
 #include "zxtools.h"
 #include <fstream>
+#include "myandroidcls.h"
 
 QString qjoGetSet(QJsonObject& clObj, const QStringList& paths, const QString* value)
 {
@@ -255,6 +256,7 @@ QString DataExchanger::jsonExample(const QString& typeName)
         txdata::PushItem tmpObj;
         tmpObj.set_subject("Subject");
         tmpObj.set_content("Content");
+        tmpObj.add_modes("tts");
         return zxtools::object2json(tmpObj);
     }
     if (msgType == txdata::MsgType::ID_SubscribeReq)
@@ -443,6 +445,13 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
             bool isOk = pshData.insert_data(sqlQuery, false, nullptr);
             Q_ASSERT(isOk);
             emit sigTableChanged(pshData.static_table_name());
+            {
+                QString text;
+                if(zxtools::needTTS(&pshData,text))
+                {
+                    android_tool::ttsSpeak(text);
+                }
+            }
         }
     }
 

@@ -3722,9 +3722,9 @@ class PushWrap : public ::google::protobuf::Message /* @@protoc_insertion_point(
   ::std::string* release_userid();
   void set_allocated_userid(::std::string* userid);
 
-  // bytes MsgData = 12;
+  // bytes MsgData = 5;
   void clear_msgdata();
-  static const int kMsgDataFieldNumber = 12;
+  static const int kMsgDataFieldNumber = 5;
   const ::std::string& msgdata() const;
   void set_msgdata(const ::std::string& value);
   #if LANG_CXX11
@@ -3754,9 +3754,9 @@ class PushWrap : public ::google::protobuf::Message /* @@protoc_insertion_point(
   ::google::protobuf::int64 msgno() const;
   void set_msgno(::google::protobuf::int64 value);
 
-  // .txdata.MsgType MsgType = 11;
+  // .txdata.MsgType MsgType = 4;
   void clear_msgtype();
-  static const int kMsgTypeFieldNumber = 11;
+  static const int kMsgTypeFieldNumber = 4;
   ::txdata::MsgType msgtype() const;
   void set_msgtype(::txdata::MsgType value);
 
@@ -3861,6 +3861,28 @@ class PushItem : public ::google::protobuf::Message /* @@protoc_insertion_point(
 
   // accessors -------------------------------------------------------
 
+  // repeated string Modes = 4;
+  int modes_size() const;
+  void clear_modes();
+  static const int kModesFieldNumber = 4;
+  const ::std::string& modes(int index) const;
+  ::std::string* mutable_modes(int index);
+  void set_modes(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_modes(int index, ::std::string&& value);
+  #endif
+  void set_modes(int index, const char* value);
+  void set_modes(int index, const char* value, size_t size);
+  ::std::string* add_modes();
+  void add_modes(const ::std::string& value);
+  #if LANG_CXX11
+  void add_modes(::std::string&& value);
+  #endif
+  void add_modes(const char* value);
+  void add_modes(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField< ::std::string>& modes() const;
+  ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_modes();
+
   // string Subject = 1;
   void clear_subject();
   static const int kSubjectFieldNumber = 1;
@@ -3899,6 +3921,7 @@ class PushItem : public ::google::protobuf::Message /* @@protoc_insertion_point(
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> modes_;
   ::google::protobuf::internal::ArenaStringPtr subject_;
   ::google::protobuf::internal::ArenaStringPtr content_;
   ::google::protobuf::int32 level_;
@@ -8345,7 +8368,7 @@ inline void PushWrap::set_allocated_msgtime(::google::protobuf::Timestamp* msgti
   // @@protoc_insertion_point(field_set_allocated:txdata.PushWrap.MsgTime)
 }
 
-// .txdata.MsgType MsgType = 11;
+// .txdata.MsgType MsgType = 4;
 inline void PushWrap::clear_msgtype() {
   msgtype_ = 0;
 }
@@ -8359,7 +8382,7 @@ inline void PushWrap::set_msgtype(::txdata::MsgType value) {
   // @@protoc_insertion_point(field_set:txdata.PushWrap.MsgType)
 }
 
-// bytes MsgData = 12;
+// bytes MsgData = 5;
 inline void PushWrap::clear_msgdata() {
   msgdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -8534,6 +8557,75 @@ inline void PushItem::set_level(::google::protobuf::int32 value) {
   
   level_ = value;
   // @@protoc_insertion_point(field_set:txdata.PushItem.Level)
+}
+
+// repeated string Modes = 4;
+inline int PushItem::modes_size() const {
+  return modes_.size();
+}
+inline void PushItem::clear_modes() {
+  modes_.Clear();
+}
+inline const ::std::string& PushItem::modes(int index) const {
+  // @@protoc_insertion_point(field_get:txdata.PushItem.Modes)
+  return modes_.Get(index);
+}
+inline ::std::string* PushItem::mutable_modes(int index) {
+  // @@protoc_insertion_point(field_mutable:txdata.PushItem.Modes)
+  return modes_.Mutable(index);
+}
+inline void PushItem::set_modes(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:txdata.PushItem.Modes)
+  modes_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void PushItem::set_modes(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:txdata.PushItem.Modes)
+  modes_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void PushItem::set_modes(int index, const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  modes_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:txdata.PushItem.Modes)
+}
+inline void PushItem::set_modes(int index, const char* value, size_t size) {
+  modes_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:txdata.PushItem.Modes)
+}
+inline ::std::string* PushItem::add_modes() {
+  // @@protoc_insertion_point(field_add_mutable:txdata.PushItem.Modes)
+  return modes_.Add();
+}
+inline void PushItem::add_modes(const ::std::string& value) {
+  modes_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:txdata.PushItem.Modes)
+}
+#if LANG_CXX11
+inline void PushItem::add_modes(::std::string&& value) {
+  modes_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:txdata.PushItem.Modes)
+}
+#endif
+inline void PushItem::add_modes(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  modes_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:txdata.PushItem.Modes)
+}
+inline void PushItem::add_modes(const char* value, size_t size) {
+  modes_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:txdata.PushItem.Modes)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+PushItem::modes() const {
+  // @@protoc_insertion_point(field_list:txdata.PushItem.Modes)
+  return modes_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+PushItem::mutable_modes() {
+  // @@protoc_insertion_point(field_mutable_list:txdata.PushItem.Modes)
+  return &modes_;
 }
 
 // -------------------------------------------------------------------

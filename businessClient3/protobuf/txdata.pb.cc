@@ -896,6 +896,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PushItem, subject_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PushItem, content_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PushItem, level_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PushItem, modes_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::SubscribeReq, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -959,11 +960,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 219, -1, sizeof(::txdata::ExecCmdRsp)},
   { 225, -1, sizeof(::txdata::PushWrap)},
   { 235, -1, sizeof(::txdata::PushItem)},
-  { 243, -1, sizeof(::txdata::SubscribeReq)},
-  { 249, -1, sizeof(::txdata::SubscribeRsp)},
-  { 257, -1, sizeof(::txdata::PathwayInfo_Pathway)},
-  { 263, 270, sizeof(::txdata::PathwayInfo_InfoEntry_DoNotUse)},
-  { 272, -1, sizeof(::txdata::PathwayInfo)},
+  { 244, -1, sizeof(::txdata::SubscribeReq)},
+  { 250, -1, sizeof(::txdata::SubscribeRsp)},
+  { 258, -1, sizeof(::txdata::PathwayInfo_Pathway)},
+  { 264, 271, sizeof(::txdata::PathwayInfo_InfoEntry_DoNotUse)},
+  { 273, -1, sizeof(::txdata::PathwayInfo)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1088,33 +1089,33 @@ void AddDescriptorsImpl() {
       "mdRsp\022\r\n\005Reply\030\001 \001(\t\"\211\001\n\010PushWrap\022\r\n\005Msg"
       "No\030\001 \001(\003\022\016\n\006UserID\030\002 \001(\t\022+\n\007MsgTime\030\003 \001("
       "\0132\032.google.protobuf.Timestamp\022 \n\007MsgType"
-      "\030\013 \001(\0162\017.txdata.MsgType\022\017\n\007MsgData\030\014 \001(\014"
-      "\";\n\010PushItem\022\017\n\007Subject\030\001 \001(\t\022\017\n\007Content"
-      "\030\002 \001(\t\022\r\n\005Level\030\003 \001(\005\"!\n\014SubscribeReq\022\021\n"
-      "\tFromMsgNo\030\001 \001(\003\"@\n\014SubscribeRsp\022\021\n\tFrom"
-      "MsgNo\030\001 \001(\003\022\r\n\005ErrNo\030\002 \001(\005\022\016\n\006ErrMsg\030\003 \001"
-      "(\t\"\255\001\n\013PathwayInfo\022\016\n\006UserID\030\001 \001(\t\022+\n\004In"
-      "fo\030\002 \003(\0132\035.txdata.PathwayInfo.InfoEntry\032"
-      "\027\n\007Pathway\022\014\n\004Data\030\001 \003(\t\032H\n\tInfoEntry\022\013\n"
-      "\003key\030\001 \001(\t\022*\n\005value\030\002 \001(\0132\033.txdata.Pathw"
-      "ayInfo.Pathway:\0028\001*\232\004\n\007MsgType\022\t\n\005Zero1\020"
-      "\000\022\021\n\rID_Common1Req\020\001\022\021\n\rID_Common1Rsp\020\002\022"
-      "\021\n\rID_Common2Req\020\003\022\021\n\rID_Common2Rsp\020\004\022\021\n"
-      "\rID_Common2Ack\020\005\022\020\n\014ID_CommonErr\020\006\022\025\n\021ID"
-      "_ConnectionInfo\020\007\022\027\n\023ID_DisconnectedData"
-      "\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\rID_ConnectRsp\020\n"
-      "\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017ID_SystemReport"
-      "\020\014\022\017\n\013ID_EchoItem\020\r\022\016\n\nID_BinItem\020\016\022\020\n\014I"
-      "D_EmailItem\020\017\022\025\n\021ID_QryConnInfoReq\020\020\022\025\n\021"
-      "ID_QryConnInfoRsp\020\021\022\025\n\021ID_QueryRecordReq"
-      "\020\022\022\025\n\021ID_QueryRecordRsp\020\023\022\021\n\rID_ExecCmdR"
-      "eq\020\024\022\021\n\rID_ExecCmdRsp\020\025\022\017\n\013ID_PushWrap\020\026"
-      "\022\017\n\013ID_PushItem\020\027\022\023\n\017ID_SubscribeReq\020\030\022\023"
-      "\n\017ID_SubscribeRsp\020\031\022\022\n\016ID_PathwayInfo\020\032P"
-      "\000b\006proto3"
+      "\030\004 \001(\0162\017.txdata.MsgType\022\017\n\007MsgData\030\005 \001(\014"
+      "\"J\n\010PushItem\022\017\n\007Subject\030\001 \001(\t\022\017\n\007Content"
+      "\030\002 \001(\t\022\r\n\005Level\030\003 \001(\005\022\r\n\005Modes\030\004 \003(\t\"!\n\014"
+      "SubscribeReq\022\021\n\tFromMsgNo\030\001 \001(\003\"@\n\014Subsc"
+      "ribeRsp\022\021\n\tFromMsgNo\030\001 \001(\003\022\r\n\005ErrNo\030\002 \001("
+      "\005\022\016\n\006ErrMsg\030\003 \001(\t\"\255\001\n\013PathwayInfo\022\016\n\006Use"
+      "rID\030\001 \001(\t\022+\n\004Info\030\002 \003(\0132\035.txdata.Pathway"
+      "Info.InfoEntry\032\027\n\007Pathway\022\014\n\004Data\030\001 \003(\t\032"
+      "H\n\tInfoEntry\022\013\n\003key\030\001 \001(\t\022*\n\005value\030\002 \001(\013"
+      "2\033.txdata.PathwayInfo.Pathway:\0028\001*\232\004\n\007Ms"
+      "gType\022\t\n\005Zero1\020\000\022\021\n\rID_Common1Req\020\001\022\021\n\rI"
+      "D_Common1Rsp\020\002\022\021\n\rID_Common2Req\020\003\022\021\n\rID_"
+      "Common2Rsp\020\004\022\021\n\rID_Common2Ack\020\005\022\020\n\014ID_Co"
+      "mmonErr\020\006\022\025\n\021ID_ConnectionInfo\020\007\022\027\n\023ID_D"
+      "isconnectedData\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\r"
+      "ID_ConnectRsp\020\n\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017"
+      "ID_SystemReport\020\014\022\017\n\013ID_EchoItem\020\r\022\016\n\nID"
+      "_BinItem\020\016\022\020\n\014ID_EmailItem\020\017\022\025\n\021ID_QryCo"
+      "nnInfoReq\020\020\022\025\n\021ID_QryConnInfoRsp\020\021\022\025\n\021ID"
+      "_QueryRecordReq\020\022\022\025\n\021ID_QueryRecordRsp\020\023"
+      "\022\021\n\rID_ExecCmdReq\020\024\022\021\n\rID_ExecCmdRsp\020\025\022\017"
+      "\n\013ID_PushWrap\020\026\022\017\n\013ID_PushItem\020\027\022\023\n\017ID_S"
+      "ubscribeReq\020\030\022\023\n\017ID_SubscribeRsp\020\031\022\022\n\016ID"
+      "_PathwayInfo\020\032P\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3649);
+      descriptor, 3664);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -10448,10 +10449,10 @@ bool PushWrap::MergePartialFromCodedStream(
         break;
       }
 
-      // .txdata.MsgType MsgType = 11;
-      case 11: {
+      // .txdata.MsgType MsgType = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(88u /* 88 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -10463,10 +10464,10 @@ bool PushWrap::MergePartialFromCodedStream(
         break;
       }
 
-      // bytes MsgData = 12;
-      case 12: {
+      // bytes MsgData = 5;
+      case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(98u /* 98 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_msgdata()));
         } else {
@@ -10522,16 +10523,16 @@ void PushWrap::SerializeWithCachedSizes(
       3, this->_internal_msgtime(), output);
   }
 
-  // .txdata.MsgType MsgType = 11;
+  // .txdata.MsgType MsgType = 4;
   if (this->msgtype() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      11, this->msgtype(), output);
+      4, this->msgtype(), output);
   }
 
-  // bytes MsgData = 12;
+  // bytes MsgData = 5;
   if (this->msgdata().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      12, this->msgdata(), output);
+      5, this->msgdata(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -10571,17 +10572,17 @@ void PushWrap::SerializeWithCachedSizes(
         3, this->_internal_msgtime(), deterministic, target);
   }
 
-  // .txdata.MsgType MsgType = 11;
+  // .txdata.MsgType MsgType = 4;
   if (this->msgtype() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      11, this->msgtype(), target);
+      4, this->msgtype(), target);
   }
 
-  // bytes MsgData = 12;
+  // bytes MsgData = 5;
   if (this->msgdata().size() > 0) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        12, this->msgdata(), target);
+        5, this->msgdata(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -10608,7 +10609,7 @@ size_t PushWrap::ByteSizeLong() const {
         this->userid());
   }
 
-  // bytes MsgData = 12;
+  // bytes MsgData = 5;
   if (this->msgdata().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::BytesSize(
@@ -10629,7 +10630,7 @@ size_t PushWrap::ByteSizeLong() const {
         this->msgno());
   }
 
-  // .txdata.MsgType MsgType = 11;
+  // .txdata.MsgType MsgType = 4;
   if (this->msgtype() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->msgtype());
@@ -10729,6 +10730,7 @@ void PushItem::InitAsDefaultInstance() {
 const int PushItem::kSubjectFieldNumber;
 const int PushItem::kContentFieldNumber;
 const int PushItem::kLevelFieldNumber;
+const int PushItem::kModesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 PushItem::PushItem()
@@ -10740,7 +10742,8 @@ PushItem::PushItem()
 }
 PushItem::PushItem(const PushItem& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL) {
+      _internal_metadata_(NULL),
+      modes_(from.modes_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   subject_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.subject().size() > 0) {
@@ -10790,6 +10793,7 @@ void PushItem::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  modes_.Clear();
   subject_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   level_ = 0;
@@ -10852,6 +10856,23 @@ bool PushItem::MergePartialFromCodedStream(
         break;
       }
 
+      // repeated string Modes = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_modes()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->modes(this->modes_size() - 1).data(),
+            static_cast<int>(this->modes(this->modes_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.PushItem.Modes"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -10903,6 +10924,16 @@ void PushItem::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->level(), output);
   }
 
+  // repeated string Modes = 4;
+  for (int i = 0, n = this->modes_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->modes(i).data(), static_cast<int>(this->modes(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PushItem.Modes");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->modes(i), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -10944,6 +10975,16 @@ void PushItem::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->level(), target);
   }
 
+  // repeated string Modes = 4;
+  for (int i = 0, n = this->modes_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->modes(i).data(), static_cast<int>(this->modes(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.PushItem.Modes");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(4, this->modes(i), target);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
@@ -10961,6 +11002,14 @@ size_t PushItem::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
+  // repeated string Modes = 4;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->modes_size());
+  for (int i = 0, n = this->modes_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->modes(i));
+  }
+
   // string Subject = 1;
   if (this->subject().size() > 0) {
     total_size += 1 +
@@ -11009,6 +11058,7 @@ void PushItem::MergeFrom(const PushItem& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  modes_.MergeFrom(from.modes_);
   if (from.subject().size() > 0) {
 
     subject_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.subject_);
@@ -11046,6 +11096,7 @@ void PushItem::Swap(PushItem* other) {
 }
 void PushItem::InternalSwap(PushItem* other) {
   using std::swap;
+  modes_.InternalSwap(CastToBase(&other->modes_));
   subject_.Swap(&other->subject_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   content_.Swap(&other->content_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),

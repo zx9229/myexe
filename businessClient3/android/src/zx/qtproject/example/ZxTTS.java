@@ -37,7 +37,7 @@ public class ZxTTS implements TextToSpeech.OnInitListener
     }
     public static boolean staticSpeak(final String text) {
         boolean retVal = (TTS == null) ? false : TTS.speak(text);
-        Log.v(TAG, MessageFormat.format("staticSpeak, {0}, TTS={1}, text={2}", retVal, TTS, text));
+        //Log.v(TAG, MessageFormat.format("staticSpeak, {0}, TTS={1}, text={2}", retVal, TTS, text));
         return retVal;
     }
 }

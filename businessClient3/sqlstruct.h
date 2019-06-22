@@ -16,7 +16,7 @@ namespace {
     inline bool Valid(int32_t& data) { return INT32_MAX != data; }
     inline bool Valid(int64_t& data) { return INT64_MAX != data; }
     inline bool Valid(float& data) { return FLT_MAX != data; }
-    inline bool Valid(double& data) { return DBL_MAX != data; }
+    inline bool Valid(double& data) { return DBL_MAX <= data; }
     inline bool Valid(QString& data) { return !data.isNull(); }
     inline bool Valid(QByteArray& data) { return !data.isNull(); }
     inline bool Valid(QDateTime& data) { return data.isValid(); }
