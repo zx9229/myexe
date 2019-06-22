@@ -19,17 +19,17 @@ public class ZxActivity extends QtActivity
 {
     private static final String TAG = "ZxActivity";
 
-    public static void funTest(Context ctx) {
-        Log.v(TAG, MessageFormat.format("myPid={0}, funTest, beg", Process.myPid()));
+    public static void startTheService(Context ctx) {
+        //Log.v(TAG, "startTheService, beg");
         ctx.startForegroundService(new Intent(ctx, ZxService.class));
-        Log.v(TAG, MessageFormat.format("myPid={0}, funTest, end", Process.myPid()));
+        //Log.v(TAG, "startTheService, end");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, MessageFormat.format("myPid={0}, onCreate, savedInstanceState={0}, beg", Process.myPid(), savedInstanceState));
         super.onCreate(savedInstanceState);
-        if (false) {
+        if (false) { // 这里仅用来表达:可以在启动程序的时候,立即启动服务.
             Intent intent = new Intent(this, ZxService.class);
             startService(intent);
         }
