@@ -9,7 +9,7 @@ Item {
             id: roStateTransition
             readOnly: true
             Layout.fillWidth: true
-            text: qsTr("状态变迁")
+            text: qsTr("QtRemoteObjects状态变迁")
         }
         TextField {
             id: roState
@@ -21,7 +21,7 @@ Item {
             id: serviceState
             readOnly: true
             Layout.fillWidth: true
-            text: qsTr("服务状态")
+            text: qsTr("service状态")
         }
         Button {
             Layout.fillWidth: true
@@ -44,8 +44,18 @@ Item {
                 serviceState.text = "%1  [%2]".arg(dataExch.serviceState()).arg(localDT)
             }
         }
-        Rectangle {
+        Button {
+            Layout.fillWidth: true
+            text: qsTr("TTS(TextToSpeech)")
+            onClicked: {
+                dataExch.testTTS(textArea.text)
+            }
+        }
+        TextArea {
+            id: textArea
+            Layout.fillWidth: true
             Layout.fillHeight: true
+            text: qsTr("测试 TTS(TextToSpeech) 功能")
         }
     }
     Connections {

@@ -83,6 +83,7 @@ DISTFILES += \
     dataro.rep \
     android/src/zx/qtproject/example/AndroidTool.java \
     android/src/zx/qtproject/example/ZxActivity.java \
-    android/src/zx/qtproject/example/ZxService.java
+    android/src/zx/qtproject/example/ZxService.java \
+    android/src/zx/qtproject/example/ZxTTS.java
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
