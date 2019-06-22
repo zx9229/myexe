@@ -26,7 +26,7 @@ Item {
         Button {
             Layout.fillWidth: true
             text: qsTr("启动服务")
-            onClicked: dataExch.startService()
+            onClicked: dataExch.startTheService()
         }
         Button {
             Layout.fillWidth: true

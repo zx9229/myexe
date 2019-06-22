@@ -219,9 +219,9 @@ Q_INVOKABLE QString DataWrapper::remoteObjectState()
     return metaEnum.valueToKey(curState);
 }
 
-Q_INVOKABLE void DataWrapper::startService()
+Q_INVOKABLE void DataWrapper::startTheService()
 {
-    android_tool::funTest();
+    android_tool::startTheService();
 }
 
 Q_INVOKABLE void DataWrapper::ttsSpeak(const QString & text)

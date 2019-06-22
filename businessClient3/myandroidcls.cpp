@@ -65,3 +65,46 @@ QString MyAndroidCls::calcExternalStorageDirectory()
 
     return value;
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+void android_tool::logVerbose(const QString& tag, const QString& msg)
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject AJO_tag = QAndroidJniObject::fromString(tag);
+    QAndroidJniObject AJO_msg = QAndroidJniObject::fromString(msg);
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/AndroidTool", "logVerbose", "(Ljava/lang/String;Ljava/lang/String;)V", AJO_tag.object(), AJO_msg.object());
+#endif
+}
+
+void android_tool::toastShow(const QString& message)
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject AJO_message = QAndroidJniObject::fromString(message);
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/AndroidTool", "toastShow", "(Landroid/content/Context;Ljava/lang/String;)V", QtAndroid::androidActivity().object(), AJO_message.object());
+#endif
+}
+
+void android_tool::startTheService()
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/ZxActivity", "startTheService", "(Landroid/content/Context;)V", QtAndroid::androidActivity().object());
+#endif
+}
+
+void android_tool::ttsInit()
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject::callStaticMethod<void>("zx/qtproject/example/ZxTTS", "staticInit", "(Landroid/content/Context;)V", QtAndroid::androidActivity().object());
+#endif
+}
+
+bool android_tool::ttsSpeak(const QString& text)
+{
+    bool retVal = false;
+#ifdef Q_OS_ANDROID
+    jboolean jRetVal = QAndroidJniObject::callStaticMethod<jboolean>("zx/qtproject/example/ZxTTS", "staticSpeak", "(Ljava/lang/String;)Z", QAndroidJniObject::fromString(text).object());
+    retVal = jRetVal;
+#endif
+    return retVal;
+}
