@@ -496,14 +496,14 @@ public:
             return false;
         while (query.next()) {
             PushWrap curData;
-            fromQVariant(curData.PeerID,query.value("PeerID"));
-            fromQVariant(curData.MsgNo,query.value("MsgNo"));
-            fromQVariant(curData.UserID,query.value("UserID"));
-            fromQVariant(curData.PshTime,query.value("PshTime"));
-            fromQVariant(curData.PshType,query.value("PshType"));
-            fromQVariant(curData.PshTypeTxt,query.value("PshTypeTxt"));
-            fromQVariant(curData.PshData,query.value("PshData"));
-            fromQVariant(curData.PshDataTxt,query.value("PshDataTxt"));
+            fromQVariant(curData.PeerID, query.value("PeerID"));
+            fromQVariant(curData.MsgNo, query.value("MsgNo"));
+            fromQVariant(curData.UserID, query.value("UserID"));
+            fromQVariant(curData.PshTime, query.value("PshTime"));
+            fromQVariant(curData.PshType, query.value("PshType"));
+            fromQVariant(curData.PshTypeTxt, query.value("PshTypeTxt"));
+            fromQVariant(curData.PshData, query.value("PshData"));
+            fromQVariant(curData.PshDataTxt, query.value("PshDataTxt"));
             dataOut.append(curData);
         }
         return true;
