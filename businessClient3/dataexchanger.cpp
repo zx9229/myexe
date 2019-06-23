@@ -1,16 +1,16 @@
 #include "dataexchanger.h"
+#include <fstream>
 #include <QCoreApplication>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QtCore/QMetaEnum>
+#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "m2b.h"
+#include <QSqlError>
+#include <QSqlQuery>
 #include "google/protobuf/util/json_util.h"
 #include "zxtools.h"
-#include <fstream>
-#include "myandroidcls.h"
-#include <QDebug>
+#include "mytts.h"
+#include "m2b.h"
 
 QString qjoGetSet(QJsonObject& clObj, const QStringList& paths, const QString* value)
 {
@@ -439,9 +439,9 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
         GPMSGPTR tmpData;
         if (m2b::slice2msg(msgData->reqdata(), msgData->reqtype(), tmpData))
         {
-            QSharedPointer<txdata::PushWrap> tmp2Data = qSharedPointerDynamicCast<txdata::PushWrap>(tmpData);
+            QSharedPointer<txdata::PushWrap> txdataPushWrap = qSharedPointerDynamicCast<txdata::PushWrap>(tmpData);
             PushWrap pshData;
-            zxtools::PushWrap2PushWrap(&pshData, tmp2Data.get(), msgData->senderid());
+            zxtools::PushWrap2PushWrap(&pshData, txdataPushWrap.get(), msgData->senderid());
             QSqlQuery sqlQuery;
             bool isOk = pshData.insert_data(sqlQuery, false, nullptr);
             Q_ASSERT(isOk);
@@ -450,7 +450,7 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
                 QString text;
                 if (zxtools::needTTS(&pshData, text))
                 {
-                    android_tool::ttsSpeak(text);
+                    MyTTS::staticSpeak(text);
                 }
             }
         }
@@ -584,7 +584,7 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
             Q_ASSERT(isOk);
             QString typeName = m2b::CalcMsgTypeName(tmpData);
             sendReq(typeName, jsonText, m_subUser, false, false, false, false, true, false, false);
-            qDebug() << m2b::CalcMsgTypeName(*tmpData) << QString::fromStdString(tmpData.DebugString());
+            qDebug() << m2b::CalcMsgTypeName(tmpData) << QString::fromStdString(tmpData.DebugString());
         }
         m_lastFind = curFind;
     }

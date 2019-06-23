@@ -1,4 +1,4 @@
-QT += quick core network websockets sql remoteobjects
+QT += quick core network websockets sql remoteobjects texttospeech
 android {
 QT += androidextras
 }
@@ -26,7 +26,8 @@ SOURCES += \
     datarosvr.cpp \
     datawrapper.cpp \
     temputils.cpp \
-    myandroidcls.cpp
+    myandroidcls.cpp \
+    mytts.cpp
 
 RESOURCES += qml.qrc
 
@@ -54,7 +55,8 @@ HEADERS += \
     datawrapper.h \
     mylog.h \
     temputils.h \
-    myandroidcls.h
+    myandroidcls.h \
+    mytts.h
 
 # 禁用(warning: unused parameter '变量名' [-Wunused-parameter])
 QMAKE_CXXFLAGS += -Wno-unused-parameter
