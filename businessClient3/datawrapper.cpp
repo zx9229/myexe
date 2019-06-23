@@ -1,6 +1,7 @@
 #include <QSqlDatabase>
 #include "datawrapper.h"
 #include "myandroidcls.h"
+#include "mytts.h"
 
 DataWrapper::DataWrapper(bool useRO, bool isServer, QObject *parent) :QObject(parent)
 {
@@ -54,7 +55,7 @@ QString DataWrapper::dbLoadValue(const QString & key)
     else
     {
         auto reply = m_client->dbLoadValue(key);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -68,7 +69,7 @@ bool    DataWrapper::dbSaveValue(const QString & key, const QString & value)
     else
     {
         auto reply = m_client->dbSaveValue(key, value);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -82,7 +83,7 @@ QString DataWrapper::memGetData(const QString & varName)
     else
     {
         auto reply = m_client->memGetData(varName);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -96,7 +97,7 @@ bool    DataWrapper::memSetData(const QString & varName, const QString & value)
     else
     {
         auto reply = m_client->memSetData(varName, value);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -110,7 +111,7 @@ QString DataWrapper::memGetInfo(const QString & varName, const QStringList & pat
     else
     {
         auto reply = m_client->memGetInfo(varName, paths);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -124,7 +125,7 @@ bool    DataWrapper::memSetInfo(const QString & varName, const QStringList & pat
     else
     {
         auto reply = m_client->memSetInfo(varName, paths, value);
-        reply.waitForFinished();
+        reply.waitForFinished(1000);
         return reply.returnValue();
     }
 }
@@ -226,8 +227,7 @@ Q_INVOKABLE void DataWrapper::startTheService()
 
 Q_INVOKABLE void DataWrapper::ttsSpeak(const QString & text)
 {
-    android_tool::ttsInit();
-    android_tool::ttsSpeak(text);
+    MyTTS::staticSpeak(text);
 }
 
 void DataWrapper::onStateChanged(QRemoteObjectReplica::State state, QRemoteObjectReplica::State oldState)
