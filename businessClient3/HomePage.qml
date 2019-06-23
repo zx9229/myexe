@@ -69,6 +69,7 @@ Item {
             HomePageComponent{
                 txtText: qsTr("")
                 btnText: qsTr("系统设置")
+                onSigClicked: sigShowSystemSettings()
             }
             HomePageComponent{
                 txtText: qsTr("")

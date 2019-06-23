@@ -24,6 +24,12 @@ Window {
                         loader1.source = urlStr
                     }
                 })
+                item.sigShowSystemSettings.connect(function(){
+                    var urlStr = "qrc:/SystemSettings.qml"
+                    if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {
+                        loader1.source = urlStr
+                    }
+                })
                 item.sigShowLogin.connect(function(){
                     var urlStr = "qrc:/Login.qml"
                     if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {
