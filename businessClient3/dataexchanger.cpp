@@ -10,6 +10,7 @@
 #include "zxtools.h"
 #include <fstream>
 #include "myandroidcls.h"
+#include <QDebug>
 
 QString qjoGetSet(QJsonObject& clObj, const QStringList& paths, const QString* value)
 {
@@ -83,7 +84,7 @@ bool DataExchanger::dbSaveValue(const QString& key, const QString& value)
 
 QString DataExchanger::memGetData(const QString& varName)
 {
-    return "";
+    return varName.isEmpty() ? "" : "";
 }
 
 bool DataExchanger::memSetData(const QString& varName, const QString& value)
@@ -447,7 +448,7 @@ void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData
             emit sigTableChanged(pshData.static_table_name());
             {
                 QString text;
-                if(zxtools::needTTS(&pshData,text))
+                if (zxtools::needTTS(&pshData, text))
                 {
                     android_tool::ttsSpeak(text);
                 }
@@ -488,8 +489,13 @@ void DataExchanger::handle_Common1Rsp(QSharedPointer<txdata::Common1Rsp> msgData
         emit sigTableChanged(tmpData.static_table_name());
     }
 
+    GPMSGPTR innerRspData;
+    m2b::slice2msg(msgData->rspdata(), msgData->rsptype(), innerRspData);
     switch (msgData->rsptype()) {
     case txdata::ID_QryConnInfoRsp:
+        break;
+    case txdata::ID_SubscribeRsp:
+        handle_SubscribeRsp(qSharedPointerDynamicCast<txdata::SubscribeRsp>(innerRspData));
         break;
     default:
         break;
@@ -578,6 +584,7 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
             Q_ASSERT(isOk);
             QString typeName = m2b::CalcMsgTypeName(tmpData);
             sendReq(typeName, jsonText, m_subUser, false, false, false, false, true, false, false);
+            qDebug() << m2b::CalcMsgTypeName(*tmpData) << QString::fromStdString(tmpData.DebugString());
         }
         m_lastFind = curFind;
     }
@@ -592,6 +599,12 @@ void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
         tmpData.insert_data(sqlQuery, false);
     }
     emit sigTableChanged(PathwayInfo::static_table_name());
+}
+
+void DataExchanger::handle_SubscribeRsp(QSharedPointer<txdata::SubscribeRsp> data)
+{
+    Q_ASSERT(data.data() != nullptr);
+    qDebug() << m2b::CalcMsgTypeName(*data) << QString::fromStdString(data->DebugString());
 }
 
 void DataExchanger::slotOnConnected()
