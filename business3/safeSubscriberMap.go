@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/zx9229/myexe/txdata"
@@ -10,13 +11,14 @@ import (
 
 type SubInfo struct {
 	sync.Mutex
-	userID string //订阅者.
-	nodeID string //从哪个节点订阅.
-	toRoot bool   //节点发送数据到订阅者的方向.
-	isLog  bool
-	isPush bool
-	conn   *wsnet.WsSocket
-	cache  []*txdata.PushWrap //nil就直接发送,非nil需要缓存.
+	userID  string //订阅者.
+	nodeID  string //从哪个节点订阅.
+	toRoot  bool   //节点发送数据到订阅者的方向.
+	isLog   bool
+	isPush  bool
+	conn    *wsnet.WsSocket
+	cache   []*txdata.PushWrap //nil就直接发送,非nil需要缓存.
+	subTime time.Time
 }
 
 func tmpMerge(srcOld, srcNew []*txdata.PushWrap) []*txdata.PushWrap {
@@ -78,7 +80,7 @@ func newSafeSubscriberMap(qw *safePushCache) *safeSubscriberMap {
 }
 
 func (thls *safeSubscriberMap) insertData(uID string, nID string, toR bool, isLog bool, conn *wsnet.WsSocket, msgNo int64) (isSuccess bool) {
-	sInfo := &SubInfo{userID: uID, nodeID: nID, toRoot: toR, isLog: isLog, conn: conn, cache: make([]*txdata.PushWrap, 0)}
+	sInfo := &SubInfo{userID: uID, nodeID: nID, toRoot: toR, isLog: isLog, conn: conn, cache: make([]*txdata.PushWrap, 0), subTime: time.Now()}
 	thls.Lock()
 	if _, isSuccess = thls.M[sInfo.userID]; !isSuccess {
 		thls.M[sInfo.userID] = sInfo
@@ -93,6 +95,15 @@ func (thls *safeSubscriberMap) deleteData(userID string) {
 	thls.Lock()
 	delete(thls.M, userID)
 	thls.Unlock()
+}
+
+func (thls *safeSubscriberMap) queryData(userID string) (sInfo *SubInfo) {
+	thls.Lock()
+	if subInfo, isSuccess := thls.M[userID]; isSuccess {
+		sInfo = subInfo
+	}
+	thls.Unlock()
+	return
 }
 
 func (thls *safeSubscriberMap) deleteByConn(conn *wsnet.WsSocket) {

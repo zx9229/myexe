@@ -133,6 +133,12 @@ func slice2msg(msgType txdata.MsgType, src []byte) (msgData ProtoMessage, err er
 		msgData = new(txdata.SubscribeReq)
 	case txdata.MsgType_ID_SubscribeRsp:
 		msgData = new(txdata.SubscribeRsp)
+	case txdata.MsgType_ID_PathwayInfo:
+		msgData = new(txdata.PathwayInfo)
+	case txdata.MsgType_ID_QrySubscribeReq:
+		msgData = new(txdata.QrySubscribeReq)
+	case txdata.MsgType_ID_QrySubscribeRsp:
+		msgData = new(txdata.QrySubscribeRsp)
 	default:
 		msgData = nil
 		err = fmt.Errorf("unknown txdata.MsgType(%v)", msgType)

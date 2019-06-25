@@ -72,6 +72,7 @@ type businessNode struct {
 	cAQZXJG     *safeSynchCacheRoot //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
 	cachePush   *safePushCache
 	cacheSub    *safeSubscriberMap
+	testInfo    *txdata.PathwayInfo
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -253,14 +254,7 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 		}
 	}
 	glog.Warningf("[onDisconnected] msgConn=%p, err=%v", msgConn, err)
-	if thls.parentInfo.conn == msgConn {
-		//如果与父亲断开连接,就清理父亲的数据,这样就不用sendDataToParent了.
-		glog.Infof("onDisconnected, disconnected with father, msgConn=%p", msgConn)
-		thls.parentInfo.setData(nil, nil, true)
-		if thls.rootOnline {
-			thls.setRootOnline(false)
-		}
-	}
+
 	if dataSlice := thls.cacheUser.deleteDataByConn(msgConn); dataSlice != nil { //儿子和我断开连接,我要清理掉儿子和孙子的缓存.
 		checkSunWhenDisconnected(dataSlice)
 		for _, data := range dataSlice { //发给父亲,让父亲也清理掉对应的缓存.
@@ -268,9 +262,21 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 			thls.sendData(thls.parentInfo.conn, &tmpTxData)
 		}
 	}
-	//thls.deleteConnectionFromAll(msgConn, false)
+
 	thls.cacheSock.deleteData(msgConn)
 	thls.cacheSub.deleteByConn(msgConn)
+
+	if thls.parentInfo.conn == msgConn {
+		//如果与父亲断开连接,就清理父亲的数据,这样就不用sendDataToParent了.
+		glog.Infof("onDisconnected, disconnected with father, msgConn=%p", msgConn)
+		thls.parentInfo.setData(nil, nil, true)
+		if thls.rootOnline {
+			thls.setRootOnline(false)
+		}
+		//它和父亲断开连接了,它就成最顶层的节点了,它要发送路径信息.
+		thls.testInfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
+		thls.cacheUser.sendDataToSon(thls.testInfo)
+	}
 }
 
 //func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {
@@ -318,6 +324,8 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 		thls.handle_MsgType_ID_OnlineNotice(txMsgData.(*txdata.OnlineNotice), msgConn)
 	case txdata.MsgType_ID_SystemReport:
 		thls.handle_MsgType_ID_SystemReport(txMsgData.(*txdata.SystemReport), msgConn)
+	case txdata.MsgType_ID_PathwayInfo:
+		thls.handle_MsgType_ID_PathwayInfo(txMsgData.(*txdata.PathwayInfo), msgConn)
 	default:
 		glog.Errorf("onMessage, unknown txdata.MsgType, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 	}
@@ -610,6 +618,11 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq(msgData *txdata.ConnectRe
 		msgData.Pathway = append(msgData.Pathway, thls.ownInfo.UserID)
 		thls.sendData(thls.parentInfo.conn, msgData)
 	}
+	if sendToParent && thls.parentInfo.conn == nil {
+		//它就成最顶层的节点了,它要发送路径信息.
+		thls.testInfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
+		thls.cacheUser.sendDataToSon(thls.testInfo)
+	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne(msgData *txdata.ConnectReq, msgConn *wsnet.WsSocket, rspData *txdata.ConnectRsp) (sendToParent bool) {
@@ -820,6 +833,15 @@ func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemR
 	} else {
 		thls.sendData(thls.parentInfo.conn, msgData)
 	}
+}
+
+func (thls *businessNode) handle_MsgType_ID_PathwayInfo(msgData *txdata.PathwayInfo, msgConn *wsnet.WsSocket) {
+	if msgConn != thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
+		glog.Errorf("recv SystemReport from father, msgConn=%p, msgData=%v", msgConn, msgData)
+		return
+	}
+	thls.testInfo = msgData
+	thls.cacheUser.sendDataToSon(msgData)
 }
 
 func (thls *businessNode) genAck4Common2Req(dataReq *txdata.Common2Req) (dataAck *txdata.Common2Ack) {
@@ -1088,6 +1110,8 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 		thls.execute_MsgType_ID_PushItem(objData.(*txdata.PushItem), stream)
 	case txdata.MsgType_ID_SubscribeReq:
 		thls.execute_MsgType_ID_SubscribeReq(objData.(*txdata.SubscribeReq), stream, reqData, msgConn)
+	case txdata.MsgType_ID_QrySubscribeReq:
+		thls.execute_MsgType_ID_QrySubscribeReq(objData.(*txdata.QrySubscribeReq), stream, reqData, msgConn)
 	default:
 		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
 			//TODO:报警.
@@ -1119,6 +1143,25 @@ func (thls *businessNode) execute_MsgType_ID_SubscribeReq(reqData *txdata.Subscr
 		rsp.ErrMsg = "maybe already sub"
 	}
 	stream.sendData(rsp, true)
+}
+
+func (thls *businessNode) execute_MsgType_ID_QrySubscribeReq(reqData *txdata.QrySubscribeReq, stream CommonRspWrapper, c1req *txdata.Common1Req, conn *wsnet.WsSocket) {
+	sInfo := thls.cacheSub.queryData(c1req.SenderID)
+	if sInfo != nil {
+		rsp := txdata.QrySubscribeRsp{}
+		rsp.SubTime, _ = ptypes.TimestampProto(sInfo.subTime)
+		rsp.UserID = sInfo.userID
+		rsp.NodeID = sInfo.nodeID
+		rsp.ToRoot = sInfo.toRoot
+		rsp.IsLog = sInfo.isLog
+		rsp.IsPush = sInfo.isPush
+		stream.sendData(&rsp, true)
+	} else {
+		rsp := txdata.CommonErr{}
+		rsp.ErrNo = 1
+		rsp.ErrMsg = "not_subscribe"
+		stream.sendData(&rsp, true)
+	}
 }
 
 func (thls *businessNode) execute_MsgType_ID_PushItem(reqData *txdata.PushItem, stream CommonRspWrapper) {

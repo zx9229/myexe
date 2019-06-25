@@ -140,3 +140,21 @@ func (thls *safeConnInfoMap) tmpF1() (data map[string]*txdata.ConnectReq) {
 	thls.Unlock()
 	return
 }
+
+func (thls *safeConnInfoMap) toPathwayInfo(uid string) (msgData *txdata.PathwayInfo) {
+	msgData = &txdata.PathwayInfo{}
+	msgData.UserID = uid
+	msgData.Info = make(map[string]*txdata.PathwayInfo_Pathway)
+	toPath := func(ciEx *connInfoEx) *txdata.PathwayInfo_Pathway {
+		tmpPath := &txdata.PathwayInfo_Pathway{}
+		tmpPath.Data = append([]string{uid}, ciEx.Pathway...)
+		return tmpPath
+	}
+	msgData.Info[uid] = &txdata.PathwayInfo_Pathway{Data: []string{uid}}
+	thls.Lock()
+	for k, v := range thls.M {
+		msgData.Info[k] = toPath(v)
+	}
+	thls.Unlock()
+	return
+}
