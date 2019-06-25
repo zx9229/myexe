@@ -181,6 +181,16 @@ class PathwayInfoDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<PathwayInfo>
       _instance;
 } _PathwayInfo_default_instance_;
+class QrySubscribeReqDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<QrySubscribeReq>
+      _instance;
+} _QrySubscribeReq_default_instance_;
+class QrySubscribeRspDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<QrySubscribeRsp>
+      _instance;
+} _QrySubscribeRsp_default_instance_;
 }  // namespace txdata
 namespace protobuf_txdata_2eproto {
 static void InitDefaultsUniKey() {
@@ -616,6 +626,35 @@ static void InitDefaultsPathwayInfo() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsPathwayInfo}, {
       &protobuf_txdata_2eproto::scc_info_PathwayInfo_InfoEntry_DoNotUse.base,}};
 
+static void InitDefaultsQrySubscribeReq() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_QrySubscribeReq_default_instance_;
+    new (ptr) ::txdata::QrySubscribeReq();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::txdata::QrySubscribeReq::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_QrySubscribeReq =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsQrySubscribeReq}, {}};
+
+static void InitDefaultsQrySubscribeRsp() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::txdata::_QrySubscribeRsp_default_instance_;
+    new (ptr) ::txdata::QrySubscribeRsp();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::txdata::QrySubscribeRsp::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_QrySubscribeRsp =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsQrySubscribeRsp}, {
+      &protobuf_google_2fprotobuf_2ftimestamp_2eproto::scc_info_Timestamp.base,}};
+
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_UniKey.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Common1Req.base);
@@ -647,9 +686,11 @@ void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo_Pathway.base);
   ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo_InfoEntry_DoNotUse.base);
   ::google::protobuf::internal::InitSCC(&scc_info_PathwayInfo.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_QrySubscribeReq.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_QrySubscribeRsp.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[30];
+::google::protobuf::Metadata file_level_metadata[32];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[2];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -933,6 +974,22 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo, userid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::PathwayInfo, info_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeReq, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, subtime_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, userid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, nodeid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, toroot_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, islog_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::txdata::QrySubscribeRsp, ispush_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::txdata::UniKey)},
@@ -965,6 +1022,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 258, -1, sizeof(::txdata::PathwayInfo_Pathway)},
   { 264, 271, sizeof(::txdata::PathwayInfo_InfoEntry_DoNotUse)},
   { 273, -1, sizeof(::txdata::PathwayInfo)},
+  { 280, -1, sizeof(::txdata::QrySubscribeReq)},
+  { 285, -1, sizeof(::txdata::QrySubscribeRsp)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -998,6 +1057,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_Pathway_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_InfoEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_PathwayInfo_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_QrySubscribeReq_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::txdata::_QrySubscribeRsp_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -1015,7 +1076,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 30);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 32);
 }
 
 void AddDescriptorsImpl() {
@@ -1098,24 +1159,29 @@ void AddDescriptorsImpl() {
       "rID\030\001 \001(\t\022+\n\004Info\030\002 \003(\0132\035.txdata.Pathway"
       "Info.InfoEntry\032\027\n\007Pathway\022\014\n\004Data\030\001 \003(\t\032"
       "H\n\tInfoEntry\022\013\n\003key\030\001 \001(\t\022*\n\005value\030\002 \001(\013"
-      "2\033.txdata.PathwayInfo.Pathway:\0028\001*\232\004\n\007Ms"
-      "gType\022\t\n\005Zero1\020\000\022\021\n\rID_Common1Req\020\001\022\021\n\rI"
-      "D_Common1Rsp\020\002\022\021\n\rID_Common2Req\020\003\022\021\n\rID_"
-      "Common2Rsp\020\004\022\021\n\rID_Common2Ack\020\005\022\020\n\014ID_Co"
-      "mmonErr\020\006\022\025\n\021ID_ConnectionInfo\020\007\022\027\n\023ID_D"
-      "isconnectedData\020\010\022\021\n\rID_ConnectReq\020\t\022\021\n\r"
-      "ID_ConnectRsp\020\n\022\023\n\017ID_OnlineNotice\020\013\022\023\n\017"
-      "ID_SystemReport\020\014\022\017\n\013ID_EchoItem\020\r\022\016\n\nID"
-      "_BinItem\020\016\022\020\n\014ID_EmailItem\020\017\022\025\n\021ID_QryCo"
-      "nnInfoReq\020\020\022\025\n\021ID_QryConnInfoRsp\020\021\022\025\n\021ID"
-      "_QueryRecordReq\020\022\022\025\n\021ID_QueryRecordRsp\020\023"
-      "\022\021\n\rID_ExecCmdReq\020\024\022\021\n\rID_ExecCmdRsp\020\025\022\017"
-      "\n\013ID_PushWrap\020\026\022\017\n\013ID_PushItem\020\027\022\023\n\017ID_S"
-      "ubscribeReq\020\030\022\023\n\017ID_SubscribeRsp\020\031\022\022\n\016ID"
-      "_PathwayInfo\020\032P\000b\006proto3"
+      "2\033.txdata.PathwayInfo.Pathway:\0028\001\"\021\n\017Qry"
+      "SubscribeReq\"\215\001\n\017QrySubscribeRsp\022+\n\007SubT"
+      "ime\030\001 \001(\0132\032.google.protobuf.Timestamp\022\016\n"
+      "\006UserID\030\002 \001(\t\022\016\n\006NodeID\030\003 \001(\t\022\016\n\006ToRoot\030"
+      "\004 \001(\010\022\r\n\005IsLog\030\005 \001(\010\022\016\n\006IsPush\030\006 \001(\010*\312\004\n"
+      "\007MsgType\022\t\n\005Zero1\020\000\022\021\n\rID_Common1Req\020\001\022\021"
+      "\n\rID_Common1Rsp\020\002\022\021\n\rID_Common2Req\020\003\022\021\n\r"
+      "ID_Common2Rsp\020\004\022\021\n\rID_Common2Ack\020\005\022\020\n\014ID"
+      "_CommonErr\020\006\022\025\n\021ID_ConnectionInfo\020\007\022\027\n\023I"
+      "D_DisconnectedData\020\010\022\021\n\rID_ConnectReq\020\t\022"
+      "\021\n\rID_ConnectRsp\020\n\022\023\n\017ID_OnlineNotice\020\013\022"
+      "\023\n\017ID_SystemReport\020\014\022\017\n\013ID_EchoItem\020\r\022\016\n"
+      "\nID_BinItem\020\016\022\020\n\014ID_EmailItem\020\017\022\025\n\021ID_Qr"
+      "yConnInfoReq\020\020\022\025\n\021ID_QryConnInfoRsp\020\021\022\025\n"
+      "\021ID_QueryRecordReq\020\022\022\025\n\021ID_QueryRecordRs"
+      "p\020\023\022\021\n\rID_ExecCmdReq\020\024\022\021\n\rID_ExecCmdRsp\020"
+      "\025\022\017\n\013ID_PushWrap\020\026\022\017\n\013ID_PushItem\020\027\022\023\n\017I"
+      "D_SubscribeReq\020\030\022\023\n\017ID_SubscribeRsp\020\031\022\022\n"
+      "\016ID_PathwayInfo\020\032\022\026\n\022ID_QrySubscribeReq\020"
+      "\033\022\026\n\022ID_QrySubscribeRsp\020\034P\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3664);
+      descriptor, 3875);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "txdata.proto", &protobuf_RegisterTypes);
   ::protobuf_google_2fprotobuf_2ftimestamp_2eproto::AddDescriptors();
@@ -1189,6 +1255,8 @@ bool MsgType_IsValid(int value) {
     case 24:
     case 25:
     case 26:
+    case 27:
+    case 28:
       return true;
     default:
       return false;
@@ -12294,6 +12362,651 @@ void PathwayInfo::InternalSwap(PathwayInfo* other) {
 }
 
 
+// ===================================================================
+
+void QrySubscribeReq::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+QrySubscribeReq::QrySubscribeReq()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_txdata_2eproto::scc_info_QrySubscribeReq.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:txdata.QrySubscribeReq)
+}
+QrySubscribeReq::QrySubscribeReq(const QrySubscribeReq& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:txdata.QrySubscribeReq)
+}
+
+void QrySubscribeReq::SharedCtor() {
+}
+
+QrySubscribeReq::~QrySubscribeReq() {
+  // @@protoc_insertion_point(destructor:txdata.QrySubscribeReq)
+  SharedDtor();
+}
+
+void QrySubscribeReq::SharedDtor() {
+}
+
+void QrySubscribeReq::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* QrySubscribeReq::descriptor() {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const QrySubscribeReq& QrySubscribeReq::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_txdata_2eproto::scc_info_QrySubscribeReq.base);
+  return *internal_default_instance();
+}
+
+
+void QrySubscribeReq::Clear() {
+// @@protoc_insertion_point(message_clear_start:txdata.QrySubscribeReq)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+bool QrySubscribeReq::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:txdata.QrySubscribeReq)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:txdata.QrySubscribeReq)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:txdata.QrySubscribeReq)
+  return false;
+#undef DO_
+}
+
+void QrySubscribeReq::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:txdata.QrySubscribeReq)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:txdata.QrySubscribeReq)
+}
+
+::google::protobuf::uint8* QrySubscribeReq::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:txdata.QrySubscribeReq)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:txdata.QrySubscribeReq)
+  return target;
+}
+
+size_t QrySubscribeReq::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:txdata.QrySubscribeReq)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void QrySubscribeReq::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:txdata.QrySubscribeReq)
+  GOOGLE_DCHECK_NE(&from, this);
+  const QrySubscribeReq* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const QrySubscribeReq>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:txdata.QrySubscribeReq)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:txdata.QrySubscribeReq)
+    MergeFrom(*source);
+  }
+}
+
+void QrySubscribeReq::MergeFrom(const QrySubscribeReq& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:txdata.QrySubscribeReq)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void QrySubscribeReq::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:txdata.QrySubscribeReq)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void QrySubscribeReq::CopyFrom(const QrySubscribeReq& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:txdata.QrySubscribeReq)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool QrySubscribeReq::IsInitialized() const {
+  return true;
+}
+
+void QrySubscribeReq::Swap(QrySubscribeReq* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void QrySubscribeReq::InternalSwap(QrySubscribeReq* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata QrySubscribeReq::GetMetadata() const {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void QrySubscribeRsp::InitAsDefaultInstance() {
+  ::txdata::_QrySubscribeRsp_default_instance_._instance.get_mutable()->subtime_ = const_cast< ::google::protobuf::Timestamp*>(
+      ::google::protobuf::Timestamp::internal_default_instance());
+}
+void QrySubscribeRsp::clear_subtime() {
+  if (GetArenaNoVirtual() == NULL && subtime_ != NULL) {
+    delete subtime_;
+  }
+  subtime_ = NULL;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int QrySubscribeRsp::kSubTimeFieldNumber;
+const int QrySubscribeRsp::kUserIDFieldNumber;
+const int QrySubscribeRsp::kNodeIDFieldNumber;
+const int QrySubscribeRsp::kToRootFieldNumber;
+const int QrySubscribeRsp::kIsLogFieldNumber;
+const int QrySubscribeRsp::kIsPushFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+QrySubscribeRsp::QrySubscribeRsp()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_txdata_2eproto::scc_info_QrySubscribeRsp.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:txdata.QrySubscribeRsp)
+}
+QrySubscribeRsp::QrySubscribeRsp(const QrySubscribeRsp& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.userid().size() > 0) {
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
+  }
+  nodeid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.nodeid().size() > 0) {
+    nodeid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.nodeid_);
+  }
+  if (from.has_subtime()) {
+    subtime_ = new ::google::protobuf::Timestamp(*from.subtime_);
+  } else {
+    subtime_ = NULL;
+  }
+  ::memcpy(&toroot_, &from.toroot_,
+    static_cast<size_t>(reinterpret_cast<char*>(&ispush_) -
+    reinterpret_cast<char*>(&toroot_)) + sizeof(ispush_));
+  // @@protoc_insertion_point(copy_constructor:txdata.QrySubscribeRsp)
+}
+
+void QrySubscribeRsp::SharedCtor() {
+  userid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  nodeid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&subtime_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&ispush_) -
+      reinterpret_cast<char*>(&subtime_)) + sizeof(ispush_));
+}
+
+QrySubscribeRsp::~QrySubscribeRsp() {
+  // @@protoc_insertion_point(destructor:txdata.QrySubscribeRsp)
+  SharedDtor();
+}
+
+void QrySubscribeRsp::SharedDtor() {
+  userid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  nodeid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete subtime_;
+}
+
+void QrySubscribeRsp::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* QrySubscribeRsp::descriptor() {
+  ::protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const QrySubscribeRsp& QrySubscribeRsp::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_txdata_2eproto::scc_info_QrySubscribeRsp.base);
+  return *internal_default_instance();
+}
+
+
+void QrySubscribeRsp::Clear() {
+// @@protoc_insertion_point(message_clear_start:txdata.QrySubscribeRsp)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  nodeid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == NULL && subtime_ != NULL) {
+    delete subtime_;
+  }
+  subtime_ = NULL;
+  ::memset(&toroot_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&ispush_) -
+      reinterpret_cast<char*>(&toroot_)) + sizeof(ispush_));
+  _internal_metadata_.Clear();
+}
+
+bool QrySubscribeRsp::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:txdata.QrySubscribeRsp)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .google.protobuf.Timestamp SubTime = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_subtime()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string UserID = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_userid()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->userid().data(), static_cast<int>(this->userid().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.QrySubscribeRsp.UserID"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string NodeID = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_nodeid()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->nodeid().data(), static_cast<int>(this->nodeid().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "txdata.QrySubscribeRsp.NodeID"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // bool ToRoot = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &toroot_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // bool IsLog = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &islog_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // bool IsPush = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &ispush_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:txdata.QrySubscribeRsp)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:txdata.QrySubscribeRsp)
+  return false;
+#undef DO_
+}
+
+void QrySubscribeRsp::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:txdata.QrySubscribeRsp)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .google.protobuf.Timestamp SubTime = 1;
+  if (this->has_subtime()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->_internal_subtime(), output);
+  }
+
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->userid().data(), static_cast<int>(this->userid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.QrySubscribeRsp.UserID");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->userid(), output);
+  }
+
+  // string NodeID = 3;
+  if (this->nodeid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->nodeid().data(), static_cast<int>(this->nodeid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.QrySubscribeRsp.NodeID");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->nodeid(), output);
+  }
+
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->toroot(), output);
+  }
+
+  // bool IsLog = 5;
+  if (this->islog() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->islog(), output);
+  }
+
+  // bool IsPush = 6;
+  if (this->ispush() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->ispush(), output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:txdata.QrySubscribeRsp)
+}
+
+::google::protobuf::uint8* QrySubscribeRsp::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:txdata.QrySubscribeRsp)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .google.protobuf.Timestamp SubTime = 1;
+  if (this->has_subtime()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, this->_internal_subtime(), deterministic, target);
+  }
+
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->userid().data(), static_cast<int>(this->userid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.QrySubscribeRsp.UserID");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->userid(), target);
+  }
+
+  // string NodeID = 3;
+  if (this->nodeid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->nodeid().data(), static_cast<int>(this->nodeid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "txdata.QrySubscribeRsp.NodeID");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->nodeid(), target);
+  }
+
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->toroot(), target);
+  }
+
+  // bool IsLog = 5;
+  if (this->islog() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->islog(), target);
+  }
+
+  // bool IsPush = 6;
+  if (this->ispush() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->ispush(), target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:txdata.QrySubscribeRsp)
+  return target;
+}
+
+size_t QrySubscribeRsp::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:txdata.QrySubscribeRsp)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // string UserID = 2;
+  if (this->userid().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->userid());
+  }
+
+  // string NodeID = 3;
+  if (this->nodeid().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->nodeid());
+  }
+
+  // .google.protobuf.Timestamp SubTime = 1;
+  if (this->has_subtime()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *subtime_);
+  }
+
+  // bool ToRoot = 4;
+  if (this->toroot() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool IsLog = 5;
+  if (this->islog() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool IsPush = 6;
+  if (this->ispush() != 0) {
+    total_size += 1 + 1;
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void QrySubscribeRsp::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:txdata.QrySubscribeRsp)
+  GOOGLE_DCHECK_NE(&from, this);
+  const QrySubscribeRsp* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const QrySubscribeRsp>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:txdata.QrySubscribeRsp)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:txdata.QrySubscribeRsp)
+    MergeFrom(*source);
+  }
+}
+
+void QrySubscribeRsp::MergeFrom(const QrySubscribeRsp& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:txdata.QrySubscribeRsp)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.userid().size() > 0) {
+
+    userid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.userid_);
+  }
+  if (from.nodeid().size() > 0) {
+
+    nodeid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.nodeid_);
+  }
+  if (from.has_subtime()) {
+    mutable_subtime()->::google::protobuf::Timestamp::MergeFrom(from.subtime());
+  }
+  if (from.toroot() != 0) {
+    set_toroot(from.toroot());
+  }
+  if (from.islog() != 0) {
+    set_islog(from.islog());
+  }
+  if (from.ispush() != 0) {
+    set_ispush(from.ispush());
+  }
+}
+
+void QrySubscribeRsp::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:txdata.QrySubscribeRsp)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void QrySubscribeRsp::CopyFrom(const QrySubscribeRsp& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:txdata.QrySubscribeRsp)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool QrySubscribeRsp::IsInitialized() const {
+  return true;
+}
+
+void QrySubscribeRsp::Swap(QrySubscribeRsp* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void QrySubscribeRsp::InternalSwap(QrySubscribeRsp* other) {
+  using std::swap;
+  userid_.Swap(&other->userid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  nodeid_.Swap(&other->nodeid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(subtime_, other->subtime_);
+  swap(toroot_, other->toroot_);
+  swap(islog_, other->islog_);
+  swap(ispush_, other->ispush_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata QrySubscribeRsp::GetMetadata() const {
+  protobuf_txdata_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_txdata_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace txdata
 namespace google {
@@ -12387,6 +13100,12 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::PathwayInfo_InfoEntry_Do
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::PathwayInfo* Arena::CreateMaybeMessage< ::txdata::PathwayInfo >(Arena* arena) {
   return Arena::CreateInternal< ::txdata::PathwayInfo >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::QrySubscribeReq* Arena::CreateMaybeMessage< ::txdata::QrySubscribeReq >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::QrySubscribeReq >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::txdata::QrySubscribeRsp* Arena::CreateMaybeMessage< ::txdata::QrySubscribeRsp >(Arena* arena) {
+  return Arena::CreateInternal< ::txdata::QrySubscribeRsp >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

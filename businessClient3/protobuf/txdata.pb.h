@@ -43,7 +43,7 @@ namespace protobuf_txdata_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[30];
+  static const ::google::protobuf::internal::ParseTable schema[32];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -123,6 +123,12 @@ extern QryConnInfoRspDefaultTypeInternal _QryConnInfoRsp_default_instance_;
 class QryConnInfoRsp_CacheEntry_DoNotUse;
 class QryConnInfoRsp_CacheEntry_DoNotUseDefaultTypeInternal;
 extern QryConnInfoRsp_CacheEntry_DoNotUseDefaultTypeInternal _QryConnInfoRsp_CacheEntry_DoNotUse_default_instance_;
+class QrySubscribeReq;
+class QrySubscribeReqDefaultTypeInternal;
+extern QrySubscribeReqDefaultTypeInternal _QrySubscribeReq_default_instance_;
+class QrySubscribeRsp;
+class QrySubscribeRspDefaultTypeInternal;
+extern QrySubscribeRspDefaultTypeInternal _QrySubscribeRsp_default_instance_;
 class QueryRecordReq;
 class QueryRecordReqDefaultTypeInternal;
 extern QueryRecordReqDefaultTypeInternal _QueryRecordReq_default_instance_;
@@ -168,6 +174,8 @@ template<> ::txdata::PushWrap* Arena::CreateMaybeMessage<::txdata::PushWrap>(Are
 template<> ::txdata::QryConnInfoReq* Arena::CreateMaybeMessage<::txdata::QryConnInfoReq>(Arena*);
 template<> ::txdata::QryConnInfoRsp* Arena::CreateMaybeMessage<::txdata::QryConnInfoRsp>(Arena*);
 template<> ::txdata::QryConnInfoRsp_CacheEntry_DoNotUse* Arena::CreateMaybeMessage<::txdata::QryConnInfoRsp_CacheEntry_DoNotUse>(Arena*);
+template<> ::txdata::QrySubscribeReq* Arena::CreateMaybeMessage<::txdata::QrySubscribeReq>(Arena*);
+template<> ::txdata::QrySubscribeRsp* Arena::CreateMaybeMessage<::txdata::QrySubscribeRsp>(Arena*);
 template<> ::txdata::QueryRecordReq* Arena::CreateMaybeMessage<::txdata::QueryRecordReq>(Arena*);
 template<> ::txdata::QueryRecordRsp* Arena::CreateMaybeMessage<::txdata::QueryRecordRsp>(Arena*);
 template<> ::txdata::SubscribeReq* Arena::CreateMaybeMessage<::txdata::SubscribeReq>(Arena*);
@@ -228,12 +236,14 @@ enum MsgType {
   ID_SubscribeReq = 24,
   ID_SubscribeRsp = 25,
   ID_PathwayInfo = 26,
+  ID_QrySubscribeReq = 27,
+  ID_QrySubscribeRsp = 28,
   MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool MsgType_IsValid(int value);
 const MsgType MsgType_MIN = Zero1;
-const MsgType MsgType_MAX = ID_PathwayInfo;
+const MsgType MsgType_MAX = ID_QrySubscribeRsp;
 const int MsgType_ARRAYSIZE = MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MsgType_descriptor();
@@ -4421,6 +4431,262 @@ class PathwayInfo : public ::google::protobuf::Message /* @@protoc_insertion_poi
       ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
       0 > info_;
   ::google::protobuf::internal::ArenaStringPtr userid_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class QrySubscribeReq : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.QrySubscribeReq) */ {
+ public:
+  QrySubscribeReq();
+  virtual ~QrySubscribeReq();
+
+  QrySubscribeReq(const QrySubscribeReq& from);
+
+  inline QrySubscribeReq& operator=(const QrySubscribeReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  QrySubscribeReq(QrySubscribeReq&& from) noexcept
+    : QrySubscribeReq() {
+    *this = ::std::move(from);
+  }
+
+  inline QrySubscribeReq& operator=(QrySubscribeReq&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const QrySubscribeReq& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const QrySubscribeReq* internal_default_instance() {
+    return reinterpret_cast<const QrySubscribeReq*>(
+               &_QrySubscribeReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    30;
+
+  void Swap(QrySubscribeReq* other);
+  friend void swap(QrySubscribeReq& a, QrySubscribeReq& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline QrySubscribeReq* New() const final {
+    return CreateMaybeMessage<QrySubscribeReq>(NULL);
+  }
+
+  QrySubscribeReq* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<QrySubscribeReq>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const QrySubscribeReq& from);
+  void MergeFrom(const QrySubscribeReq& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(QrySubscribeReq* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:txdata.QrySubscribeReq)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::protobuf_txdata_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class QrySubscribeRsp : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:txdata.QrySubscribeRsp) */ {
+ public:
+  QrySubscribeRsp();
+  virtual ~QrySubscribeRsp();
+
+  QrySubscribeRsp(const QrySubscribeRsp& from);
+
+  inline QrySubscribeRsp& operator=(const QrySubscribeRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  QrySubscribeRsp(QrySubscribeRsp&& from) noexcept
+    : QrySubscribeRsp() {
+    *this = ::std::move(from);
+  }
+
+  inline QrySubscribeRsp& operator=(QrySubscribeRsp&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const QrySubscribeRsp& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const QrySubscribeRsp* internal_default_instance() {
+    return reinterpret_cast<const QrySubscribeRsp*>(
+               &_QrySubscribeRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    31;
+
+  void Swap(QrySubscribeRsp* other);
+  friend void swap(QrySubscribeRsp& a, QrySubscribeRsp& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline QrySubscribeRsp* New() const final {
+    return CreateMaybeMessage<QrySubscribeRsp>(NULL);
+  }
+
+  QrySubscribeRsp* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<QrySubscribeRsp>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const QrySubscribeRsp& from);
+  void MergeFrom(const QrySubscribeRsp& from);
+  void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(QrySubscribeRsp* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string UserID = 2;
+  void clear_userid();
+  static const int kUserIDFieldNumber = 2;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_userid(::std::string&& value);
+  #endif
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
+
+  // string NodeID = 3;
+  void clear_nodeid();
+  static const int kNodeIDFieldNumber = 3;
+  const ::std::string& nodeid() const;
+  void set_nodeid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_nodeid(::std::string&& value);
+  #endif
+  void set_nodeid(const char* value);
+  void set_nodeid(const char* value, size_t size);
+  ::std::string* mutable_nodeid();
+  ::std::string* release_nodeid();
+  void set_allocated_nodeid(::std::string* nodeid);
+
+  // .google.protobuf.Timestamp SubTime = 1;
+  bool has_subtime() const;
+  void clear_subtime();
+  static const int kSubTimeFieldNumber = 1;
+  private:
+  const ::google::protobuf::Timestamp& _internal_subtime() const;
+  public:
+  const ::google::protobuf::Timestamp& subtime() const;
+  ::google::protobuf::Timestamp* release_subtime();
+  ::google::protobuf::Timestamp* mutable_subtime();
+  void set_allocated_subtime(::google::protobuf::Timestamp* subtime);
+
+  // bool ToRoot = 4;
+  void clear_toroot();
+  static const int kToRootFieldNumber = 4;
+  bool toroot() const;
+  void set_toroot(bool value);
+
+  // bool IsLog = 5;
+  void clear_islog();
+  static const int kIsLogFieldNumber = 5;
+  bool islog() const;
+  void set_islog(bool value);
+
+  // bool IsPush = 6;
+  void clear_ispush();
+  static const int kIsPushFieldNumber = 6;
+  bool ispush() const;
+  void set_ispush(bool value);
+
+  // @@protoc_insertion_point(class_scope:txdata.QrySubscribeRsp)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
+  ::google::protobuf::internal::ArenaStringPtr nodeid_;
+  ::google::protobuf::Timestamp* subtime_;
+  bool toroot_;
+  bool islog_;
+  bool ispush_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_txdata_2eproto::TableStruct;
 };
@@ -8881,9 +9147,218 @@ PathwayInfo::mutable_info() {
   return info_.MutableMap();
 }
 
+// -------------------------------------------------------------------
+
+// QrySubscribeReq
+
+// -------------------------------------------------------------------
+
+// QrySubscribeRsp
+
+// .google.protobuf.Timestamp SubTime = 1;
+inline bool QrySubscribeRsp::has_subtime() const {
+  return this != internal_default_instance() && subtime_ != NULL;
+}
+inline const ::google::protobuf::Timestamp& QrySubscribeRsp::_internal_subtime() const {
+  return *subtime_;
+}
+inline const ::google::protobuf::Timestamp& QrySubscribeRsp::subtime() const {
+  const ::google::protobuf::Timestamp* p = subtime_;
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.SubTime)
+  return p != NULL ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* QrySubscribeRsp::release_subtime() {
+  // @@protoc_insertion_point(field_release:txdata.QrySubscribeRsp.SubTime)
+  
+  ::google::protobuf::Timestamp* temp = subtime_;
+  subtime_ = NULL;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* QrySubscribeRsp::mutable_subtime() {
+  
+  if (subtime_ == NULL) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    subtime_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:txdata.QrySubscribeRsp.SubTime)
+  return subtime_;
+}
+inline void QrySubscribeRsp::set_allocated_subtime(::google::protobuf::Timestamp* subtime) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(subtime_);
+  }
+  if (subtime) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(subtime)->GetArena();
+    if (message_arena != submessage_arena) {
+      subtime = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, subtime, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  subtime_ = subtime;
+  // @@protoc_insertion_point(field_set_allocated:txdata.QrySubscribeRsp.SubTime)
+}
+
+// string UserID = 2;
+inline void QrySubscribeRsp::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& QrySubscribeRsp::userid() const {
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.UserID)
+  return userid_.GetNoArena();
+}
+inline void QrySubscribeRsp::set_userid(const ::std::string& value) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.QrySubscribeRsp.UserID)
+}
+#if LANG_CXX11
+inline void QrySubscribeRsp::set_userid(::std::string&& value) {
+  
+  userid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.QrySubscribeRsp.UserID)
+}
+#endif
+inline void QrySubscribeRsp::set_userid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.QrySubscribeRsp.UserID)
+}
+inline void QrySubscribeRsp::set_userid(const char* value, size_t size) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.QrySubscribeRsp.UserID)
+}
+inline ::std::string* QrySubscribeRsp::mutable_userid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.QrySubscribeRsp.UserID)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* QrySubscribeRsp::release_userid() {
+  // @@protoc_insertion_point(field_release:txdata.QrySubscribeRsp.UserID)
+  
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void QrySubscribeRsp::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
+    
+  } else {
+    
+  }
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.QrySubscribeRsp.UserID)
+}
+
+// string NodeID = 3;
+inline void QrySubscribeRsp::clear_nodeid() {
+  nodeid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& QrySubscribeRsp::nodeid() const {
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.NodeID)
+  return nodeid_.GetNoArena();
+}
+inline void QrySubscribeRsp::set_nodeid(const ::std::string& value) {
+  
+  nodeid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:txdata.QrySubscribeRsp.NodeID)
+}
+#if LANG_CXX11
+inline void QrySubscribeRsp::set_nodeid(::std::string&& value) {
+  
+  nodeid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:txdata.QrySubscribeRsp.NodeID)
+}
+#endif
+inline void QrySubscribeRsp::set_nodeid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  nodeid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:txdata.QrySubscribeRsp.NodeID)
+}
+inline void QrySubscribeRsp::set_nodeid(const char* value, size_t size) {
+  
+  nodeid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:txdata.QrySubscribeRsp.NodeID)
+}
+inline ::std::string* QrySubscribeRsp::mutable_nodeid() {
+  
+  // @@protoc_insertion_point(field_mutable:txdata.QrySubscribeRsp.NodeID)
+  return nodeid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* QrySubscribeRsp::release_nodeid() {
+  // @@protoc_insertion_point(field_release:txdata.QrySubscribeRsp.NodeID)
+  
+  return nodeid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void QrySubscribeRsp::set_allocated_nodeid(::std::string* nodeid) {
+  if (nodeid != NULL) {
+    
+  } else {
+    
+  }
+  nodeid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), nodeid);
+  // @@protoc_insertion_point(field_set_allocated:txdata.QrySubscribeRsp.NodeID)
+}
+
+// bool ToRoot = 4;
+inline void QrySubscribeRsp::clear_toroot() {
+  toroot_ = false;
+}
+inline bool QrySubscribeRsp::toroot() const {
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.ToRoot)
+  return toroot_;
+}
+inline void QrySubscribeRsp::set_toroot(bool value) {
+  
+  toroot_ = value;
+  // @@protoc_insertion_point(field_set:txdata.QrySubscribeRsp.ToRoot)
+}
+
+// bool IsLog = 5;
+inline void QrySubscribeRsp::clear_islog() {
+  islog_ = false;
+}
+inline bool QrySubscribeRsp::islog() const {
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.IsLog)
+  return islog_;
+}
+inline void QrySubscribeRsp::set_islog(bool value) {
+  
+  islog_ = value;
+  // @@protoc_insertion_point(field_set:txdata.QrySubscribeRsp.IsLog)
+}
+
+// bool IsPush = 6;
+inline void QrySubscribeRsp::clear_ispush() {
+  ispush_ = false;
+}
+inline bool QrySubscribeRsp::ispush() const {
+  // @@protoc_insertion_point(field_get:txdata.QrySubscribeRsp.IsPush)
+  return ispush_;
+}
+inline void QrySubscribeRsp::set_ispush(bool value) {
+  
+  ispush_ = value;
+  // @@protoc_insertion_point(field_set:txdata.QrySubscribeRsp.IsPush)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

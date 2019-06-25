@@ -43,6 +43,7 @@ signals:
 private:
     void initDB();
     void initOwnInfo();
+    void initTypeToJson();
     QString toC1C2(int64_t msgNo, const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR& msgOut);
     QString sendCommon1Req(QSharedPointer<txdata::Common1Req> data);
     QString sendCommon2Req(QSharedPointer<txdata::Common2Req> data);
@@ -74,6 +75,7 @@ private:
     bool m_lastFind;
     QString m_subUser;
     SafeSynchCache m_cacheSync;
+    QMap<txdata::MsgType, QString> m_typeTOjson;
 };
 
 #endif // DATAEXCHANGER_H

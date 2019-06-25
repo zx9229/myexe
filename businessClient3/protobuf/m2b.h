@@ -145,6 +145,12 @@ public:
         case ::txdata::MsgType::ID_PathwayInfo:
             msgOut = QSharedPointer<txdata::PathwayInfo>(new txdata::PathwayInfo);
             break;
+        case ::txdata::MsgType::ID_QrySubscribeReq:
+            msgOut = QSharedPointer<txdata::QrySubscribeReq>(new txdata::QrySubscribeReq);
+            break;
+        case ::txdata::MsgType::ID_QrySubscribeRsp:
+            msgOut = QSharedPointer<txdata::QrySubscribeRsp>(new txdata::QrySubscribeRsp);
+            break;
         default:
             break;
         }

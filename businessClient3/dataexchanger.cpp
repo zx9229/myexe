@@ -61,6 +61,7 @@ DataExchanger::DataExchanger(QObject *parent) :
 
     initOwnInfo();
     initDB();
+    initTypeToJson();
 }
 
 DataExchanger::~DataExchanger()
@@ -231,12 +232,10 @@ QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText,
 QStringList DataExchanger::getTxMsgTypeNameList()
 {
     QStringList typeNameList;
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EchoItem));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_EmailItem));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_ExecCmdReq));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_QueryRecordReq));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_PushItem));
-    typeNameList << QString::fromStdString(::txdata::MsgType_Name(txdata::ID_SubscribeReq));
+    for (auto it = m_typeTOjson.begin(); it != m_typeTOjson.end(); ++it)
+    {
+        typeNameList << QString::fromStdString(::txdata::MsgType_Name(it.key()));
+    }
     return  typeNameList;
 }
 
@@ -244,28 +243,8 @@ QString DataExchanger::jsonExample(const QString& typeName)
 {
     txdata::MsgType msgType = txdata::MsgType::Zero1;
     txdata::MsgType_Parse(typeName.toStdString(), &msgType);
-    if (msgType == txdata::MsgType::ID_EchoItem)
-    {
-        txdata::EchoItem tmpObj;
-        tmpObj.set_data("DATA");
-        tmpObj.set_rspcnt(2);
-        tmpObj.set_secgap(0);
-        return zxtools::object2json(tmpObj);
-    }
-    if (msgType == txdata::MsgType::ID_PushItem)
-    {
-        txdata::PushItem tmpObj;
-        tmpObj.set_subject("Subject");
-        tmpObj.set_content("Content");
-        tmpObj.add_modes("tts");
-        return zxtools::object2json(tmpObj);
-    }
-    if (msgType == txdata::MsgType::ID_SubscribeReq)
-    {
-        txdata::SubscribeReq tmpObj;
-        return zxtools::object2json(tmpObj);
-    }
-    return "";
+    auto it = m_typeTOjson.find(msgType);
+    return (m_typeTOjson.end() == it) ? "" : it.value();
 }
 
 void DataExchanger::initDB()
@@ -304,6 +283,32 @@ void DataExchanger::initOwnInfo()
     m_ownInfo.set_exepid(static_cast<int>(QCoreApplication::applicationPid()));
     m_ownInfo.set_exepath(QCoreApplication::applicationFilePath().toStdString());
     m_ownInfo.set_remark("");
+}
+
+void DataExchanger::initTypeToJson()
+{
+    if (true) {
+        txdata::EchoItem tmpObj;
+        tmpObj.set_data("DATA");
+        tmpObj.set_rspcnt(2);
+        tmpObj.set_secgap(0);
+        m_typeTOjson[m2b::CalcMsgType(tmpObj)] = zxtools::object2json(tmpObj);
+    }
+    if (true) {
+        txdata::PushItem tmpObj;
+        tmpObj.set_subject("Subject");
+        tmpObj.set_content("Content");
+        tmpObj.add_modes("tts");
+        m_typeTOjson[m2b::CalcMsgType(tmpObj)] = zxtools::object2json(tmpObj);
+    }
+    if (true) {
+        txdata::SubscribeReq tmpObj;
+        m_typeTOjson[m2b::CalcMsgType(tmpObj)] = zxtools::object2json(tmpObj);
+    }
+    if (true) {
+        txdata::QrySubscribeReq tmpObj;
+        m_typeTOjson[m2b::CalcMsgType(tmpObj)] = zxtools::object2json(tmpObj);
+    }
 }
 
 QString DataExchanger::toC1C2(int64_t msgNo, const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, GPMSGPTR &msgOut)
