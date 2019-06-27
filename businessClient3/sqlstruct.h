@@ -412,6 +412,12 @@ public:
         isOk = query.exec();
         return isOk;
     }
+    static bool delete_data(QSqlQuery& query, const QString& whereCond)
+    {
+        QString sqlStr = QObject::tr("DELETE FROM %1").arg(static_table_name());
+        if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
+        return query.exec(sqlStr);
+    }
 };
 Q_DECLARE_METATYPE(CommonData);
 
@@ -507,6 +513,12 @@ public:
             dataOut.append(curData);
         }
         return true;
+    }
+    static bool delete_data(QSqlQuery& query, const QString& whereCond)
+    {
+        QString sqlStr = QObject::tr("DELETE FROM %1").arg(static_table_name());
+        if (!whereCond.isEmpty()) { sqlStr += " WHERE " + whereCond; }
+        return query.exec(sqlStr);
     }
 };
 Q_DECLARE_METATYPE(PushWrap);
