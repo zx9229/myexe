@@ -1,3 +1,5 @@
+#include <QGuiApplication>
+#include <QClipboard>
 #include <QSqlDatabase>
 #include "datawrapper.h"
 #include "myandroidcls.h"
@@ -209,33 +211,33 @@ QString DataWrapper::jsonExample(const QString & typeName)
     }
 }
 
-bool DataWrapper::deleteCommonData(const QString& userid, qint64 msgno)
+bool DataWrapper::deleteCommonData1(const QString& userid, qint64 msgno)
 {
     if (m_daExch)
     {
-        return m_daExch->deleteCommonData(userid, msgno);
+        return m_daExch->deleteCommonData1(userid, msgno);
     }
     else
     {
-        auto reply = m_client->deleteCommonData(userid, msgno);
+        auto reply = m_client->deleteCommonData1(userid, msgno);
         reply.waitForFinished();
         return reply.returnValue();
     }
 }
-bool DataWrapper::deleteCommonData2(const QString& userid, int64_t msgno, int seqno)
+bool DataWrapper::deleteCommonData2(const QString& userid, qint64 msgno, int seqno)
 {
     if (m_daExch)
     {
-        return m_daExch->deleteCommonData(userid, msgno, seqno);
+        return m_daExch->deleteCommonData2(userid, msgno, seqno);
     }
     else
     {
-        auto reply = m_client->deleteCommonData(userid, msgno, seqno);
+        auto reply = m_client->deleteCommonData2(userid, msgno, seqno);
         reply.waitForFinished();
         return reply.returnValue();
     }
 }
-bool DataWrapper::deletePushWrap(const QString& userid, const QString& peerid, int64_t msgno)
+bool DataWrapper::deletePushWrap(const QString& userid, const QString& peerid, qint64 msgno)
 {
     if (m_daExch)
     {
@@ -248,21 +250,21 @@ bool DataWrapper::deletePushWrap(const QString& userid, const QString& peerid, i
         return reply.returnValue();
     }
 }
-QString DataWrapper::serverStartTime()
+QString DataWrapper::serviceInfo()
 {
     if (m_daExch)
     {
-        return m_daExch->serverStartTime();
+        return m_daExch->serviceInfo();
     }
     else
     {
-        auto reply = m_client->serverStartTime();
+        auto reply = m_client->serviceInfo();
         reply.waitForFinished();
         return reply.returnValue();
     }
 }
 
-Q_INVOKABLE QString DataWrapper::remoteObjectState()
+QString DataWrapper::remoteObjectState()
 {
     QRemoteObjectReplica::State curState = QRemoteObjectReplica::Uninitialized;
     QMetaEnum metaEnum = QMetaEnum::fromType<QRemoteObjectReplica::State>();
@@ -273,12 +275,19 @@ Q_INVOKABLE QString DataWrapper::remoteObjectState()
     return metaEnum.valueToKey(curState);
 }
 
-Q_INVOKABLE void DataWrapper::startTheService()
+void DataWrapper::startTheService()
 {
     android_tool::startTheService();
 }
 
-Q_INVOKABLE void DataWrapper::ttsSpeak(const QString & text)
+void DataWrapper::copyText(const QString& text)
+{
+    QClipboard* clipboard = QGuiApplication::clipboard();//获取系统剪贴板指针.
+    //clipboard->text();//获取剪贴板上文本信息.
+    clipboard->setText(text,QClipboard::Mode::Clipboard);//设置剪贴板内容.
+}
+
+void DataWrapper::ttsSpeak(const QString & text)
 {
     MyTTS::staticSpeak(text);
 }

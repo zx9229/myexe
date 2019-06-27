@@ -11,6 +11,10 @@ class DataRO
     SLOT(QString sendReq(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB));
     SLOT(QStringList getTxMsgTypeNameList());
     SLOT(QString jsonExample(const QString& typeName));
+    SLOT(bool deleteCommonData1(const QString& userid, qint64 msgno));
+    SLOT(bool deleteCommonData2(const QString& userid, qint64 msgno, int seqno));
+    SLOT(bool deletePushWrap(const QString& userid, const QString& peerid, qint64 msgno));
+    SLOT(QString serviceInfo());
     SIGNAL(sigReady());
     SIGNAL(sigStatusError(const QString& errMessage, int errType));
     SIGNAL(sigTableChanged(const QString &tableName));
