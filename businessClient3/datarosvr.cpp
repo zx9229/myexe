@@ -60,3 +60,19 @@ QString DataROSvr::jsonExample(const QString & typeName)
 {
     return m_dataExch.jsonExample(typeName);
 }
+bool DataROSvr::deleteCommonData(const QString & userid, int64_t msgno)
+{
+    return m_dataExch.deleteCommonData(userid, msgno);
+}
+bool DataROSvr::deleteCommonData(const QString & userid, int64_t msgno, int seqno)
+{
+    return m_dataExch.deleteCommonData(userid, msgno, seqno);
+}
+bool DataROSvr::deletePushWrap(const QString & userid, const QString & peerid, int64_t msgno)
+{
+    return m_dataExch.deletePushWrap(userid, peerid, msgno);
+}
+QString DataROSvr::serverStartTime()
+{
+    return m_dataExch.serverStartTime();
+}

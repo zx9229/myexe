@@ -33,6 +33,10 @@ public:
     Q_INVOKABLE QString sendReq(const QString& typeName, const QString& jsonText, const QString& rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB);
     Q_INVOKABLE QStringList getTxMsgTypeNameList();
     Q_INVOKABLE QString jsonExample(const QString& typeName);
+    Q_INVOKABLE bool deleteCommonData(const QString& userid, int64_t msgno);
+    Q_INVOKABLE bool deleteCommonData(const QString& userid, int64_t msgno, int seqno);
+    Q_INVOKABLE bool deletePushWrap(const QString& userid, const QString& peerid, int64_t msgno);
+    Q_INVOKABLE QString serverStartTime();
 
 signals:
     void sigReady();
@@ -76,6 +80,7 @@ private:
     QString m_subUser;
     SafeSynchCache m_cacheSync;
     QMap<txdata::MsgType, QString> m_typeTOjson;
+    QDateTime m_startDateTime;
 };
 
 #endif // DATAEXCHANGER_H

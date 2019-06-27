@@ -209,6 +209,59 @@ QString DataWrapper::jsonExample(const QString & typeName)
     }
 }
 
+bool DataWrapper::deleteCommonData(const QString& userid, qint64 msgno)
+{
+    if (m_daExch)
+    {
+        return m_daExch->deleteCommonData(userid, msgno);
+    }
+    else
+    {
+        auto reply = m_client->deleteCommonData(userid, msgno);
+        reply.waitForFinished();
+        return reply.returnValue();
+    }
+}
+bool DataWrapper::deleteCommonData2(const QString& userid, int64_t msgno, int seqno)
+{
+    if (m_daExch)
+    {
+        return m_daExch->deleteCommonData(userid, msgno, seqno);
+    }
+    else
+    {
+        auto reply = m_client->deleteCommonData(userid, msgno, seqno);
+        reply.waitForFinished();
+        return reply.returnValue();
+    }
+}
+bool DataWrapper::deletePushWrap(const QString& userid, const QString& peerid, int64_t msgno)
+{
+    if (m_daExch)
+    {
+        return m_daExch->deletePushWrap(userid, peerid, msgno);
+    }
+    else
+    {
+        auto reply = m_client->deletePushWrap(userid, peerid, msgno);
+        reply.waitForFinished();
+        return reply.returnValue();
+    }
+}
+QString DataWrapper::serverStartTime()
+{
+    if (m_daExch)
+    {
+        return m_daExch->serverStartTime();
+    }
+    else
+    {
+        auto reply = m_client->serverStartTime();
+        reply.waitForFinished();
+        return reply.returnValue();
+    }
+}
+
 Q_INVOKABLE QString DataWrapper::remoteObjectState()
 {
     QRemoteObjectReplica::State curState = QRemoteObjectReplica::Uninitialized;

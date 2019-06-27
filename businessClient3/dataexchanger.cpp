@@ -62,6 +62,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     initOwnInfo();
     initDB();
     initTypeToJson();
+    m_startDateTime = QDateTime::currentDateTime();
 }
 
 DataExchanger::~DataExchanger()
@@ -245,6 +246,40 @@ QString DataExchanger::jsonExample(const QString& typeName)
     txdata::MsgType_Parse(typeName.toStdString(), &msgType);
     auto it = m_typeTOjson.find(msgType);
     return (m_typeTOjson.end() == it) ? "" : it.value();
+}
+
+bool DataExchanger::deleteCommonData(const QString& userid, int64_t msgno)
+{
+    QSqlQuery sqlQuery;
+    QString whereCond = QString("UserID='%1' AND MsgNo='%2'").arg(userid).arg(QString::number(msgno));
+    bool isOk = CommonData::delete_data(sqlQuery, whereCond);
+    if (isOk) { emit sigTableChanged(CommonData::static_table_name()); }
+    return isOk;
+}
+
+bool DataExchanger::deleteCommonData(const QString& userid, int64_t msgno, int seqno)
+{
+    QSqlQuery sqlQuery;
+    QString whereCond = QString("UserID='%1' AND MsgNo='%2' AND SeqNo='%3'").arg(userid).arg(QString::number(msgno)).arg(QString::number(seqno));
+    qDebug() << whereCond;
+    bool isOk = CommonData::delete_data(sqlQuery, whereCond);
+    if (isOk) { emit sigTableChanged(CommonData::static_table_name()); }
+    return isOk;
+}
+
+bool DataExchanger::deletePushWrap(const QString& userid, const QString& peerid, int64_t msgno)
+{
+    QSqlQuery sqlQuery;
+    QString whereCond = QString("UserID='%1' AND PeerID='%2' AND MsgNo='%3'").arg(userid).arg(peerid).arg(QString::number(msgno));
+    bool isOk = PushWrap::delete_data(sqlQuery, whereCond);
+    if (isOk) { emit sigTableChanged(CommonData::static_table_name()); }
+    return isOk;
+}
+
+QString DataExchanger::serverStartTime()
+{
+    return "";
+    //return m_startDateTime;
 }
 
 void DataExchanger::initDB()
