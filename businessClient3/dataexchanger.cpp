@@ -272,7 +272,7 @@ bool DataExchanger::deletePushWrap(const QString& userid, const QString& peerid,
     QSqlQuery sqlQuery;
     QString whereCond = QString("UserID='%1' AND PeerID='%2' AND MsgNo='%3'").arg(userid).arg(peerid).arg(QString::number(msgno));
     bool isOk = PushWrap::delete_data(sqlQuery, whereCond);
-    if (isOk) { emit sigTableChanged(CommonData::static_table_name()); }
+    if (isOk) { emit sigTableChanged(PushWrap::static_table_name()); }
     return isOk;
 }
 

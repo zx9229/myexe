@@ -266,23 +266,23 @@ void zxtools::PushWrap2PushWrap(PushWrap* dst, const txdata::PushWrap* src, cons
 bool zxtools::needTTS(const PushWrap* src, QString& text)
 {
     bool isTTS = false;
-    if(static_cast<txdata::MsgType>(src->PshType)==txdata::MsgType::ID_PushItem )
+    if (static_cast<txdata::MsgType>(src->PshType) == txdata::MsgType::ID_PushItem)
     {
         GPMSGPTR theMsg;
-        if(m2b::slice2msg(src->PshData.toStdString(),txdata::MsgType::ID_PushItem,theMsg))
+        if (m2b::slice2msg(src->PshData.toStdString(), txdata::MsgType::ID_PushItem, theMsg))
         {
             auto pushItem = qSharedPointerDynamicCast<txdata::PushItem>(theMsg);
-            for(int i=0;i<pushItem->modes_size();i++)
+            for (int i = 0; i < pushItem->modes_size(); i++)
             {
-                if(pushItem->modes(i)=="tts")
+                if (pushItem->modes(i) == "tts")
                 {
-                    isTTS=true;
+                    isTTS = true;
                     break;
                 }
             }
-            if(isTTS)
+            if (isTTS)
             {
-                text=QString::fromStdString(pushItem->subject());
+                text = QString::fromStdString(pushItem->subject());
             }
         }
     }

@@ -284,7 +284,7 @@ void DataWrapper::copyText(const QString& text)
 {
     QClipboard* clipboard = QGuiApplication::clipboard();//获取系统剪贴板指针.
     //clipboard->text();//获取剪贴板上文本信息.
-    clipboard->setText(text,QClipboard::Mode::Clipboard);//设置剪贴板内容.
+    clipboard->setText(text, QClipboard::Mode::Clipboard);//设置剪贴板内容.
 }
 
 void DataWrapper::ttsSpeak(const QString & text)
