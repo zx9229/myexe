@@ -12,6 +12,8 @@ const (
 	EMPTYSTR = ""
 	//FORONCE 仅执行一次for循环.
 	FORONCE = "1"
+	//ROOTNODE 根节点.
+	ROOTNODE = "ROOT"
 )
 
 func toConfigNode(filename string) (cfg *configNode, err error) {
