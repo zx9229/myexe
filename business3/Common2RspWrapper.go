@@ -77,7 +77,7 @@ func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	return true
 }
 
-func (thls *Common2RspWrapper) sendData(data ProtoMessage, isLast bool) bool {
+func (thls *Common2RspWrapper) sendData1(data ProtoMessage, isLast bool) bool {
 	thls.Lock()
 	defer thls.Unlock()
 	if thls.isLast {

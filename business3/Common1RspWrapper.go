@@ -11,7 +11,7 @@ import (
 
 //CommonRspWrapper omit.
 type CommonRspWrapper interface {
-	sendData(data ProtoMessage, isLast bool) bool
+	sendData1(data ProtoMessage, isLast bool) bool
 }
 
 //Common1RspWrapper omit
@@ -65,7 +65,7 @@ func (thls *Common1RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	return true
 }
 
-func (thls *Common1RspWrapper) sendData(data ProtoMessage, isLast bool) bool {
+func (thls *Common1RspWrapper) sendData1(data ProtoMessage, isLast bool) bool {
 	thls.Lock()
 	defer thls.Unlock()
 	if thls.isLast {

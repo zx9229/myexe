@@ -1,5 +1,19 @@
 package main
 
+/*
+"ROOT节点"建议保存大量数据.
+"非ROOT节点"允许缓存少量数据,不建议保存大量数据.
+Common2: 因为需要对它去重,所以一定要有一个去重的地方,建议选择在ROOT节点去重,需求Common2必经ROOT节点,然后对它去重.
+ROOT节点和执行节点要怎么去重呢？
+执行节点收到C2Req,写数据库,返回C2ReqAck,执行命令,得到C2Rsp,写数据库,发送C2Rsp(同步它们).
+清理C2Req的方式1:得到C2Rsp_1(SeqNo=1),写数据库,删除C2Req.
+清理C2Req的方式2:执行完整个命令之后,再删除C2Req.
+ROOT节点收到C2Rsp,立即删除C2Req,再返回C2RspAck.
+极端情况:ROOT节点发送C2Req,执行节点返回C2ReqAck,还没发出去呢,就断线了;执行节点执行命令,执行完毕后,C2Rsp写数据库;
+连接恢复正常,执行节点先同步了C2Rsp并收到C2RspAck,然后清理掉了C2Rsp;然后ROOT节点开始同步C2Req;此时会认为C2Req尚未处理过,会再处理一次.
+规避方法1:保留所有C2Req;规避方法2:保留最近几个C2Req(比如保留最近10个);
+*/
+
 import (
 	"encoding/json"
 	"errors"
@@ -20,11 +34,13 @@ import (
 )
 
 type configNode struct {
-	IsRoot         bool   //这个Node是RootNode.
-	UserID         string //为空表示是ROOT节点.
-	BelongID       string
+	LetUpCache     bool   //让上游缓存数据.
+	UserID         string //为空表示字段无效,该字段永不为空.
+	BelongID       string //为空表示字段无效,仅UserID为ROOTNODE时BelongID为空.
+	Remark         string
 	ServerURL      url.URL
 	ClientURL      []url.URL
+	DriverName     string //数据库的类型(为空表示不启用数据库,仅支持sqlite3).
 	DataSourceName string //数据源的名字.
 	LocationName   string //数据源的时区的名字.
 }
@@ -53,84 +69,89 @@ func (thls *businessNode) MarshalJSON() (byteSlice []byte, err error) {
 }
 
 type businessNode struct {
-	xEngine     *xorm.Engine
-	chanDB      chan *DbOp
 	letUpCache  bool                  //(一经设置,不再修改)让上游缓存数据;TODO:做检查(此时它必须是叶子节点).
 	ownInfo     txdata.ConnectionInfo //(一经设置,不再修改)
-	iAmRoot     bool                  //(一经设置,不再修改)(I am root node)
+	iAmRoot     bool                  //(一经设置,不再修改)(I am root node)(根据ownInfo衍生出来的字段)
 	parentInfo  safeFatherData
+	xEngine     *xorm.Engine
+	chanDB      chan *DbOp
 	rootOnline  bool
-	cacheUser   *safeConnInfoMap
 	cacheSock   *safeWsSocketMap
-	cacheSync   *safeSynchCache        //(db)要绝对的投递过去而缓存+因为UpCache而缓存.
-	cacheC2RR   *safeNodeC2ReqRspCache //异步转同步,让请求和响应对应起来.
-	cacheC1RR   *safeNodeC1ReqRspCache
-	ownMsgNo    int64
-	chanSync    chan string         //哪个UserID连通了,就投递过来一个信号.
-	cacheZZZXML *safeUniSymCache    //(正在执行命令)的Req消息的UniSym.给续传模式的命令使用,因为只有它们可能续传.
-	cBAQYTDHC   *safeMemoryTmpCache //(ROOT模式有用)(不安全用途的缓存)(Common2Req+Common2Rsp+!IsSafe)的数据缓存在这里.
-	cAQZXJG     *safeSynchCacheRoot //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
-	cachePush   *safePushCache
+	cacheUser   *safeConnInfoMap
 	cacheSub    *safeSubscriberMap
-	testInfo    *txdata.PathwayInfo
+	cacheSync   *safeSynchCache        //(db)要绝对的投递过去而缓存+因为UpCache而缓存.
+	cacheC1RR   *safeNodeC1ReqRspCache //异步转同步,让请求和响应对应起来.
+	cacheC2RR   *safeNodeC2ReqRspCache //异步转同步,让请求和响应对应起来.
+	cacheZZZXML *safeUniSymCache       //(正在执行命令)的Req消息的UniSym.给续传模式的命令使用,因为只有它们可能续传.
+	cBAQYTDHC   *safeMemoryTmpCache    //(ROOT模式有用)(不安全用途的缓存)(Common2Req+Common2Rsp+!IsSafe)的数据缓存在这里.
+	cAQZXJG     *safeSynchCacheRoot    //(db)(ROOT模式有用)安全执行结果.将续传模式的结果写入此表.
+	cachePush   *safePushCache
+	ownMsgNo    int64
+	chanSync    chan string //哪个UserID连通了,就投递过来一个信号.
+	pathinfo    *txdata.PathwayInfo
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
 	if false ||
-		(cfg.IsRoot && (cfg.UserID != EMPTYSTR || cfg.BelongID != EMPTYSTR)) || //(为防误操作).
-		(!cfg.IsRoot && cfg.UserID == EMPTYSTR) ||
-		(!cfg.IsRoot && cfg.UserID == cfg.BelongID) {
+		(cfg.UserID == EMPTYSTR) ||
+		(cfg.UserID == ROOTNODE && cfg.LetUpCache) || //根节点没有上游,肯定不能让上游缓存数据.
+		(cfg.UserID == ROOTNODE && cfg.BelongID != EMPTYSTR) ||
+		(cfg.UserID != ROOTNODE && cfg.BelongID == EMPTYSTR) ||
+		(cfg.UserID == cfg.BelongID) {
 		glog.Fatalf("newBusinessNode fail with cfg=%v", cfg)
 	}
-
+	//
 	curData := new(businessNode)
 	//
-	curData.letUpCache = false //TODO:
+	curData.letUpCache = cfg.LetUpCache
 	//
 	curData.ownInfo.UserID = cfg.UserID
 	curData.ownInfo.BelongID = cfg.BelongID
-	curData.ownInfo.Version = "Version20190411"
+	curData.ownInfo.Version = "Version20190629"
 	curData.ownInfo.LinkMode = txdata.ConnectionInfo_Zero2
 	curData.ownInfo.ExePid = int32(os.Getpid())
 	curData.ownInfo.ExePath, _ = filepath.Abs(os.Args[0])
-	curData.ownInfo.Remark = ""
+	curData.ownInfo.Remark = cfg.Remark
 	//
-	curData.iAmRoot = (curData.ownInfo.UserID == EMPTYSTR)
-	//
-	curData.initDatabase(cfg.DataSourceName, cfg.LocationName)
+	curData.iAmRoot = (curData.ownInfo.UserID == ROOTNODE)
 	//
 	curData.parentInfo.setData(nil, nil, true)
+	//
+	curData.initDatabase(cfg.DriverName, cfg.DataSourceName, cfg.LocationName)
 	//
 	if curData.iAmRoot {
 		curData.setRootOnline(true)
 	}
 	//
-	curData.cacheUser = newSafeConnInfoMap()
 	curData.cacheSock = newSafeWsSocketMap()
+	curData.cacheUser = newSafeConnInfoMap()
 	curData.cacheSync = newSafeSynchCache(curData.xEngine, curData.chanDB)
-	curData.cacheC2RR = newSafeNodeC2ReqRspCache()
 	curData.cacheC1RR = newSafeNodeC1ReqRspCache()
+	curData.cacheC2RR = newSafeNodeC2ReqRspCache()
 	curData.cacheZZZXML = newSafeUniSymCache()
 	curData.cBAQYTDHC = newSafeMemoryTmpCache()
 	curData.cAQZXJG = newSafeSynchCacheRoot(curData.xEngine, curData.chanDB)
 	curData.cachePush = newSafePushCache(curData.xEngine, curData.chanDB)
 	curData.cacheSub = newSafeSubscriberMap(curData.cachePush)
 	//
-	curData.refreshSeqNo()
+	curData.refreshMsgNo()
 	//
-	curData.chanSync = make(chan string, 256)
-	go curData.backgroundWork()
+	curData.backgroundWork()
 	//
 	return curData
 }
 
-func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
-	if len(DataSourceName) == 0 {
+func (thls *businessNode) initDatabase(DriverName, DataSourceName, LocationName string) {
+	if len(DriverName) == 0 {
+		glog.Infof("DriverName=%v, will sikp database", DriverName)
 		return
+	}
+	if DriverName != "sqlite3" {
+		glog.Fatalf("DriverName=%v, not sqlite3!", DriverName)
 	}
 	var err error
 	var xEngine *xorm.Engine
-	if xEngine, err = xorm.NewEngine("sqlite3", DataSourceName); err != nil {
+	if xEngine, err = xorm.NewEngine(DriverName, DataSourceName); err != nil {
 		glog.Fatalln(err)
 	}
 	//
@@ -156,9 +177,9 @@ func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
 	if err = xEngine.Sync2(beanSlice...); err != nil { //同步数据库结构
 		glog.Fatalln(err)
 	}
-
+	//
 	thls.xEngine = xEngine
-
+	//
 	if thls.xEngine != nil && thls.chanDB == nil {
 		thls.chanDB = make(chan *DbOp, 256)
 		go func() {
@@ -170,7 +191,7 @@ func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
 				if dbop, isOk = <-thls.chanDB; !isOk {
 					if session != nil {
 						if err = session.Commit(); err != nil {
-							panic(err)
+							glog.Fatalln(err)
 						}
 						session.Close()
 						session = nil
@@ -181,7 +202,7 @@ func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
 				if session == nil {
 					session = xEngine.NewSession()
 					if err = session.Begin(); err != nil {
-						panic(err)
+						glog.Fatalln(err)
 					}
 				}
 				dbop.handler(session, dbop)
@@ -191,7 +212,7 @@ func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
 				if cnt == 0 || len(thls.chanDB) <= 0 {
 					//队列里面已经没有数据了,就立即提交.
 					if err = session.Commit(); err != nil {
-						panic(err)
+						glog.Fatalln(err)
 					}
 					session.Close()
 					session = nil
@@ -202,13 +223,71 @@ func (thls *businessNode) initDatabase(DataSourceName, LocationName string) {
 	}
 }
 
-func (thls *businessNode) sendData(sock *wsnet.WsSocket, data ProtoMessage) {
+func (thls *businessNode) refreshMsgNo() {
+	//如果节点尚未连接ROOTNODE的时候,就为这些数据分配了MsgNo,并缓存了它们,
+	//然后节点成功连接ROOTNODE后发现,MsgNo冲突了,此时将会很尴尬.
+	//9223372036854775807(int64.max)
+	//91231      00000000|
+	//yMMddHHmmSS        |
+	//60102150405     |  |
+	//           86400000
+	//可以每隔(1天)重新获取该值.
+	//服务端如果遇到冲突的情况,应当立即报警(发邮件等)
+	//10年之内将当前表的数据迁移到历史表.
+	//                                 60102150405          86400
+	str4int64 := time.Now().Format("20060102150405")[3:] + "00000000"
+	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
+	assert4true(err == nil)
+	atomic.SwapInt64(&thls.ownMsgNo, val4int64)
+}
+
+func (thls *businessNode) backgroundWork() {
+	if thls.chanSync != nil {
+		glog.Fatalln("thls.chanSync != nil")
+		return
+	}
+	thls.chanSync = make(chan string, 256)
+	go func() {
+		var userID string
+		var isOk bool
+		var cie *connInfoEx
+		var nodeSlice []ProtoMessage
+		var nodeItem ProtoMessage
+		for {
+			if userID, isOk = <-thls.chanSync; !isOk {
+				glog.Warningf("the channel may be closed")
+				break
+			}
+			if userID == ROOTNODE {
+				if nodeSlice = thls.cacheSync.queryDataByToRoot(true); nodeSlice != nil {
+					for _, nodeItem = range nodeSlice {
+						thls.sendData1(thls.parentInfo.conn, nodeItem)
+					}
+				}
+			} else {
+				if cie, isOk = thls.cacheUser.queryData(userID); isOk {
+					if nodeSlice = thls.cacheSync.queryData(false, userID); nodeSlice != nil {
+						for _, nodeItem = range nodeSlice {
+							thls.sendData1(cie.conn, nodeItem)
+						}
+					}
+				}
+			}
+		}
+	}()
+}
+
+func (thls *businessNode) feedToChan(userID string) {
+	thls.chanSync <- userID
+}
+
+func (thls *businessNode) sendData1(sock *wsnet.WsSocket, data ProtoMessage) {
 	if sock != nil {
 		sock.Send(msg2package(data))
 	}
 }
 
-func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, isParentSock bool) error {
+func (thls *businessNode) sendData2(sock *wsnet.WsSocket, data ProtoMessage, isParentSock bool) error {
 	//如果不是父代的socket那么不会出现nil的情况,此时就让它崩溃.
 	if sock == nil && isParentSock {
 		return errors.New("parent is offline")
@@ -216,13 +295,13 @@ func (thls *businessNode) sendDataEx(sock *wsnet.WsSocket, data ProtoMessage, is
 	return sock.Send(msg2package(data))
 }
 
-func (thls *businessNode) sendDataEx2(data ProtoMessage, sock *wsnet.WsSocket, txToRoot bool, rID string) error {
+func (thls *businessNode) sendData3(data ProtoMessage, sock *wsnet.WsSocket, txToRoot bool, rID string) error {
 	if sock != nil {
 		return sock.Send(msg2package(data))
 	}
 	if txToRoot {
 		assert4false(thls.iAmRoot) //此时我一定不是ROOT,否则入参就已经填写错误了.
-		return thls.sendDataEx(thls.parentInfo.conn, data, true)
+		return thls.sendData2(thls.parentInfo.conn, data, true)
 	}
 	return thls.cacheUser.sendDataToUser(data, rID)
 }
@@ -234,7 +313,7 @@ func (thls *businessNode) onConnected(msgConn *wsnet.WsSocket, isAccepted bool) 
 	}
 	if !isAccepted { //(协议规则)主动connect的socket要主动发送连接请求.
 		tmpTxData := txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		thls.sendData(msgConn, &tmpTxData)
+		thls.sendData1(msgConn, &tmpTxData)
 	}
 }
 
@@ -259,7 +338,7 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 		checkSunWhenDisconnected(dataSlice)
 		for _, data := range dataSlice { //发给父亲,让父亲也清理掉对应的缓存.
 			tmpTxData := txdata.DisconnectedData{Info: &data.Info}
-			thls.sendData(thls.parentInfo.conn, &tmpTxData)
+			thls.sendData1(thls.parentInfo.conn, &tmpTxData)
 		}
 	}
 
@@ -274,25 +353,10 @@ func (thls *businessNode) onDisconnected(msgConn *wsnet.WsSocket, err error) {
 			thls.setRootOnline(false)
 		}
 		//它和父亲断开连接了,它就成最顶层的节点了,它要发送路径信息.
-		thls.testInfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
-		thls.cacheUser.sendDataToSon(thls.testInfo)
+		thls.pathinfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
+		thls.cacheUser.sendDataToSon(thls.pathinfo)
 	}
 }
-
-//func (thls *businessNode) deleteConnectionFromAll(conn *wsnet.WsSocket, closeIt bool) {
-//	if closeIt {
-//		conn.Close()
-//	}
-//	if thls.parentInfo.conn == conn {
-//		//不需要在这里处理它,因为主动断开连接,也会触发onDisconnected回调,回调里面已经有这个逻辑了.
-//		//thls.parentInfo.setData(nil, nil, true)
-//		//if thls.rootOnline {
-//		//	thls.setRootOnline(false)
-//		//}
-//	}
-//	thls.cacheSock.deleteData(conn)
-//	thls.cacheUser.deleteDataByConn(conn)
-//}
 
 func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msgType int) {
 	txMsgType, txMsgData, err := package2msg(msgData)
@@ -304,16 +368,16 @@ func (thls *businessNode) onMessage(msgConn *wsnet.WsSocket, msgData []byte, msg
 	//glog.Infof("onMessage, msgConn=%p, txMsgType=%v, txMsgData=%v", msgConn, txMsgType, txMsgData)
 
 	switch txMsgType {
-	case txdata.MsgType_ID_Common2Ack:
-		thls.handle_MsgType_ID_Common2Ack(txMsgData.(*txdata.Common2Ack), msgConn)
-	case txdata.MsgType_ID_Common2Req:
-		thls.handle_MsgType_ID_Common2Req(txMsgData.(*txdata.Common2Req), msgConn)
-	case txdata.MsgType_ID_Common2Rsp:
-		thls.handle_MsgType_ID_Common2Rsp(txMsgData.(*txdata.Common2Rsp), msgConn)
 	case txdata.MsgType_ID_Common1Req:
 		thls.handle_MsgType_ID_Common1Req(txMsgData.(*txdata.Common1Req), msgConn)
 	case txdata.MsgType_ID_Common1Rsp:
 		thls.handle_MsgType_ID_Common1Rsp(txMsgData.(*txdata.Common1Rsp), msgConn)
+	case txdata.MsgType_ID_Common2Req:
+		thls.handle_MsgType_ID_Common2Req(txMsgData.(*txdata.Common2Req), msgConn)
+	case txdata.MsgType_ID_Common2Rsp:
+		thls.handle_MsgType_ID_Common2Rsp(txMsgData.(*txdata.Common2Rsp), msgConn)
+	case txdata.MsgType_ID_Common2Ack:
+		thls.handle_MsgType_ID_Common2Ack(txMsgData.(*txdata.Common2Ack), msgConn)
 	case txdata.MsgType_ID_DisconnectedData:
 		thls.handle_MsgType_ID_DisconnectedData(txMsgData.(*txdata.DisconnectedData), msgConn)
 	case txdata.MsgType_ID_ConnectReq:
@@ -337,6 +401,9 @@ func (thls *businessNode) handle_MsgType_ID_Common2Ack(msgData *txdata.Common2Ac
 	}
 
 	assert4true(msgData.Key != nil)
+	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
+	assert4true(msgData.Key.MsgNo >= 0)
+	assert4true(msgData.Key.SeqNo >= 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
 	}
@@ -349,7 +416,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Ack(msgData *txdata.Common2Ac
 		msgData.ToRoot = !msgData.ToRoot
 		assert4false(msgData.ToRoot)
 	}
-	thls.sendDataEx2(msgData, nil, msgData.ToRoot, msgData.RecverID)
+	thls.sendData3(msgData, nil, msgData.ToRoot, msgData.RecverID)
 }
 
 func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Req, msgConn *wsnet.WsSocket) {
@@ -358,6 +425,8 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 	}
 
 	assert4true(msgData.Key != nil)
+	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
+	assert4true(msgData.Key.MsgNo >= 0)
 	assert4true(msgData.Key.SeqNo == 0)
 	assert4false(msgData.UpCache && !msgData.ToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
 	if pconn := thls.parentInfo.conn; pconn != nil {
@@ -368,7 +437,8 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 		//TODO:ROOT节点应当有去重的功能,已经存在的,应当直接回应ACK,然后直接丢弃.
 		if msgData.IsSafe { //TODO:留痕.
 			if isExist, isInsert := thls.cAQZXJG.insertData(msgData.Key, msgData.ToRoot, msgData.RecverID, msgData); !isExist && !isInsert {
-				//TODO:报警.
+				//TODO:不应当崩溃,应当报警.
+				glog.Fatalf("isExist=%v, isInsert=%v, msgData=%v", isExist, isInsert, msgData)
 			}
 		} else {
 			thls.cBAQYTDHC.insertReqData(msgData.Key, msgData)
@@ -381,7 +451,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 		if msgData.IsSafe {
 			//TODO:要执行命令了,结果崩溃了,然后消息丢失了,我也没办法,我不准备"程序重启之后继续执行该命令",崩了就算了.
 			dataAck := thls.genAck4Common2Req(msgData)
-			thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
+			thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
 			//ROOT发出去请求消息,NODE接收后,在即将发送ACK的时候,ROOT与之断开,ACK丢失,
 			//NODE开始执行请求命令,请求命令非常耗时(约耗时1分钟),期间没有响应消息发出.
 			//数秒之后,ROOT与NODE重连成功,ROOT再次发送请求消息,NODE就会再次受到该消息.
@@ -412,10 +482,10 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 			msgData.UpCache = false
 
 			if isExist, isInsert := thls.cacheSync.insertData(msgData.Key, msgData.ToRoot, msgData.RecverID, msgData); isExist {
-				thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID) //已经存在了,就发送ACK让对方别再续传了,已经在待同步表里了,它自会同步,也不用再发送了.
+				thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID) //已经存在了,就发送ACK让对方别再续传了,已经在待同步表里了,它自会同步,也不用再发送了.
 				return
 			} else if isInsert { //不存在,又插入失败,估计硬盘满了,赶紧报警吧;(如果插入成功了,肯定要正常往下走,然后发送出去).
-				thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
+				thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
 			} else {
 				//TODO:报警.
 				return
@@ -429,7 +499,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 		}
 	}
 
-	err := thls.sendDataEx2(msgData, nil, msgData.ToRoot, msgData.RecverID)
+	err := thls.sendData3(msgData, nil, msgData.ToRoot, msgData.RecverID)
 
 	if (err != nil) && !msgData.IsSafe && !msgData.IsPush {
 		tmpTxRspData := thls.genRsp4Common2Req(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
@@ -438,7 +508,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 			tmpTxRspData.ToRoot = !tmpTxRspData.ToRoot
 			assert4false(tmpTxRspData.ToRoot)
 		}
-		thls.sendData(msgConn, tmpTxRspData)
+		thls.sendData1(msgConn, tmpTxRspData)
 	}
 }
 
@@ -448,8 +518,10 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 	}
 
 	assert4true(msgData.Key != nil)
+	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
+	assert4true(msgData.Key.MsgNo >= 0)
+	assert4true(msgData.Key.SeqNo > 0)
 	assert4false(msgData.UpCache && !msgData.ToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
-	assert4true(msgData.Key.SeqNo != 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
 	}
@@ -482,7 +554,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 		//TODO:应当添加响应的回调函数,供外部使用.
 		if msgData.IsSafe { //应当所有的操作都处理完了,再回应ACK.
 			dataAck := thls.genAck4Common2Rsp(msgData)
-			thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
+			thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
 		}
 		return
 	}
@@ -497,10 +569,10 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 			}
 			msgData.UpCache = false
 			if isExist, isInsert := thls.cacheSync.insertData(msgData.Key, msgData.ToRoot, msgData.RecverID, msgData); isExist {
-				thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
+				thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
 				return
 			} else if isInsert {
-				thls.sendDataEx2(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
+				thls.sendData3(dataAck, msgConn, dataAck.ToRoot, dataAck.RecverID)
 			} else {
 				//TODO:报警
 				return
@@ -514,7 +586,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 		}
 	}
 
-	thls.sendDataEx2(msgData, nil, msgData.ToRoot, msgData.RecverID)
+	thls.sendData3(msgData, nil, msgData.ToRoot, msgData.RecverID)
 }
 
 func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Req, msgConn *wsnet.WsSocket) {
@@ -522,6 +594,9 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 		glog.Infof("handle_MsgType_ID_Common1Req, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
+	assert4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
+	assert4true(msgData.MsgNo >= 0)
+	assert4true(msgData.SeqNo == 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
 	}
@@ -536,10 +611,10 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 	var err error
 	if connEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
 		msgData.ToRoot = false //我即将发送给自己的子节点,所以不是发往根节点的方向.
-		err = thls.sendDataEx(connEx.conn, msgData, false)
+		err = thls.sendData2(connEx.conn, msgData, false)
 	} else {
 		if !thls.iAmRoot && msgData.ToRoot {
-			err = thls.sendDataEx(thls.parentInfo.conn, msgData, true)
+			err = thls.sendData2(thls.parentInfo.conn, msgData, true)
 		} else {
 			//一旦(!ToRoot)则说明该消息已经在某一个节点找到了RecverID,然后扭头(!ToRoot)发往目标节点,在奔往目标节点的过程中,目标节点离线了.
 			//此时目标节点不可达了,因此,直接发送响应即可.
@@ -549,7 +624,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 	if (err != nil) && (!msgData.IsPush) {
 		msgData.ToRoot = originalToRoot
 		tmpTxRspData := thls.genRsp4Common1Req(msgData, 1, &txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true)
-		thls.sendData(msgConn, tmpTxRspData) //TODO:打印日志.
+		thls.sendData1(msgConn, tmpTxRspData) //TODO:打印日志.
 	}
 }
 
@@ -558,9 +633,13 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 		glog.Infof("handle_MsgType_ID_Common1Rsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
+	assert4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
+	assert4true(msgData.MsgNo >= 0)
+	assert4true(msgData.SeqNo > 0)
 	if pconn := thls.parentInfo.conn; pconn != nil {
 		assert4true((msgConn != pconn) == msgData.ToRoot)
 	}
+
 	if msgData.RecverID == thls.ownInfo.UserID {
 		thls.cacheC1RR.operateNode(msgData.MsgNo, msgData, msgData.IsLast)
 		//TODO:回调函数.
@@ -570,10 +649,10 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 	var err error
 	if connEx, isExist := thls.cacheUser.queryData(msgData.RecverID); isExist {
 		msgData.ToRoot = false
-		err = thls.sendDataEx(connEx.conn, msgData, false)
+		err = thls.sendData2(connEx.conn, msgData, false)
 	} else {
 		if msgData.ToRoot {
-			err = thls.sendDataEx(thls.parentInfo.conn, msgData, true)
+			err = thls.sendData2(thls.parentInfo.conn, msgData, true)
 		} else {
 			err = errors.New("node is offline")
 		}
@@ -584,6 +663,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 }
 
 func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
+	assert4true(msgData.Info.UserID != EMPTYSTR)
 	if msgConn == thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
 		glog.Errorf("recv DisconnectedData from father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
@@ -594,7 +674,7 @@ func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.Dis
 		glog.Errorf("cache cleanup failed, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 	thls.cacheSub.deleteData(msgData.Info.UserID)
-	thls.sendData(thls.parentInfo.conn, msgData)
+	thls.sendData1(thls.parentInfo.conn, msgData)
 }
 
 func (thls *businessNode) handle_MsgType_ID_ConnectReq(msgData *txdata.ConnectReq, msgConn *wsnet.WsSocket) {
@@ -611,17 +691,17 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq(msgData *txdata.ConnectRe
 	}
 
 	if msgData.Pathway == nil || len(msgData.Pathway) <= 1 { //非ConnectReq_stepMulti时要发送回应.
-		thls.sendData(msgConn, &tmpTxdata)
+		thls.sendData1(msgConn, &tmpTxdata)
 	}
 
 	if sendToParent {
 		msgData.Pathway = append(msgData.Pathway, thls.ownInfo.UserID)
-		thls.sendData(thls.parentInfo.conn, msgData)
+		thls.sendData1(thls.parentInfo.conn, msgData)
 	}
 	if sendToParent && thls.parentInfo.conn == nil {
 		//它就成最顶层的节点了,它要发送路径信息.
-		thls.testInfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
-		thls.cacheUser.sendDataToSon(thls.testInfo)
+		thls.pathinfo = thls.cacheUser.toPathwayInfo(thls.ownInfo.UserID)
+		thls.cacheUser.sendDataToSon(thls.pathinfo)
 	}
 }
 
@@ -630,16 +710,20 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne(msgData *txdata.C
 
 	for range FORONCE {
 		rspData.ErrNo = 1
+		if msgData.InfoReq.UserID == EMPTYSTR {
+			rspData.ErrMsg = "req.UserID == EMPTYSTR"
+			break
+		}
 		if msgData.InfoReq.UserID != msgData.Pathway[0] {
 			rspData.ErrMsg = "req.UserID != req.Pathway[0]"
 			break
 		}
-		if (msgData.InfoReq.UserID == EMPTYSTR) && (msgData.InfoReq.BelongID != EMPTYSTR) { //ROOT节点的UserID和BelongID皆为空.
-			rspData.ErrMsg = "(req.UserID == EMPTYSTR) && (req.BelongID != EMPTYSTR)"
+		if msgData.InfoReq.UserID == msgData.InfoReq.BelongID {
+			rspData.ErrMsg = "req.UserID == req.BelongID"
 			break
 		}
-		if (msgData.InfoReq.UserID != EMPTYSTR) && (msgData.InfoReq.UserID == msgData.InfoReq.BelongID) {
-			rspData.ErrMsg = "(req.UserID != EMPTYSTR) && (req.UserID == req.BelongID)"
+		if (msgData.InfoReq.UserID == ROOTNODE) && (msgData.InfoReq.BelongID != EMPTYSTR) { //ROOT节点的BelongID应为空.
+			rspData.ErrMsg = "(req.UserID == ROOTNODE) && (req.BelongID != EMPTYSTR)"
 			break
 		}
 		if msgData.InfoReq.UserID == thls.ownInfo.UserID {
@@ -711,11 +795,11 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forSon(msgData *t
 		//连接建立后,_connect方要主动发送ConnectReq给accepted方.
 		//校验通过后,accepted方要主动发送ConnectReq给_connect方.
 		tmpTxData := txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		thls.sendData(msgConn, &tmpTxData)
+		thls.sendData1(msgConn, &tmpTxData)
 	}
 
 	if thls.rootOnline { //如果我能连通ROOT那么我就把这个消息通知(新建立连接的这个)儿子.
-		thls.sendData(msgConn, &txdata.OnlineNotice{RootIsOnline: true})
+		thls.sendData1(msgConn, &txdata.OnlineNotice{RootIsOnline: true})
 	}
 
 	thls.feedToChan(curData.Info.UserID)
@@ -757,14 +841,14 @@ func (thls *businessNode) handle_MsgType_ID_ConnectReq_stepOne_forParent(msgData
 		//连接建立后,_connect方要主动发送ConnectReq给accepted方.
 		//校验通过后,accepted方要主动发送ConnectReq给_connect方.
 		tmpTxData := txdata.ConnectReq{InfoReq: &thls.ownInfo, Pathway: []string{thls.ownInfo.UserID}}
-		thls.sendData(msgConn, &tmpTxData)
+		thls.sendData1(msgConn, &tmpTxData)
 	}
 
 	if true { //和父亲建立连接了,要把自己的缓存发送给父亲,更新父亲的缓存.
 		thls.cacheUser.Lock()
 		for _, cInfoEx := range thls.cacheUser.M {
 			tmpTxData := txdata.ConnectReq{InfoReq: &cInfoEx.Info, Pathway: append(cInfoEx.Pathway, thls.ownInfo.UserID)}
-			thls.sendData(msgConn, &tmpTxData)
+			thls.sendData1(msgConn, &tmpTxData)
 		}
 		thls.cacheUser.Unlock()
 	}
@@ -831,16 +915,17 @@ func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemR
 	if thls.iAmRoot {
 		glog.Infoln(msgData)
 	} else {
-		thls.sendData(thls.parentInfo.conn, msgData)
+		thls.sendData1(thls.parentInfo.conn, msgData)
 	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_PathwayInfo(msgData *txdata.PathwayInfo, msgConn *wsnet.WsSocket) {
+	assert4true(msgData.UserID != EMPTYSTR)
 	if msgConn != thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
 		glog.Errorf("recv SystemReport from father, msgConn=%p, msgData=%v", msgConn, msgData)
 		return
 	}
-	thls.testInfo = msgData
+	thls.pathinfo = msgData
 	thls.cacheUser.sendDataToSon(msgData)
 }
 
@@ -901,22 +986,6 @@ func (thls *businessNode) genRsp4Common1Req(dataReq *txdata.Common1Req, seqno in
 	return
 }
 
-func (thls *businessNode) refreshSeqNo() {
-	//9223372036854775807(int64.max)
-	//91231      00000000|
-	//yMMddHHmmSS        |
-	//60102150405     |  |
-	//           86400000
-	//可以每隔(1天)重新获取该值.
-	//服务端如果遇到冲突的情况,应当立即报警(发邮件等)
-	//10年之内将当前表的数据迁移到历史表.
-	//                              20060102150405          86400
-	str4int64 := time.Now().Format("20060102150405")[3:] + "00000000"
-	val4int64, err := strconv.ParseInt(str4int64, 10, 64)
-	assert4true(err == nil)
-	atomic.SwapInt64(&thls.ownMsgNo, val4int64)
-}
-
 func (thls *businessNode) increaseSeqNo() int64 {
 	return atomic.AddInt64(&thls.ownMsgNo, 1)
 }
@@ -933,7 +1002,7 @@ func (thls *businessNode) setRootOnline(newValue bool) {
 
 func (thls *businessNode) reportErrorMsg(message string) {
 	tmpTxData := txdata.SystemReport{UserID: thls.ownInfo.UserID, Pathway: []string{thls.ownInfo.UserID}, Message: message}
-	thls.sendData(thls.parentInfo.conn, &tmpTxData)
+	thls.sendData1(thls.parentInfo.conn, &tmpTxData)
 }
 
 func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, d time.Duration) (rspSlice []*txdata.Common2Rsp) {
@@ -969,7 +1038,7 @@ func (thls *businessNode) syncExecuteCommon2ReqRsp(reqInOut *txdata.Common2Req, 
 	var rspData *txdata.Common2Rsp
 	var err error
 	for range FORONCE {
-		err = thls.sendDataEx(thls.parentInfo.conn, reqInOut, true)
+		err = thls.sendData2(thls.parentInfo.conn, reqInOut, true)
 		//如果推送,等待字段无效,直接返回(等待字段没有意义).
 		//如果推送,等待字段有效,直接返回(等待字段没有意义).
 		//如果应答,等待字段无效,直接返回.
@@ -1027,7 +1096,7 @@ func (thls *businessNode) syncExecuteCommon1ReqRsp(reqInOut *txdata.Common1Req, 
 	var rspData *txdata.Common1Rsp
 	var err error
 	for range FORONCE {
-		err = thls.sendDataEx(thls.parentInfo.conn, reqInOut, true)
+		err = thls.sendData2(thls.parentInfo.conn, reqInOut, true)
 		//如果推送,等待字段无效,直接返回(等待字段没有意义).
 		//如果推送,等待字段有效,直接返回(等待字段没有意义).
 		//如果应答,等待字段无效,直接返回.
@@ -1064,7 +1133,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req_exec(reqData *txdata.Comm
 
 	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
 	if err != nil {
-		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true) {
+		if !stream.sendData1(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true) {
 			//TODO:报警.
 		}
 		return
@@ -1079,7 +1148,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req_exec(reqData *txdata.Comm
 	case txdata.MsgType_ID_QryConnInfoReq:
 		thls.execute_MsgType_ID_QryConnInfoReq(objData.(*txdata.QryConnInfoReq), stream)
 	default:
-		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
+		if !stream.sendData1(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
 			//TODO:报警.
 		}
 	}
@@ -1092,7 +1161,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 
 	objData, err := slice2msg(reqData.ReqType, reqData.ReqData)
 	if err != nil {
-		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true) {
+		if !stream.sendData1(&txdata.CommonErr{ErrNo: 1, ErrMsg: err.Error()}, true) {
 			//TODO:报警.
 		}
 		return
@@ -1113,7 +1182,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 	case txdata.MsgType_ID_QrySubscribeReq:
 		thls.execute_MsgType_ID_QrySubscribeReq(objData.(*txdata.QrySubscribeReq), stream, reqData, msgConn)
 	default:
-		if !stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
+		if !stream.sendData1(&txdata.CommonErr{ErrNo: 1, ErrMsg: "unknown_txdata.MsgType"}, true) {
 			//TODO:报警.
 		}
 	}
@@ -1123,11 +1192,11 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req_exec(reqData *txdata.Comm
 
 func (thls *businessNode) execute_MsgType_ID_EchoItem(reqData *txdata.EchoItem, stream CommonRspWrapper) {
 	if reqData.RspCnt <= 0 || reqData.SecGap < 0 {
-		stream.sendData(&txdata.CommonErr{ErrNo: 1, ErrMsg: "field (RspCnt and/or SecGap) error"}, true)
+		stream.sendData1(&txdata.CommonErr{ErrNo: 1, ErrMsg: "field (RspCnt and/or SecGap) error"}, true)
 	} else {
 		for i := int32(1); i <= reqData.RspCnt; i++ {
 			isLast := (i == reqData.RspCnt)
-			stream.sendData(&txdata.EchoItem{Data: fmt.Sprintf("%v.%v", reqData.Data, i), RspCnt: reqData.RspCnt, SecGap: reqData.SecGap}, isLast)
+			stream.sendData1(&txdata.EchoItem{Data: fmt.Sprintf("%v.%v", reqData.Data, i), RspCnt: reqData.RspCnt, SecGap: reqData.SecGap}, isLast)
 			if !isLast {
 				time.Sleep(time.Second * time.Duration(reqData.SecGap))
 			}
@@ -1142,7 +1211,7 @@ func (thls *businessNode) execute_MsgType_ID_SubscribeReq(reqData *txdata.Subscr
 		rsp.ErrNo = 1
 		rsp.ErrMsg = "maybe already sub"
 	}
-	stream.sendData(rsp, true)
+	stream.sendData1(rsp, true)
 }
 
 func (thls *businessNode) execute_MsgType_ID_QrySubscribeReq(reqData *txdata.QrySubscribeReq, stream CommonRspWrapper, c1req *txdata.Common1Req, conn *wsnet.WsSocket) {
@@ -1155,12 +1224,12 @@ func (thls *businessNode) execute_MsgType_ID_QrySubscribeReq(reqData *txdata.Qry
 		rsp.ToRoot = sInfo.toRoot
 		rsp.IsLog = sInfo.isLog
 		rsp.IsPush = sInfo.isPush
-		stream.sendData(&rsp, true)
+		stream.sendData1(&rsp, true)
 	} else {
 		rsp := txdata.CommonErr{}
 		rsp.ErrNo = 1
 		rsp.ErrMsg = "not_subscribe"
-		stream.sendData(&rsp, true)
+		stream.sendData1(&rsp, true)
 	}
 }
 
@@ -1174,7 +1243,7 @@ func (thls *businessNode) execute_MsgType_ID_PushItem(reqData *txdata.PushItem, 
 	if thls.cachePush.Insert(tmpData) == true {
 		thls.cacheSub.Send(tmpData)
 	}
-
+	stream.sendData1(&txdata.CommonErr{ErrNo: 0, ErrMsg: "execute finish, maybe success."}, true)
 }
 
 func (thls *businessNode) execute_MsgType_ID_QueryRecordReq(reqData *txdata.QueryRecordReq, stream CommonRspWrapper) {
@@ -1186,39 +1255,5 @@ func (thls *businessNode) execute_MsgType_ID_QryConnInfoReq(reqData *txdata.QryC
 	for _, v := range data.Cache {
 		v.Pathway = append(v.Pathway, thls.ownInfo.UserID)
 	}
-	stream.sendData(data, true)
-}
-
-func (thls *businessNode) backgroundWork() {
-	var userID string
-	var isOk bool
-	var cie *connInfoEx
-	var nodeSlice []ProtoMessage
-	var nodeItem ProtoMessage
-	for {
-		if userID, isOk = <-thls.chanSync; isOk {
-			if userID == EMPTYSTR {
-				if nodeSlice = thls.cacheSync.queryDataByToRoot(true); nodeSlice != nil {
-					for _, nodeItem = range nodeSlice {
-						thls.sendData(thls.parentInfo.conn, nodeItem)
-					}
-				}
-			} else {
-				if cie, isOk = thls.cacheUser.queryData(userID); isOk {
-					if nodeSlice = thls.cacheSync.queryData(false, userID); nodeSlice != nil {
-						for _, nodeItem = range nodeSlice {
-							thls.sendData(cie.conn, nodeItem)
-						}
-					}
-				}
-			}
-		} else {
-			glog.Warningf("the channel may be closed")
-			break
-		}
-	}
-}
-
-func (thls *businessNode) feedToChan(userID string) {
-	thls.chanSync <- userID
+	stream.sendData1(data, true)
 }
