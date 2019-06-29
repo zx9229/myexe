@@ -142,12 +142,12 @@ func newBusinessNode(cfg *configNode) *businessNode {
 }
 
 func (thls *businessNode) initDatabase(DriverName, DataSourceName, LocationName string) {
-	if len(DriverName) == 0 {
-		glog.Infof("DriverName=%v, will sikp database", DriverName)
+	if DriverName == EMPTYSTR {
+		glog.Infof("DriverName=[%v], will sikp database", DriverName)
 		return
 	}
 	if DriverName != "sqlite3" {
-		glog.Fatalf("DriverName=%v, not sqlite3!", DriverName)
+		glog.Fatalf("DriverName=[%v], not [sqlite3]!", DriverName)
 	}
 	var err error
 	var xEngine *xorm.Engine
