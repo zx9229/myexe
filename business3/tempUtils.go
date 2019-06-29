@@ -68,7 +68,9 @@ func filename_line_funcname() (filename string, line int, funcname string) {
 }
 
 func funName(depth int) (funcname string) {
-	if pc, _, _, ok := runtime.Caller(2 + depth); ok {
+	//0: funName
+	//1: 调用funName的函数(对print类的函数无效?)
+	if pc, _, _, ok := runtime.Caller(depth); ok {
 		funcname = runtime.FuncForPC(pc).Name()      // main.(*MyStruct).foo
 		funcname = filepath.Ext(funcname)            // .foo
 		funcname = strings.TrimPrefix(funcname, ".") // foo
