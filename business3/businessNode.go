@@ -409,7 +409,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Ack(msgData *txdata.Common2Ac
 		check4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
 		check4true(msgData.Key.MsgNo >= 0) &&
 		check4true(msgData.Key.SeqNo >= 0)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -440,7 +440,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 		check4true(msgData.Key.SeqNo == 0) &&
 		//从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了,(只有UpCache为真时,ToRoot才可能为真)
 		check4false(msgData.UpCache && !msgData.ToRoot)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -539,7 +539,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 		check4true(msgData.Key.SeqNo > 0) &&
 		//从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了,(只有UpCache为真时,ToRoot才可能为真)
 		check4false(msgData.UpCache && !msgData.ToRoot)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -619,7 +619,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 		check4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
 		check4true(msgData.MsgNo >= 0) &&
 		check4true(msgData.SeqNo == 0)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -663,7 +663,7 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 		check4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
 		check4true(msgData.MsgNo >= 0) &&
 		check4true(msgData.SeqNo > 0)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -692,8 +692,8 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
 	if (check4true(msgData.Info.UserID != EMPTYSTR) &&
 		//协议规定,它必须是从儿子的方向发过来的,(它一定不是父亲的连接)
-		check4false(msgConn != thls.parentInfo.conn)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		check4true(msgConn != thls.parentInfo.conn)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -925,7 +925,7 @@ func (thls *businessNode) handle_MsgType_ID_ConnectRsp(msgData *txdata.ConnectRs
 
 func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineNotice, msgConn *wsnet.WsSocket) {
 	if pconn := thls.parentInfo.conn; /*pconn != nil &&*/ pconn != msgConn {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -938,7 +938,7 @@ func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineN
 
 func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemReport, msgConn *wsnet.WsSocket) {
 	if pconn := thls.parentInfo.conn; pconn != nil && pconn == msgConn { //协议规定,它必须是从儿子的方向发过来的.
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 
@@ -954,9 +954,9 @@ func (thls *businessNode) handle_MsgType_ID_PathwayInfo(msgData *txdata.PathwayI
 	if pconn := thls.parentInfo.conn; pconn != nil && pconn != msgConn { //可能为真,都失败了,那么一定为假.
 		sockMaybeParent = false //(parentSock存在 && parentSock!=sock)=>(sock是sonSock)
 	}
-	if (check4false(sockMaybeParent) && //协议规定,它必须是从儿子的方向发过来的.
+	if (check4true(sockMaybeParent) && //协议规定,它必须是从父亲的方向发过来的.
 		check4true(msgData.UserID != EMPTYSTR)) == false {
-		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(-1), msgConn, msgData)
 		return
 	}
 

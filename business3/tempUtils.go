@@ -67,8 +67,8 @@ func filename_line_funcname() (filename string, line int, funcname string) {
 	return
 }
 
-func funName() (funcname string) {
-	if pc, _, _, ok := runtime.Caller(2); ok {
+func funName(depth int) (funcname string) {
+	if pc, _, _, ok := runtime.Caller(2 + depth); ok {
 		funcname = runtime.FuncForPC(pc).Name()      // main.(*MyStruct).foo
 		funcname = filepath.Ext(funcname)            // .foo
 		funcname = strings.TrimPrefix(funcname, ".") // foo
