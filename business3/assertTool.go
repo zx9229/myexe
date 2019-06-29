@@ -11,3 +11,11 @@ func assert4false(cond bool) {
 		panic(cond)
 	}
 }
+
+func check4true(cond bool) bool {
+	return cond
+}
+
+func check4false(cond bool) bool {
+	return !cond
+}

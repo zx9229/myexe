@@ -400,12 +400,17 @@ func (thls *businessNode) handle_MsgType_ID_Common2Ack(msgData *txdata.Common2Ac
 		glog.Infof("handle_MsgType_ID_Common2Ack, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
-	assert4true(msgData.Key != nil)
-	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
-	assert4true(msgData.Key.MsgNo >= 0)
-	assert4true(msgData.Key.SeqNo >= 0)
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
+	fieldMaybeOkToRoot := true
+	if pconn := thls.parentInfo.conn; pconn != nil { //可能为真,都失败了,那么一定为假.
+		fieldMaybeOkToRoot = (msgConn != pconn) == msgData.ToRoot //[(sock!=parentSock)=>sonSock=>(ToRoot==true)]
+	}
+	if (check4true(fieldMaybeOkToRoot) &&
+		check4true(msgData.Key != nil) &&
+		check4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
+		check4true(msgData.Key.MsgNo >= 0) &&
+		check4true(msgData.Key.SeqNo >= 0)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		return
 	}
 
 	if msgData.RecverID == thls.ownInfo.UserID {
@@ -424,13 +429,19 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 		glog.Infof("handle_MsgType_ID_Common2Req, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
-	assert4true(msgData.Key != nil)
-	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
-	assert4true(msgData.Key.MsgNo >= 0)
-	assert4true(msgData.Key.SeqNo == 0)
-	assert4false(msgData.UpCache && !msgData.ToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
+	fieldMaybeOkToRoot := true
+	if pconn := thls.parentInfo.conn; pconn != nil { //可能为真,都失败了,那么一定为假.
+		fieldMaybeOkToRoot = (msgConn != pconn) == msgData.ToRoot //[(sock!=parentSock)=>sonSock=>(ToRoot==true)]
+	}
+	if (check4true(fieldMaybeOkToRoot) &&
+		check4true(msgData.Key != nil) &&
+		check4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
+		check4true(msgData.Key.MsgNo >= 0) &&
+		check4true(msgData.Key.SeqNo == 0) &&
+		//从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了,(只有UpCache为真时,ToRoot才可能为真)
+		check4false(msgData.UpCache && !msgData.ToRoot)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		return
 	}
 
 	if thls.iAmRoot {
@@ -517,13 +528,19 @@ func (thls *businessNode) handle_MsgType_ID_Common2Rsp(msgData *txdata.Common2Rs
 		glog.Infof("handle_MsgType_ID_Common2Rsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
-	assert4true(msgData.Key != nil)
-	assert4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
-	assert4true(msgData.Key.MsgNo >= 0)
-	assert4true(msgData.Key.SeqNo > 0)
-	assert4false(msgData.UpCache && !msgData.ToRoot) //从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了.
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
+	fieldMaybeOkToRoot := true
+	if pconn := thls.parentInfo.conn; pconn != nil { //可能为真,都失败了,那么一定为假.
+		fieldMaybeOkToRoot = (msgConn != pconn) == msgData.ToRoot //[(sock!=parentSock)=>sonSock=>(ToRoot==true)]
+	}
+	if (check4true(fieldMaybeOkToRoot) &&
+		check4true(msgData.Key != nil) &&
+		check4true(msgData.Key.UserID != EMPTYSTR && msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
+		check4true(msgData.Key.MsgNo >= 0) &&
+		check4true(msgData.Key.SeqNo > 0) &&
+		//从(根节点)发往(叶子节点)只允许一次性到位,不允许中间再有托管环节了,(只有UpCache为真时,ToRoot才可能为真)
+		check4false(msgData.UpCache && !msgData.ToRoot)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		return
 	}
 
 	if thls.iAmRoot {
@@ -594,11 +611,16 @@ func (thls *businessNode) handle_MsgType_ID_Common1Req(msgData *txdata.Common1Re
 		glog.Infof("handle_MsgType_ID_Common1Req, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
-	assert4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
-	assert4true(msgData.MsgNo >= 0)
-	assert4true(msgData.SeqNo == 0)
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.ToRoot) //如果是(儿子)发过来的数据,那么(ToRoot)必为真.
+	fieldMaybeOkToRoot := true
+	if pconn := thls.parentInfo.conn; pconn != nil { //可能为真,都失败了,那么一定为假.
+		fieldMaybeOkToRoot = (msgConn != pconn) == msgData.ToRoot //[(sock!=parentSock)=>sonSock=>(ToRoot==true)]
+	}
+	if (check4true(fieldMaybeOkToRoot) &&
+		check4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
+		check4true(msgData.MsgNo >= 0) &&
+		check4true(msgData.SeqNo == 0)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		return
 	}
 
 	if msgData.RecverID == thls.ownInfo.UserID {
@@ -633,11 +655,16 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 		glog.Infof("handle_MsgType_ID_Common1Rsp, msgConn=%p, msgData=%v", msgConn, msgData)
 	}
 
-	assert4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR)
-	assert4true(msgData.MsgNo >= 0)
-	assert4true(msgData.SeqNo > 0)
-	if pconn := thls.parentInfo.conn; pconn != nil {
-		assert4true((msgConn != pconn) == msgData.ToRoot)
+	fieldMaybeOkToRoot := true
+	if pconn := thls.parentInfo.conn; pconn != nil { //可能为真,都失败了,那么一定为假.
+		fieldMaybeOkToRoot = (msgConn != pconn) == msgData.ToRoot //[(sock!=parentSock)=>sonSock=>(ToRoot==true)]
+	}
+	if (check4true(fieldMaybeOkToRoot) &&
+		check4true(msgData.SenderID != EMPTYSTR && msgData.RecverID != EMPTYSTR) &&
+		check4true(msgData.MsgNo >= 0) &&
+		check4true(msgData.SeqNo > 0)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
+		return
 	}
 
 	if msgData.RecverID == thls.ownInfo.UserID {
@@ -663,11 +690,13 @@ func (thls *businessNode) handle_MsgType_ID_Common1Rsp(msgData *txdata.Common1Rs
 }
 
 func (thls *businessNode) handle_MsgType_ID_DisconnectedData(msgData *txdata.DisconnectedData, msgConn *wsnet.WsSocket) {
-	assert4true(msgData.Info.UserID != EMPTYSTR)
-	if msgConn == thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
-		glog.Errorf("recv DisconnectedData from father, msgConn=%p, msgData=%v", msgConn, msgData)
+	if (check4true(msgData.Info.UserID != EMPTYSTR) &&
+		//协议规定,它必须是从儿子的方向发过来的,(它一定不是父亲的连接)
+		check4false(msgConn != thls.parentInfo.conn)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
 		return
 	}
+
 	if !thls.cacheUser.deleteData(msgData.Info.UserID) {
 		//极端情况下,可能会出现:儿子和孙子连接好了,儿子和父亲连接起来了,儿子即将和父亲同步连接信息的时候,儿子和孙子连接断开了,
 		//儿子向父亲发送DisconnectedData,父亲接收了DisconnectedData,父亲无法清理缓存.
@@ -895,23 +924,24 @@ func (thls *businessNode) handle_MsgType_ID_ConnectRsp(msgData *txdata.ConnectRs
 }
 
 func (thls *businessNode) handle_MsgType_ID_OnlineNotice(msgData *txdata.OnlineNotice, msgConn *wsnet.WsSocket) {
-	pConn := thls.parentInfo.conn
-	if msgConn != pConn {
-		glog.Errorf("handle_MsgType_ID_OnlineNotice, OnlineNotice not from parent, msgConn=%p, pConn=%p", msgConn, pConn)
+	if pconn := thls.parentInfo.conn; /*pconn != nil &&*/ pconn != msgConn {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
 		return
 	}
+
 	thls.setRootOnline(msgData.RootIsOnline)
 
 	if thls.rootOnline {
-		thls.feedToChan("")
+		thls.feedToChan(ROOTNODE)
 	}
 }
 
 func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemReport, msgConn *wsnet.WsSocket) {
-	if msgConn == thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
-		glog.Errorf("recv SystemReport from father, msgConn=%p, msgData=%v", msgConn, msgData)
+	if pconn := thls.parentInfo.conn; pconn != nil && pconn == msgConn { //协议规定,它必须是从儿子的方向发过来的.
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
 		return
 	}
+
 	if thls.iAmRoot {
 		glog.Infoln(msgData)
 	} else {
@@ -920,11 +950,16 @@ func (thls *businessNode) handle_MsgType_ID_SystemReport(msgData *txdata.SystemR
 }
 
 func (thls *businessNode) handle_MsgType_ID_PathwayInfo(msgData *txdata.PathwayInfo, msgConn *wsnet.WsSocket) {
-	assert4true(msgData.UserID != EMPTYSTR)
-	if msgConn != thls.parentInfo.conn { //协议规定,它必须是从儿子的方向发过来的.
-		glog.Errorf("recv SystemReport from father, msgConn=%p, msgData=%v", msgConn, msgData)
+	sockMaybeParent := true
+	if pconn := thls.parentInfo.conn; pconn != nil && pconn != msgConn { //可能为真,都失败了,那么一定为假.
+		sockMaybeParent = false //(parentSock存在 && parentSock!=sock)=>(sock是sonSock)
+	}
+	if (check4false(sockMaybeParent) && //协议规定,它必须是从儿子的方向发过来的.
+		check4true(msgData.UserID != EMPTYSTR)) == false {
+		glog.Errorf("check_failure, funName=%v, msgConn=%p, msgData=%v", funName(), msgConn, msgData)
 		return
 	}
+
 	thls.pathinfo = msgData
 	thls.cacheUser.sendDataToSon(msgData)
 }

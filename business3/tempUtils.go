@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/zx9229/myexe/txdata"
 )
@@ -48,5 +51,29 @@ func int2mode(src int) (isPush bool, isSafe bool) {
 	//3 要推送,要安全
 	isSafe = ((src & 1) == 1)
 	isPush = (((src >> 1) & 1) == 1)
+	return
+}
+
+func filename_line_funcname() (filename string, line int, funcname string) {
+	filename, line, funcname = "???", 0, "???"
+	pc, filename, line, ok := runtime.Caller(2)
+	// fmt.Println(reflect.TypeOf(pc), reflect.ValueOf(pc))
+	if ok {
+		filename = filepath.Base(filename)           // /full/path/basename.go => basename.go
+		funcname = runtime.FuncForPC(pc).Name()      // main.(*MyStruct).foo
+		funcname = filepath.Ext(funcname)            // .foo
+		funcname = strings.TrimPrefix(funcname, ".") // foo
+	}
+	return
+}
+
+func funName() (funcname string) {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		funcname = runtime.FuncForPC(pc).Name()      // main.(*MyStruct).foo
+		funcname = filepath.Ext(funcname)            // .foo
+		funcname = strings.TrimPrefix(funcname, ".") // foo
+	} else {
+		funcname = "???"
+	}
 	return
 }
