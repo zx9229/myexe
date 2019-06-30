@@ -53,7 +53,12 @@ Item {
                         onDoubleClicked: {
                             messageText.selectByMouse = !messageText.selectByMouse
                         }
-                        onPressAndHold: {}
+                        onPressAndHold: {
+                            menu.userid = UserID
+                            menu.msgno = MsgNo
+                            menu.jsonText = TxDataTxt
+                            menu.popup()
+                        }
                     }
                 }
                 states: State {
@@ -104,7 +109,7 @@ Item {
             text: qsTr("显示发送面板")
             onClicked: {
                 paneSend.visible = !paneSend.visible
-                text = paneSend.visible ? qsTr("隐藏发送面板") : qsTr("显示发送面板")
+                text = paneSend.visible ? "隐藏发送面板" : "显示发送面板"
             }
         }
 
@@ -226,6 +231,28 @@ Item {
                 mstm.select()
                 verScrollBar.setPosition(1.0)
             }
+        }
+    }
+
+    Menu {
+        id: menu
+        property var userid: undefined
+        property var msgno : undefined
+        property var jsonText : undefined
+        MenuItem {
+            text: "复制"
+            onTriggered: dataExch.copyText(jsonText)
+            visible: true
+        }
+        MenuItem {
+            text: "删除整个MsgNo"
+            onTriggered: dataExch.deleteCommonData1(menu.userid,menu.msgno)
+            visible: true
+        }
+        MenuItem {
+            text: "TTS朗读json"
+            onTriggered: dataExch.ttsSpeak(menu.jsonText)
+            visible: true
         }
     }
 }

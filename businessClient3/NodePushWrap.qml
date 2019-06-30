@@ -5,6 +5,7 @@ import QtQuick.Controls.Styles 1.4
 import MySqlTableModel 0.1
 
 Item {
+    property string userid
     property string peerid
 
     ColumnLayout {
@@ -48,7 +49,13 @@ Item {
                         onDoubleClicked: {
                             messageText.selectByMouse = !messageText.selectByMouse
                         }
-                        onPressAndHold: {}
+                        onPressAndHold: {
+                            menu.userid = UserID
+                            menu.peerid = PeerID
+                            menu.msgno = MsgNo
+                            menu.jsonText = PshDataTxt
+                            menu.popup()
+                        }
                     }
                 }
                 states: State {
@@ -101,6 +108,43 @@ Item {
             if (tableName === "PushWrap") {
                 mstm.select()
                 verScrollBar.setPosition(1.0)
+            }
+        }
+    }
+
+    Menu {
+        id: menu
+        property var userid: undefined
+        property var peerid: undefined
+        property var msgno : undefined
+        property var jsonText : undefined
+        MenuItem {
+            text: "复制"
+            onTriggered: dataExch.copyText(menu.jsonText)
+            visible: true
+        }
+        MenuItem {
+            text: "删除"
+            onTriggered: dataExch.deletePushWrap(menu.userid,menu.peerid,menu.msgno)
+            visible: true
+        }
+        MenuItem {
+            text: "TTS朗读json"
+            onTriggered: dataExch.ttsSpeak(menu.jsonText)
+            visible: true
+        }
+        MenuItem {
+            text: "TTS朗读json.Subject"
+            onTriggered: {
+                var jsonObj = JSON.parse(menu.jsonText);
+                dataExch.ttsSpeak(jsonObj.Subject)
+            }
+        }
+        MenuItem {
+            text: "TTS朗读json.Content"
+            onTriggered: {
+                var jsonObj = JSON.parse(menu.jsonText);
+                dataExch.ttsSpeak(jsonObj.Content)
             }
         }
     }

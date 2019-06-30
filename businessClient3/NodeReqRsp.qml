@@ -70,6 +70,13 @@ Item {
                             onDoubleClicked: {
                                 messageText.selectByMouse = !messageText.selectByMouse
                             }
+                            onPressAndHold: {
+                                menu.userid = UserID
+                                menu.msgno = MsgNo
+                                menu.seqno = SeqNo
+                                menu.jsonText = TxDataTxt
+                                menu.popup()
+                            }
                         }
                     }
                     Rectangle {
@@ -136,6 +143,48 @@ Item {
             if (tableName === "CommonData") {
                 mstm.select()
                 verScrollBar.setPosition(1.0)
+            }
+        }
+    }
+
+    Menu {
+        id: menu
+        property var userid: undefined
+        property var msgno : undefined
+        property var seqno: undefined
+        property var jsonText : undefined
+        MenuItem {
+            text: "复制"
+            onTriggered: dataExch.copyText(jsonText)
+            visible: true
+        }
+        MenuItem {
+            text: "删除整个MsgNo"
+            onTriggered: dataExch.deleteCommonData1(menu.userid,menu.msgno)
+            visible: true
+        }
+        MenuItem {
+            text: "删除单个SeqNo"
+            onTriggered: dataExch.deleteCommonData2(menu.userid,menu.msgno,menu.seqno)
+            visible: true
+        }
+        MenuItem {
+            text: "TTS朗读json"
+            onTriggered: dataExch.ttsSpeak(menu.jsonText)
+            visible: true
+        }
+        MenuItem {
+            text: "TTS朗读json.Subject"
+            onTriggered: {
+                var jsonObj = JSON.parse(menu.jsonText);
+                dataExch.ttsSpeak(jsonObj.Subject)
+            }
+        }
+        MenuItem {
+            text: "TTS朗读json.Content"
+            onTriggered: {
+                var jsonObj = JSON.parse(menu.jsonText);
+                dataExch.ttsSpeak(jsonObj.Content)
             }
         }
     }
