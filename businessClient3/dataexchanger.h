@@ -59,6 +59,7 @@ private:
     void handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data);
     void handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data);
     void handle_SubscribeRsp(QSharedPointer<txdata::SubscribeRsp> data);
+    void genAck4Common2Rsp(QSharedPointer<txdata::Common2Rsp> rspIn, QSharedPointer<txdata::Common2Ack>& ackOut);
 
 private slots:
     void slotOnConnected();

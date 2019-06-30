@@ -52,7 +52,7 @@ DataExchanger::DataExchanger(QObject *parent) :
     m_ws(parent),
     m_MsgNo("MsgNo", QString()),
     m_lastFind(false),
-    m_subUser("")
+    m_subUser("ROOT")
 {
     connect(&m_ws, &MyWebsock::sigConnected, this, &DataExchanger::slotOnConnected);
     connect(&m_ws, &MyWebsock::sigDisconnected, this, &DataExchanger::slotOnDisconnected);
@@ -446,6 +446,12 @@ void DataExchanger::handle_Common2Rsp(QSharedPointer<txdata::Common2Rsp> msgData
         Q_ASSERT(isOk);
         emit sigTableChanged(tmpData.static_table_name());
     }
+    if (msgData->issafe())
+    {
+        QSharedPointer<txdata::Common2Ack> ackOut;
+        genAck4Common2Rsp(msgData, ackOut);
+        m_ws.sendBinaryMessage(m2b::msg2package(*ackOut));
+    }
 }
 
 void DataExchanger::handle_Common1Req(QSharedPointer<txdata::Common1Req> msgData)
@@ -554,6 +560,11 @@ void DataExchanger::handle_ConnectReq(QSharedPointer<txdata::ConnectReq> data)
     bool checkOk = false;
     do
     {
+        if (data->inforeq().userid().empty())
+        {
+            data4send.set_errmsg("(req.UserID == EMPTYSTR)");
+            break;
+        }
         if (data->inforeq().userid() != m_ownInfo.belongid())
         {
             data4send.set_errmsg("(req.UserID != rsp.BelongID)");
@@ -644,6 +655,20 @@ void DataExchanger::handle_SubscribeRsp(QSharedPointer<txdata::SubscribeRsp> dat
 {
     Q_ASSERT(data.data() != nullptr);
     qDebug() << m2b::CalcMsgTypeName(*data) << QString::fromStdString(data->DebugString());
+}
+
+void DataExchanger::genAck4Common2Rsp(QSharedPointer<txdata::Common2Rsp> rspIn, QSharedPointer<txdata::Common2Ack>& ackOut)
+{
+    Q_ASSERT(rspIn->issafe() == true);
+    Q_ASSERT(rspIn->ispush() == false);
+    ackOut = QSharedPointer<txdata::Common2Ack>(new txdata::Common2Ack);
+    ackOut->mutable_key()->set_userid(rspIn->key().userid());
+    ackOut->mutable_key()->set_msgno(rspIn->key().msgno());
+    ackOut->mutable_key()->set_seqno(rspIn->key().seqno());
+    ackOut->set_senderid(this->m_ownInfo.userid());
+    ackOut->set_recverid(rspIn->senderid());
+    ackOut->set_toroot(!rspIn->toroot());
+    ackOut->set_islog(rspIn->islog());
 }
 
 void DataExchanger::slotOnConnected()
