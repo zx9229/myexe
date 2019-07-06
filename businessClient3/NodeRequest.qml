@@ -153,11 +153,6 @@ Item {
                             checked: true
                             visible: true
                         }
-                        Controls1.CheckBox {
-                            id: cbForceToDB
-                            text: qsTr("DB")
-                            checked: false
-                        }
                     }
                 }
                 RowLayout {
@@ -200,9 +195,9 @@ Item {
                     Button {
                         text: qsTr("发送")
                         onClicked: {
+                            //var message = dataExch.sendReq(cbReqType.currentText,taReqData.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbFillMsgNo.checked,cbForceToDB.checked)
                             var paramList = paneSend.getCommonReqParams()
                             var message = dataExch.sendCommonReq(paramList, rbC1Req.checked)
-                            //var message = dataExch.sendReq(cbReqType.currentText,taReqData.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbFillMsgNo.checked,cbForceToDB.checked)
                             ToolTip.show("send: "+message, 5000)
                         }
                     }
