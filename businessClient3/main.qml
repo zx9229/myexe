@@ -49,10 +49,10 @@ Window {
                         loader1.setSource(urlStr, attrMap)
                     }
                 })
-                item.sigShowNodeRequest.connect(function(PeerID){
+                item.sigShowNodeRequest.connect(function(UserID, PeerID){
                     var urlStr = "qrc:/NodeRequest.qml"
                     if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {
-                        var attrMap = {"peerid":PeerID}
+                        var attrMap = {"userid":UserID, "peerid":PeerID}
                         loader1.setSource(urlStr, attrMap)
                     }
                 })

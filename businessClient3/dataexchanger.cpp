@@ -188,6 +188,16 @@ bool DataExchanger::start()
 
 QString DataExchanger::sendReq(const QString &typeName, const QString &jsonText, const QString &rID, bool isLog, bool isSafe, bool isPush, bool isUpCache, bool isC1NotC2, bool fillMsgNo, bool forceToDB)
 {
+    QMap<QString,QString> kvMap;
+    {
+        kvMap["ReqType"]=typeName;
+        kvMap["ReqData"]=jsonText;
+        kvMap["RecverID"]=rID;
+        kvMap["IsLog"]=isLog;
+        kvMap["IsSafe"]=isSafe;
+        kvMap["IsPush"]=isPush;
+        kvMap["UpCache"]=isUpCache;
+    }
     QString message;
     int64_t msgNo = 0;
     if (fillMsgNo || !isC1NotC2)

@@ -7,7 +7,7 @@ Item {
     signal sigShowLogin()
     signal sigShowPathwayInfo()
     signal sigShowNodePushWrap(string PeerID)
-    signal sigShowNodeRequest(string PeerID)
+    signal sigShowNodeRequest(string UserID, string PeerID)
     signal sigShowNodeReqRsp(string UserID, string MsgNo)
     signal sigShowSystemSettings()
     signal sigShowCommonRequest()
@@ -47,7 +47,7 @@ Item {
                     if (typeof(peerID) === "undefined") {
                         ToolTip.show("请先指定对端节点", 5000)
                     } else {
-                        sigShowNodeRequest(peerID)
+                        sigShowNodeRequest(userID, peerID)
                     }
                 }
             }

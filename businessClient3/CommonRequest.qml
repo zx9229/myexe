@@ -73,6 +73,9 @@ Item {
                 text: ""
                 Layout.fillWidth: true
                 readOnly: tfMsgNo_cb.checked
+                validator: RegExpValidator {
+                    regExp: /[-]{0,1}[0-9]+/
+                }
                 function autoFillData() {
                     var curMsgNo = Number(dataExch.memGetData("MsgNo"))
                     tfMsgNo.text = "%1=%2+1".arg(curMsgNo+1).arg(curMsgNo)
@@ -95,6 +98,9 @@ Item {
                 text: "0"
                 Layout.fillWidth: true
                 readOnly: tfSeqNo_cb.checked
+                validator: RegExpValidator {
+                    regExp: /[-]{0,1}[0-9]+/
+                }
             }
             Controls1.CheckBox {
                 id: tfSeqNo_cb
@@ -113,6 +119,9 @@ Item {
                 text: "0"
                 Layout.fillWidth: true
                 Layout.columnSpan: 2
+                validator: RegExpValidator {
+                    regExp: /[-]{0,1}[0-9]+/
+                }
             }
             Label {
                 text: "RefNum"
@@ -122,6 +131,9 @@ Item {
                 text: "0"
                 Layout.fillWidth: true
                 Layout.columnSpan: 2
+                validator: RegExpValidator {
+                    regExp: /[-]{0,1}[0-9]+/
+                }
             }
             Label {
                 text: "RefText"
@@ -269,7 +281,7 @@ Item {
                 onClicked: cbReqType.editable = cbReqType_cb.checked
             }
             TextArea {
-                id: idTextArea
+                id: taReqData
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.columnSpan: 3
@@ -284,7 +296,7 @@ Item {
                 Button {
                     text: qsTr("填充JSON")
                     Layout.fillWidth: true
-                    onClicked: idTextArea.text = dataExch.jsonExample(cbReqType.text2)
+                    onClicked: taReqData.text = dataExch.jsonExample(cbReqType.text2)
                 }
                 Button {
                     text: qsTr("发送")
@@ -304,7 +316,7 @@ Item {
         function selectCommonReq() {
             var paramList = []
             paramList.push('UserID'); paramList.push(tfUserID.text);
-            paramList.push('MsgNo'); paramList.push(tfMsgNo.text.split("=")[0]);
+            paramList.push('MsgNo'); paramList.push(tfMsgNo.text.split('=')[0]);
             paramList.push('SeqNo'); paramList.push(tfSeqNo.text);
             paramList.push('BatchNo'); paramList.push(tfBatchNo.text);
             paramList.push('RefNum'); paramList.push(tfRefNum.text);
@@ -313,11 +325,12 @@ Item {
             paramList.push('RecverID'); paramList.push(cbRecverID.text2);
             paramList.push('ToRoot'); paramList.push(cbToRoot.checked?1:0);
             paramList.push('IsLog'); paramList.push(cbIsLog.checked?1:0);
+            paramList.push('IsSafe'); paramList.push(cbIsSafe.checked?1:0);
             paramList.push('IsPush'); paramList.push(cbIsPush.checked?1:0);
             paramList.push('UpCache'); paramList.push(cbUpCache.checked?1:0);
-            paramList.push('ReqTime'); paramList.push(tfReqTime.text2);
             paramList.push('ReqType'); paramList.push(cbReqType.text2);
-            paramList.push('ReqData'); paramList.push(idTextArea.text);
+            paramList.push('ReqData'); paramList.push(taReqData.text);
+            paramList.push('ReqTime'); paramList.push(tfReqTime.text2);
             return paramList
         }
     }

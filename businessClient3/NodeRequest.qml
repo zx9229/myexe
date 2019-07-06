@@ -8,6 +8,7 @@ import MySqlTableModel 0.1
 Item {
     signal sigPickMsgNo(string MsgNo)
     //property alias statement: mstm.selectStatement
+    property string userid
     property string peerid
 
     ColumnLayout {
@@ -194,25 +195,27 @@ Item {
                     }
                     Button {
                         text: qsTr("填充示例JSON")
-                        onClicked: idTextArea.text = dataExch.jsonExample(idComboBox.currentText)
+                        onClicked: taReqData.text = dataExch.jsonExample(cbReqType.currentText)
                     }
                     Button {
                         text: qsTr("发送")
                         onClicked: {
-                            var message = dataExch.sendReq(idComboBox.currentText,idTextArea.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbFillMsgNo.checked,cbForceToDB.checked)
+                            var paramList = paneSend.getCommonReqParams()
+                            var message = dataExch.sendCommonReq(paramList, rbC1Req.checked)
+                            //var message = dataExch.sendReq(cbReqType.currentText,taReqData.text,peerid,cbIsLog.checked,cbIsSafe.checked,cbIsPush.checked,cbIsUpCache.checked,rbC1Req.checked,cbFillMsgNo.checked,cbForceToDB.checked)
                             ToolTip.show("send: "+message, 5000)
                         }
                     }
                 }
 
                 Controls1.ComboBox {
-                    id: idComboBox
+                    id: cbReqType
                     Layout.fillWidth: true
                     model: dataExch.getTxMsgTypeNameList()
                 }
 
                 TextArea {
-                    id: idTextArea
+                    id: taReqData
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     background: Rectangle {
@@ -220,6 +223,28 @@ Item {
                         border.color: "blue"
                     }
                 }
+            }
+            function getCommonReqParams() {
+                var curMsgNo = 0
+                if(cbFillMsgNo.checked){ curMsgNo = Number(dataExch.memGetData("MsgNo"))+1 }
+                var paramList = []
+                paramList.push('UserID'); paramList.push(userid);
+                paramList.push('MsgNo'); paramList.push(curMsgNo);
+                paramList.push('SeqNo'); paramList.push("0");
+                paramList.push('BatchNo'); paramList.push("0");
+                paramList.push('RefNum'); paramList.push("0");
+                paramList.push('RefText'); paramList.push("");
+                paramList.push('SenderID'); paramList.push(userid);
+                paramList.push('RecverID'); paramList.push(peerid);
+                paramList.push('ToRoot'); paramList.push("1");
+                paramList.push('IsLog'); paramList.push(cbIsLog.checked?1:0);
+                paramList.push('IsSafe'); paramList.push(cbIsSafe.checked?1:0);
+                paramList.push('IsPush'); paramList.push(cbIsPush.checked?1:0);
+                paramList.push('UpCache'); paramList.push(cbIsUpCache.checked?1:0);
+                paramList.push('ReqType'); paramList.push(cbReqType.currentText);
+                paramList.push('ReqData'); paramList.push(taReqData.text);
+                paramList.push('ReqTime'); paramList.push((new Date()).toLocaleString(Qt.locale(), "yyyy-MM-dd hh:mm:ss"));
+                return paramList
             }
         }
     }
