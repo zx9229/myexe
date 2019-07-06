@@ -86,6 +86,10 @@ bool DataExchanger::dbSaveValue(const QString& key, const QString& value)
 
 QString DataExchanger::memGetData(const QString& varName)
 {
+    if (varName == "MsgNo")
+        return m_MsgNo.Value;
+    if (varName == "PathwayInfo")
+        return m_PathwayInfo ? zxtools::object2json(*m_PathwayInfo, nullptr) : "{}";
     return varName.isEmpty() ? "" : "";
 }
 
@@ -279,6 +283,56 @@ bool DataExchanger::deletePushWrap(const QString& userid, const QString& peerid,
 QString DataExchanger::serviceInfo()
 {
     return m_startDateTime.toString("yyyy-MM-dd hh:mm:ss");
+}
+
+QString DataExchanger::sendCommonReq(const QStringList& kvs, bool isC1NotC2)
+{
+    QString message;
+    do
+    {
+        QMap<QString, QString> kvMap = zxtools::fromOddEven(kvs);
+        if (kvMap.isEmpty())
+        {
+            message = "param illegal";
+            break;
+        }
+        CommonData tmpCommonData;
+        if (isC1NotC2)
+        {
+            QSharedPointer<txdata::Common1Req> c1req = QSharedPointer<txdata::Common1Req>(new txdata::Common1Req);
+            message = zxtools::map2Common1Req(c1req.get(), kvMap);
+            if (!message.isEmpty())
+                break;
+            message = sendCommon1Req(c1req);
+            if (!message.isEmpty())
+                break;
+            zxtools::Common1Req2CommonData(&tmpCommonData, c1req.get());
+        }
+        else
+        {
+            QSharedPointer<txdata::Common2Req> c2req = QSharedPointer<txdata::Common2Req>(new txdata::Common2Req);
+            message = zxtools::map2Common2Req(c2req.get(), kvMap);
+            if (!message.isEmpty())
+                break;
+            message = sendCommon2Req(c2req);
+            if (!message.isEmpty())
+                break;
+            zxtools::Common2Req2CommonData(&tmpCommonData, c2req.get());
+        }
+        tmpCommonData.SendOK = message.isEmpty();
+        if (tmpCommonData.SendOK && tmpCommonData.MsgNo != 0)
+        {
+            QSqlQuery sqlQuery;
+            tmpCommonData.insert_data(sqlQuery, true, nullptr);
+            if (m_MsgNo.Value.toLongLong() < tmpCommonData.MsgNo)
+            {
+                m_MsgNo.Value.setNum(tmpCommonData.MsgNo);
+                m_MsgNo.update_data(sqlQuery);
+            }
+            emit sigTableChanged(tmpCommonData.static_table_name());
+        }
+    } while (false);
+    return message;
 }
 
 void DataExchanger::initDB()
@@ -618,6 +672,7 @@ void DataExchanger::handle_ConnectRsp(QSharedPointer<txdata::ConnectRsp> data)
 void DataExchanger::handle_PathwayInfo(QSharedPointer<txdata::PathwayInfo> data)
 {
     Q_ASSERT(data.data() != nullptr);
+    m_PathwayInfo = data;
     QSqlQuery sqlQuery;
     bool curFind = (data->info().find(m_subUser.toStdString()) != data->info().end());
     if (m_lastFind != curFind)

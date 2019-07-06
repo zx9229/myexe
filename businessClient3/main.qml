@@ -63,6 +63,12 @@ Window {
                         loader1.setSource(urlStr, attrMap)
                     }
                 })
+                item.sigShowCommonRequest.connect(function(){
+                    var urlStr = "qrc:/CommonRequest.qml"
+                    if (loader1.source == urlStr) { swipeView.setCurrentIndex(1) } else {
+                        loader1.source = urlStr
+                    }
+                })
             }
         }
 
@@ -93,6 +99,9 @@ Window {
                     item.sigShowHomePage.connect(function(){
                         swipeView.setCurrentIndex(0)
                     })
+                }
+                if (item.hasOwnProperty('funLoaded')) {
+                    item.funLoaded()
                 }
             }
         }

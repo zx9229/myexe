@@ -13,13 +13,14 @@ Item {
     }
 
     Controls1.ScrollView {
+        id: scrollView
         anchors.fill: parent
         GridLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             id: gridLayout
-            rows: 17
+            Layout.fillHeight: true
+            Layout.fillWidth: true
             columns: 3
+            rows: 22
             Label {
                 text: qsTr("C1C2")
             }
@@ -289,8 +290,8 @@ Item {
                     text: qsTr("发送")
                     Layout.fillWidth: true
                     onClicked: {
-                        var paramList =  selectCommonReq()
-                        var message = dataExch.testSendC1Req(paramList)
+                        var paramList = scrollView.selectCommonReq()
+                        var message = dataExch.sendCommonReq(paramList, rbC1Req.checked)
                         ToolTip.show("send: "+message, 5000)
                     }
                 }

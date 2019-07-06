@@ -26,6 +26,7 @@ public Q_SLOTS:
     virtual bool deleteCommonData2(const QString& userid, qint64 msgno, int seqno);
     virtual bool deletePushWrap(const QString& userid, const QString& peerid, qint64 msgno);
     virtual QString serviceInfo();
+    virtual QString sendCommonReq(const QStringList& kvs, bool isC1NotC2);
 public:
     DataExchanger m_dataExch;
     QRemoteObjectHost m_node;

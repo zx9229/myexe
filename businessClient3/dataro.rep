@@ -15,6 +15,7 @@ class DataRO
     SLOT(bool deleteCommonData2(const QString& userid, qint64 msgno, int seqno));
     SLOT(bool deletePushWrap(const QString& userid, const QString& peerid, qint64 msgno));
     SLOT(QString serviceInfo());
+    SLOT(QString sendCommonReq(const QStringList& kvs, bool isC1NotC2));
     SIGNAL(sigReady());
     SIGNAL(sigStatusError(const QString& errMessage, int errType));
     SIGNAL(sigTableChanged(const QString &tableName));

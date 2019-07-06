@@ -37,6 +37,7 @@ public:
     Q_INVOKABLE bool deleteCommonData2(const QString& userid, qint64 msgno, int seqno);
     Q_INVOKABLE bool deletePushWrap(const QString& userid, const QString& peerid, qint64 msgno);
     Q_INVOKABLE QString serviceInfo();
+    Q_INVOKABLE QString sendCommonReq(const QStringList& kvs, bool isC1NotC2);
 
 signals:
     void sigReady();
@@ -73,6 +74,7 @@ private:
 
     txdata::ConnectionInfo m_ownInfo;
     txdata::ConnectionInfo m_parentInfo;
+    QSharedPointer<txdata::PathwayInfo> m_PathwayInfo;
 
     QSqlDatabase m_db;
     KeyValue     m_MsgNo;

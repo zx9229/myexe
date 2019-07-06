@@ -288,3 +288,87 @@ bool zxtools::needTTS(const PushWrap* src, QString& text)
     }
     return isTTS;
 }
+
+QMap<QString, QString> zxtools::fromOddEven(const QStringList& kvs)
+{
+    QMap<QString, QString> dstMap;
+    do
+    {
+        if (kvs.size() % 2)
+        {
+            dstMap.clear();
+            break;
+        }
+        for (int i = 0; i < kvs.size() / 2; i++)
+        {
+            if (dstMap.count(kvs.at(2 * i)))
+            {
+                dstMap.clear();
+                break;
+            }
+            dstMap.insert(kvs.at(2 * i), kvs.at(2 * i + 1));
+        }
+    } while (false);
+    return dstMap;
+}
+
+QString zxtools::map2Common1Req(txdata::Common1Req* dst, const QMap<QString, QString>& src)
+{
+    QString message;
+    do
+    {
+        ::txdata::MsgType tmpMsgType = ::txdata::MsgType::Zero1;
+        std::string tmpMsgData;
+        if (!zxtools::json2binary(src.value("ReqType"), src.value("ReqData"), tmpMsgType, tmpMsgData))
+        {
+            message = "json2binary fail";
+            break;
+        }
+        dst->set_msgno(src.value("MsgNo").toLongLong());
+        dst->set_seqno(src.value("SeqNo").toInt());
+        dst->set_batchno(src.value("BatchNo").toLong());
+        dst->set_refnum(src.value("RefNum").toLong());
+        dst->set_reftext(src.value("RefText").toStdString());
+        dst->set_senderid(src.value("SenderID").toStdString());
+        dst->set_recverid(src.value("RecverID").toStdString());
+        dst->set_toroot(src.value("ToRoot").toInt() != 0);
+        dst->set_islog(src.value("IsLog").toInt() != 0);
+        dst->set_ispush(src.value("IsPush").toInt() != 0);
+        dst->set_reqtype(tmpMsgType);
+        dst->set_reqdata(tmpMsgData);
+        zxtools::qdt2gpt(*dst->mutable_reqtime(), QDateTime::fromString(src.value("ReqTime"), "yyyy-MM-dd hh:mm:ss"));
+    } while (false);
+    return message;
+}
+
+QString zxtools::map2Common2Req(txdata::Common2Req* dst, const QMap<QString, QString>& src)
+{
+    QString message;
+    do
+    {
+        ::txdata::MsgType tmpMsgType = ::txdata::MsgType::Zero1;
+        std::string tmpMsgData;
+        if (!zxtools::json2binary(src.value("ReqType"), src.value("ReqData"), tmpMsgType, tmpMsgData))
+        {
+            message = "json2binary fail";
+            break;
+        }
+        dst->mutable_key()->set_userid(src.value("UserID").toStdString());
+        dst->mutable_key()->set_msgno(src.value("MsgNo").toLongLong());
+        dst->mutable_key()->set_seqno(src.value("SeqNo").toInt());
+        dst->set_batchno(src.value("BatchNo").toLong());
+        dst->set_refnum(src.value("RefNum").toLong());
+        dst->set_reftext(src.value("RefText").toStdString());
+        dst->set_senderid(src.value("SenderID").toStdString());
+        dst->set_recverid(src.value("RecverID").toStdString());
+        dst->set_toroot(src.value("ToRoot").toInt() != 0);
+        dst->set_islog(src.value("IsLog").toInt() != 0);
+        dst->set_issafe(src.value("IsSafe").toInt() != 0);
+        dst->set_ispush(src.value("IsPush").toInt() != 0);
+        dst->set_upcache(src.value("UpCache").toInt() != 0);
+        dst->set_reqtype(tmpMsgType);
+        dst->set_reqdata(tmpMsgData);
+        zxtools::qdt2gpt(*dst->mutable_reqtime(), QDateTime::fromString(src.value("ReqTime"), "yyyy-MM-dd hh:mm:ss"));
+    } while (false);
+    return message;
+}

@@ -10,6 +10,7 @@ Item {
     signal sigShowNodeRequest(string PeerID)
     signal sigShowNodeReqRsp(string UserID, string MsgNo)
     signal sigShowSystemSettings()
+    signal sigShowCommonRequest()
     //The var type is a generic property type that can refer to any data type.
     property var userID: undefined
     property var peerID: undefined
@@ -85,6 +86,11 @@ Item {
                 txtText: qsTr("")
                 btnText: qsTr("登录页面")
                 onSigClicked: sigShowLogin()
+            }
+            HomePageComponent{
+                txtText: qsTr("")
+                btnText: qsTr("C1C2")
+                onSigClicked: sigShowCommonRequest()
             }
         }
         Rectangle {

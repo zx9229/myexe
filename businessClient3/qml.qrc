@@ -12,5 +12,6 @@
         <file>RefreshView.qml</file>
         <file>ServiceStatus.qml</file>
         <file>SystemSettings.qml</file>
+        <file>CommonRequest.qml</file>
     </qresource>
 </RCC>

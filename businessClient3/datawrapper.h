@@ -32,6 +32,7 @@ public Q_SLOTS:
     Q_INVOKABLE QString remoteObjectState();
     Q_INVOKABLE void    startTheService();
     Q_INVOKABLE void    copyText(const QString& text);
+    Q_INVOKABLE QString sendCommonReq(const QStringList& kvs, bool isC1NotC2);
 signals:
     void sigReady();
     void sigStatusError(const QString & errMessage, int errType);

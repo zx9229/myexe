@@ -287,6 +287,20 @@ void DataWrapper::copyText(const QString& text)
     clipboard->setText(text, QClipboard::Mode::Clipboard);//设置剪贴板内容.
 }
 
+QString DataWrapper::sendCommonReq(const QStringList& kvs, bool isC1NotC2)
+{
+    if (m_daExch)
+    {
+        return m_daExch->sendCommonReq(kvs, isC1NotC2);
+    }
+    else
+    {
+        auto reply = m_client->sendCommonReq(kvs, isC1NotC2);
+        reply.waitForFinished();
+        return reply.returnValue();
+    }
+}
+
 void DataWrapper::ttsSpeak(const QString & text)
 {
     MyTTS::staticSpeak(text);

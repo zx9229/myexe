@@ -76,3 +76,7 @@ QString DataROSvr::serviceInfo()
 {
     return m_dataExch.serviceInfo();
 }
+QString DataROSvr::sendCommonReq(const QStringList& kvs, bool isC1NotC2)
+{
+    return m_dataExch.sendCommonReq(kvs, isC1NotC2);
+}
