@@ -32,14 +32,14 @@ Item {
                     Controls1.RadioButton {
                         exclusiveGroup: common1Req_common2Req
                         id: rbC1Req
-                        text: qsTr("Common11Req")
+                        text: qsTr("C1Req")
                         checked: true
                         onClicked: {}
                     }
                     Controls1.RadioButton {
                         exclusiveGroup: common1Req_common2Req
                         id: rbC2Req
-                        text: qsTr("Common12Req")
+                        text: qsTr("C2Req")
                         onClicked: {}
                     }
                 }
@@ -181,7 +181,7 @@ Item {
             }
             Controls1.CheckBox {
                 id: cbToRoot
-                text: "(叶子节点=>子节点=>根节点)"
+                text: "(叶子=>子节点=>根)"
                 Layout.fillWidth: true
                 checked: true
                 onClicked: cbToRoot.checked = cbToRoot_cb.checked || cbToRoot.checked
