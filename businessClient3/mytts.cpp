@@ -31,6 +31,7 @@ void MyTTS::speak(const QString& text)
 #ifdef Q_OS_ANDROID
     android_tool::ttsSpeak(text);
 #else
+    m_tts->stop();
     m_tts->say(text);
 #endif
 }
