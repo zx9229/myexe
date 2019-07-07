@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.4
+import QtQuick.Controls 1.4 as Controls1
 import QtQuick.Layouts 1.3
 import MySqlTableModel 0.1
 
@@ -147,40 +148,40 @@ Item {
         }
     }
 
-    Menu {
+    Controls1.Menu {
         id: menu
         property var userid: undefined
         property var msgno : undefined
         property var seqno: undefined
         property var jsonText : undefined
-        MenuItem {
+        Controls1.MenuItem {
             text: "复制"
             onTriggered: dataExch.copyText(jsonText)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "删除整个MsgNo"
             onTriggered: dataExch.deleteCommonData1(menu.userid,menu.msgno)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "删除单个SeqNo"
             onTriggered: dataExch.deleteCommonData2(menu.userid,menu.msgno,menu.seqno)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "TTS朗读json"
             onTriggered: dataExch.ttsSpeak(menu.jsonText)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "TTS朗读json.Subject"
             onTriggered: {
                 var jsonObj = JSON.parse(menu.jsonText);
                 dataExch.ttsSpeak(jsonObj.Subject)
             }
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "TTS朗读json.Content"
             onTriggered: {
                 var jsonObj = JSON.parse(menu.jsonText);

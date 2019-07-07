@@ -254,22 +254,22 @@ Item {
         }
     }
 
-    Menu {
+    Controls1.Menu {
         id: menu
         property var userid: undefined
         property var msgno : undefined
         property var jsonText : undefined
-        MenuItem {
+        Controls1.MenuItem {
             text: "复制"
             onTriggered: dataExch.copyText(jsonText)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "删除整个MsgNo"
             onTriggered: dataExch.deleteCommonData1(menu.userid,menu.msgno)
             visible: true
         }
-        MenuItem {
+        Controls1.MenuItem {
             text: "TTS朗读json"
             onTriggered: dataExch.ttsSpeak(menu.jsonText)
             visible: true
