@@ -94,7 +94,7 @@ type businessNode struct {
 	ownMsgNo    int64
 	chanSync    chan string //哪个UserID连通了,就投递过来一个信号.
 	pathinfo    *txdata.PathwayInfo
-	spacer      freeSpace
+	spaceChker  *StorageSpaceChecker
 }
 
 func newBusinessNode(cfg *configNode) *businessNode {
@@ -139,6 +139,7 @@ func newBusinessNode(cfg *configNode) *businessNode {
 	curData.cAQZXJG = newSafeSynchCacheRoot(curData.xEngine, curData.chanDB)
 	curData.cachePush = newSafePushCache(curData.xEngine, curData.chanDB)
 	curData.cacheSub = newSafeSubscriberMap(curData.cachePush)
+	curData.spaceChker = newStorageSpaceChecker(cfg.DataSourceName, 1024*1024*1)
 	//
 	curData.refreshMsgNo()
 	//
@@ -562,7 +563,7 @@ func (thls *businessNode) handle_MsgType_ID_Common2Req(msgData *txdata.Common2Re
 	//	}
 	//}
 
-	if !msgData.UpCache && !thls.spacer.available() {
+	if !msgData.UpCache && !thls.spaceChker.available() {
 		glog.Errorf("space, msgData=%v", msgData)
 		thls.reportErrorMsg("Insufficient available space")
 		if msgData.IsSafe {
