@@ -23,7 +23,7 @@ public class ZxTTS implements TextToSpeech.OnInitListener
     public void onInit(int status) {
         Log.v(TAG, MessageFormat.format("onInit, status={0}, SUCCESS={1}", TTS, TextToSpeech.SUCCESS));
         if (status == TextToSpeech.SUCCESS) {}
-        if (true) {
+        if (false) {//它是将系统级别的媒体音量调至最大.
             AudioManager am = (AudioManager)m_ctx.getSystemService(Context.AUDIO_SERVICE);
             int amMusicStreamMaxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             am.setStreamVolume(AudioManager.STREAM_MUSIC, amMusicStreamMaxVolume, 0);
