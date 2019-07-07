@@ -31,6 +31,7 @@ type DbCommonReqRsp struct {
 	TxTime     time.Time
 	IsLast     bool
 	InsertTime time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	TmpTag     int32     `xorm:"notnull"` //临时用途的标签(0:默认值;1:仅插入数据库,不做同步用途;)
 }
 
 func (thls *DbCommonReqRsp) insertOneResult(affected int64, err error) (isExist, isInsert bool) {
@@ -53,7 +54,7 @@ func (thls *DbCommonReqRsp) insertOneResult(affected int64, err error) (isExist,
 }
 
 //FromC2Req omit
-func (thls *DbCommonReqRsp) FromC2Req(src *txdata.Common2Req) {
+func (thls *DbCommonReqRsp) FromC2Req(src *txdata.Common2Req, tmpTag int32) {
 	thls.MsgType = CalcMessageIndex(src)
 	thls.UserID = src.Key.UserID
 	thls.MsgNo = src.Key.MsgNo
@@ -73,10 +74,11 @@ func (thls *DbCommonReqRsp) FromC2Req(src *txdata.Common2Req) {
 	thls.TxTime, _ = ptypes.Timestamp(src.ReqTime)
 	//thls.IsLast = src.IsLast
 	//thls.InsertTime = src.InsertTime
+	thls.TmpTag = tmpTag
 }
 
 //FromC2Rsp omit
-func (thls *DbCommonReqRsp) FromC2Rsp(src *txdata.Common2Rsp) {
+func (thls *DbCommonReqRsp) FromC2Rsp(src *txdata.Common2Rsp, tmpTag int32) {
 	thls.MsgType = CalcMessageIndex(src)
 	thls.UserID = src.Key.UserID
 	thls.MsgNo = src.Key.MsgNo
@@ -96,6 +98,7 @@ func (thls *DbCommonReqRsp) FromC2Rsp(src *txdata.Common2Rsp) {
 	thls.TxTime, _ = ptypes.Timestamp(src.RspTime)
 	thls.IsLast = src.IsLast
 	//thls.InsertTime = src.InsertTime
+	thls.TmpTag = tmpTag
 }
 
 //To omit

@@ -26,7 +26,7 @@ func newSafeSynchCacheRoot(engine *xorm.Engine, dbc chan *DbOp) *safeSynchCacheR
 }
 
 //insertData 入参uniKey是入参pm的一个数据成员.
-func (thls *safeSynchCacheRoot) insertData(uniKey *txdata.UniKey, toR bool, rID string, pm ProtoMessage) (isExist, isInsert bool) {
+func (thls *safeSynchCacheRoot) insertData(uniKey *txdata.UniKey, toR bool, rID string, pm ProtoMessage, tmpTag int32) (isExist, isInsert bool) {
 	//isExist, isInsert
 	//true   , false    (已经存在了,肯定插不进去)
 	//false  , true
@@ -37,6 +37,7 @@ func (thls *safeSynchCacheRoot) insertData(uniKey *txdata.UniKey, toR bool, rID 
 		node.ToRoot = toR
 		node.RecverID = rID
 		node.data = pm
+		node.TmpFlag = tmpTag
 		thls.Lock()
 		if _, isExist = thls.M[node.Key]; !isExist {
 			thls.M[node.Key] = node
@@ -49,10 +50,10 @@ func (thls *safeSynchCacheRoot) insertData(uniKey *txdata.UniKey, toR bool, rID 
 		action.handler = func(session *xorm.Session, dbop *DbOp) {
 			temp := &DbCommonReqRspRoot{}
 			if c2req, isOk := dbop.pm.(*txdata.Common2Req); isOk {
-				temp.FromC2Req(c2req)
+				temp.FromC2Req(c2req, tmpTag)
 				dbop.affected, dbop.err = session.Insert(temp)
 			} else if c2rsp, isOk := dbop.pm.(*txdata.Common2Rsp); isOk {
-				temp.FromC2Rsp(c2rsp)
+				temp.FromC2Rsp(c2rsp, tmpTag)
 				dbop.affected, dbop.err = session.Insert(temp)
 			} else {
 				dbop.affected = 0

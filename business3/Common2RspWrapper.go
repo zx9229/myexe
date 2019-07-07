@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang/glog"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/zx9229/myexe/txdata"
 	"github.com/zx9229/myexe/wsnet"
@@ -18,11 +19,12 @@ type Common2RspWrapper struct {
 	rspIdx  int32
 	reqData *txdata.Common2Req
 	cache   *safeSynchCache
+	cacheR  *safeSynchCacheRoot
 	zzzxml  *safeUniSymCache
 }
 
-func newCommon2RspWrapper(req *txdata.Common2Req, cache *safeSynchCache, zzzxml *safeUniSymCache, upCache bool, conn *wsnet.WsSocket) *Common2RspWrapper {
-	return &Common2RspWrapper{upCache: upCache, conn: conn, cache: cache, zzzxml: zzzxml, reqData: req}
+func newCommon2RspWrapper(req *txdata.Common2Req, cache *safeSynchCache, cacheR *safeSynchCacheRoot, zzzxml *safeUniSymCache, upCache bool, conn *wsnet.WsSocket) *Common2RspWrapper {
+	return &Common2RspWrapper{upCache: upCache, conn: conn, cache: cache, cacheR: cacheR, zzzxml: zzzxml, reqData: req}
 }
 
 //doRemainder 把剩余的事情做完. 执行(善后/清理)工作.
@@ -59,10 +61,15 @@ func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	if !thls.reqData.IsPush {
 		if curRspData.IsSafe {
 			var isExist, isInsert bool
-			isExist, isInsert = thls.cache.insertData(curRspData.Key, curRspData.ToRoot, curRspData.RecverID, &curRspData)
+			isExist, isInsert = thls.cache.insertData(curRspData.Key, curRspData.ToRoot, curRspData.RecverID, &curRspData, 0)
 			assert4false(isExist) //一定不会存在.
 			if !isInsert {
+				glog.Errorf("isExist=%v, isInsert=%v, msgData=%v", isExist, isInsert, curRspData)
 				return false
+			}
+			if thls.cacheR != nil {
+				isExist, isInsert = thls.cacheR.insertData(curRspData.Key, curRspData.ToRoot, curRspData.RecverID, &curRspData, 0)
+				assert4true(!isExist && isInsert)
 			}
 		}
 		thls.conn.Send(msg2package(&curRspData))
@@ -70,14 +77,15 @@ func (thls *Common2RspWrapper) sendDataWithoutLock(data ProtoMessage, isLast boo
 	thls.rspIdx = curRspData.Key.SeqNo
 	thls.isLast = curRspData.IsLast
 	if thls.isLast && thls.reqData.IsSafe {
-		isOk := thls.zzzxml.deleteData(thls.reqData.Key)
-		assert4true(isOk)
+		thls.cache.deleteData(thls.reqData.Key)
+		//isOk := thls.zzzxml.deleteData(thls.reqData.Key)
+		//assert4true(isOk)
 	}
 
 	return true
 }
 
-func (thls *Common2RspWrapper) sendData1(data ProtoMessage, isLast bool) bool {
+func (thls *Common2RspWrapper) sendData(data ProtoMessage, isLast bool) bool {
 	thls.Lock()
 	defer thls.Unlock()
 	if thls.isLast {

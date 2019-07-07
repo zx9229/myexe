@@ -147,7 +147,7 @@ func (thls *safeConnInfoMap) toPathwayInfo(uid string) (msgData *txdata.PathwayI
 	msgData.Info = make(map[string]*txdata.PathwayInfo_Pathway)
 	toPath := func(ciEx *connInfoEx) *txdata.PathwayInfo_Pathway {
 		tmpPath := &txdata.PathwayInfo_Pathway{}
-		tmpPath.Data = append([]string{uid}, ciEx.Pathway...)
+		tmpPath.Data = append(ciEx.Pathway, uid)
 		return tmpPath
 	}
 	msgData.Info[uid] = &txdata.PathwayInfo_Pathway{Data: []string{uid}}
