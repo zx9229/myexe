@@ -1,6 +1,7 @@
 package zx.qtproject.example;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import java.text.MessageFormat;
@@ -22,6 +23,11 @@ public class ZxTTS implements TextToSpeech.OnInitListener
     public void onInit(int status) {
         Log.v(TAG, MessageFormat.format("onInit, status={0}, SUCCESS={1}", TTS, TextToSpeech.SUCCESS));
         if (status == TextToSpeech.SUCCESS) {}
+        if (true) {
+            AudioManager am = (AudioManager)m_ctx.getSystemService(Context.AUDIO_SERVICE);
+            int amMusicStreamMaxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, amMusicStreamMaxVolume, 0);
+        }
     }
     public boolean speak(final String text) {
         //public int speak (String text, int queueMode, HashMap<String, String> params) // Deprecated in API level 21
