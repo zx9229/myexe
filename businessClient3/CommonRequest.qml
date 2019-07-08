@@ -12,9 +12,10 @@ Item {
         cbReqType.autoFillData()
     }
 
-    Controls1.ScrollView {
+    ScrollView {
         id: scrollView
         anchors.fill: parent
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         GridLayout {
             id: gridLayout
             Layout.fillHeight: true
