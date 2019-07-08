@@ -5,7 +5,7 @@ import QtQuick.Controls 2.4
 Window {
     visible: true
     width: 324
-    height: 702
+    height: 672
     title: qsTr("MyHelloWorld")
     color: "silver"
 
