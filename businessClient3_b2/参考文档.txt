@@ -1,0 +1,37 @@
+===============================================================================
+qml 使用 GridLayout 做一个简单的metro风格界面
+http://blog.sina.com.cn/s/blog_537517170102ww3n.html
+===============================================================================
+QML 与 C++交互 - 02 QML访问C++对象的属性与函数
+https://blog.csdn.net/baidu_33850454/article/details/81914821
+===============================================================================
+C++与QML交互，把C++对象特性暴露到QML中
+https://blog.csdn.net/weixin_39187443/article/details/78020470
+===============================================================================
+【svn\money\trunk\Solutions\ZClient\TestTable\】
+setTable(
+setFilter(
+selectStatement()
+QSqlTableModel::select()
+=======================================
+connect(m_pDataExchanger, SIGNAL(
+connect(m_pDataExchanger, SIGNAL(sigUpdatePflPos(
+emit sigUpdatePflPos(pid);
+===============================================================================
+QML使用Sqlite数据库
+https://blog.csdn.net/clinuxf/article/details/80169331
+===============================================================================
+TableView - Qt Blog
+https://blog.qt.io/blog/2018/08/29/tableview/
+===============================================================================
+TableView QML Type | Qt Quick 5.12.3
+https://doc.qt.io/qt-5.12/qml-qtquick-tableview.html
+===============================================================================
+05-Dec-2018 09:55    2018-12-05
+===============================================================================
+Using C++ Models with Qt Quick Views | Qt Quick 5.12.3
+https://doc.qt.io/qt-5/qtquick-modelviewsdata-cppmodels.html
+===============================================================================
+Qt Quick Controls - Table View Example | Qt Quick Controls 5.9
+https://doc-snapshots.qt.io/qt5-5.9/qtquickcontrols-tableview-example.html
+===============================================================================

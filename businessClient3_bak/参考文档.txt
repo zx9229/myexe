@@ -1,0 +1,23 @@
+===============================================================================
+qml 使用 GridLayout 做一个简单的metro风格界面
+http://blog.sina.com.cn/s/blog_537517170102ww3n.html
+===============================================================================
+QML 与 C++交互 - 02 QML访问C++对象的属性与函数
+https://blog.csdn.net/baidu_33850454/article/details/81914821
+===============================================================================
+C++与QML交互，把C++对象特性暴露到QML中
+https://blog.csdn.net/weixin_39187443/article/details/78020470
+===============================================================================
+【svn\money\trunk\Solutions\ZClient\TestTable\】
+setTable(
+setFilter(
+selectStatement()
+QSqlTableModel::select()
+=======================================
+connect(m_pDataExchanger, SIGNAL(
+connect(m_pDataExchanger, SIGNAL(sigUpdatePflPos(
+emit sigUpdatePflPos(pid);
+===============================================================================
+QML使用Sqlite数据库
+https://blog.csdn.net/clinuxf/article/details/80169331
+===============================================================================

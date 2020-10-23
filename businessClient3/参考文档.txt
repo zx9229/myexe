@@ -99,3 +99,15 @@ https://www.cnblogs.com/wangqiang9/p/10595417.html
 Android TTS 支持中文
 https://blog.csdn.net/u012532263/article/details/85338969
 ===============================================================================
+Android TTS volume control
+https://stackoverflow.com/questions/4545874/android-tts-volume-control
+===============================================================================
+android – 如何设置文本到语音“说话”方法的音量？
+https://codeday.me/bug/20190324/821674.html
+===============================================================================
+
+调试界面
+Service启动时刻
+
+在Golang中获取系统的磁盘空间内存占用
+http://wendal.net/2012/1224.html
